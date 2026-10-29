@@ -108,9 +108,10 @@ const live = Boolean(form.turnstileSiteKey && form.endpoint);
             form.querySelectorAll('.field, .turnstile, button[type=submit]').forEach((el) => ((el as HTMLElement).hidden = true));
             return;
           }
-          const err = (await res.json().catch(() => ({}))) as { error?: string };
+          const err = (await res.json().catch(() => ({}))) as { error?: string; detail?: string };
           // Unknown failures show their code, so a problem can be traced.
-          say(ERRORS[err.error ?? ''] ?? `The message could not be sent (${err.error ?? 'error'}, ${res.status}). Please write to ${form.dataset.email}.`);
+          const code = [err.error ?? 'error', err.detail].filter(Boolean).join(': ');
+          say(ERRORS[err.error ?? ''] ?? `The message could not be sent (${code}, ${res.status}). Please write to ${form.dataset.email}.`);
         } catch {
           say(`The message could not be sent. Please write to ${form.dataset.email}.`);
         } finally {
