@@ -28,5 +28,13 @@ await check('wrong hostname', handleContact(req(good), deps({ verify: async () =
 await check('wrong action', handleContact(req(good), deps({ verify: async () => ({ success: true, hostname: 'kuschonink.com', action: 'x' }) })), 403, 'verification_failed');
 await check('siteverify down', handleContact(req(good), deps({ verify: async () => { throw new Error('down'); } })), 503, 'verification_unavailable');
 await check('email error code surfaced', handleContact(req(good), deps({ send: async () => { throw Object.assign(new Error('nope'), { code: 'E_SENDER_NOT_VERIFIED' }); } })), 502, 'delivery_failed');
+await check('email error without code shows its message', handleContact(req(good), deps({ send: async () => { throw new Error('Sender address not allowed'); } })), 502, 'delivery_failed');
 await check('not JSON', handleContact(req(good, 'https://kuschonink.com', 'POST', 'text/plain'), deps()), 415, 'unsupported_media_type');
 console.log(fails ? `${fails} FAILED` : 'all passed');
+
+import { buildMime } from './mime.ts';
+const mime = buildMime({ from: { email: 'noreply@kuschonink.com', name: 'kuschonink.com' }, replyTo: 'ann@example.com', subject: 'kuschonink.com: 你好', text: 'Line 1\nLine 2 é', html: '<p>hi</p>' }, 'to@example.com', 'abc', new Date(0));
+const okMime = mime.includes('From: "kuschonink.com" <noreply@kuschonink.com>\r\n') && mime.includes('To: <to@example.com>') && mime.includes('Reply-To: <ann@example.com>') && /Subject: =\?UTF-8\?B\?[A-Za-z0-9+/=]+\?=/.test(mime) && mime.includes('Message-ID: <abc@kuschonink.com>') && mime.endsWith('--kuschonink-abc--\r\n');
+const body = Buffer.from(mime.split('Content-Transfer-Encoding: base64\r\n\r\n')[1].split('\r\n--')[0].replace(/\r\n/g, ''), 'base64').toString('utf8');
+console.log(okMime && body === 'Line 1\nLine 2 é' ? 'PASS' : 'FAIL', 'raw MIME message is well formed and decodes back');
+if (!(okMime && body === 'Line 1\nLine 2 é')) process.exitCode = 1;

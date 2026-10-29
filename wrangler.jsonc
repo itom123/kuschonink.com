@@ -20,6 +20,7 @@
   "ratelimits": [
     { "name": "CONTACT_LIMIT", "namespace_id": "4242", "simple": { "limit": 5, "period": 60 } }
   ],
+  "vars": { "CONTACT_TO": "Xiangyin.Tom.Gu@gmail.com" },
   // TURNSTILE_SECRET is a secret, set in the dashboard (not in this file).
   "observability": { "enabled": true }
 }

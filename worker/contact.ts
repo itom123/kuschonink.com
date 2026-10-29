@@ -125,7 +125,8 @@ export async function handleContact(request: Request, deps: Deps): Promise<Respo
   try {
     await deps.send(buildEmail(p));
   } catch (e) {
-    const code = (e as { code?: string }).code ?? 'unknown';
+    // Cloudflare's code when there is one, otherwise the start of its message.
+    const code = (e as { code?: string }).code ?? ((e as Error).message || 'unknown').slice(0, 140);
     deps.log('contact: email send failed', code, (e as Error).message);
     return json({ error: 'delivery_failed', detail: code }, 502, origin);
   }
