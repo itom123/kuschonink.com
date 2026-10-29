@@ -1,8 +1,10 @@
 {
   "title": "Gestalt Lost in Time",
+  "titleZh": "迷失于时间的格式塔",
   "order": 11,
   "seo": {
-    "title": "Gestalt Lost in Time — Xiangyin Gu"
+    "title": "Gestalt Lost in Time — Xiangyin Gu",
+    "titleZh": "迷失于时间的格式塔 — Xiangyin Gu"
   },
   "sections": [
     {
@@ -10,11 +12,13 @@
       "blocks": [
         {
           "type": "text",
-          "html": "<h1 class=\"align-center\">Milan Kundera</h1>"
+          "html": "<h1 class=\"align-center\">Milan Kundera</h1>",
+          "htmlZh": "<h1 class=\"align-center\">米兰·昆德拉</h1>"
         },
         {
           "type": "text",
-          "html": "<p class=\"align-center\">Karenin was not overjoyed by the move to Switzerland. Karenin hated change. Dog time cannot be plotted along a straight line; it does not move on and on, from one thing to the next. It moves in a circle like the hands of a clock, which—they, too, unwilling to dash madly ahead—turn round and round the face, day in and day out following the same path. In Prague, when Tomas and Tereza bought a new chair or moved a flower pot, Karenin would look on in displeasure. It disturbed his sense of time. It was as though they were trying to dupe the hands of the clock by changing the numbers on its face.</p>"
+          "html": "<p class=\"align-center\">Karenin was not overjoyed by the move to Switzerland. Karenin hated change. Dog time cannot be plotted along a straight line; it does not move on and on, from one thing to the next. It moves in a circle like the hands of a clock, which—they, too, unwilling to dash madly ahead—turn round and round the face, day in and day out following the same path. In Prague, when Tomas and Tereza bought a new chair or moved a flower pot, Karenin would look on in displeasure. It disturbed his sense of time. It was as though they were trying to dupe the hands of the clock by changing the numbers on its face.</p>",
+          "htmlZh": "<p class=\"align-center\">卡列宁对搬到瑞士并不怎么高兴。卡列宁讨厌变化。狗的时间无法沿着一条直线标绘；它不是从一件事到下一件事那样不停地向前推进。它像钟表的指针一样绕圈运行——指针同样不愿疯狂地向前冲，而是绕着表盘一圈又一圈地转，日复一日沿着同一条路径。在布拉格，每当托马斯和特蕾莎买了一把新椅子，或挪动了一个花盆，卡列宁就会不悦地看着。这扰乱了他的时间感，仿佛他们想通过更换表盘上的数字来愚弄钟表的指针。</p>"
         }
       ]
     },
@@ -28,11 +32,13 @@
         },
         {
           "type": "text",
-          "html": "<h1 class=\"align-center\">It’s okay to grasp, but don’t hold on too tightly.</h1>"
+          "html": "<h1 class=\"align-center\">It’s okay to grasp, but don’t hold on too tightly.</h1>",
+          "htmlZh": "<h1 class=\"align-center\">可以抓住，但别握得太紧。</h1>"
         },
         {
           "type": "text",
-          "html": "<p class=\"align-center\">Gestalt Lost in Time</p>"
+          "html": "<p class=\"align-center\">Gestalt Lost in Time</p>",
+          "htmlZh": "<p class=\"align-center\">迷失于时间的格式塔</p>"
         }
       ]
     },

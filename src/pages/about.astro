@@ -1,11 +1,20 @@
 ---
 import Win98 from '../layouts/Win98.astro';
 import Section from '../components/Section.astro';
+import Bi from '../components/Bi.astro';
 import { about as page, site } from '../lib/content';
 import { roomForPage } from '../lib/house';
+import { t, floorZh } from '../lib/i18n';
 const room = roomForPage('about');
+const title = { en: page.title, zh: page.titleZh ?? t.about.zh };
 ---
-<Win98 seo={page.seo} title={page.title} address={`C:\\kuschonink\\about.txt`} houseHref={room ? `/house/${room.slug}` : '/house'} status={room ? `In the house: ${room.en}, ${room.floor.name.toLowerCase()}` : site.name}>
-  <h1>{page.title}</h1>
+<Win98
+  seo={page.seo}
+  title={title}
+  address={`C:\\kuschonink\\about.txt`}
+  houseHref={room ? `/house/${room.slug}` : '/house'}
+  status={room ? { en: `In the house: ${room.en}, ${room.floor.name.toLowerCase()}`, zh: `在房子里：${floorZh(room.floor.zh)}${room.zh}` } : { en: site.name, zh: site.name }}
+>
+  <h1><Bi t={title} /></h1>
   {page.sections.map((s, i) => <Section section={s} first={i === 0} />)}
 </Win98>

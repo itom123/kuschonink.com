@@ -4,11 +4,13 @@ import Win98 from '../layouts/Win98.astro';
 import { home, projects, imagesOf, site } from '../lib/content';
 import { img } from '../lib/images';
 import { roomForProject } from '../lib/house';
+import Bi from '../components/Bi.astro';
+import { t, attr, floorZh, seoTitle } from '../lib/i18n';
 import type { Seo } from '../lib/types';
 
 // The simple view's Projects window. Rendered at / (the default view) and /image.
 interface Props { seo?: Seo }
-const { seo = { title: `Projects — ${site.name}`, description: home.seo.description } } = Astro.props;
+const { seo = { ...seoTitle(t.projects, site.name), description: home.seo.description } } = Astro.props;
 
 const items = await Promise.all(
   projects.map(async (p) => {
@@ -24,27 +26,29 @@ const items = await Promise.all(
       videos: blocks.filter((b) => b.type === 'video').length,
       room,
       source: room?.constraints.find((c) => c.list === 'source')?.value ?? '',
+      sourceZh: room?.constraints.find((c) => c.list === 'source')?.valueZh ?? '',
     };
   }),
 );
 ---
-<Win98 seo={seo} title="Projects" address="C:\kuschonink\image" status={`${projects.length} object(s)`}>
-  <h1>Projects</h1>
-  <p>All work by {site.name}. <a href="/image/all">See every project on one page</a>, or <a href="/house/facade">walk through the house</a>.</p>
+<Win98 seo={seo} title={t.projects} address="C:\kuschonink\image" status={{ en: `${projects.length} object(s)`, zh: `${projects.length} 个对象` }}>
+  <h1><Bi t={t.projects} /></h1>
+  <p data-l="en">All work by {site.name}. <a href="/image/all">See every project on one page</a>, or <a href="/house/facade">walk through the house</a>.</p>
+  <p data-l="zh" lang="zh-Hans">{site.name}的全部作品。<a href="/image/all">在一页上查看所有作品</a>，或者<a href="/house/facade">走进这座房子</a>。</p>
 
-  <div class="view-switch" role="radiogroup" aria-label="View">
+  <div class="view-switch" role="radiogroup" {...attr('aria-label', t.view)}>
     <input type="radio" name="view" id="view-icons" class="view-radio-icons" checked />
-    <label for="view-icons">Large icons</label>
+    <label for="view-icons"><Bi t={t.largeIcons} /></label>
     <input type="radio" name="view" id="view-details" class="view-radio-details" />
-    <label for="view-details">Details</label>
+    <label for="view-details"><Bi t={t.details} /></label>
 
     <ul class="explorer view-icons">
       {items.map(({ p, thumb, images }) => (
         <li>
           <a href={`/image/${p.slug}`}>
             <img class="thumb" src={thumb} alt="" width="140" height="105" loading="lazy" />
-            <span class="name">{p.title}</span>
-            <span class="meta">{images} image{images === 1 ? '' : 's'}</span>
+            <span class="name"><Bi t={{ en: p.title, zh: p.titleZh ?? '' }} /></span>
+            <span class="meta"><Bi t={{ en: `${images} image${images === 1 ? '' : 's'}`, zh: `${images} 张图片` }} /></span>
           </a>
         </li>
       ))}
@@ -54,34 +58,34 @@ const items = await Promise.all(
       <table class="interactive details" data-sortable>
         <thead>
           <tr>
-            <th data-sort="text">Name</th>
-            <th data-sort="text">Room</th>
-            <th data-sort="text">Floor</th>
-            <th data-sort="num">Chapter</th>
-            <th data-sort="num">Images</th>
-            <th data-sort="num">Texts</th>
-            <th data-sort="num">Videos</th>
-            <th data-sort="text">Source (dealt)</th>
+            <th data-sort="text"><Bi t={t.name} /></th>
+            <th data-sort="text"><Bi t={t.room} /></th>
+            <th data-sort="text"><Bi t={t.floor} /></th>
+            <th data-sort="num"><Bi t={t.chapterCol} /></th>
+            <th data-sort="num"><Bi t={t.images} /></th>
+            <th data-sort="num"><Bi t={t.texts} /></th>
+            <th data-sort="num"><Bi t={t.videos} /></th>
+            <th data-sort="text"><Bi t={t.sourceDealt} /></th>
           </tr>
         </thead>
         <tbody>
-          {items.map(({ p, images, texts, videos, room, source }) => (
+          {items.map(({ p, images, texts, videos, room, source, sourceZh }) => (
             <tr>
-              <td><a href={`/image/${p.slug}`}>{p.title}</a></td>
-              <td>{room ? <a href={`/house/${room.slug}`}>{room.en}{room.zh && ` ${room.zh}`}</a> : ''}</td>
-              <td>{room?.floor.name ?? ''}</td>
+              <td><a href={`/image/${p.slug}`}><Bi t={{ en: p.title, zh: p.titleZh ?? '' }} /></a></td>
+              <td>{room ? <a href={`/house/${room.slug}`}><Bi t={{ en: room.en, zh: room.zh }} /></a> : ''}</td>
+              <td>{room ? <Bi t={{ en: room.floor.name, zh: floorZh(room.floor.zh) }} /> : ''}</td>
               <td>{room?.chapter ?? ''}</td>
               <td>{images}</td>
               <td>{texts}</td>
               <td>{videos}</td>
-              <td>{source}</td>
+              <td><Bi t={{ en: source, zh: sourceZh }} /></td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
   </div>
-  <p class="classify-note"><small>The house collects; this window classifies.</small></p>
+  <p class="classify-note"><small><Bi t={t.classify} /></small></p>
 </Win98>
 
 <script>
@@ -99,7 +103,8 @@ const items = await Promise.all(
         const num = th.dataset.sort === 'num';
         const rows = [...table.tBodies[0].rows];
         rows.sort((a, b) => {
-          const x = a.cells[i].textContent!.trim(), y = b.cells[i].textContent!.trim();
+          const text = (c: HTMLTableCellElement) => (c.querySelector(`[data-l="${document.documentElement.dataset.lang === 'zh' ? 'zh' : 'en'}"]`) ?? c).textContent!.trim();
+          const x = text(a.cells[i]), y = text(b.cells[i]);
           const d = num ? Number(x) - Number(y) : x.localeCompare(y);
           return asc ? d : -d;
         });

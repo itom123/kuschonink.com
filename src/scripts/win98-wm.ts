@@ -3,6 +3,8 @@
 // be open at once. Each window loads a simple-view page into itself. On phones and
 // narrow screens nothing here runs: pages stay plain links.
 
+import { applyLang, getLang } from './lang';
+
 const DESKTOP = '(min-width: 900px) and (hover: hover) and (pointer: fine)';
 // Pages of the simple view. Anything else (the house) is a normal page load.
 const SIMPLE = /^\/(?:image(?:\/[^/]+)?|about|contact)?$/;
@@ -15,7 +17,7 @@ type Win = {
   el: HTMLElement;
   task: HTMLButtonElement;
   url: string;
-  docTitle: string;
+  titles: { en: string; zh: string };
   prefix: string;
   max: boolean;
   min: boolean;
@@ -34,8 +36,17 @@ const seenStyles = new Set<string>();
 const desk = () => ({ w: window.innerWidth, h: window.innerHeight - TASKBAR });
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 const winOf = (n: Element | null) => wins.find((w) => n && w.el.contains(n));
-const titleText = (doc: Document | HTMLElement) => doc.querySelector('.title-bar-text')?.textContent?.trim() ?? 'Window';
-const shortTitle = (t: string) => t.split(' — ')[0];
+// The window's name without " — site name", in both languages (the 中/EN toggle picks one).
+function shortTitle(bar: Element | null) {
+  const c = (bar?.cloneNode(true) ?? document.createTextNode('Window')) as Element;
+  const last = c.lastChild;
+  if (last?.nodeType === Node.TEXT_NODE) last.textContent = last.textContent!.replace(/\s*—[^—]*$/, '');
+  return c instanceof Element ? c.innerHTML : c.textContent ?? '';
+}
+const pageTitles = (doc: Document) => {
+  const en = doc.querySelector<HTMLMetaElement>('meta[name="title-en"]')?.content || doc.title;
+  return { en, zh: doc.querySelector<HTMLMetaElement>('meta[name="title-zh"]')?.content || en };
+};
 // / and /image show the same Projects window.
 const pathOf = (url: string) => { const p = new URL(url, location.href).pathname; return p === '/image' ? '/' : p; };
 
@@ -50,11 +61,42 @@ function setBox(w: Win, b: Box) {
 }
 const boxOf = (w: Win): Box => ({ l: w.el.offsetLeft, t: w.el.offsetTop, w: w.el.offsetWidth, h: w.el.offsetHeight });
 
+// Button names in both languages. 98.css draws the icons from the classes, so they
+// stay when the 中/EN toggle changes the aria-label.
+const LABELS = {
+  min: { en: 'Minimize', zh: '最小化' },
+  max: { en: 'Maximize', zh: '最大化' },
+  restore: { en: 'Restore', zh: '还原' },
+  close: { en: 'Close', zh: '关闭' },
+};
+function label(b: HTMLElement, k: keyof typeof LABELS) {
+  b.dataset.ariaLabelEn = LABELS[k].en;
+  b.dataset.ariaLabelZh = LABELS[k].zh;
+  b.setAttribute('aria-label', LABELS[k][getLang()]);
+}
 function controls() {
   const c = document.createElement('div');
   c.className = 'title-bar-controls';
-  c.innerHTML = '<button type="button" aria-label="Minimize" data-wm="min"></button><button type="button" aria-label="Maximize" data-wm="max"></button><button type="button" aria-label="Close" data-wm="close"></button>';
+  for (const [k, cls] of [['min', 'minimize'], ['max', 'maximize'], ['close', 'close']] as const) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = cls;
+    b.dataset.wm = k;
+    label(b, k);
+    c.appendChild(b);
+  }
   return c;
+}
+
+function showTitle(w: Win) {
+  const meta = (l: 'en' | 'zh') => {
+    let m = document.querySelector<HTMLMetaElement>(`meta[name="title-${l}"]`);
+    if (!m) { m = document.createElement('meta'); m.name = `title-${l}`; document.head.appendChild(m); }
+    m.content = w.titles[l];
+  };
+  meta('en');
+  meta('zh');
+  document.title = w.titles[getLang()];
 }
 
 function focus(w: Win | null) {
@@ -67,7 +109,7 @@ function focus(w: Win | null) {
   w.el.style.zIndex = String(++z);
   // The address bar follows the window in front, so a reload or a shared link opens it.
   if (location.pathname + location.hash !== w.url) history.replaceState(null, '', w.url);
-  document.title = w.docTitle;
+  showTitle(w);
 }
 
 function topmost(except?: Win) {
@@ -92,12 +134,14 @@ function toggleMax(w: Win) {
     w.max = false;
     w.el.classList.remove('maximized');
     if (w.restore) setBox(w, w.restore);
-    btn.setAttribute('aria-label', 'Maximize');
+    btn.className = 'maximize';
+    label(btn, 'max');
   } else {
     w.restore = boxOf(w);
     w.max = true;
     w.el.classList.add('maximized');
-    btn.setAttribute('aria-label', 'Restore');
+    btn.className = 'restore';
+    label(btn, 'restore');
   }
   focus(w);
 }
@@ -158,19 +202,18 @@ async function load(w: Win, href: string) {
     const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
     const body = doc.querySelector('.main-window .window-body');
     if (!body) throw new Error('not a simple-view page');
-    const title = titleText(doc);
-    w.el.querySelector('.title-bar-text')!.textContent = title;
-    w.el.setAttribute('aria-label', shortTitle(title));
-    w.task.textContent = shortTitle(title);
-    w.task.title = title;
+    const bar = doc.querySelector('.main-window .title-bar-text');
+    w.el.querySelector('.title-bar-text')!.innerHTML = bar?.innerHTML ?? '';
+    w.task.innerHTML = shortTitle(bar);
     const wb = w.el.querySelector<HTMLElement>('.window-body')!;
     wb.innerHTML = body.innerHTML;
     prefixIds(wb, w.prefix);
     w.url = url.pathname + url.hash;
-    w.docTitle = doc.title;
+    w.titles = pageTitles(doc);
     adopt(doc);
-    // Page scripts (galleries, the contact form, sorting) set up anything new.
+    // Page scripts (galleries, the contact form, sorting, the language) set up anything new.
     document.dispatchEvent(new Event('astro:page-load'));
+    applyLang(w.el);
     scrollToHash(w, url.hash);
     if (active === w) focus(w);
   } catch {
@@ -184,11 +227,14 @@ function makeWin(el: HTMLElement, url: string, prefix: string): Win {
   const task = document.createElement('button');
   task.type = 'button';
   task.className = 'task-btn';
-  const w: Win = { el, task, url, docTitle: document.title, prefix, max: false, min: false };
-  const title = titleText(el);
-  task.textContent = shortTitle(title);
-  task.title = title;
-  el.setAttribute('aria-label', shortTitle(title));
+  const w: Win = { el, task, url, titles: pageTitles(document), prefix, max: false, min: false };
+  const name = el.querySelector('.title-bar-text');
+  task.innerHTML = shortTitle(name);
+  // The window is named by its title bar.
+  if (name) {
+    name.id = `wm-title-${seq}`;
+    el.setAttribute('aria-labelledby', name.id);
+  }
   task.addEventListener('click', () => {
     if (w.min) restore(w);
     else if (active === w) minimize(w);
@@ -243,7 +289,7 @@ function open(href: string) {
   const prefix = `w${++seq}-`;
   const el = document.createElement('section');
   el.className = 'window wm-window';
-  el.innerHTML = '<div class="title-bar"><div class="title-bar-text">Loading…</div></div><div class="window-body"><div class="page sunken-panel"><p>Please wait…</p></div></div>';
+  el.innerHTML = '<div class="title-bar"><div class="title-bar-text"><span data-l="en">Loading…</span><span data-l="zh" lang="zh-Hans">载入中…</span></div></div><div class="window-body"><div class="page sunken-panel"><p><span data-l="en">Please wait…</span><span data-l="zh" lang="zh-Hans">请稍候…</span></p></div></div>';
   el.querySelector('.title-bar')!.appendChild(controls());
   document.querySelector('.desktop')!.appendChild(el);
   const w = makeWin(el, href, prefix);

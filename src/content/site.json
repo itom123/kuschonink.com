@@ -34,29 +34,35 @@
           "name": "name",
           "label": "Name",
           "type": "text",
-          "required": true
+          "required": true,
+          "labelZh": "姓名"
         },
         {
           "name": "email",
           "label": "Email",
           "type": "email",
-          "required": true
+          "required": true,
+          "labelZh": "电子邮箱"
         },
         {
           "name": "subject",
           "label": "Subject",
           "type": "text",
-          "required": true
+          "required": true,
+          "labelZh": "主题"
         },
         {
           "name": "message",
           "label": "Message",
           "type": "textarea",
-          "required": true
+          "required": true,
+          "labelZh": "留言"
         }
       ],
       "submitText": "Send",
+      "submitTextZh": "发送",
       "successMessage": "Thank you for contacting me. Please allow up to one week’s time for me to respond.",
+      "successMessageZh": "感谢你的来信。我会在一周内回复。",
       "endpoint": "/v1/contact/kuschonink",
       "turnstileSiteKey": "0x4AAAAAAFrLd1nfvznPIU8w",
       "_comment": "Submissions go to the kuschonink-contact Worker (Turnstile + Email Sending). Leave turnstileSiteKey empty to fall back to opening the visitor's email app. The Worker only accepts requests from https://kuschonink.com and https://www.kuschonink.com."

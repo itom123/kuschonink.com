@@ -98,6 +98,31 @@ a sheet of paper.
 To add a piece, add `src/content/writings/<id>.json` (title, date, object,
 objectLabel, html, references). The rules find it a drawer.
 
+### Two languages: the 中/EN toggle
+
+Every page can be read in English or Chinese, one at a time. The **中 / EN**
+switch sits top right (in the house header, and in the simple view's menu bar).
+The choice is remembered in the browser; first-time visitors get Chinese if
+their browser is set to Chinese, English otherwise.
+
+How it works: each page carries both languages. Elements marked `data-l="en"` /
+`data-l="zh"` show only when that language is on (`src/styles/lang.css`), and
+`src/scripts/lang.ts` swaps attributes like `aria-label` and the page title.
+
+Where the words live:
+
+- **Interface words** (buttons, headings, table labels, messages):
+  `src/lib/i18n.ts`, each as `{ en, zh }`. `src/components/Bi.astro` prints one.
+- **Content** keeps its Chinese next to the English:
+  - pages: `titleZh`, `seo.titleZh`, `seo.descriptionZh`;
+  - text blocks: `htmlZh`; images: `captionZh`, `altZh`; marquees: `itemsZh`;
+  - rooms and furniture: `zh` / `en`; list items, list names, façade hotspots: `zh`;
+    chronology: `whenZh` / `whatZh`; contact form: `labelZh`, `submitTextZh`;
+  - writings: `titleZh`, `excerptZh`, `htmlZh` (in Traditional Chinese, as the
+    artist writes them).
+- Anything without a Chinese version shows its English in both modes, so a new
+  project still works before it's translated. Fill in both when you can.
+
 ### Contact form
 
 The form posts to `/v1/contact/kuschonink`, handled by the site's own Worker

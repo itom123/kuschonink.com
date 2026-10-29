@@ -139,7 +139,7 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
   .has-panel .map-zoom { bottom: calc(55vh + 12px); }
   .has-panel .map-floors { bottom: calc(55vh + 92px); }
   .has-panel .map-blueprint { display: none; }
-  .house-top nav a[target] , .house-top nav span:last-of-type { display: none; }
+  .house-top nav a[target], .house-top nav .sep-social { display: none; }
 }
 
 .noscript-index { position: relative; z-index: 10; background: #fff; padding: calc(var(--top) + 12px) 16px; }
@@ -175,7 +175,7 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 .interior-walls { fill: #fff; stroke: #000; stroke-width: 3px; vector-effect: non-scaling-stroke; }
 .furniture-body { fill: #fafafa; stroke: #000; stroke-width: 1px; vector-effect: non-scaling-stroke; }
 .furniture-label { text-anchor: middle; font-family: 'Times New Roman', Times, serif; font-size: 150px; fill: #000; pointer-events: none; }
-.furniture-en { font-size: 110px; font-style: italic; }
+.furniture-en { font-style: italic; }
 .furniture-label-small { font-size: 120px; }
 .drawer { cursor: pointer; outline: none; }
 .drawer rect { fill: #ececec; stroke: #000; stroke-width: 1px; vector-effect: non-scaling-stroke; transition: transform 0.25s ease-out, fill 0.15s; transform-box: fill-box; }
@@ -208,3 +208,8 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 .sheet-footer { margin-top: 2em; padding-top: 0.8em; border-top: 1px dashed #999; font-size: 0.9em; color: #333; }
 .room-panel .sheet { margin: 0 -16px; }
 @media (max-width: 600px) { .sheet { padding: 20px 18px; } }
+
+/* Bilingual text: Chinese sits beside or under the English. */
+.chapter-nav a[rel='next'] { text-align: right; }
+.label-sub-zh { font-style: normal; }
+.house-top .lang-toggle button { color: var(--link); }

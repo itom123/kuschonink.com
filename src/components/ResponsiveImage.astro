@@ -4,7 +4,7 @@ import { img, focalPosition } from '../lib/images';
 import type { ImageRef } from '../lib/types';
 
 interface Props {
-  image: Pick<ImageRef, 'src' | 'alt' | 'focal'>;
+  image: Pick<ImageRef, 'src' | 'alt' | 'altZh' | 'focal'>;
   sizes?: string;
   class?: string;
   /** Fill the parent box (object-fit: cover) instead of keeping natural ratio. */
@@ -20,6 +20,8 @@ const position = focalPosition(image.focal);
 <Image
   src={meta}
   alt={image.alt ?? ''}
+  data-alt-en={image.altZh ? image.alt : undefined}
+  data-alt-zh={image.altZh || undefined}
   widths={widths}
   sizes={sizes}
   format="webp"

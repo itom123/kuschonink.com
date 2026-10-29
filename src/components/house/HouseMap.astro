@@ -4,6 +4,8 @@ import type { ImageMetadata } from 'astro';
 import { floors, rooms, house, floorBounds, roomPoints, type Room } from '../../lib/house';
 import { projects, imagesOf } from '../../lib/content';
 import { img } from '../../lib/images';
+import { t as tr, attr, chapter, floorZh } from '../../lib/i18n';
+import Bi from '../Bi.astro';
 
 interface Props { current?: Room }
 const { current } = Astro.props;
@@ -27,7 +29,7 @@ for (const r of rooms) {
 }
 
 const { columns, rows } = house.grid;
-const search = rooms.map((r) => ({ slug: r.slug, floor: r.floor.id, title: r.title, zh: r.zh, en: r.en, chapter: r.chapter, locked: !!r.locked }));
+const search = rooms.map((r) => ({ slug: r.slug, floor: r.floor.id, title: r.title, titleZh: r.titleZh, zh: r.zh, en: r.en, chapter: r.chapter, locked: !!r.locked }));
 const initialFloor = current?.floor.id ?? 'f1';
 
 // Layout of up to 4 thumbnails inside a room, as a 2 × 2 grid with a margin.
@@ -40,7 +42,7 @@ function thumbBoxes(r: Room, n: number) {
 }
 ---
 <div class="house-map" id="house-map" data-floor={initialFloor} data-current={current?.slug ?? ''} data-zoom-level="1" transition:persist="house-map">
-  <div class="map-viewport" tabindex="0" aria-label="Floorplan. Drag to move, scroll to zoom, PageUp and PageDown change floors.">
+  <div class="map-viewport" tabindex="0" {...attr('aria-label', tr.mapHelp)}>
     {floors.map((f) => {
       const b = floorBounds(f);
       const m = 2400;
@@ -53,7 +55,7 @@ function thumbBoxes(r: Room, n: number) {
           preserveAspectRatio="xMidYMid meet"
           hidden={f.id !== initialFloor}
           role="group"
-          aria-label={`${f.name} (${f.zh})`}
+          {...attr('aria-label', { en: f.name, zh: f.zh })}
         >
           <image class="scan" href={scans[f.id]} x={f.scan.x} y={f.scan.y} width={f.scan.width} height={f.scan.height} preserveAspectRatio="none" />
           <g class="grid" aria-hidden="true">
@@ -67,7 +69,12 @@ function thumbBoxes(r: Room, n: number) {
             const [x, y, w, h] = r.rect;
             const t = thumbs.get(r.key) ?? [];
             const boxes = thumbBoxes(r, t.length);
-            const label = r.zh || r.en;
+            // One label per language; the 中/EN toggle shows one of them.
+            const labels = [
+              { l: 'en', main: r.en, sub: r.title },
+              { l: 'zh', main: r.zh || r.en, sub: r.titleZh },
+            ];
+            const name = (l: 'en' | 'zh') => (l === 'zh' ? `${chapter(r.chapter).zh}：${r.zh}${r.contents ? ' — ' + r.titleZh : ''}` : `${chapter(r.chapter).en}: ${r.en}${r.contents ? ' — ' + r.title : ''}`);
             const inner = (
               <>
                 <polygon points={pts} />
@@ -77,18 +84,19 @@ function thumbBoxes(r: Room, n: number) {
                     <image data-href={src} x={boxes[i].x} y={boxes[i].y} width={boxes[i].w} height={boxes[i].h} preserveAspectRatio="xMidYMid slice" />
                   ))}
                 </g>
-                <text class="label" x={x + w / 2} y={y + h / 2}>
-                  <tspan class="label-main" x={x + w / 2}>{label}</tspan>
-                  {r.zh && <tspan class="label-en" x={x + w / 2} dy="1.2em">{r.en}</tspan>}
-                  {r.contents && <tspan class="label-sub" x={x + w / 2} dy="1.25em">{r.title}</tspan>}
-                </text>
+                {labels.map((lb) => (
+                  <text class="label" x={x + w / 2} y={y + h / 2} data-l={lb.l} lang={lb.l === 'zh' ? 'zh-Hans' : 'en'}>
+                    <tspan class="label-main" x={x + w / 2}>{lb.main}</tspan>
+                    {r.contents && <tspan class:list={['label-sub', { 'label-sub-zh': lb.l === 'zh' }]} x={x + w / 2} dy="1.25em">{lb.sub}</tspan>}
+                  </text>
+                ))}
                 <text class="chapter" x={x + 150} y={y + 380}>{r.locked ? '—' : r.chapter}</text>
               </>
             );
             return r.locked ? (
-              <g class="room locked" data-slug={r.slug} aria-label={`${r.en}, locked`}>{inner}</g>
+              <g class="room locked" data-slug={r.slug} {...attr('aria-label', { en: `${r.en}, ${tr.locked.en}`, zh: `${r.zh}，${tr.locked.zh}` })}>{inner}</g>
             ) : (
-              <a class:list={['room', { 'has-contents': !!r.contents, outdoor: r.outdoor, current: current?.slug === r.slug }]} href={`/house/${r.slug}`} data-slug={r.slug} aria-label={`Chapter ${r.chapter}: ${r.en}${r.contents ? ' — ' + r.title : ''}`}>{inner}</a>
+              <a class:list={['room', { 'has-contents': !!r.contents, outdoor: r.outdoor, current: current?.slug === r.slug }]} href={`/house/${r.slug}`} data-slug={r.slug} {...attr('aria-label', { en: name('en'), zh: name('zh') })}>{inner}</a>
             );
           })}
         </svg>
@@ -96,25 +104,25 @@ function thumbBoxes(r: Room, n: number) {
     })}
   </div>
 
-  <div class="map-ui map-floors" role="toolbar" aria-label="Floors">
+  <div class="map-ui map-floors" role="toolbar" {...attr('aria-label', tr.floors)}>
     {[...floors].reverse().map((f) => (
-      <button type="button" data-floor-btn={f.id} aria-pressed={String(f.id === initialFloor)} title={`${f.name} · ${f.zh} · ${f.level}`}>{f.label}</button>
+      <button type="button" data-floor-btn={f.id} aria-pressed={String(f.id === initialFloor)} {...attr('title', { en: `${f.name} · ${f.level}`, zh: `${f.zh} · ${f.level}` })}>{f.label}</button>
     ))}
   </div>
-  <div class="map-ui map-zoom" role="toolbar" aria-label="Zoom">
-    <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
-    <button type="button" data-zoom="out" aria-label="Zoom out">−</button>
+  <div class="map-ui map-zoom" role="toolbar" {...attr('aria-label', tr.zoom)}>
+    <button type="button" data-zoom="in" {...attr('aria-label', tr.zoomIn)} {...attr('title', tr.zoomIn)}>+</button>
+    <button type="button" data-zoom="out" {...attr('aria-label', tr.zoomOut)} {...attr('title', tr.zoomOut)}>−</button>
   </div>
   <div class="map-ui map-search">
-    <input type="search" placeholder="Search this house" aria-label="Search rooms and projects" autocomplete="off" />
+    <input type="search" {...attr('placeholder', tr.searchHouse)} {...attr('aria-label', tr.searchLabel)} autocomplete="off" />
     <ul class="search-results" hidden></ul>
   </div>
-  <label class="map-ui map-blueprint"><input type="checkbox" data-blueprint /> Blueprint</label>
+  <label class="map-ui map-blueprint"><input type="checkbox" data-blueprint /> <Bi t={tr.blueprint} /></label>
   <div class="map-ui map-floorname" aria-live="polite"></div>
-  <script type="application/json" id="house-index" set:html={JSON.stringify({ rooms: search, floors: floors.map((f) => ({ id: f.id, name: f.name, zh: f.zh, level: f.level })) })} />
+  <script type="application/json" id="house-index" set:html={JSON.stringify({ text: { none: tr.searchNone, noDoor: tr.noDoorToast }, rooms: search, floors: floors.map((f) => ({ id: f.id, name: f.name, zh: f.zh, zhShort: floorZh(f.zh), level: f.level })) })} />
 </div>
 
 <script>
-  import { initMap } from '../../scripts/map';
-  initMap();
+  import { startMap } from '../../scripts/map';
+  startMap();
 </script>

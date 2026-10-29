@@ -5,6 +5,8 @@ import House from '../../../layouts/House.astro';
 import HouseMap from '../../../components/house/HouseMap.astro';
 import { placements, sharedItems, pieces, roomByKey, type Placement } from '../../../lib/house';
 import { projects, site } from '../../../lib/content';
+import Bi from '../../../components/Bi.astro';
+import { t, attr, drawerN } from '../../../lib/i18n';
 
 export function getStaticPaths() {
   return placements.map((p) => ({ params: { id: p.piece.id }, props: { p } }));
@@ -13,39 +15,51 @@ const { p } = Astro.props as { p: Placement };
 const { piece, room, furniture, drawer, fulfils } = p;
 const shared = sharedItems(piece).filter((s) => s.rooms.some((r) => r !== room));
 const refLabel = (ref: Placement['piece']['references'][number]) => {
-  if ('project' in ref) { const x = projects.find((y) => y.slug === ref.project)!; return { href: `/image/${x.slug}`, label: x.title }; }
-  if ('room' in ref) { const r = roomByKey.get(ref.room)!; return { href: `/house/${r.slug}`, label: `${r.title} (ch. ${r.chapter})` }; }
-  const q = pieces.find((y) => y.id === ref.piece)!; return { href: `/house/drawer/${q.id}`, label: q.title };
+  if ('project' in ref) { const x = projects.find((y) => y.slug === ref.project)!; return { href: `/image/${x.slug}`, label: { en: x.title, zh: x.titleZh ?? '' } }; }
+  if ('room' in ref) { const r = roomByKey.get(ref.room)!; return { href: `/house/${r.slug}`, label: { en: `${r.title} (ch. ${r.chapter})`, zh: `${r.titleZh}（第${r.chapter}章）` } }; }
+  const q = pieces.find((y) => y.id === ref.piece)!; return { href: `/house/drawer/${q.id}`, label: { en: q.title, zh: q.titleZh ?? '' } };
 };
+// The writings are in Traditional Chinese, as the artist writes them.
+const zhLang = 'zh-Hant';
 ---
-<House seo={{ title: `${piece.title} — ${site.name}` }} noindex bodyClass="house-map-page">
+<House seo={{ title: `${piece.title} — ${site.name}`, titleZh: `${piece.titleZh ?? piece.title} — ${site.name}` }} noindex bodyClass="house-map-page">
   <HouseMap current={room} />
   <aside class="room-panel" data-room-page={room.slug} aria-labelledby="room-title">
     <div class="panel-bar">
-      <span>Chapter {room.chapter} · {room.en} · {furniture.en}, drawer {drawer}</span>
-      <a class="panel-close" href={`/house/${room.slug}`} aria-label="Close the drawer">[×]</a>
+      <span><Bi t={{ en: `Chapter ${room.chapter} · ${room.en} · ${furniture.en}, drawer ${drawer}`, zh: `第${room.chapter}章 · ${room.zh} · ${furniture.zh}${drawerN(drawer).zh}` }} /></span>
+      <a class="panel-close" href={`/house/${room.slug}`} {...attr('aria-label', t.closeDrawer)}>[×]</a>
     </div>
     <div class="panel-body">
       <article class={`sheet sheet-${piece.object}`} data-sheet>
         <header>
-          <h1 id="room-title">{piece.title}</h1>
-          <p class="sheet-date"><time datetime={piece.date}>{piece.date}</time>{piece.excerpt && <> · <i>{piece.excerpt}</i></>}</p>
+          <h1 id="room-title"><span data-l="en">{piece.title}</span><span data-l="zh" lang={zhLang}>{piece.titleZh ?? piece.title}</span></h1>
+          <p class="sheet-date"><time datetime={piece.date}>{piece.date}</time>{piece.excerpt && <> · <i><span data-l="en">{piece.excerpt}</span><span data-l="zh" lang={zhLang}>{piece.excerptZh ?? piece.excerpt}</span></i></>}</p>
         </header>
-        <div class="prose" set:html={piece.html} />
+        {piece.htmlZh ? (
+          <>
+            <div class="prose" data-l="en" set:html={piece.html} />
+            <div class="prose" data-l="zh" lang={zhLang} set:html={piece.htmlZh} />
+          </>
+        ) : (
+          <div class="prose" set:html={piece.html} />
+        )}
         <footer class="sheet-footer">
-          <p>Kept in the {furniture.en.toLowerCase()} ({furniture.zh}), drawer {drawer}, {room.en.toLowerCase()}, chapter {room.chapter}.
+          <p data-l="en">Kept in the {furniture.en.toLowerCase()}, drawer {drawer}, {room.en.toLowerCase()}, chapter {room.chapter}.
             {fulfils.length ? <> It fulfils the room’s constraints: {fulfils.map((f) => `${f.name.toLowerCase()}, “${f.value}”`).join('; ')}.</> : <> It fulfils none of the room’s constraints; it was placed by the tie rule (earliest chapter).</>}
           </p>
+          <p data-l="zh" lang="zh-Hans">存放于{room.zh}（第{room.chapter}章）的{furniture.zh}，{drawerN(drawer).zh}。
+            {fulfils.length ? <>它满足了这个房间的约束：{fulfils.map((f) => `${f.nameZh}，“${f.valueZh}”`).join('；')}。</> : <>它不满足这个房间的任何约束；它是按平局规则（最早的章节）放进来的。</>}
+          </p>
           {piece.references.length > 0 && (
-            <p>See also: {piece.references.map((r, i) => { const l = refLabel(r); return <>{i > 0 && ', '}<a href={l.href}>{l.label}</a></>; })}.</p>
+            <p><Bi t={t.seeAlso} /><span data-l="en">: </span><span data-l="zh">：</span>{piece.references.map((r, i) => { const l = refLabel(r); return <>{i > 0 && <><span data-l="en">, </span><span data-l="zh">、</span></>}<a href={l.href}><Bi t={l.label} /></a></>; })}</p>
           )}
           {shared.length > 0 && (
-            <p>Shares with the house: {shared.map((s, i) => <>{i > 0 && '; '}{s.item.label} ({s.rooms.filter((r) => r !== room).map((r, j) => <>{j > 0 && ', '}<a href={`/house/${r.slug}`}>ch. {r.chapter}</a></>)})</>)}.</p>
+            <p><Bi t={t.sharesWith} /><span data-l="en">: </span><span data-l="zh">：</span>{shared.map((s, i) => <>{i > 0 && '; '}<Bi t={{ en: s.item.label, zh: s.item.zh }} /> ({s.rooms.filter((r) => r !== room).map((r, j) => <>{j > 0 && ', '}<a href={`/house/${r.slug}`}><Bi t={{ en: `ch. ${r.chapter}`, zh: `第${r.chapter}章` }} /></a></>)})</>)}</p>
           )}
         </footer>
       </article>
       <hr />
-      <p><a href={`/house/${room.slug}`}>← Close the drawer</a></p>
+      <p><a href={`/house/${room.slug}`}>← <Bi t={t.closeDrawer} /></a></p>
     </div>
   </aside>
 </House>

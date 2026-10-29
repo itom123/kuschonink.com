@@ -1,25 +1,49 @@
 // The house map: pan, zoom, floors, search, URL state. Plain DOM, no framework.
 // Works like an indoor map: the viewport shows one floor at a time, rooms are links.
+import { getLang, pick } from './lang';
 
 type View = { cx: number; cy: number; z: number };
 type Bounds = { x: number; y: number; w: number; h: number };
-interface IndexRoom { slug: string; floor: string; title: string; zh: string; en: string; chapter: number; locked: boolean }
+interface IndexRoom { slug: string; floor: string; title: string; titleZh: string; zh: string; en: string; chapter: number; locked: boolean }
 
 const MIN_Z = 0.6;
 const MAX_Z = 12;
 
-export function initMap() {
+// The map currently on the page. ClientRouter can drop the map (e.g. on the
+// façade page) and bring a fresh, uninitialised copy back later, so set up
+// whichever map is present after every navigation.
+let active: { root: HTMLElement; sync: () => void; off: AbortController } | null = null;
+
+export function startMap() {
+  initMap();
+  document.addEventListener('astro:page-load', () => {
+    initMap();
+    active?.sync();
+  });
+  if (document.readyState === 'complete') active?.sync();
+}
+
+function initMap() {
   const root = document.getElementById('house-map');
-  if (!root || root.dataset.ready) return;
+  if (root && root === active?.root) return;
+  active?.off.abort();
+  active = null;
+  if (!root) return;
   root.dataset.ready = '1';
+  const off = new AbortController();
 
   const viewport = root.querySelector<HTMLElement>('.map-viewport')!;
   const svgs = [...root.querySelectorAll<SVGSVGElement>('svg.floor')];
   const index = JSON.parse(document.getElementById('house-index')!.textContent!) as {
     rooms: IndexRoom[];
-    floors: { id: string; name: string; zh: string; level: string }[];
+    floors: { id: string; name: string; zh: string; zhShort: string; level: string }[];
+    text: { none: { en: string; zh: string }; noDoor: { en: string; zh: string } };
   };
   const floorName = root.querySelector<HTMLElement>('.map-floorname')!;
+  const showFloorName = () => {
+    const info = index.floors.find((x) => x.id === floor)!;
+    floorName.textContent = `${getLang() === 'zh' ? info.zh : info.name} · ${info.level}`;
+  };
 
   const bounds = new Map<string, Bounds>(
     svgs.map((s) => {
@@ -137,8 +161,7 @@ export function initMap() {
       next.classList.add('floor-enter');
     }
     root!.querySelectorAll<HTMLButtonElement>('[data-floor-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.floorBtn === f)));
-    const info = index.floors.find((x) => x.id === f)!;
-    floorName.textContent = `${info.name} · ${info.zh} · ${info.level}`;
+    showFloorName();
     view = clampView(v ?? views.get(f) ?? { ...view, ...{ cx: home(f).cx, cy: home(f).cy } });
     root!.dataset.zoomLevel = '';
     render();
@@ -237,7 +260,7 @@ export function initMap() {
       return;
     }
     const locked = (e.target as Element).closest('.room.locked');
-    if (locked) toast('This room has no door.');
+    if (locked) toast(pick(index.text.noDoor));
   }, true);
 
   viewport.addEventListener('wheel', (e) => {
@@ -282,17 +305,25 @@ export function initMap() {
   const input = root.querySelector<HTMLInputElement>('.map-search input')!;
   const results = root.querySelector<HTMLUListElement>('.search-results')!;
   const norm = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
-  const floorLabel = (id: string) => index.floors.find((f) => f.id === id)!.name;
+  const floorLabel = (id: string) => { const f = index.floors.find((f) => f.id === id)!; return getLang() === 'zh' ? f.zhShort : f.name; };
   function showResults() {
     const q = norm(input.value.trim());
     if (!q) { results.hidden = true; results.innerHTML = ''; return; }
-    const hits = index.rooms.filter((r) => [r.title, r.en, r.zh, String(r.chapter)].some((t) => norm(t).includes(q))).slice(0, 8);
+    const hits = index.rooms.filter((r) => [r.title, r.titleZh, r.en, r.zh, String(r.chapter)].some((t) => norm(t).includes(q))).slice(0, 8);
     results.innerHTML = hits.length
-      ? hits.map((r) => `<li><a href="/house/${r.slug}" data-slug="${r.slug}" ${r.locked ? 'data-locked' : ''}><b>${escape(r.title)}</b> <small>${escape(r.zh)} ${escape(r.en === r.title ? '' : r.en)} · ${floorLabel(r.floor)} · ch. ${r.locked ? '—' : r.chapter}</small></a></li>`).join('')
-      : '<li class="none">Nothing in this house by that name.</li>';
+      ? hits.map((r) => {
+          const zh = getLang() === 'zh';
+          const n = r.locked ? '—' : r.chapter;
+          const title = zh ? r.titleZh || r.title : r.title;
+          const name = zh ? (r.zh === title ? '' : r.zh) : (r.en === title ? '' : r.en);
+          const where = zh ? `${floorLabel(r.floor)} · 第${n}章` : `${floorLabel(r.floor)} · ch. ${n}`;
+          return `<li><a href="/house/${r.slug}" data-slug="${r.slug}" ${r.locked ? 'data-locked' : ''}><b>${escape(title)}</b> <small>${escape(name)} · ${where}</small></a></li>`;
+        }).join('')
+      : `<li class="none">${escape(pick(index.text.none))}</li>`;
     results.hidden = false;
   }
   input.addEventListener('input', showResults);
+  document.addEventListener('langchange', () => { showFloorName(); showResults(); });
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const a = results.querySelector<HTMLAnchorElement>('a');
@@ -303,7 +334,7 @@ export function initMap() {
   results.addEventListener('click', (e) => {
     const a = (e.target as Element).closest<HTMLAnchorElement>('a');
     if (!a) return;
-    if (a.hasAttribute('data-locked')) { e.preventDefault(); focusRoom(a.dataset.slug!); toast('This room has no door.'); }
+    if (a.hasAttribute('data-locked')) { e.preventDefault(); focusRoom(a.dataset.slug!); toast(pick(index.text.noDoor)); }
     input.value = '';
     showResults();
   });
@@ -328,7 +359,7 @@ export function initMap() {
     z: Number(params.get('z')) || 1,
   };
   setFloor(floor, start);
-  window.addEventListener('resize', () => render());
+  window.addEventListener('resize', () => render(), { signal: off.signal });
 
   // After every page (initial and ClientRouter navigations), follow the current room.
   const sync = () => {
@@ -338,8 +369,7 @@ export function initMap() {
     else root!.querySelectorAll('.room.current').forEach((r) => r.classList.remove('current'));
     root!.dataset.synced = '1';
   };
-  document.addEventListener('astro:page-load', sync);
-  if (document.readyState === 'complete') sync();
+  active = { root, sync, off };
 }
 
 function escape(s: string) {

@@ -1,0 +1,10 @@
+/* One language at a time: the 中/EN toggle sets <html data-lang>. English by default. */
+html[data-lang='zh'] [data-l='en'],
+html:not([data-lang='zh']) [data-l='zh'] { display: none !important; }
+
+.lang-toggle { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
+.lang-toggle button {
+  font: inherit; background: none; border: 0; padding: 0 3px; cursor: pointer;
+  color: inherit; text-decoration: underline; min-width: 0; min-height: 0; box-shadow: none;
+}
+.lang-toggle button[aria-pressed='true'] { font-weight: bold; text-decoration: none; cursor: default; }
