@@ -1,0 +1,28 @@
+{
+  "seo": {
+    "title": "Xiangyin Gu",
+    "description": "Xiangyin Gu, also known as Tom, is an emerging artist who works and is based in London. His work focuses on memory, fantasy, history and archive in combination with his reserach around art and photography."
+  },
+  "background": {
+    "src": "home/250304-archive-of-xiang-s-p-36.jpg",
+    "focal": [
+      0.5681,
+      0.352
+    ]
+  },
+  "projects": [
+    "failure-of-memory",
+    "dissecting-memories",
+    "eternal-return",
+    "it-says-forget",
+    "an-entangled-past",
+    "into-the-woods",
+    "anterior-future",
+    "a-suivre",
+    "farewell-and-resurrection",
+    "fragmented-ocean",
+    "gestalt-lost-in-time",
+    "hanabi",
+    "sisyphus-flower"
+  ]
+}

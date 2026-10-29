@@ -1,0 +1,24 @@
+{
+  "title": "Dissecting Memories",
+  "order": 2,
+  "seo": {
+    "title": "Dissecting Memories — Xiangyin Gu"
+  },
+  "sections": [
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "slideshow",
+          "images": [
+            {
+              "src": "projects/dissecting-memories/19660916-tgpcr-re-read-s2.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

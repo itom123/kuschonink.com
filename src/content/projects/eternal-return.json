@@ -1,0 +1,40 @@
+{
+  "title": "Eternal Return",
+  "order": 3,
+  "seo": {
+    "title": "Eternal Return — Xiangyin Gu"
+  },
+  "sections": [
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "fullscreen",
+          "images": [
+            {
+              "src": "projects/eternal-return/s-three-projects-installation-shot-bridge-studio-p-7.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/eternal-return/s-three-projects-installation-shot-bridge-studio-p-4.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/eternal-return/s-three-projects-installation-shot-bridge-studio-p-5.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/eternal-return/s-three-projects-installation-shot-bridge-studio-p-6.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/eternal-return/s-three-projects-installation-shot-bridge-studio-p-8.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

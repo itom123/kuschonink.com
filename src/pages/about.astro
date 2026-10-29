@@ -1,0 +1,8 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+import { about as page } from '../lib/content';
+---
+<Base seo={page.seo} bodyClass="page-about">
+  {page.sections.map((s, i) => <Section section={s} first={i === 0} />)}
+</Base>

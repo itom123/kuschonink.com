@@ -1,0 +1,49 @@
+---
+import { site } from '../lib/content';
+import Icon from './Icon.astro';
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const isCurrent = (href: string) =>
+  href === '/' ? path === '/' || path.startsWith('/image') : path === href || path.startsWith(href + '/');
+---
+<header class="site-header">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <nav class="site-nav" aria-label="Main">
+    <ul>
+      {site.nav.map((item) => (
+        <li><a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a></li>
+      ))}
+    </ul>
+  </nav>
+  <a class="site-title" href="/">{site.name}</a>
+  <div class="site-social">
+    {site.social.map((s) => (
+      <a href={s.href} target="_blank" rel="noopener" aria-label={s.label}><Icon name={s.icon} /></a>
+    ))}
+  </div>
+  <button class="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+    <span></span><span></span>
+  </button>
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    <ul>
+      {site.nav.map((item) => (
+        <li><a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a></li>
+      ))}
+    </ul>
+    <div class="mobile-social">
+      {site.social.map((s) => (
+        <a href={s.href} target="_blank" rel="noopener" aria-label={s.label}><Icon name={s.icon} /></a>
+      ))}
+    </div>
+  </div>
+</header>
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+  btn?.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    btn.setAttribute('aria-label', open ? 'Open menu' : 'Close menu');
+    if (menu) menu.hidden = open;
+    document.documentElement.classList.toggle('menu-open', !open);
+  });
+</script>

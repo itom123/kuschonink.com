@@ -1,0 +1,19 @@
+{
+  "title": "It Says Forget",
+  "order": 4,
+  "seo": {
+    "title": "It Says Forget — Xiangyin Gu"
+  },
+  "sections": [
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "image",
+          "src": "projects/it-says-forget/0-final-240212-f-00722.jpg",
+          "alt": ""
+        }
+      ]
+    }
+  ]
+}

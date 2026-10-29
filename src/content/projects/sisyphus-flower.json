@@ -1,0 +1,37 @@
+{
+  "title": "Sisyphus Flower",
+  "order": 13,
+  "seo": {
+    "title": "Sisyphus Flower — Xiangyin Gu"
+  },
+  "sections": [
+    {
+      "theme": "dark",
+      "background": {
+        "src": "projects/sisyphus-flower/ssf.jpg",
+        "overlay": 0.15
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "html": "<p class=\"display\">Sisyphus Flower</p>"
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "background": {
+        "src": "projects/sisyphus-flower/ssp-edit-2.jpg",
+        "overlay": 0.15
+      },
+      "blocks": [
+        {
+          "type": "video",
+          "provider": "youtube",
+          "url": "https://www.youtube.com/watch?v=cJwi4CwG0XM",
+          "youtubeId": "cJwi4CwG0XM"
+        }
+      ]
+    }
+  ]
+}

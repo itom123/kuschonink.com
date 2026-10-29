@@ -1,0 +1,33 @@
+---
+import { site } from '../../lib/content';
+const { email, form } = site.contact;
+// Static site: the form opens the visitor's email app with the message filled in.
+// To receive submissions directly, point `action` at a Worker endpoint later.
+---
+<form class="block block-form contact-form" action={`mailto:${email}`} method="post" enctype="text/plain" data-email={email}>
+  {form.fields.map((f) => (
+    <label class="field">
+      <span class="field-label">{f.label}{f.required && <span class="field-required"> (required)</span>}</span>
+      {f.type === 'textarea' ? (
+        <textarea name={f.name} required={f.required} rows="6"></textarea>
+      ) : (
+        <input type={f.type} name={f.name} required={f.required} autocomplete={f.name === 'name' ? 'name' : f.name === 'email' ? 'email' : 'off'} />
+      )}
+    </label>
+  ))}
+  <button type="submit" class="button">{form.submitText}</button>
+  <p class="form-success" hidden>{form.successMessage}</p>
+</form>
+<script>
+  for (const form of document.querySelectorAll<HTMLFormElement>('.contact-form')) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const get = (k: string) => String(data.get(k) ?? '');
+      const body = `${get('message')}\n\n— ${get('name')} (${get('email')})`;
+      const href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(get('subject'))}&body=${encodeURIComponent(body)}`;
+      window.location.href = href;
+      form.querySelector<HTMLElement>('.form-success')!.hidden = false;
+    });
+  }
+</script>

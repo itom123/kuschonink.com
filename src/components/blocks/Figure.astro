@@ -1,0 +1,14 @@
+---
+import type { ImageRef } from '../../lib/types';
+import ResponsiveImage from '../ResponsiveImage.astro';
+interface Props { image: ImageRef; eager?: boolean }
+const { image, eager } = Astro.props;
+---
+<figure class="block block-image">
+  {image.link ? (
+    <a href={image.link}><ResponsiveImage image={image} sizes="(max-width: 800px) 100vw, 1200px" eager={eager} /></a>
+  ) : (
+    <ResponsiveImage image={image} sizes="(max-width: 800px) 100vw, 1200px" eager={eager} />
+  )}
+  {image.caption && <figcaption set:html={image.caption} />}
+</figure>

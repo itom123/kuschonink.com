@@ -1,0 +1,33 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../../components/Section.astro';
+import { projects } from '../../lib/content';
+
+export function getStaticPaths() {
+  return projects.map((project, i) => ({
+    params: { slug: project.slug },
+    props: { project, prev: projects[i - 1], next: projects[i + 1] },
+  }));
+}
+const { project, prev, next } = Astro.props;
+// Use the first image on the page as the social-share image.
+const firstImage = (() => {
+  for (const s of project.sections) {
+    if (s.background) return s.background.src;
+    for (const b of s.blocks) {
+      if (b.type === 'image') return b.src;
+      if ((b.type === 'gallery' || b.type === 'banner') && b.images[0]) return b.images[0].src;
+    }
+  }
+})();
+---
+<Base seo={project.seo} image={firstImage} bodyClass="page-project">
+  <article class="project">
+    <h1 class="visually-hidden">{project.title}</h1>
+    {project.sections.map((s, i) => <Section section={s} first={i === 0} />)}
+  </article>
+  <nav class="project-pager" aria-label="More projects">
+    {prev ? <a class="pager-prev" href={`/image/${prev.slug}`}><span>Previous</span>{prev.title}</a> : <span />}
+    {next ? <a class="pager-next" href={`/image/${next.slug}`}><span>Next</span>{next.title}</a> : <span />}
+  </nav>
+</Base>

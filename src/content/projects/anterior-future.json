@@ -1,0 +1,38 @@
+{
+  "title": "Anterior Future",
+  "order": 7,
+  "seo": {
+    "title": "Anterior Future — Xiangyin Gu"
+  },
+  "sections": [
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "image",
+          "src": "projects/anterior-future/img20211201-12225299.png",
+          "alt": ""
+        },
+        {
+          "type": "text",
+          "html": "<h2 class=\"display\">Anterior Future</h2>"
+        },
+        {
+          "type": "text",
+          "html": "<p>It is an honest review on my own maternal family via a deeper look into the 10,000 old images left by my grandfather before he passed away. Unfortunately I found lots of painful truth behind the scene, including problems with the typical Chinese patriarchal family, domestic violence and childhood psychological trauma.</p>"
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "video",
+          "provider": "youtube",
+          "url": "https://www.youtube.com/watch?v=-esHL68qDgo",
+          "youtubeId": "-esHL68qDgo"
+        }
+      ]
+    }
+  ]
+}

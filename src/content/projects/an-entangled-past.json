@@ -1,0 +1,96 @@
+{
+  "title": "An Entangled Past",
+  "order": 5,
+  "seo": {
+    "title": "An Entangled Past — Xiangyin Gu"
+  },
+  "sections": [
+    {
+      "theme": "dark",
+      "background": {
+        "src": "projects/an-entangled-past/culturalrevolution-s.jpg",
+        "overlay": 0.15
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "html": "<h2 class=\"display align-center\"><span class=\"accent\">Sometimes to spectate is to act, sometimes to act is to spectate.</span></h2>"
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "strips",
+          "images": [
+            {
+              "src": "projects/an-entangled-past/an-entangled-past-detail-1.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/an-entangled-past/an-entangled-past-detail-2.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/an-entangled-past/an-entangled-past-detail-3.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "marquee",
+          "items": [
+            "William Blake and Conflict Beyond Borders and Forms",
+            "*"
+          ]
+        },
+        {
+          "type": "text",
+          "html": "<p>Date | 30 April 2024 18:30 - 21:00<br/>Venue l Fitzwilliam Museum, Cambridge CB2 1RB<br/>Curator Talks l 19:55 - 20:35, Ground Floor</p>"
+        },
+        {
+          "type": "image",
+          "src": "projects/an-entangled-past/cambridge-fitzwilliam-installation-shot.jpg",
+          "alt": ""
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "slideshow",
+          "images": [
+            {
+              "src": "projects/an-entangled-past/26.png",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "text",
+          "html": "<h2>An Entangled Past</h2><p>\"An Entangled Past\", installation space (35 sec). Video documenting of works, including Gestalt Lost in Time (book), An Entangled Past (triptych print) and Fragmented Ocean (installation) for 'RCA 2022'.</p>"
+        },
+        {
+          "type": "video",
+          "provider": "youtube",
+          "url": "https://www.youtube.com/watch?v=3W6kb9AmRPw",
+          "youtubeId": "3W6kb9AmRPw"
+        }
+      ]
+    }
+  ]
+}

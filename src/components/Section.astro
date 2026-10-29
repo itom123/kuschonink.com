@@ -1,0 +1,24 @@
+---
+import type { Section } from '../lib/types';
+import ResponsiveImage from './ResponsiveImage.astro';
+import Blocks from './Blocks.astro';
+interface Props { section: Section; first?: boolean }
+const { section, first = false } = Astro.props;
+const bg = section.background;
+const fullBleed = section.blocks.length > 0 && section.blocks.every((b) => b.type === 'banner');
+---
+<section
+  class:list={['section', `theme-${section.theme}`, { 'has-bg': bg, 'bg-only': bg && section.blocks.length === 0, 'full-bleed': fullBleed }]}
+>
+  {bg && (
+    <div class="section-bg" aria-hidden="true">
+      <ResponsiveImage image={bg} cover eager={first} />
+      {bg.overlay ? <div class="section-overlay" style={`opacity:${bg.overlay}`} /> : null}
+    </div>
+  )}
+  {section.blocks.length > 0 && (
+    <div class="section-inner">
+      <Blocks blocks={section.blocks} eager={first} />
+    </div>
+  )}
+</section>

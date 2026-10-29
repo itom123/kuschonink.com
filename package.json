@@ -1,0 +1,22 @@
+{
+  "name": "kuschonink",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "wrangler dev",
+    "deploy": "astro build && wrangler deploy",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@fontsource/manrope": "^5.3.0",
+    "@fontsource/poppins": "^5.3.0",
+    "astro": "^7.4.1",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "wrangler": "^4.155.0"
+  }
+}

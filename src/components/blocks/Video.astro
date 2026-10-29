@@ -1,0 +1,20 @@
+---
+import type { Block } from '../../lib/types';
+interface Props { block: Extract<Block, { type: 'video' }> }
+const { block } = Astro.props;
+const embed = block.youtubeId
+  ? `https://www.youtube-nocookie.com/embed/${block.youtubeId}`
+  : block.vimeoId
+    ? `https://player.vimeo.com/video/${block.vimeoId}`
+    : null;
+---
+<figure class="block block-video">
+  {embed ? (
+    <div class="video-frame">
+      <iframe src={embed} title={block.caption ?? 'Video'} loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
+  ) : (
+    <a href={block.url} target="_blank" rel="noopener">Watch video</a>
+  )}
+  {block.caption && <figcaption set:html={block.caption} />}
+</figure>

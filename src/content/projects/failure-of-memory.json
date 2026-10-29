@@ -1,0 +1,172 @@
+{
+  "title": "Failure of Memory",
+  "order": 1,
+  "seo": {
+    "title": "Failure of Memory — Xiangyin Gu"
+  },
+  "sections": [
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "slideshow",
+          "images": [
+            {
+              "src": "projects/failure-of-memory/dsc2408.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc2409.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc2415.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc2419.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc2421.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc2424.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc2427.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc2443.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc2445.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc2447.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "slideshow",
+          "images": [
+            {
+              "src": "projects/failure-of-memory/the-fall-of-icarus-x-gu-00.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/the-fall-of-icarus-x-gu-02.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/the-fall-of-icarus-x-gu-01.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "slideshow",
+          "images": [
+            {
+              "src": "projects/failure-of-memory/dsc01754.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc01768.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc01752.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc01776.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc01781.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc01787.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc01792.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc01745.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc01800.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "slideshow",
+          "images": [
+            {
+              "src": "projects/failure-of-memory/dsc01758.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc01759.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc01760.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/failure-of-memory/dsc01761.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "slideshow",
+          "images": [
+            {
+              "src": "projects/failure-of-memory/project-of-failure-2-3-of-17-extra-s.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

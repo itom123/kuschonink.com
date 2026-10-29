@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kuschonink",
+  "compatibility_date": "2026-10-01",
+  // Static site served by Cloudflare Workers (static assets).
+  // To add server features later (API routes, forms), add a "main" script here.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "drop-trailing-slash"
+  }
+}

@@ -1,0 +1,10 @@
+---
+// Same as the home page: the old site served the project list at /image too.
+import Base from '../../layouts/Base.astro';
+import ProjectList from '../../components/ProjectList.astro';
+import { home } from '../../lib/content';
+---
+<Base seo={home.seo} bodyClass="page-home">
+  <h1 class="visually-hidden">Image</h1>
+  <ProjectList />
+</Base>

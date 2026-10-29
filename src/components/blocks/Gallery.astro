@@ -1,0 +1,64 @@
+---
+import type { ImageRef } from '../../lib/types';
+import ResponsiveImage from '../ResponsiveImage.astro';
+interface Props {
+  style: 'slideshow' | 'reel' | 'fullscreen' | 'masonry' | 'strips' | 'grid';
+  images: ImageRef[];
+  eager?: boolean;
+}
+const { style, images, eager } = Astro.props;
+// Slideshow-type galleries scroll horizontally, one item (or a reel of items) at a time.
+const scrolling = style === 'slideshow' || style === 'fullscreen' || style === 'reel';
+const sizes = style === 'masonry' || style === 'grid' ? '(max-width: 800px) 50vw, 33vw' : style === 'reel' ? '(max-width: 800px) 90vw, 60vw' : '100vw';
+---
+<div class:list={['block', 'block-gallery', `gallery-${style}`]} data-gallery={scrolling ? '' : undefined}>
+  <div class="gallery-track">
+    {images.map((image, i) => (
+      <figure class="gallery-item" aria-label={scrolling ? `${i + 1} of ${images.length}` : undefined}>
+        {image.link ? (
+          <a href={image.link}><ResponsiveImage image={image} sizes={sizes} eager={eager && i === 0} /></a>
+        ) : (
+          <ResponsiveImage image={image} sizes={sizes} eager={eager && i === 0} />
+        )}
+        {image.caption && <figcaption set:html={image.caption} />}
+      </figure>
+    ))}
+  </div>
+  {scrolling && images.length > 1 && (
+    <div class="gallery-controls">
+      <button type="button" class="gallery-prev" aria-label="Previous image">←</button>
+      <span class="gallery-count" aria-live="polite">1 / {images.length}</span>
+      <button type="button" class="gallery-next" aria-label="Next image">→</button>
+    </div>
+  )}
+</div>
+<script>
+  for (const g of document.querySelectorAll<HTMLElement>('[data-gallery]')) {
+    const track = g.querySelector<HTMLElement>('.gallery-track')!;
+    const items = [...track.children] as HTMLElement[];
+    const count = g.querySelector('.gallery-count');
+    const loop = !g.classList.contains('gallery-reel');
+    const current = () => {
+      const x = track.scrollLeft + track.clientWidth / 2;
+      let best = 0, dist = Infinity;
+      items.forEach((el, i) => {
+        const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - x);
+        if (d < dist) { dist = d; best = i; }
+      });
+      return best;
+    };
+    const go = (i: number) => {
+      const n = items.length;
+      const target = loop ? (i + n) % n : Math.max(0, Math.min(n - 1, i));
+      const el = items[target];
+      track.scrollTo({ left: el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2, behavior: 'smooth' });
+    };
+    g.querySelector('.gallery-prev')?.addEventListener('click', () => go(current() - 1));
+    g.querySelector('.gallery-next')?.addEventListener('click', () => go(current() + 1));
+    track.addEventListener('scroll', () => { if (count) count.textContent = `${current() + 1} / ${items.length}`; }, { passive: true });
+    g.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') go(current() - 1);
+      if (e.key === 'ArrowRight') go(current() + 1);
+    });
+  }
+</script>

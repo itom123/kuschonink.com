@@ -1,0 +1,62 @@
+{
+  "name": "Xiangyin Gu",
+  "tagline": "kuschonink",
+  "url": "https://kuschonink.com",
+  "description": "Xiangyin Gu, also known as Tom, is an emerging artist who works and is based in London. His work focuses on memory, fantasy, history and archive in combination with his reserach around art and photography.",
+  "defaultImage": "home/project-of-failure-2-3-of-17-extra-s.jpg",
+  "nav": [
+    {
+      "label": "About",
+      "href": "/about"
+    },
+    {
+      "label": "Image",
+      "href": "/"
+    },
+    {
+      "label": "Contact",
+      "href": "/contact"
+    }
+  ],
+  "social": [
+    {
+      "label": "Instagram",
+      "href": "https://www.instagram.com/kuschonink",
+      "icon": "instagram"
+    }
+  ],
+  "contact": {
+    "email": "Xiangyin.Tom.Gu@gmail.com",
+    "phone": "+44 (0) 7928 164 076",
+    "form": {
+      "fields": [
+        {
+          "name": "name",
+          "label": "Name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "email",
+          "label": "Email",
+          "type": "email",
+          "required": true
+        },
+        {
+          "name": "subject",
+          "label": "Subject",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "message",
+          "label": "Message",
+          "type": "textarea",
+          "required": true
+        }
+      ],
+      "submitText": "Send",
+      "successMessage": "Thank you for contacting me. Please allow up to one week’s time for me to respond."
+    }
+  }
+}

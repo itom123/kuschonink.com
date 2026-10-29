@@ -1,0 +1,9 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectList from '../components/ProjectList.astro';
+import { home } from '../lib/content';
+---
+<Base seo={home.seo} bodyClass="page-home">
+  <h1 class="visually-hidden">Xiangyin Gu — Image</h1>
+  <ProjectList />
+</Base>

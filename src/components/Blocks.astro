@@ -1,0 +1,23 @@
+---
+import type { Block } from '../lib/types';
+import Text from './blocks/Text.astro';
+import Figure from './blocks/Figure.astro';
+import Gallery from './blocks/Gallery.astro';
+import Video from './blocks/Video.astro';
+import Marquee from './blocks/Marquee.astro';
+import Banner from './blocks/Banner.astro';
+import ContactForm from './blocks/ContactForm.astro';
+interface Props { blocks: Block[]; eager?: boolean }
+const { blocks, eager = false } = Astro.props;
+---
+{blocks.map((b, i) => {
+  switch (b.type) {
+    case 'text': return <Text html={b.html} />;
+    case 'image': return <Figure image={b} eager={eager && i === 0} />;
+    case 'gallery': return <Gallery style={b.style} images={b.images} eager={eager && i === 0} />;
+    case 'video': return <Video block={b} />;
+    case 'marquee': return <Marquee items={b.items} />;
+    case 'banner': return <Banner images={b.images} eager={eager && i === 0} />;
+    case 'contactForm': return <ContactForm />;
+  }
+})}
