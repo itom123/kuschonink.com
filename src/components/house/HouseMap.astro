@@ -29,7 +29,29 @@ for (const r of rooms) {
 }
 
 const { columns, rows } = house.grid;
-const search = rooms.map((r) => ({ slug: r.slug, floor: r.floor.id, title: r.title, titleZh: r.titleZh, zh: r.zh, en: r.en, chapter: r.chapter, locked: !!r.locked }));
+// Extra names people use for each floor, so "upstairs", "2F" or "阁楼" all find something.
+const floorAliases: Record<string, string> = {
+  f1: 'ground floor level 1 1f downstairs 一层 一楼 首层',
+  f2: 'first floor second floor upstairs level 2 2f 二层 二楼',
+  attic: 'attic loft top floor level 3 3f 阁楼 三层 三楼',
+  roof: 'roof rooftop terrace 屋顶 屋面 天台',
+};
+const projectOf = (r: Room) => (r.contents && 'project' in r.contents ? projects.find((p) => p.slug === (r.contents as { project: string }).project) : undefined);
+const search = rooms.map((r) => {
+  const p = projectOf(r);
+  return {
+    slug: r.slug, floor: r.floor.id, title: r.title, titleZh: r.titleZh, zh: r.zh, en: r.en, chapter: r.chapter, locked: !!r.locked,
+    // Searchable, but weighted below the names above.
+    where: [r.floor.name, r.floor.zh, floorZh(r.floor.zh), floorAliases[r.floor.id] ?? ''].join(' '),
+    more: [
+      ...r.inventory, ...r.inventoryZh,
+      ...r.constraints.filter((c) => c.list !== 'coordinates' && c.status === 'fulfilled').flatMap((c) => [c.value, c.valueZh]),
+      p?.seo.description ?? '', p?.seo.descriptionZh ?? '',
+      r.contents && 'page' in r.contents ? r.contents.page : '',
+      r.locked ? 'locked no door 上锁 没有门' : '', r.outdoor ? 'outdoor outside 室外' : '',
+    ].filter(Boolean).join(' · '),
+  };
+});
 const initialFloor = current?.floor.id ?? 'f1';
 
 // Layout of up to 4 thumbnails inside a room, as a 2 × 2 grid with a margin.

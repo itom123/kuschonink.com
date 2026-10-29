@@ -1,10 +1,11 @@
 // The house map: pan, zoom, floors, search, URL state. Plain DOM, no framework.
 // Works like an indoor map: the viewport shows one floor at a time, rooms are links.
 import { getLang, pick } from './lang';
+import { searchRooms, type SearchRoom } from './search';
 
 type View = { cx: number; cy: number; z: number };
 type Bounds = { x: number; y: number; w: number; h: number };
-interface IndexRoom { slug: string; floor: string; title: string; titleZh: string; zh: string; en: string; chapter: number; locked: boolean }
+type IndexRoom = SearchRoom;
 
 const MIN_Z = 0.6;
 const MAX_Z = 12;
@@ -308,12 +309,10 @@ function initMap() {
   // ---- Search ----
   const input = root.querySelector<HTMLInputElement>('.map-search input')!;
   const results = root.querySelector<HTMLUListElement>('.search-results')!;
-  const norm = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
   const floorLabel = (id: string) => { const f = index.floors.find((f) => f.id === id)!; return getLang() === 'zh' ? f.zhShort : f.name; };
   function showResults() {
-    const q = norm(input.value.trim());
-    if (!q) { results.hidden = true; results.innerHTML = ''; return; }
-    const hits = index.rooms.filter((r) => [r.title, r.titleZh, r.en, r.zh, String(r.chapter)].some((t) => norm(t).includes(q))).slice(0, 8);
+    if (!input.value.trim()) { results.hidden = true; results.innerHTML = ''; return; }
+    const hits = searchRooms(index.rooms, input.value);
     results.innerHTML = hits.length
       ? hits.map((r) => {
           const zh = getLang() === 'zh';
