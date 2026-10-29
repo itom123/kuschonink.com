@@ -190,9 +190,13 @@ function initMap() {
   function focusRoom(slug: string, animate = true) {
     root!.querySelectorAll('.room.current').forEach((r) => r.classList.remove('current'));
     root!.querySelector(`.room[data-slug="${slug}"]`)?.classList.add('current');
+    const el = root!.querySelector(`.room[data-slug="${slug}"]`);
+    if (!el) return;
+    // Show the room's floor before measuring it: a hidden SVG has no geometry.
+    const f = (el.closest('svg') as SVGSVGElement).dataset.floor!;
+    if (f !== floor) setFloor(f, { ...view, z: Math.max(1, view.z * 0.8) });
     const target = roomView(slug);
     if (!target) return;
-    if (target.floor !== floor) setFloor(target.floor, { ...view, z: Math.max(1, view.z * 0.8) });
     flyTo(target.view, animate ? 550 : 0);
   }
 
