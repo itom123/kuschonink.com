@@ -58,7 +58,7 @@
       "submitText": "Send",
       "successMessage": "Thank you for contacting me. Please allow up to one week’s time for me to respond.",
       "endpoint": "/v1/contact/kuschonink",
-      "turnstileSiteKey": "",
+      "turnstileSiteKey": "0x4AAAAAAFrLd1nfvznPIU8w",
       "_comment": "Submissions go to the kuschonink-contact Worker (Turnstile + Email Sending). Leave turnstileSiteKey empty to fall back to opening the visitor's email app. The Worker only accepts requests from https://kuschonink.com and https://www.kuschonink.com."
     }
   }
