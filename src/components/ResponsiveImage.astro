@@ -1,0 +1,31 @@
+---
+import { Image } from 'astro:assets';
+import { img, focalPosition } from '../lib/images';
+import type { ImageRef } from '../lib/types';
+
+interface Props {
+  image: Pick<ImageRef, 'src' | 'alt' | 'focal'>;
+  sizes?: string;
+  class?: string;
+  /** Fill the parent box (object-fit: cover) instead of keeping natural ratio. */
+  cover?: boolean;
+  eager?: boolean;
+}
+const { image, sizes = '100vw', class: className, cover = false, eager = false } = Astro.props;
+const meta = img(image.src);
+const all = [480, 800, 1200, 1600, 2000, 2500];
+const widths = [...all.filter((w) => w < meta.width), Math.min(meta.width, 2500)];
+const position = focalPosition(image.focal);
+---
+<Image
+  src={meta}
+  alt={image.alt ?? ''}
+  widths={widths}
+  sizes={sizes}
+  format="webp"
+  quality={82}
+  loading={eager ? 'eager' : 'lazy'}
+  fetchpriority={eager ? 'high' : undefined}
+  class:list={[className, { 'img-cover': cover }]}
+  style={position ? `object-position: ${position}` : undefined}
+/>

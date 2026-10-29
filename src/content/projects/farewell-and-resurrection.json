@@ -1,0 +1,106 @@
+{
+  "title": "Farewell and Resurrection",
+  "order": 9,
+  "seo": {
+    "title": "Farewell and Resurrection — Xiangyin Gu"
+  },
+  "sections": [
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "slideshow",
+          "images": [
+            {
+              "src": "projects/farewell-and-resurrection/fotofilmicgalleryimages-11.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/farewell-and-resurrection/fotofilmicgalleryimages-17.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/farewell-and-resurrection/fotofilmicgalleryimages-05.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/farewell-and-resurrection/s-three-projects-installation-shot-bridge-studio-p-9.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/farewell-and-resurrection/s-three-projects-installation-shot-bridge-studio-p-10.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/farewell-and-resurrection/s-three-projects-installation-shot-bridge-studio-p-11.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/farewell-and-resurrection/s-three-projects-installation-shot-bridge-studio-p-12.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/farewell-and-resurrection/s-three-projects-installation-shot-bridge-studio-p-13.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "banner",
+          "images": [
+            {
+              "src": "projects/farewell-and-resurrection/s-three-projects-installation-shot-bridge-studio-p-9-2.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "banner",
+          "images": [
+            {
+              "src": "projects/farewell-and-resurrection/farewell-and-resurrection-1.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "image",
+          "src": "projects/farewell-and-resurrection/farewell-and-resurrection-000039.jpg",
+          "alt": ""
+        },
+        {
+          "type": "text",
+          "html": "<p class=\"display\">Farewell and Resurrection</p>"
+        },
+        {
+          "type": "text",
+          "html": "<p class=\"align-center\">\"Farewell and Resurrection\" is a performance of mine during which period I felt pushed to the point of destruction for resurrection.<br/><br/>Through this act, all the archives of my previous collected negatives and the single copy of my most treasured piece are burned into ashes. I chose my birthplace where the river meets the ocean to make this performative act. Footages are recorded during the whole process and showcased in this feed.<br/><br/>It is negation of negation, namely quintessential gesture to begin anew.<br/><br/>前者に拠って、自己批判の对象となった中平の初期作品を、あえて展示することの是非に関する問いが生起するであらう。これに対し、私たちわ、過去の否定という重い意味を伝えるために、是非とも当の初期作品を充分に示す必要があると考えた。<br/><br/>原点復帰－横浜 中平卓马<br/><br/>Based on the former, questions arise about the pros and cons of exhibiting Nakahira's early works, which became the object of self-criticism. On the other hand, in order to convey the heavy meaning of denial of the past, we thought that it was necessary to fully show the initial work in question.<br/><br/>DEGREE ZERO - YOKOHAMA NAKAHIRA TAKUMA</p>"
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "background": {
+        "src": "projects/farewell-and-resurrection/feuer-main-l-ete-1.jpg",
+        "overlay": 0.15
+      },
+      "blocks": []
+    }
+  ]
+}

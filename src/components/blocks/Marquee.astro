@@ -1,0 +1,12 @@
+---
+interface Props { items: string[] }
+const { items } = Astro.props;
+const run = Array.from({ length: 6 }, () => items).flat();
+---
+<div class="block block-marquee" aria-label={items.filter((t) => t.trim() !== '*').join(' ')} role="marquee">
+  <div class="marquee-track" aria-hidden="true">
+    {[0, 1].map(() => (
+      <div class="marquee-run">{run.map((t) => <span>{t}</span>)}</div>
+    ))}
+  </div>
+</div>

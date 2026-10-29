@@ -1,0 +1,125 @@
+---
+import { site } from '../../lib/content';
+const { email, form } = site.contact;
+// With a Turnstile site key, the form posts to the kuschonink-contact Worker.
+// Without one, it opens the visitor's email app with the message filled in.
+const live = Boolean(form.turnstileSiteKey && form.endpoint);
+---
+<form
+  class="block block-form contact-form"
+  action={live ? form.endpoint : `mailto:${email}`}
+  method="post"
+  enctype={live ? undefined : 'text/plain'}
+  data-email={email}
+  data-endpoint={live ? form.endpoint : undefined}
+  data-sitekey={live ? form.turnstileSiteKey : undefined}
+>
+  {form.fields.map((f) => (
+    <label class="field">
+      <span class="field-label">{f.label}{f.required && <span class="field-required"> (required)</span>}</span>
+      {f.type === 'textarea' ? (
+        <textarea name={f.name} required={f.required} rows="6" maxlength="4000"></textarea>
+      ) : (
+        <input type={f.type} name={f.name} required={f.required} maxlength={f.name === 'email' ? 254 : f.name === 'subject' ? 180 : 120} autocomplete={f.name === 'name' ? 'name' : f.name === 'email' ? 'email' : 'off'} />
+      )}
+    </label>
+  ))}
+  {/* Spam trap: people never see or fill this. */}
+  <label class="field-trap" aria-hidden="true">Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+  {live && <div class="turnstile"></div>}
+  <button type="submit" class="button">{form.submitText}</button>
+  <p class="form-status" role="status" aria-live="polite" hidden></p>
+  <p class="form-success" hidden>{form.successMessage}</p>
+</form>
+<script>
+  const ERRORS: Record<string, string> = {
+    verification_failed: 'The anti-spam check failed. Please try again.',
+    rate_limited: 'Too many messages just now. Please try again later.',
+    missing_required_field: 'Please fill in every field.',
+    field_too_long: 'One of the fields is too long.',
+    invalid_submission: 'Please check your email address.',
+  };
+  type TS = { render: (el: Element, o: object) => string; reset: (id?: string) => void };
+  let turnstileLoading: Promise<TS> | null = null;
+  function loadTurnstile(): Promise<TS> {
+    const w = window as unknown as { turnstile?: TS };
+    if (w.turnstile) return Promise.resolve(w.turnstile);
+    turnstileLoading ??= new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      s.async = true;
+      s.onload = () => resolve(w.turnstile!);
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+    return turnstileLoading;
+  }
+
+  function initForms() {
+    for (const form of document.querySelectorAll<HTMLFormElement>('.contact-form:not([data-ready])')) {
+      form.dataset.ready = '1';
+      const status = form.querySelector<HTMLElement>('.form-status')!;
+      const success = form.querySelector<HTMLElement>('.form-success')!;
+      const say = (msg: string) => { status.textContent = msg; status.hidden = !msg; };
+      const endpoint = form.dataset.endpoint;
+      let token = '';
+      let widget: string | undefined;
+
+      if (endpoint && form.dataset.sitekey) {
+        loadTurnstile()
+          .then((ts) => {
+            widget = ts.render(form.querySelector('.turnstile')!, {
+              sitekey: form.dataset.sitekey,
+              action: 'kuschonink-contact',
+              callback: (t: string) => { token = t; },
+              'expired-callback': () => { token = ''; },
+            });
+          })
+          .catch(() => say('The anti-spam check could not load. You can also write to ' + form.dataset.email + '.'));
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = new FormData(form);
+        const get = (k: string) => String(data.get(k) ?? '').trim();
+
+        if (!endpoint) {
+          // Fallback: open the visitor's email app.
+          const body = `${get('message')}\n\n— ${get('name')} (${get('email')})`;
+          window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(get('subject'))}&body=${encodeURIComponent(body)}`;
+          success.hidden = false;
+          return;
+        }
+        if (!token) return say('Please wait for the anti-spam check to finish.');
+        const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+        button.disabled = true;
+        say('Sending…');
+        try {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: get('name'), email: get('email'), subject: get('subject'), message: get('message'), website: get('website'), turnstileToken: token }),
+          });
+          if (res.ok) {
+            form.reset();
+            say('');
+            success.hidden = false;
+            form.querySelectorAll('.field, .turnstile, button[type=submit]').forEach((el) => ((el as HTMLElement).hidden = true));
+            return;
+          }
+          const err = (await res.json().catch(() => ({}))) as { error?: string };
+          say(ERRORS[err.error ?? ''] ?? `The message could not be sent. Please write to ${form.dataset.email}.`);
+        } catch {
+          say(`The message could not be sent. Please write to ${form.dataset.email}.`);
+        } finally {
+          button.disabled = false;
+          token = '';
+          const w = window as unknown as { turnstile?: TS };
+          if (widget) w.turnstile?.reset(widget);
+        }
+      });
+    }
+  }
+  initForms();
+  document.addEventListener('astro:page-load', initForms);
+</script>

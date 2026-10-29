@@ -1,0 +1,68 @@
+{
+  "title": "入森",
+  "order": 6,
+  "seo": {
+    "title": "入森 — Xiangyin Gu"
+  },
+  "sections": [
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "slideshow",
+          "images": [
+            {
+              "src": "projects/into-the-woods/s-240521-p-01225.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/into-the-woods/s-240521-p-01243.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/into-the-woods/s-240521-p-01247.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/into-the-woods/s-240521-p-01262.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/into-the-woods/s-240521-p-01271.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/into-the-woods/s-240521-p-01278.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/into-the-woods/s-240521-p-01281.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/into-the-woods/s-240521-p-01284.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/into-the-woods/s-240521-p-01286.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/into-the-woods/s-240521-p-01293.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/into-the-woods/s-240521-p-01301.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/into-the-woods/s-240521-p-01303.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

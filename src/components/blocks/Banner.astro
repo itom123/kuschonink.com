@@ -1,0 +1,11 @@
+---
+import type { ImageRef } from '../../lib/types';
+import ResponsiveImage from '../ResponsiveImage.astro';
+interface Props { images: ImageRef[]; eager?: boolean }
+const { images, eager } = Astro.props;
+---
+<div class="block block-banner">
+  {images.map((image, i) => (
+    <div class="banner-slide"><ResponsiveImage image={image} cover eager={eager && i === 0} /></div>
+  ))}
+</div>

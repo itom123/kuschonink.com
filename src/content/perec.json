@@ -1,0 +1,273 @@
+{
+  "_comment": "The constraint system, after Perec's Life A User's Manual. Each list has exactly 5 items. They are dealt over the house's 5 x 5 grid by mutually orthogonal Latin squares of order 5, so every pair of items from two lists meets exactly once. A room receives the values of the grid square where the knight first enters it. 'match' words are searched for in the room's own content to decide whether the constraint is fulfilled. 'hidden' constraints are shown in red, as on the Wauquaire chapter site. Edit freely: keep 5 items per list.",
+  "lists": [
+    {
+      "id": "source",
+      "name": "Source",
+      "square": "row",
+      "items": [
+        {
+          "label": "the municipal governmental archive",
+          "match": [
+            "municipal"
+          ]
+        },
+        {
+          "label": "British declassified documents on China (National Archives)",
+          "match": [
+            "declassified",
+            "National Archives"
+          ]
+        },
+        {
+          "label": "textual writings from artist research; novelistic writing",
+          "match": [
+            "writing"
+          ]
+        },
+        {
+          "label": "maternal family photographs",
+          "match": [
+            "family photograph",
+            "family history",
+            "maternal"
+          ]
+        },
+        {
+          "label": "diary entries from my maternal grandfather",
+          "match": [
+            "diary"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "time",
+      "name": "Time",
+      "square": 1,
+      "items": [
+        {
+          "label": "early 1990s: the land is bought",
+          "match": [
+            "1990"
+          ]
+        },
+        {
+          "label": "late 1990s: the house is built",
+          "match": [
+            "1998",
+            "1999",
+            "construction"
+          ]
+        },
+        {
+          "label": "the years of my birth",
+          "match": [
+            "born"
+          ]
+        },
+        {
+          "label": "2008: the last renovation",
+          "match": [
+            "2008"
+          ]
+        },
+        {
+          "label": "2025: the floorplan is found again",
+          "match": [
+            "2025"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "object",
+      "name": "Object",
+      "hidden": true,
+      "square": 2,
+      "items": [
+        {
+          "label": "The Surgical Clinics of North America, Vol. 69 No. 3, June 1989",
+          "match": [
+            "Surgical Clinics",
+            "1989"
+          ]
+        },
+        {
+          "label": "a Hasselblad 500C",
+          "match": [
+            "Hasselblad"
+          ]
+        },
+        {
+          "label": "the red bin chutes of the building site",
+          "match": [
+            "chute"
+          ]
+        },
+        {
+          "label": "the floor/house plan",
+          "match": [
+            "floorplan",
+            "floor plan",
+            "house plan",
+            "blueprint"
+          ]
+        },
+        {
+          "label": "a slide projector",
+          "match": [
+            "projector",
+            "projection",
+            "slide"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quote",
+      "name": "Quoted document",
+      "hidden": true,
+      "square": 3,
+      "items": [
+        {
+          "label": "Milan Kundera",
+          "match": [
+            "Kundera"
+          ]
+        },
+        {
+          "label": "Louise Glück",
+          "match": [
+            "Glück",
+            "Gluck"
+          ]
+        },
+        {
+          "label": "Nakahira Takuma, Degree Zero",
+          "match": [
+            "Nakahira",
+            "中平"
+          ]
+        },
+        {
+          "label": "William Blake",
+          "match": [
+            "Blake"
+          ]
+        },
+        {
+          "label": "“Like a Spoon of Sugar” (my poem)",
+          "match": [
+            "Spoon of Sugar"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sign",
+      "name": "Autobiographical sign",
+      "hidden": true,
+      "square": 4,
+      "items": [
+        {
+          "label": "Suzhou",
+          "match": [
+            "Suzhou",
+            "苏州"
+          ]
+        },
+        {
+          "label": "London",
+          "match": [
+            "London"
+          ]
+        },
+        {
+          "label": "the Royal College of Art",
+          "match": [
+            "Royal College of Art",
+            "RCA"
+          ]
+        },
+        {
+          "label": "my paternal grandparents",
+          "match": [
+            "paternal"
+          ]
+        },
+        {
+          "label": "my grandfather",
+          "match": [
+            "grandfather"
+          ]
+        }
+      ]
+    }
+  ],
+  "clinamen": "On each floor, the last room the knight reaches breaks its quoted-document constraint on purpose.",
+  "chronology": [
+    {
+      "when": "early 1990s",
+      "what": "My grandparents buy the land, with two other plots of similar size; they sell the others and keep this one."
+    },
+    {
+      "when": "late 1990s",
+      "what": "My grandfather begins the first major construction. My father, just married, helps with the planning and errands."
+    },
+    {
+      "when": "the same years",
+      "what": "The house is built and furnished, and I am born. My birth is tied to the fate of the house."
+    },
+    {
+      "when": "2008",
+      "what": "The last major renovation. The digital floor/house plans are the only remaining trace of the original design.",
+      "room": "attic/blind-room"
+    },
+    {
+      "when": "15–19 Aug 2022",
+      "what": "After the Waiting Room, Copeland Gallery, London.",
+      "room": "f1/garage"
+    },
+    {
+      "when": "19–25 Nov 2022",
+      "what": "What a Waste, The Koppel Project Hive, London.",
+      "room": "f2/sitting-room"
+    },
+    {
+      "when": "2023",
+      "what": "Fresh Eyes International Talents, 2023 edition, GUP.",
+      "room": "f2/sitting-room"
+    },
+    {
+      "when": "14–15 Apr 2023",
+      "what": "Hot Sheet 2023, Downstairs at The Department Store, London.",
+      "room": "f2/sitting-room"
+    },
+    {
+      "when": "2–10 Feb 2024",
+      "what": "It Says Forget at CHASMA, Beaconsfield, London.",
+      "room": "f1/east-bathroom"
+    },
+    {
+      "when": "30 Apr 2024",
+      "what": "William Blake and Conflict Beyond Borders and Forms, Fitzwilliam Museum, Cambridge.",
+      "room": "f2/terrace"
+    },
+    {
+      "when": "26 Aug – 28 Sep 2024",
+      "what": "AFMP Exhibition, FotoFilmic, Bowen Island, BC.",
+      "room": "f1/kitchen"
+    },
+    {
+      "when": "2025",
+      "what": "After much effort, the floor/house plan is fetched from a family elder friend. The original blueprint is supposedly lost.",
+      "room": "roof/roof"
+    },
+    {
+      "when": "16 Jul – 16 Aug 2025",
+      "what": "Room We Didn't Build, with Lujane Pagganwala and Maya Silverberg, Norito Gallery, London.",
+      "room": "f2/study"
+    }
+  ]
+}

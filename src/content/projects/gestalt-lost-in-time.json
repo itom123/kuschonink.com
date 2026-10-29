@@ -1,0 +1,182 @@
+{
+  "title": "Gestalt Lost in Time",
+  "order": 11,
+  "seo": {
+    "title": "Gestalt Lost in Time — Xiangyin Gu"
+  },
+  "sections": [
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "text",
+          "html": "<h1 class=\"align-center\">Milan Kundera</h1>"
+        },
+        {
+          "type": "text",
+          "html": "<p class=\"align-center\">Karenin was not overjoyed by the move to Switzerland. Karenin hated change. Dog time cannot be plotted along a straight line; it does not move on and on, from one thing to the next. It moves in a circle like the hands of a clock, which—they, too, unwilling to dash madly ahead—turn round and round the face, day in and day out following the same path. In Prague, when Tomas and Tereza bought a new chair or moved a flower pot, Karenin would look on in displeasure. It disturbed his sense of time. It was as though they were trying to dupe the hands of the clock by changing the numbers on its face.</p>"
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "image",
+          "src": "projects/gestalt-lost-in-time/4-1-1-w.png",
+          "alt": ""
+        },
+        {
+          "type": "text",
+          "html": "<h1 class=\"align-center\">It’s okay to grasp, but don’t hold on too tightly.</h1>"
+        },
+        {
+          "type": "text",
+          "html": "<p class=\"align-center\">Gestalt Lost in Time</p>"
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "reel",
+          "images": [
+            {
+              "src": "projects/gestalt-lost-in-time/gestalt-lost-in-time-book-9899.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/gestalt-lost-in-time-book-9911.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/gestalt-lost-in-time-book-9915.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/gestalt-lost-in-time-book-9917.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "masonry",
+          "images": [
+            {
+              "src": "projects/gestalt-lost-in-time/54-000048-s.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/00004422-wood-2.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/54-lushangdeguanghui.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/4-4-3-s.png",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/9-2-2k.png",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/img20211015-18182584-5.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/000057.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/000027-57.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/000021.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/img20211015-19065625-a-bus.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/000063.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/000037.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/000039-3-or.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/57-visitors-by-the-lake.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/00004422-ocean-7-54.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/5-4p-0-11-s.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/2cemetery-scene-l-ete-4.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/itsuki-05.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/itsuki-03.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/itsuki-04.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/id-s-1.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/id-s-1-2.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/id-s-2.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/id-s-2-2.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/id-s-4.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/gestalt-lost-in-time/id-s-16.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "title": "À Suivre",
+  "order": 8,
+  "seo": {
+    "title": "À Suivre — Xiangyin Gu"
+  },
+  "sections": [
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "reel",
+          "images": [
+            {
+              "src": "projects/a-suivre/cf3080-bw.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/a-suivre/dscf2101.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/a-suivre/xtg-01-001-3.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/a-suivre/000053250001.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "text",
+          "html": "<p><span class=\"accent\">It took me two days to arrive here. Mountains were steep. The leaves kept hitting my skin. My feet were bleeding. Running, chasing, yet one goes on forgetting.</span></p>"
+        },
+        {
+          "type": "image",
+          "src": "projects/a-suivre/dscf0460.jpg",
+          "alt": ""
+        },
+        {
+          "type": "image",
+          "src": "projects/a-suivre/dscf0439.jpg",
+          "alt": ""
+        },
+        {
+          "type": "image",
+          "src": "projects/a-suivre/dscf0473.jpg",
+          "alt": ""
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "background": {
+        "src": "projects/a-suivre/3-2-11-2k.png",
+        "overlay": 0.15
+      },
+      "blocks": []
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "gallery",
+          "style": "reel",
+          "images": [
+            {
+              "src": "projects/a-suivre/220317-4.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/a-suivre/a-a-lovely-school-flower27322048.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/a-suivre/dscf8662.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/a-suivre/dscf0452.jpg",
+              "alt": ""
+            },
+            {
+              "src": "projects/a-suivre/20201225-haiku.jpg",
+              "alt": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "background": {
+        "src": "projects/a-suivre/dscf0453.jpg",
+        "overlay": 0.15
+      },
+      "blocks": [
+        {
+          "type": "image",
+          "src": "projects/a-suivre/dscf0449.jpg",
+          "alt": ""
+        }
+      ]
+    }
+  ]
+}

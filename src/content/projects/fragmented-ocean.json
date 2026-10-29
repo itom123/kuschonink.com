@@ -1,0 +1,79 @@
+{
+  "title": "Fragmented Ocean",
+  "order": 10,
+  "seo": {
+    "title": "Fragmented Ocean — Xiangyin Gu"
+  },
+  "sections": [
+    {
+      "theme": "dark",
+      "background": {
+        "src": "projects/fragmented-ocean/cf0939-w.png",
+        "overlay": 0.15
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "html": "<h2 class=\"display align-center\">Fragmented Ocean</h2>"
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "text",
+          "html": "<blockquote><p class=\"align-right\">Nothing can be forced to live.<br/>The earth is like a drug now, like a voice from far away,<br/>a lover or master. In the end, you do what the voice tells you.<br/>It says forget, you forget.<br/>It says begin again, you begin again.</p><p class=\"align-right\"><strong>Louise Glück</strong></p></blockquote>"
+        },
+        {
+          "type": "image",
+          "src": "projects/fragmented-ocean/dscf0013.jpg",
+          "alt": ""
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "video",
+          "provider": "youtube",
+          "url": "https://www.youtube.com/watch?v=S-m6E3DIjgI",
+          "youtubeId": "S-m6E3DIjgI"
+        },
+        {
+          "type": "text",
+          "html": "<h2 class=\"align-right\">Fragmented Ocean</h2><p class=\"align-right\">\"Fragmented Ocean\", installation space (51 sec). Video documenting of works for 'After the Waiting Room'.</p>"
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "background": {
+        "src": "projects/fragmented-ocean/culturalrevolution-s.jpg",
+        "overlay": 0.15
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "html": "<h2 class=\"align-center\"><span class=\"accent\">Sometimes to spectate is to act, sometimes to act is to spectate.</span></h2>"
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "video",
+          "provider": "youtube",
+          "url": "https://www.youtube.com/watch?v=3W6kb9AmRPw",
+          "youtubeId": "3W6kb9AmRPw"
+        },
+        {
+          "type": "text",
+          "html": "<h2>An Entangled Past</h2><p>\"An Entangled Past\", installation space (35 sec). Video documenting of works, including Gestalt Lost in Time (book), An Entangled Past (triptych print) and Fragmented Ocean (installation) for 'RCA 2022'.</p>"
+        }
+      ]
+    }
+  ]
+}

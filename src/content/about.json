@@ -1,0 +1,39 @@
+{
+  "title": "About",
+  "seo": {
+    "title": "About | Xiangyin Gu – Artist & Researcher — Xiangyin Gu",
+    "description": "Learn about Xiangyin Gu, a London-based artist and PhD researcher specializing in interdisciplinary photography, memory studies, and psychoanalytic art. Explore past and current exhibitions, ongoing projects, and research that connects personal archives with broader cultural and historical contexts."
+  },
+  "sections": [
+    {
+      "theme": "dark",
+      "background": {
+        "src": "about/project-of-failure-2-3-of-17-extra-s.jpg",
+        "focal": [
+          0.5036,
+          0.32
+        ],
+        "overlay": 0.15
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "html": "<p class=\"large\">Xiangyin Gu, born and raised in Suzhou (China), is an artist based in London (United Kingdom). He is currently a PhD candidate at Royal College of Art, London. His interdisciplinary practice bridges writing and photography, with a particular focus on psychoanalytic explorations of memory, trauma, and intergenerational transmission. His work investigates the psychical spaces where temporality and history intersect, challenging conventional modes of representation. Gu’s long-term projects, <em>Entangled Pasts </em>and <em>Eternal Return</em>, explores alternative narratives of family history and collective memory.</p>"
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "text",
+          "html": "<h1>Selected Conferences, Exhibitions &amp; Programs</h1>"
+        },
+        {
+          "type": "text",
+          "html": "<ul><li><p><a href=\"https://www.rca.ac.uk/news-and-events/events/after-the-waiting-room/\" rel=\"noopener\" target=\"_blank\">After the Waiting Room</a> (15 Aug – 19 Aug 2022), Copeland Gallery, London, SE15 3SN <a href=\"https://www.artrabbit.com/events/after-the-waiting-room\" rel=\"noopener\" target=\"_blank\">(alternative link)</a></p></li><li><p><a href=\"https://thekoppelproject.com/events/what-a-waste\" rel=\"noopener\" target=\"_blank\">What a Waste</a> (19 Nov - 25 Nov 2022), The Koppel Project Hive, 26 Holborn Viaduct, London, EC1A 2AT</p></li><li><p><a href=\"https://www.fresheyesphoto.com/2023\" rel=\"noopener\" target=\"_blank\">Fresh Eyes International Talents - 2023 Edition</a>, GUP</p></li><li><p><a href=\"https://www.artrabbit.com/events/hot-sheet-2023\" rel=\"noopener\" target=\"_blank\">Hot Sheet 2023</a> (14 Apr 2023 – 15 Apr 2023), Downstairs at The Department Store, London, SW9 8FR</p></li><li><p><a href=\"https://beaconsfield.ltd.uk/xiangyin-gu/\" rel=\"noopener\" target=\"_blank\">It Says Forget</a> shown at <a href=\"https://beaconsfield.ltd.uk/chasma/\" rel=\"noopener\" target=\"_blank\">CHASMA </a>(2 Feb 2024 – 10 Feb 2024), Beaconsfield, London, SE11 6AY</p></li><li><p><a href=\"https://www.rca.ac.uk/news-and-events/events/william-blake-and-conflict-beyond-borders-and-forms/\" rel=\"noopener\" target=\"_blank\">William Blake and Conflict Beyond Borders and Forms</a> (30 Apr 2024), Fitzwilliam Museum, Cambridge CB2 1RB <a href=\"https://www.thesocialcanvasprojects.org/blank-6\" rel=\"noopener\" target=\"_blank\">(mediator website)</a></p></li><li><p><a href=\"https://fotofilmic.com/afmp-exhibition/\" rel=\"noopener\" target=\"_blank\">AFMP Exhibition</a> (26 Aug – 28 Sep 2024), FotoFilmic, Bowen Island, BC</p></li><li><p><a href=\"https://www.noritogallery.com/exhibitions/room-we-didn't-build\" rel=\"noopener\" target=\"_blank\">Room We Didn't Build: Lujane Pagganwala, Maya Silverberg, Xiangyin Gu</a> (16 Jul – 16 Aug 2025), Norito Gallery, London, W1F 9RP</p></li></ul>"
+        }
+      ]
+    }
+  ]
+}

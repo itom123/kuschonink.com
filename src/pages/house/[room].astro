@@ -1,0 +1,20 @@
+---
+import House from '../../layouts/House.astro';
+import HouseMap from '../../components/house/HouseMap.astro';
+import RoomView from '../../components/house/RoomView.astro';
+import { rooms, type Room } from '../../lib/house';
+import { projects, site } from '../../lib/content';
+
+export function getStaticPaths() {
+  return rooms.map((room) => ({ params: { room: room.slug }, props: { room } }));
+}
+const { room } = Astro.props as { room: Room };
+const c = room.contents;
+const project = c && 'project' in c ? projects.find((p) => p.slug === c.project) : undefined;
+const simpleHref = project ? `/image/${project.slug}` : c && 'page' in c && (c.page === 'about' || c.page === 'contact') ? `/${c.page}` : '/image';
+const description = project?.seo.description ?? `${room.en}${room.zh ? ' (' + room.zh + ')' : ''}, ${room.floor.name.toLowerCase()} of the house. ${room.inventory.join('; ')}.`;
+---
+<House seo={{ title: `${room.title} — ${site.name}`, description }} simpleHref={simpleHref} bodyClass="house-map-page">
+  <HouseMap current={room} />
+  <RoomView room={room} transition:animate="fade" />
+</House>

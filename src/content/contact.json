@@ -1,0 +1,42 @@
+{
+  "title": "Contact",
+  "seo": {
+    "title": "Contact | Xiangyin Gu – Artist & Researcher — Xiangyin Gu",
+    "description": "Get in touch with Xiangyin Gu, a London-based artist and PhD researcher specializing in psychoanalysis, memory studies, and archival art practices. Whether you are interested in exhibitions, collaborations, teaching, or research inquiries, you can reach out via email or phone for personalized assistance and support."
+  },
+  "sections": [
+    {
+      "theme": "light",
+      "blocks": [
+        {
+          "type": "text",
+          "html": "<p><strong>Email<br/></strong><a href=\"mailto:Xiangyin.Tom.Gu@gmail.com\">Xiangyin.Tom.Gu@gmail.com</a></p>"
+        },
+        {
+          "type": "text",
+          "html": "<p><strong>Phone</strong><br/>+44  (0) 7928 164 076</p>"
+        },
+        {
+          "type": "contactForm"
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "background": {
+        "src": "contact/the-scene-of-thousands-of-people-carrying-soil-at-the-liuhetang-water-conservancy-construction-site-in-1958.jpg",
+        "overlay": 0.15
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "html": "<p class=\"align-center\">kuschonink</p>"
+        },
+        {
+          "type": "text",
+          "html": "<h1 class=\"display align-center\"><mark>Xiangyin Tom Gu</mark></h1>"
+        }
+      ]
+    }
+  ]
+}

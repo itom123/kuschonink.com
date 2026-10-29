@@ -1,0 +1,5 @@
+---
+interface Props { html: string }
+const { html } = Astro.props;
+---
+<div class="block block-text prose" set:html={html} />
