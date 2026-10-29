@@ -3,7 +3,7 @@
   "name": "kuschonink",
   "compatibility_date": "2026-10-01",
   // Static site (dist/) served by Cloudflare. The Worker only runs for the
-  // contact form endpoint, which it forwards to the kuschonink-contact Worker.
+  // contact form endpoint (worker/contact.ts).
   "main": "worker/index.ts",
   "assets": {
     "directory": "./dist",
@@ -12,8 +12,14 @@
     "html_handling": "drop-trailing-slash",
     "run_worker_first": ["/v1/contact/*"]
   },
-  "services": [
-    { "binding": "CONTACT", "service": "kuschonink-contact" }
+  // Contact form email: can only ever send to this one verified inbox.
+  "send_email": [
+    { "name": "EMAIL", "destination_address": "Xiangyin.Tom.Gu@gmail.com" }
   ],
+  // At most 5 messages a minute from one visitor.
+  "ratelimits": [
+    { "name": "CONTACT_LIMIT", "namespace_id": "4242", "simple": { "limit": 5, "period": 60 } }
+  ],
+  // TURNSTILE_SECRET is a secret, set in the dashboard (not in this file).
   "observability": { "enabled": true }
 }

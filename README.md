@@ -94,16 +94,24 @@ objectLabel, html, references). The rules find it a drawer.
 
 ### Contact form
 
-The form posts to `/v1/contact/kuschonink` on the site itself. The site's small
-Worker (`worker/index.ts`) hands those requests to the existing
-`kuschonink-contact` Worker over a service binding (`wrangler.jsonc`), and that
-Worker checks Turnstile and emails the message. No extra route is needed.
+The form posts to `/v1/contact/kuschonink`, handled by the site's own Worker
+(`worker/contact.ts`). It checks the origin, validates the fields, rate-limits
+(5 messages a minute per visitor), checks Turnstile, and emails the message
+through the `EMAIL` binding. That binding can only send to the inbox set as
+`destination_address` in `wrangler.jsonc`, and the address must be verified
+in Email Routing. The sender is `noreply@kuschonink.com`. Replying to the
+email goes to the visitor.
 
-Set `contact.form.turnstileSiteKey` in `src/content/site.json` to the public
-site key of the Turnstile widget (Cloudflare dashboard → Turnstile). Until it's
-set, the form opens the visitor's email app instead. The contact Worker only
-accepts requests from `https://kuschonink.com` and `https://www.kuschonink.com`,
-so sending works on the real domain, not on preview links.
+- **Secret:** `TURNSTILE_SECRET` is set in the dashboard (Workers & Pages →
+  kuschonink → Settings → Variables and Secrets), never in the repo. It must
+  belong to the same Turnstile widget as `contact.form.turnstileSiteKey` in
+  `src/content/site.json`.
+- **Errors:** if sending fails, the form shows the error code (for example
+  `delivery_failed: E_SENDER_NOT_VERIFIED`), and the Worker logs it under
+  Observability.
+- **Tests:** `npm test` runs the handler against stand-in services.
+
+The old `kuschonink-contact` Worker is no longer used by the site.
 
 ### Analytics
 
