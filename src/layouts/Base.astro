@@ -4,6 +4,7 @@ import { getImage } from 'astro:assets';
 import { site } from '../lib/content';
 import { img } from '../lib/images';
 import type { Seo } from '../lib/types';
+import '../styles/lang.css';
 
 interface Props { seo: Seo; image?: string; bodyClass?: string }
 const { seo, image = site.defaultImage, bodyClass } = Astro.props;
@@ -18,6 +19,20 @@ const ogUrl = new URL(og.src, site.url).href;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{seo.title}</title>
+    <meta name="title-en" content={seo.title} />
+    {seo.titleZh && <meta name="title-zh" content={seo.titleZh} />}
+    <script is:inline>
+      // Pick the language before the page paints: saved choice, else the browser's.
+      (function () {
+        var d = document.documentElement, l;
+        try { l = localStorage.getItem('lang'); } catch (e) {}
+        if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+        function apply(root, lang) { root.dataset.lang = lang; root.lang = lang === 'zh' ? 'zh-Hans' : 'en-GB'; }
+        apply(d, l);
+        // Page changes (Astro view transitions) replace <html>'s attributes: keep the language.
+        document.addEventListener('astro:before-swap', function (e) { apply(e.newDocument.documentElement, d.dataset.lang || 'en'); });
+      })();
+    </script>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -35,5 +50,9 @@ const ogUrl = new URL(og.src, site.url).href;
   </head>
   <body class={bodyClass}>
     <slot />
+    <script>
+      import { initLang } from '../scripts/lang';
+      initLang();
+    </script>
   </body>
 </html>

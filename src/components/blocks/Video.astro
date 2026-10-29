@@ -1,5 +1,8 @@
 ---
 import type { Block } from '../../lib/types';
+import Bi from '../Bi.astro';
+import Caption from '../Caption.astro';
+import { attr, t } from '../../lib/i18n';
 interface Props { block: Extract<Block, { type: 'video' }> }
 const { block } = Astro.props;
 const embed = block.youtubeId
@@ -11,10 +14,10 @@ const embed = block.youtubeId
 <figure class="block block-video">
   {embed ? (
     <div class="video-frame">
-      <iframe src={embed} title={block.caption ?? 'Video'} loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      <iframe src={embed} {...attr('title', { en: block.caption ?? 'Video', zh: block.captionZh ?? block.caption ?? '视频' })} loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
   ) : (
-    <a href={block.url} target="_blank" rel="noopener">Watch video <span lang="zh">观看视频</span></a>
+    <a href={block.url} target="_blank" rel="noopener"><Bi t={t.watchVideo} /></a>
   )}
-  {block.caption && <figcaption set:html={block.caption} />}
+  <Caption text={block.caption} zh={block.captionZh} />
 </figure>

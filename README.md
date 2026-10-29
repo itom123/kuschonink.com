@@ -92,22 +92,30 @@ a sheet of paper.
 To add a piece, add `src/content/writings/<id>.json` (title, date, object,
 objectLabel, html, references). The rules find it a drawer.
 
-### Bilingual text (English · 中文)
+### Two languages: the 中/EN toggle
 
-Everything on the site is shown in English and Chinese.
+Every page can be read in English or Chinese, one at a time. The **中 / EN**
+switch sits top right (in the house header, and in the simple view's menu bar).
+The choice is remembered in the browser; first-time visitors get Chinese if
+their browser is set to Chinese, English otherwise.
 
-- **Interface words** (buttons, headings, table labels, messages) live in
-  `src/lib/i18n.ts`, each as `{ en, zh }`. `src/components/Bi.astro` prints one
-  pair as "English 中文".
-- **Content** keeps its Chinese next to the English: rooms and furniture have
-  `zh` and `en`; projects and writings have `titleZh`; list items, list names,
-  chronology entries and façade hotspots have `zh` / `whenZh` / `whatZh`;
-  contact form fields have `labelZh`.
-- When you add a room, project, list item or chronology entry, fill in both
-  languages. The inventory, constraint table and chapter links build their
-  Chinese from these fields automatically.
-- Project texts, About and the writings themselves are still in their original
-  language only.
+How it works: each page carries both languages. Elements marked `data-l="en"` /
+`data-l="zh"` show only when that language is on (`src/styles/lang.css`), and
+`src/scripts/lang.ts` swaps attributes like `aria-label` and the page title.
+
+Where the words live:
+
+- **Interface words** (buttons, headings, table labels, messages):
+  `src/lib/i18n.ts`, each as `{ en, zh }`. `src/components/Bi.astro` prints one.
+- **Content** keeps its Chinese next to the English:
+  - pages: `titleZh`, `seo.titleZh`, `seo.descriptionZh`;
+  - text blocks: `htmlZh`; images: `captionZh`, `altZh`; marquees: `itemsZh`;
+  - rooms and furniture: `zh` / `en`; list items, list names, façade hotspots: `zh`;
+    chronology: `whenZh` / `whatZh`; contact form: `labelZh`, `submitTextZh`;
+  - writings: `titleZh`, `excerptZh`, `htmlZh` (in Traditional Chinese, as the
+    artist writes them).
+- Anything without a Chinese version shows its English in both modes, so a new
+  project still works before it's translated. Fill in both when you can.
 
 ### Contact form
 

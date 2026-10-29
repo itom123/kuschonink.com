@@ -1,6 +1,8 @@
 ---
 import type { ImageRef } from '../../lib/types';
 import ResponsiveImage from '../ResponsiveImage.astro';
+import Caption from '../Caption.astro';
+import { attr, t } from '../../lib/i18n';
 interface Props {
   style: 'slideshow' | 'reel' | 'fullscreen' | 'masonry' | 'strips' | 'grid';
   images: ImageRef[];
@@ -14,21 +16,21 @@ const sizes = style === 'masonry' || style === 'grid' ? '(max-width: 800px) 50vw
 <div class:list={['block', 'block-gallery', `gallery-${style}`]} data-gallery={scrolling ? '' : undefined}>
   <div class="gallery-track">
     {images.map((image, i) => (
-      <figure class="gallery-item" aria-label={scrolling ? `${i + 1} of ${images.length}` : undefined}>
+      <figure class="gallery-item" {...(scrolling ? attr('aria-label', { en: `${i + 1} of ${images.length}`, zh: `第 ${i + 1} 张，共 ${images.length} 张` }) : {})}>
         {image.link ? (
           <a href={image.link}><ResponsiveImage image={image} sizes={sizes} eager={eager && i === 0} /></a>
         ) : (
           <ResponsiveImage image={image} sizes={sizes} eager={eager && i === 0} />
         )}
-        {image.caption && <figcaption set:html={image.caption} />}
+        <Caption text={image.caption} zh={image.captionZh} />
       </figure>
     ))}
   </div>
   {scrolling && images.length > 1 && (
     <div class="gallery-controls">
-      <button type="button" class="gallery-prev" aria-label="Previous image 上一张">←</button>
+      <button type="button" class="gallery-prev" {...attr('aria-label', t.prevImage)}>←</button>
       <span class="gallery-count" aria-live="polite">1 / {images.length}</span>
-      <button type="button" class="gallery-next" aria-label="Next image 下一张">→</button>
+      <button type="button" class="gallery-next" {...attr('aria-label', t.nextImage)}>→</button>
     </div>
   )}
 </div>

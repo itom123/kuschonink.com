@@ -5,7 +5,9 @@ export interface ImageRef {
   /** Path under src/assets/images, e.g. "projects/hanabi/flux.jpg" */
   src: string;
   alt?: string;
+  altZh?: string;
   caption?: string;
+  captionZh?: string;
   link?: string;
   /** Focal point [x, y] from 0 to 1, used when the image is cropped. */
   focal?: [number, number];
@@ -17,11 +19,11 @@ export interface Background extends Omit<ImageRef, 'alt'> {
 }
 
 export type Block =
-  | { type: 'text'; html: string }
+  | { type: 'text'; html: string; htmlZh?: string }
   | ({ type: 'image' } & ImageRef)
   | { type: 'gallery'; style: 'slideshow' | 'reel' | 'fullscreen' | 'masonry' | 'strips' | 'grid'; images: ImageRef[] }
-  | { type: 'video'; provider: string; url: string; youtubeId?: string; vimeoId?: string; caption?: string }
-  | { type: 'marquee'; items: string[] }
+  | { type: 'video'; provider: string; url: string; youtubeId?: string; vimeoId?: string; caption?: string; captionZh?: string }
+  | { type: 'marquee'; items: string[]; itemsZh?: string[] }
   | { type: 'banner'; images: ImageRef[] }
   | { type: 'contactForm' };
 
@@ -33,18 +35,19 @@ export interface Section {
 
 export interface Seo {
   title: string;
+  titleZh?: string;
   description?: string;
+  descriptionZh?: string;
 }
 
 export interface Page {
   title: string;
+  titleZh?: string;
   seo: Seo;
   sections: Section[];
 }
 
 export interface Project extends Page {
-  /** Chinese title. */
-  titleZh?: string;
   order: number;
 }
 

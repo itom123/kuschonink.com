@@ -4,7 +4,7 @@
 // from its own unlisted page (/house/drawer/<id>) only when opened.
 import { furnitureOf, placementsIn, type Room } from '../../lib/house';
 import Bi from '../Bi.astro';
-import { t, both, drawerN } from '../../lib/i18n';
+import { t, attr, text, drawerN } from '../../lib/i18n';
 
 interface Props { room: Room }
 const { room } = Astro.props;
@@ -16,8 +16,8 @@ const inDrawer = (fid: string, n: number) => placed.find((p) => p.furniture.id =
 const years = (d: string) => d.slice(0, 4);
 ---
 {furniture.length > 0 && (
-  <section class="interior" aria-label={both(t.furnitureHere, ' ')}>
-    <svg class="interior-plan" viewBox={`${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}`} role="group" aria-label={`Plan of the ${room.en.toLowerCase()} with furniture · ${room.zh}家具平面`}>
+  <section class="interior" {...attr('aria-label', t.furnitureHere)}>
+    <svg class="interior-plan" viewBox={`${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}`} role="group" {...attr('aria-label', { en: `Plan of the ${room.en.toLowerCase()} with furniture`, zh: `${room.zh}家具平面图` })}>
       <rect class="interior-walls" x="0" y="0" width={W} height={H} />
       {furniture.map((f) => {
         const [x, y, w, h] = f.rect;
@@ -34,27 +34,35 @@ const years = (d: string) => d.slice(0, 4);
               const p = inDrawer(f.id, n);
               return (
                 <g class:list={['drawer', { full: !!p }]} tabindex="0" role="button" aria-expanded="false"
-                   data-drawer={`${f.id}-${n}`} aria-label={`Open ${f.en.toLowerCase()}, drawer ${n} · 打开${f.zh}${drawerN(n).zh}`}>
+                   data-drawer={`${f.id}-${n}`} {...attr('aria-label', { en: `Open ${f.en.toLowerCase()}, drawer ${n}`, zh: `打开${f.zh}${drawerN(n).zh}` })}>
                   <rect x={dx} y={dy} width={dw} height={dh} />
                   <circle cx={dx + dw / 2} cy={dy + dh / 2} r={Math.min(dw, dh) * 0.08} />
                 </g>
               );
             })}
-            <title>{f.en} {f.zh}{f.drawers ? `, ${f.drawers} drawer${f.drawers > 1 ? 's' : ''} · ${f.drawers}格抽屉` : ''}</title>
+            {(() => {
+              const tip = { en: `${f.en}${f.drawers ? `, ${f.drawers} drawer${f.drawers > 1 ? 's' : ''}` : ''}`, zh: `${f.zh}${f.drawers ? `，${f.drawers}格抽屉` : ''}` };
+              return <title {...text(tip)}>{tip.en}</title>;
+            })()}
             {Math.min(w, h) >= 500 ? (
-              <text x={x + w / 2} y={y + h / 2} class="furniture-label">
-                <tspan x={x + w / 2} dy="-0.2em">{f.zh}</tspan>
-                <tspan x={x + w / 2} dy="1.2em" class="furniture-en">{f.en}</tspan>
-              </text>
+              <>
+                <text x={x + w / 2} y={y + h / 2} dy="0.35em" class="furniture-label" data-l="zh" lang="zh-Hans">{f.zh}</text>
+                <text x={x + w / 2} y={y + h / 2} dy="0.35em" class="furniture-label furniture-en" data-l="en">{f.en}</text>
+              </>
             ) : (
               // Small furniture: label beside it, outside the room's edge if needed.
               // Near a wall, the label lines up with the furniture's edge so it stays inside the plan.
-              <text
-                x={x + w / 2 > W * 0.7 ? x + w : x + w / 2 < W * 0.3 ? x : x + w / 2}
-                y={y - 60}
-                style={`text-anchor: ${x + w / 2 > W * 0.7 ? 'end' : x + w / 2 < W * 0.3 ? 'start' : 'middle'}`}
-                class="furniture-label furniture-label-small"
-              >{f.zh} <tspan class="furniture-en">{f.en}</tspan></text>
+              <>
+                {(['zh', 'en'] as const).map((l) => (
+                  <text
+                    x={x + w / 2 > W * 0.7 ? x + w : x + w / 2 < W * 0.3 ? x : x + w / 2}
+                    y={y - 60}
+                    style={`text-anchor: ${x + w / 2 > W * 0.7 ? 'end' : x + w / 2 < W * 0.3 ? 'start' : 'middle'}`}
+                    class:list={['furniture-label', 'furniture-label-small', { 'furniture-en': l === 'en' }]}
+                    data-l={l}
+                  >{l === 'zh' ? f.zh : f.en}</text>
+                ))}
+              </>
             )}
           </g>
         );
@@ -68,7 +76,7 @@ const years = (d: string) => d.slice(0, 4);
         const p = inDrawer(f.id, n);
         return (
           <div class="drawer-contents" data-for={`${f.id}-${n}`} hidden>
-            <p class="drawer-title">{f.en}, drawer {n} · <span lang="zh">{f.zh}{drawerN(n).zh}</span>:</p>
+            <p class="drawer-title"><Bi t={{ en: `${f.en}, drawer ${n}:`, zh: `${f.zh}${drawerN(n).zh}：` }} /></p>
             {p ? (
               <a class={`object object-${p.piece.object}`} href={`/house/drawer/${p.piece.id}`} rel="nofollow" data-astro-reload data-piece={p.piece.id}>
                 <svg class="object-icon" viewBox="0 0 40 40" aria-hidden="true">
@@ -76,7 +84,7 @@ const years = (d: string) => d.slice(0, 4);
                   {p.piece.object === 'page' && <><rect x="10" y="4" width="20" height="32" /><path d="M14 12h12M14 17h12M14 22h12M14 27h8" /></>}
                   {p.piece.object === 'notebook' && <><rect x="9" y="5" width="22" height="30" /><path d="M13 5v30M17 13h10M17 18h10" /></>}
                 </svg>
-                <span>{p.piece.objectLabel}, {years(p.piece.date)}{p.piece.objectLabelZh && <> · <span lang="zh">{p.piece.objectLabelZh}，{years(p.piece.date)}年</span></>}</span>
+                <span><Bi t={{ en: `${p.piece.objectLabel}, ${years(p.piece.date)}`, zh: p.piece.objectLabelZh ? `${p.piece.objectLabelZh}，${years(p.piece.date)}年` : '' }} /></span>
               </a>
             ) : (
               <p class="drawer-empty"><i><Bi t={t.empty} /></i></p>
@@ -90,9 +98,10 @@ const years = (d: string) => d.slice(0, 4);
 
 <script>
   // Open drawers; read objects on a sheet of paper (fetched on demand).
-  const PUT_BACK = 'Put it back · 放回去';
-  const UNFOLDING = 'Unfolding… · 正在展开……';
-  const UNREADABLE = 'This sheet could not be read. 这张纸无法读取。';
+  import { pick } from '../../scripts/lang';
+  const PUT_BACK = () => pick({ en: 'Put it back', zh: '放回去' });
+  const UNFOLDING = () => pick({ en: 'Unfolding…', zh: '正在展开……' });
+  const UNREADABLE = () => pick({ en: 'This sheet could not be read.', zh: '这张纸无法读取。' });
   const cache = new Map<string, string>();
   function sheetDialog() {
     let d = document.getElementById('sheet-dialog') as HTMLDialogElement | null;
@@ -100,7 +109,7 @@ const years = (d: string) => d.slice(0, 4);
       d = document.createElement('dialog');
       d.id = 'sheet-dialog';
       d.className = 'sheet-dialog';
-      d.innerHTML = `<form method="dialog" class="sheet-close"><button aria-label="${PUT_BACK}">${PUT_BACK}</button></form><div class="sheet-holder"></div>`;
+      d.innerHTML = `<form method="dialog" class="sheet-close"><button aria-label="${PUT_BACK()}">${PUT_BACK()}</button></form><div class="sheet-holder"></div>`;
       d.addEventListener('click', (e) => { if (e.target === d) d!.close(); });
       document.body.appendChild(d);
     }
@@ -108,19 +117,22 @@ const years = (d: string) => d.slice(0, 4);
   }
   async function openPiece(id: string, href: string) {
     const d = sheetDialog();
+    const close = d.querySelector('.sheet-close button')!;
+    close.textContent = PUT_BACK();
+    close.setAttribute('aria-label', PUT_BACK());
     const holder = d.querySelector('.sheet-holder')!;
-    holder.innerHTML = `<p><i>${UNFOLDING}</i></p>`;
+    holder.innerHTML = `<p><i>${UNFOLDING()}</i></p>`;
     d.showModal();
     try {
       if (!cache.has(id)) {
         const html = await (await fetch(href)).text();
         const sheet = new DOMParser().parseFromString(html, 'text/html').querySelector('[data-sheet]');
-        cache.set(id, sheet ? sheet.outerHTML : `<p>${UNREADABLE}</p>`);
+        cache.set(id, sheet ? sheet.outerHTML : `<p>${UNREADABLE()}</p>`);
       }
       holder.innerHTML = cache.get(id)!;
       holder.scrollTop = 0;
     } catch {
-      holder.innerHTML = `<p>${UNREADABLE} <a href="${href}">Open it on its own · 单独打开</a>.</p>`;
+      holder.innerHTML = `<p>${UNREADABLE()} <a href="${href}">${pick({ en: 'Open it on its own', zh: '单独打开' })}</a>.</p>`;
     }
   }
   function initDrawers() {

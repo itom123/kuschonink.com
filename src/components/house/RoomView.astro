@@ -4,7 +4,7 @@ import RoomInterior from './RoomInterior.astro';
 import { projects, about, contact, site } from '../../lib/content';
 import { neighbours, house, rooms, type Room } from '../../lib/house';
 import Bi from '../Bi.astro';
-import { t, chapter, statusZh } from '../../lib/i18n';
+import { t, attr, chapter, statusZh } from '../../lib/i18n';
 
 interface Props { room: Room }
 const { room } = Astro.props;
@@ -14,36 +14,36 @@ const project = c && 'project' in c ? projects.find((p) => p.slug === c.project)
 const page = c && 'page' in c ? c.page : undefined;
 const sections = project?.sections ?? (page === 'about' ? about.sections : page === 'contact' ? contact.sections : []);
 const chapterOf = (r: Room) => chapter(r.locked ? undefined : r.chapter);
-const chapterLabel = (r: Room) => chapterOf(r).en;
 const titleOf = (r: Room) => ({ en: r.title, zh: r.titleZh });
+const chapterLink = (r: Room) => ({ en: `${chapterOf(r).en}: ${r.title}`, zh: `${chapterOf(r).zh}：${r.titleZh}` });
 ---
 <aside class="room-panel" data-room-page={room.slug} aria-labelledby="room-title">
   <div class="panel-bar">
-    <span><Bi t={chapterOf(room)} sep=" · " /> · {room.floor.name} · <span lang="zh">{room.floor.zh}</span></span>
-    <a class="panel-close" href={`/house?floor=${room.floor.id}`} aria-label={t.close.en} title={t.close.zh}>[×]</a>
+    <span><Bi t={chapterOf(room)} /> · <Bi t={{ en: room.floor.name, zh: room.floor.zh }} /></span>
+    <a class="panel-close" href={`/house?floor=${room.floor.id}`} {...attr('aria-label', t.close)}>[×]</a>
   </div>
   <div class="panel-body">
     <h1 id="room-title"><Bi t={titleOf(room)} /></h1>
-    {room.contents && <p class="room-name">{room.zh && <span lang="zh">{room.zh}</span>} {room.en}</p>}
+    {room.contents && <p class="room-name"><Bi t={{ en: room.en, zh: room.zh }} /></p>}
 
-    <p class="inventory"><b><Bi t={t.inventory} />:</b> {room.inventory.join('; ')}.</p>
-    <p class="inventory" lang="zh">{room.inventoryZh.join('；')}。</p>
+    <p class="inventory" data-l="en"><b>{t.inventory.en}:</b> {room.inventory.join('; ')}.</p>
+    <p class="inventory" data-l="zh" lang="zh-Hans"><b>{t.inventory.zh}：</b>{room.inventoryZh.join('；')}。</p>
 
     <details class="constraints" open={!room.contents ? true : undefined}>
-      <summary>{t.constraintsFor.en} {chapterOf(room).en.toLowerCase()} · <span lang="zh">{t.constraintsFor.zh}{chapterOf(room).zh}</span></summary>
+      <summary><Bi t={{ en: `${t.constraintsFor.en} ${chapterOf(room).en.toLowerCase()}`, zh: `${chapterOf(room).zh}的约束` }} /></summary>
       <table>
         <thead><tr><th scope="col"><Bi t={t.list} /></th><th scope="col"><Bi t={t.value} /></th><th scope="col"><Bi t={t.status} /></th></tr></thead>
         <tbody>
           {room.constraints.map((c) => (
             <tr class:list={{ hidden: c.hidden }} data-status={c.status}>
-              <th scope="row">{c.name}<br /><span lang="zh" class="zh">{c.nameZh}</span></th>
-              <td>{c.value}<br /><span lang="zh" class="zh">{c.valueZh}</span></td>
-              <td>{c.status}<br /><span lang="zh" class="zh">{statusZh[c.status]}</span></td>
+              <th scope="row"><Bi t={{ en: c.name, zh: c.nameZh }} /></th>
+              <td><Bi t={{ en: c.value, zh: c.valueZh }} /></td>
+              <td><Bi t={{ en: c.status, zh: statusZh[c.status] }} /></td>
             </tr>
           ))}
         </tbody>
       </table>
-      <p class="constraints-note"><Bi t={t.hiddenNote} /> <a href="/house/appendix/rules"><Bi t={t.howDealt} /></a>.</p>
+      <p class="constraints-note"><Bi t={t.hiddenNote} /> <a href="/house/appendix/rules"><Bi t={t.howDealt} /></a><span data-l="en">.</span><span data-l="zh">。</span></p>
     </details>
     <hr />
 
@@ -52,8 +52,7 @@ const titleOf = (r: Room) => ({ en: r.title, zh: r.titleZh });
     {room.locked && (
       <div class="missing">
         <p><i><Bi t={t.missing} /></i></p>
-        <p>{house.lockedNote}</p>
-        <p lang="zh">{house.lockedNoteZh}</p>
+        <p><Bi t={{ en: house.lockedNote, zh: house.lockedNoteZh }} /></p>
       </div>
     )}
 
@@ -65,13 +64,15 @@ const titleOf = (r: Room) => ({ en: r.title, zh: r.titleZh });
 
     {page === 'colophon' && (
       <div class="prose">
-        <p>{site.name}. <a href="/">kuschonink.com</a></p>
-        <p>The house is drawn from the plans of the 2008 renovation of the family house: ground floor, first floor, attic and roof, and the south elevation. {house.lockedNote}</p>
-        <p>Its {rooms.length} chapters follow a knight’s tour of the house’s 5 × 5 structural grid, floor by floor, after Georges Perec’s <i>Life A User’s Manual</i> (1978). One room has no door.</p>
-        <p>The house collects: every room keeps one thing. The <a href="/image">simple view</a> classifies the same things into an array.</p>
-        <p>Appendices: <a href="/house/appendix/index">Index</a> · <a href="/house/appendix/chronology">Chronology</a> · <a href="/house/appendix/checklist">Checklist</a> · <a href="/house/appendix/rules">Rules</a>.</p>
-        <p>Set in Times New Roman.</p>
-        <div lang="zh">
+        <div data-l="en">
+          <p>{site.name}. <a href="/">kuschonink.com</a></p>
+          <p>The house is drawn from the plans of the 2008 renovation of the family house: ground floor, first floor, attic and roof, and the south elevation. {house.lockedNote}</p>
+          <p>Its {rooms.length} chapters follow a knight’s tour of the house’s 5 × 5 structural grid, floor by floor, after Georges Perec’s <i>Life A User’s Manual</i> (1978). One room has no door.</p>
+          <p>The house collects: every room keeps one thing. The <a href="/image">simple view</a> classifies the same things into an array.</p>
+          <p>Appendices: <a href="/house/appendix/index">Index</a> · <a href="/house/appendix/chronology">Chronology</a> · <a href="/house/appendix/checklist">Checklist</a> · <a href="/house/appendix/rules">Rules</a>.</p>
+          <p>Set in Times New Roman.</p>
+        </div>
+        <div data-l="zh" lang="zh-Hans">
           <p>{site.name}。<a href="/">kuschonink.com</a></p>
           <p>这座房子取自家宅2008年翻修时的图纸：一层、二层、阁楼层和屋顶，以及南立面。{house.lockedNoteZh}</p>
           <p>它的{rooms.length}个章节沿着骑士在房子5 × 5结构网格上的巡游，一层接一层排列，仿照乔治·佩雷克的《人生拼图版》（1978）。有一个房间没有门。</p>
@@ -83,15 +84,15 @@ const titleOf = (r: Room) => ({ en: r.title, zh: r.titleZh });
     )}
 
     {project && (
-      <p class="simple-link"><a href={`/image/${project.slug}`}>See “{project.title}” in the simple view · <span lang="zh">在简易视图中查看《{project.titleZh ?? project.title}》</span></a></p>
+      <p class="simple-link"><a href={`/image/${project.slug}`}><Bi t={{ en: `See “${project.title}” in the simple view`, zh: `在简易视图中查看《${project.titleZh ?? project.title}》` }} /></a></p>
     )}
-    {page === 'about' && <p class="simple-link"><a href="/about">About, in the simple view · <span lang="zh">简易视图中的“关于”</span></a></p>}
-    {page === 'contact' && <p class="simple-link"><a href="/contact">Contact, in the simple view · <span lang="zh">简易视图中的“联系”</span></a></p>}
+    {page === 'about' && <p class="simple-link"><a href="/about"><Bi t={{ en: 'About, in the simple view', zh: '在简易视图中查看“关于”' }} /></a></p>}
+    {page === 'contact' && <p class="simple-link"><a href="/contact"><Bi t={{ en: 'Contact, in the simple view', zh: '在简易视图中查看“联系”' }} /></a></p>}
 
     <hr />
-    <nav class="chapter-nav" aria-label={t.chapters.en}>
-      {prev ? <a href={`/house/${prev.slug}`} rel="prev">← {chapterLabel(prev)}: {prev.title}<br /><span lang="zh" class="zh">{chapterOf(prev).zh}：{prev.titleZh}</span></a> : <span />}
-      {next ? <a href={`/house/${next.slug}`} rel="next">{chapterLabel(next)}: {next.title} →<br /><span lang="zh" class="zh">{chapterOf(next).zh}：{next.titleZh}</span></a> : <a href="/house/appendix/index" rel="next"><Bi t={t.appendicesIndex} /> →</a>}
+    <nav class="chapter-nav" {...attr('aria-label', t.chapters)}>
+      {prev ? <a href={`/house/${prev.slug}`} rel="prev">← <Bi t={chapterLink(prev)} /></a> : <span />}
+      {next ? <a href={`/house/${next.slug}`} rel="next"><Bi t={chapterLink(next)} /> →</a> : <a href="/house/appendix/index" rel="next"><Bi t={t.appendicesIndex} /> →</a>}
     </nav>
   </div>
 </aside>

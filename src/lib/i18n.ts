@@ -1,11 +1,25 @@
 // The bilingual pack: every piece of interface text, in English and Chinese.
+// The 中/EN toggle (src/components/LangToggle.astro) shows one language at a time.
 // Content (rooms, furniture, lists, projects) keeps its own `zh` fields in
 // src/content; this file holds the words of the site itself.
 
 export interface Bi { en: string; zh: string }
 
-/** "English · 中文" as plain text, for titles, aria-labels and placeholders. */
-export const both = (b: Bi, sep = ' · ') => (b.zh && b.zh !== b.en ? `${b.en}${sep}${b.zh}` : b.en);
+/**
+ * A translated attribute (aria-label, title, placeholder, alt), to spread on an
+ * element: English in the attribute, both versions in data-* for the toggle.
+ */
+export const attr = (name: 'aria-label' | 'title' | 'placeholder' | 'alt', b: Bi) => ({
+  [name]: b.en,
+  [`data-${name}-en`]: b.en,
+  [`data-${name}-zh`]: b.zh || b.en,
+});
+
+/** Text that CSS can't hide (e.g. SVG <title>): English inside, both in data-*. */
+export const text = (b: Bi) => ({ 'data-text-en': b.en, 'data-text-zh': b.zh || b.en });
+
+/** English and Chinese page titles: "<en> — site", "<zh> — site". */
+export const seoTitle = (b: Bi, site: string) => ({ title: `${b.en} — ${site}`, titleZh: `${b.zh || b.en} — ${site}` });
 
 /** Short floor name in Chinese: "二层平面图" → "二层". */
 export const floorZh = (zh: string) => zh.replace(/平面图$/, '');

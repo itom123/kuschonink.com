@@ -296,11 +296,13 @@ export interface Piece {
   titleZh?: string;
   date: string;
   excerpt?: string;
+  excerptZh?: string;
   object: 'letter' | 'page' | 'notebook';
   objectLabel: string;
   objectLabelZh?: string;
   references: ({ project: string } | { room: string } | { piece: string })[];
   html: string;
+  htmlZh?: string;
 }
 export interface Placement {
   piece: Piece;

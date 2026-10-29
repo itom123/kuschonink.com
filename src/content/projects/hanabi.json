@@ -3,7 +3,8 @@
   "titleZh": "花火",
   "order": 12,
   "seo": {
-    "title": "Hanabi — Xiangyin Gu"
+    "title": "Hanabi — Xiangyin Gu",
+    "titleZh": "花火 — Xiangyin Gu"
   },
   "sections": [
     {
@@ -19,7 +20,8 @@
       "blocks": [
         {
           "type": "text",
-          "html": "<h2 class=\"display align-center\">Hanabi</h2>"
+          "html": "<h2 class=\"display align-center\">Hanabi</h2>",
+          "htmlZh": "<h2 class=\"display align-center\">花火</h2>"
         }
       ]
     },
@@ -28,7 +30,8 @@
       "blocks": [
         {
           "type": "text",
-          "html": "<h1>“Hanabi” is an ongoing experimental project for two years which consist of both writing and photography around the theme of fireworks. For me, fireworks are beautiful in its most enigmatic way. How ephemeral yet how eternal; how unforgettable yet how repetitive. One fails to flee from the spectacle regardless. Threads of events in life are similar to the sprakling of the fire like a spoon of sugar.</h1>"
+          "html": "<h1>“Hanabi” is an ongoing experimental project for two years which consist of both writing and photography around the theme of fireworks. For me, fireworks are beautiful in its most enigmatic way. How ephemeral yet how eternal; how unforgettable yet how repetitive. One fails to flee from the spectacle regardless. Threads of events in life are similar to the sprakling of the fire like a spoon of sugar.</h1>",
+          "htmlZh": "<h1>《花火》是一个已持续两年的实验性项目，围绕烟花这一主题，由写作与摄影共同构成。对我而言，烟花之美在于它最难以捉摸的那一面。何其短暂，又何其永恒；何其难忘，又何其重复。无论如何，人都无法从这场奇观中逃离。生活中一桩桩事件的线索，就像火光的迸溅，如一勺糖。</h1>"
         }
       ]
     },
@@ -80,7 +83,8 @@
       "blocks": [
         {
           "type": "text",
-          "html": "<p class=\"large align-center\">Birds stopped</p><p class=\"large align-center\">mid in the air.</p><p class=\"large align-center\">Now it’s there,</p><p class=\"large align-center\">at present,</p><p class=\"large align-center\">intervals bring illusions and visions.</p><p><br/></p><p class=\"large align-center\">It is not there,</p><p class=\"large align-center\">we could only guess</p><p class=\"large align-center\">its next position,</p><p class=\"large align-center\">its next juncture</p><p class=\"large align-center\">and its next presence.</p><p><br/></p><p class=\"large align-center\">Like</p><p class=\"large align-center\">a spoon of sugar sprinkled into</p><p class=\"large align-center\">the boiling water,</p><p class=\"large align-center\">hereon any moment of it</p><p class=\"large align-center\">can not be dispensed.</p><p><br/></p><p class=\"large align-center\">Everything</p><p class=\"large align-center\">in this world combines</p><p class=\"large align-center\">into a large monad,</p><p class=\"large align-center\">here isolation of the individuals</p><p class=\"large align-center\">is merely hypothesis out of convenience.</p><p><br/></p><p class=\"large align-center\">Like</p><p class=\"large align-center\">webs of the spiders,</p><p class=\"large align-center\">connections of being spray out</p><p class=\"large align-center\">intricately yet obediently,</p><p class=\"large align-center\">adhering all their prey.</p><p><br/></p><p class=\"align-center\">“Like a Spoon of Sugar” (poem)</p><p class=\"align-center\">by Xiangyin Tom Gu</p>"
+          "html": "<p class=\"large align-center\">Birds stopped</p><p class=\"large align-center\">mid in the air.</p><p class=\"large align-center\">Now it’s there,</p><p class=\"large align-center\">at present,</p><p class=\"large align-center\">intervals bring illusions and visions.</p><p><br/></p><p class=\"large align-center\">It is not there,</p><p class=\"large align-center\">we could only guess</p><p class=\"large align-center\">its next position,</p><p class=\"large align-center\">its next juncture</p><p class=\"large align-center\">and its next presence.</p><p><br/></p><p class=\"large align-center\">Like</p><p class=\"large align-center\">a spoon of sugar sprinkled into</p><p class=\"large align-center\">the boiling water,</p><p class=\"large align-center\">hereon any moment of it</p><p class=\"large align-center\">can not be dispensed.</p><p><br/></p><p class=\"large align-center\">Everything</p><p class=\"large align-center\">in this world combines</p><p class=\"large align-center\">into a large monad,</p><p class=\"large align-center\">here isolation of the individuals</p><p class=\"large align-center\">is merely hypothesis out of convenience.</p><p><br/></p><p class=\"large align-center\">Like</p><p class=\"large align-center\">webs of the spiders,</p><p class=\"large align-center\">connections of being spray out</p><p class=\"large align-center\">intricately yet obediently,</p><p class=\"large align-center\">adhering all their prey.</p><p><br/></p><p class=\"align-center\">“Like a Spoon of Sugar” (poem)</p><p class=\"align-center\">by Xiangyin Tom Gu</p>",
+          "htmlZh": "<p class=\"large align-center\">鸟儿停驻</p><p class=\"large align-center\">在半空中。</p><p class=\"large align-center\">此刻它在那里，</p><p class=\"large align-center\">在当下，</p><p class=\"large align-center\">间隙带来幻觉与幻象。</p><p><br/></p><p class=\"large align-center\">它不在那里，</p><p class=\"large align-center\">我们只能猜测</p><p class=\"large align-center\">它下一个位置，</p><p class=\"large align-center\">它下一个节点</p><p class=\"large align-center\">和它下一次的在场。</p><p><br/></p><p class=\"large align-center\">就像</p><p class=\"large align-center\">一勺糖撒进</p><p class=\"large align-center\">沸腾的水中，</p><p class=\"large align-center\">从此它的任何一刻</p><p class=\"large align-center\">都无法再被分离。</p><p><br/></p><p class=\"large align-center\">万物</p><p class=\"large align-center\">在这世上结合</p><p class=\"large align-center\">成一个巨大的单子，</p><p class=\"large align-center\">在此，个体的孤立</p><p class=\"large align-center\">不过是出于便利的假设。</p><p><br/></p><p class=\"large align-center\">就像</p><p class=\"large align-center\">蜘蛛的网，</p><p class=\"large align-center\">存在的联结向外喷散，</p><p class=\"large align-center\">错综而又顺从，</p><p class=\"large align-center\">粘住它们所有的猎物。</p><p><br/></p><p class=\"align-center\">《如一勺糖》（诗）</p><p class=\"align-center\">Xiangyin Tom Gu 作</p>"
         }
       ]
     }

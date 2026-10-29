@@ -6,50 +6,62 @@ import '../styles/vendor/98css/98.css';
 import '../styles/blocks.css';
 import '../styles/win98.css';
 import { site } from '../lib/content';
-import { t, both } from '../lib/i18n';
-
-const zh = (s: { zh: string }) => s.zh;
+import { t, attr, type Bi as BiText } from '../lib/i18n';
+import Bi from '../components/Bi.astro';
+import LangToggle from '../components/LangToggle.astro';
 import type { Seo } from '../lib/types';
 
 interface Props {
   seo: Seo;
   image?: string;
   /** Window title */
-  title: string;
+  title: BiText;
   /** Fake address, e.g. C:\kuschonink\image */
   address: string;
   houseHref?: string;
-  status?: string;
+  status?: BiText;
 }
 const { seo, image, title, address, houseHref = '/house', status } = Astro.props;
+// Menu items with their keyboard letter underlined, Windows style: "Projects" / "作品(P)".
+const menu = (en: string, key: string, zh: string) => ({ en, key, zh });
+const menuItems = [
+  { href: '/image', ...menu('Projects', 'P', t.projects.zh) },
+  { href: '/image/all', ...menu('All on one page', 'A', t.allOnOnePage.zh) },
+  { href: '/about', ...menu('About', 'b', t.about.zh) },
+  { href: '/contact', ...menu('Contact', 'C', t.contact.zh) },
+  { href: houseHref, ...menu('The House', 'T', t.theHouse.zh) },
+];
+const underline = (text: string, key: string) => {
+  const i = text.indexOf(key);
+  return i < 0 ? text : `${text.slice(0, i)}<u>${key}</u>${text.slice(i + 1)}`;
+};
 ---
 <Base seo={seo} image={image} bodyClass="win98">
   <div class="desktop">
-    <nav class="desktop-icons" aria-label={both(t.desktop, ' ')}>
-      <a href="/image" class="desk-icon"><span class="ico ico-folder" aria-hidden="true"></span>Projects<span lang="zh" class="zh">{zh(t.projects)}</span></a>
-      <a href={houseHref} class="desk-icon"><span class="ico ico-house" aria-hidden="true"></span>The House<span lang="zh" class="zh">{zh(t.theHouse)}</span></a>
-      <a href="/about" class="desk-icon"><span class="ico ico-doc" aria-hidden="true"></span>About.txt<span lang="zh" class="zh">{zh(t.about)}</span></a>
-      <a href="/contact" class="desk-icon"><span class="ico ico-mail" aria-hidden="true"></span>Contact<span lang="zh" class="zh">{zh(t.contact)}</span></a>
+    <nav class="desktop-icons" {...attr('aria-label', t.desktop)}>
+      <a href="/image" class="desk-icon"><span class="ico ico-folder" aria-hidden="true"></span><Bi t={t.projects} /></a>
+      <a href={houseHref} class="desk-icon"><span class="ico ico-house" aria-hidden="true"></span><Bi t={t.theHouse} /></a>
+      <a href="/about" class="desk-icon"><span class="ico ico-doc" aria-hidden="true"></span><Bi t={{ en: 'About.txt', zh: '关于.txt' }} /></a>
+      <a href="/contact" class="desk-icon"><span class="ico ico-mail" aria-hidden="true"></span><Bi t={t.contact} /></a>
     </nav>
     <main class="window main-window">
       <div class="title-bar">
-        <div class="title-bar-text">{title} — {site.name}</div>
+        <div class="title-bar-text"><Bi t={title} /> — {site.name}</div>
         <div class="title-bar-controls">
-          <button aria-label="Minimize 最小化" disabled></button>
-          <button aria-label="Maximize 最大化" disabled></button>
-          <a href={houseHref} class="close-link" aria-label="Close and go to the house 关闭并前往房子"><button aria-label="Close 关闭" tabindex="-1"></button></a>
+          <button {...attr('aria-label', { en: 'Minimize', zh: '最小化' })} disabled></button>
+          <button {...attr('aria-label', { en: 'Maximize', zh: '最大化' })} disabled></button>
+          <a href={houseHref} class="close-link" {...attr('aria-label', { en: 'Close and go to the house', zh: '关闭并前往房子' })}><button {...attr('aria-label', { en: 'Close', zh: '关闭' })} tabindex="-1"></button></a>
         </div>
       </div>
       <div class="window-body">
-        <div class="menu-bar" role="navigation" aria-label={both(t.menu, ' ')}>
-          <a href="/image"><u>P</u>rojects <span lang="zh">{zh(t.projects)}</span></a>
-          <a href="/image/all"><u>A</u>ll on one page <span lang="zh">{zh(t.allOnOnePage)}</span></a>
-          <a href="/about">A<u>b</u>out <span lang="zh">{zh(t.about)}</span></a>
-          <a href="/contact"><u>C</u>ontact <span lang="zh">{zh(t.contact)}</span></a>
-          <a href={houseHref}><u>T</u>he House <span lang="zh">{zh(t.theHouse)}</span></a>
+        <div class="menu-bar" role="navigation" {...attr('aria-label', t.menu)}>
+          {menuItems.map((m) => (
+            <a href={m.href}><span data-l="en" set:html={underline(m.en, m.key)} /><span data-l="zh" lang="zh-Hans">{m.zh}(<u>{m.key.toUpperCase()}</u>)</span></a>
+          ))}
+          <span class="menu-lang"><LangToggle /></span>
         </div>
         <div class="field-row address-row">
-          <label for="address">Address <span lang="zh">{zh(t.address)}</span></label>
+          <label for="address"><Bi t={t.address} /></label>
           <input id="address" type="text" value={address} readonly />
         </div>
         <div class="page sunken-panel">
@@ -57,31 +69,32 @@ const { seo, image, title, address, houseHref = '/house', status } = Astro.props
         </div>
         {status && (
           <div class="status-bar">
-            <p class="status-bar-field">{status}</p>
+            <p class="status-bar-field"><Bi t={status} /></p>
             <p class="status-bar-field">{site.name}</p>
           </div>
         )}
       </div>
     </main>
   </div>
-  <footer class="taskbar">
+<footer class="taskbar">
     <details class="start">
-      <summary><span class="start-flag" aria-hidden="true"></span><b>Start</b> <span lang="zh">{zh(t.start)}</span></summary>
+      <summary><span class="start-flag" aria-hidden="true"></span><b><Bi t={t.start} /></b></summary>
       <ul class="start-menu window">
-        <li><a href={houseHref}>The House <span lang="zh">{zh(t.theHouse)}</span></a></li>
-        <li><a href="/image">Projects <span lang="zh">{zh(t.projects)}</span></a></li>
-        <li><a href="/image/all">All projects on one page <span lang="zh">{zh(t.allProjectsOnOnePage)}</span></a></li>
-        <li><a href="/about">About <span lang="zh">{zh(t.about)}</span></a></li>
-        <li><a href="/contact">Contact <span lang="zh">{zh(t.contact)}</span></a></li>
+        <li><a href={houseHref}><Bi t={t.theHouse} /></a></li>
+        <li><a href="/image"><Bi t={t.projects} /></a></li>
+        <li><a href="/image/all"><Bi t={t.allProjectsOnOnePage} /></a></li>
+        <li><a href="/about"><Bi t={t.about} /></a></li>
+        <li><a href="/contact"><Bi t={t.contact} /></a></li>
         <li><a href={site.social[0].href} target="_blank" rel="noopener">Instagram</a></li>
       </ul>
     </details>
-    <span class="task-current">{title}</span>
+    <span class="task-current"><Bi t={title} /></span>
     <span class="tray"><time class="clock"></time></span>
   </footer>
   <script>
     const c = document.querySelector('.clock');
-    const tick = () => { if (c) c.textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); };
+    const tick = () => { if (c) c.textContent = new Date().toLocaleTimeString(document.documentElement.lang || [], { hour: 'numeric', minute: '2-digit' }); };
     tick(); setInterval(tick, 15000);
+    document.addEventListener('langchange', tick);
   </script>
 </Base>

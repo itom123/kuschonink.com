@@ -6,6 +6,7 @@ import '../styles/blocks.css';
 import '../styles/house.css';
 import { site } from '../lib/content';
 import Bi from '../components/Bi.astro';
+import LangToggle from '../components/LangToggle.astro';
 import { t } from '../lib/i18n';
 import type { Seo } from '../lib/types';
 
@@ -21,8 +22,10 @@ const { seo, image, simpleHref = '/image', bodyClass, noindex = false } = Astro.
       <a href="/house"><Bi t={t.theHouse} /></a>
       <span aria-hidden="true">|</span>
       <a href={simpleHref} data-simple-link><Bi t={t.simpleView} /></a>
-      <span aria-hidden="true">|</span>
+      <span aria-hidden="true" class="sep-social">|</span>
       <a href={site.social[0].href} target="_blank" rel="noopener">Instagram</a>
+      <span aria-hidden="true">|</span>
+      <LangToggle />
     </nav>
   </header>
   <slot />

@@ -1,5 +1,6 @@
 // The house map: pan, zoom, floors, search, URL state. Plain DOM, no framework.
 // Works like an indoor map: the viewport shows one floor at a time, rooms are links.
+import { getLang, pick } from './lang';
 
 type View = { cx: number; cy: number; z: number };
 type Bounds = { x: number; y: number; w: number; h: number };
@@ -17,10 +18,14 @@ export function initMap() {
   const svgs = [...root.querySelectorAll<SVGSVGElement>('svg.floor')];
   const index = JSON.parse(document.getElementById('house-index')!.textContent!) as {
     rooms: IndexRoom[];
-    floors: { id: string; name: string; zh: string; level: string }[];
-    text: { none: string; noDoor: string };
+    floors: { id: string; name: string; zh: string; zhShort: string; level: string }[];
+    text: { none: { en: string; zh: string }; noDoor: { en: string; zh: string } };
   };
   const floorName = root.querySelector<HTMLElement>('.map-floorname')!;
+  const showFloorName = () => {
+    const info = index.floors.find((x) => x.id === floor)!;
+    floorName.textContent = `${getLang() === 'zh' ? info.zh : info.name} · ${info.level}`;
+  };
 
   const bounds = new Map<string, Bounds>(
     svgs.map((s) => {
@@ -138,8 +143,7 @@ export function initMap() {
       next.classList.add('floor-enter');
     }
     root!.querySelectorAll<HTMLButtonElement>('[data-floor-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.floorBtn === f)));
-    const info = index.floors.find((x) => x.id === f)!;
-    floorName.textContent = `${info.name} · ${info.zh} · ${info.level}`;
+    showFloorName();
     view = clampView(v ?? views.get(f) ?? { ...view, ...{ cx: home(f).cx, cy: home(f).cy } });
     root!.dataset.zoomLevel = '';
     render();
@@ -238,7 +242,7 @@ export function initMap() {
       return;
     }
     const locked = (e.target as Element).closest('.room.locked');
-    if (locked) toast(index.text.noDoor);
+    if (locked) toast(pick(index.text.noDoor));
   }, true);
 
   viewport.addEventListener('wheel', (e) => {
@@ -283,17 +287,25 @@ export function initMap() {
   const input = root.querySelector<HTMLInputElement>('.map-search input')!;
   const results = root.querySelector<HTMLUListElement>('.search-results')!;
   const norm = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
-  const floorLabel = (id: string) => { const f = index.floors.find((f) => f.id === id)!; return `${f.name} ${f.zh.replace(/平面图$/, '')}`; };
+  const floorLabel = (id: string) => { const f = index.floors.find((f) => f.id === id)!; return getLang() === 'zh' ? f.zhShort : f.name; };
   function showResults() {
     const q = norm(input.value.trim());
     if (!q) { results.hidden = true; results.innerHTML = ''; return; }
     const hits = index.rooms.filter((r) => [r.title, r.titleZh, r.en, r.zh, String(r.chapter)].some((t) => norm(t).includes(q))).slice(0, 8);
     results.innerHTML = hits.length
-      ? hits.map((r) => `<li><a href="/house/${r.slug}" data-slug="${r.slug}" ${r.locked ? 'data-locked' : ''}><b>${escape(r.title)}</b>${r.titleZh && r.titleZh !== r.title && r.titleZh !== r.zh ? ` <b lang="zh">${escape(r.titleZh)}</b>` : ''} <small>${escape(r.zh)} ${escape(r.en === r.title ? '' : r.en)} · ${floorLabel(r.floor)} · ch. ${r.locked ? '—' : r.chapter} · 第${r.locked ? '—' : r.chapter}章</small></a></li>`).join('')
-      : `<li class="none">${escape(index.text.none)}</li>`;
+      ? hits.map((r) => {
+          const zh = getLang() === 'zh';
+          const n = r.locked ? '—' : r.chapter;
+          const title = zh ? r.titleZh || r.title : r.title;
+          const name = zh ? (r.zh === title ? '' : r.zh) : (r.en === title ? '' : r.en);
+          const where = zh ? `${floorLabel(r.floor)} · 第${n}章` : `${floorLabel(r.floor)} · ch. ${n}`;
+          return `<li><a href="/house/${r.slug}" data-slug="${r.slug}" ${r.locked ? 'data-locked' : ''}><b>${escape(title)}</b> <small>${escape(name)} · ${where}</small></a></li>`;
+        }).join('')
+      : `<li class="none">${escape(pick(index.text.none))}</li>`;
     results.hidden = false;
   }
   input.addEventListener('input', showResults);
+  document.addEventListener('langchange', () => { showFloorName(); showResults(); });
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const a = results.querySelector<HTMLAnchorElement>('a');
@@ -304,7 +316,7 @@ export function initMap() {
   results.addEventListener('click', (e) => {
     const a = (e.target as Element).closest<HTMLAnchorElement>('a');
     if (!a) return;
-    if (a.hasAttribute('data-locked')) { e.preventDefault(); focusRoom(a.dataset.slug!); toast(index.text.noDoor); }
+    if (a.hasAttribute('data-locked')) { e.preventDefault(); focusRoom(a.dataset.slug!); toast(pick(index.text.noDoor)); }
     input.value = '';
     showResults();
   });
