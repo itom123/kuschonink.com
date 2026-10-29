@@ -18,7 +18,7 @@ interface Props {
   houseHref?: string;
   status?: string;
 }
-const { seo, image, title, address, houseHref = '/house', status } = Astro.props;
+const { seo, image, title, address, houseHref = '/house/facade', status } = Astro.props;
 ---
 <Base seo={seo} image={image} bodyClass="win98">
   <div class="desktop">

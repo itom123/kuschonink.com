@@ -15,15 +15,15 @@ npm run deploy    # build and deploy to Cloudflare Workers
 
 ## Two ways in
 
-**The house** (`/`, `/house`, `/house/<room>`): the site is the family house, drawn from
-the 2008 renovation plans. The façade (`/`) is the south elevation: the door and
+**The house** (`/house/facade`, `/house`, `/house/<room>`): the site is the family house, drawn from
+the 2008 renovation plans. The façade (`/house/facade`) is the south elevation: the door and
 windows lead inside. The floorplan works like an indoor map: drag to move, scroll
 or pinch to zoom, switch floors with **R / A / 2 / 1**, search with *Search this
 house*, and tick **Blueprint** to see the original drawings. Rooms hold projects,
 About and Contact. Everything is set in Times New Roman.
 
-**The simple view** (`/image`, `/image/<slug>`, `/image/all`, `/about`, `/contact`):
-a Windows 98 desktop for anyone who wants to see the work quickly. Every gallery
+**The simple view** (`/`, `/image`, `/image/<slug>`, `/image/all`, `/about`, `/contact`):
+the default view visitors land on at `/`. A Windows 98 desktop for anyone who wants to see the work quickly. Every gallery
 is laid flat, so a project is one page. `/image/all` puts every project on one page.
 
 ### The rules of the house (after Perec)
