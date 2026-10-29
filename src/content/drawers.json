@@ -1,0 +1,157 @@
+{
+ "_comment": "Furniture with drawers, drawn inside rooms. Positions are in millimetres inside the room [x, y, width, height], from the room's top-left corner. Pieces in src/content/writings are placed into drawers by the rules in src/lib/drawers.ts (best constraint fit, ties to the earlier chapter, one piece per drawer). Pieces in drawers are unlisted: hidden from search engines, the sitemap, the Index and the simple view.",
+ "rooms": {
+  "f2/study": [
+   {
+    "id": "desk",
+    "zh": "书桌",
+    "en": "Desk",
+    "rect": [
+     250,
+     250,
+     1600,
+     700
+    ],
+    "drawers": 2
+   },
+   {
+    "id": "bookshelf",
+    "zh": "书架",
+    "en": "Bookshelf",
+    "rect": [
+     3200,
+     500,
+     350,
+     1800
+    ],
+    "drawers": 0
+   },
+   {
+    "id": "chair",
+    "zh": "椅子",
+    "en": "Chair",
+    "rect": [
+     800,
+     1050,
+     500,
+     500
+    ],
+    "drawers": 0
+   }
+  ],
+  "f2/west-bedroom": [
+   {
+    "id": "bed",
+    "zh": "床",
+    "en": "Bed",
+    "rect": [
+     1000,
+     1700,
+     1500,
+     2000
+    ],
+    "drawers": 0
+   },
+   {
+    "id": "bedside-table",
+    "zh": "床头柜",
+    "en": "Bedside table",
+    "rect": [
+     450,
+     1700,
+     450,
+     450
+    ],
+    "drawers": 1
+   },
+   {
+    "id": "chest",
+    "zh": "五斗柜",
+    "en": "Chest of drawers",
+    "rect": [
+     300,
+     4150,
+     1100,
+     500
+    ],
+    "drawers": 3
+   }
+  ],
+  "f2/middle-bedroom": [
+   {
+    "id": "bed",
+    "zh": "床",
+    "en": "Bed",
+    "rect": [
+     1000,
+     2600,
+     1500,
+     2000
+    ],
+    "drawers": 0
+   },
+   {
+    "id": "bedside-table",
+    "zh": "床头柜",
+    "en": "Bedside table",
+    "rect": [
+     450,
+     2600,
+     450,
+     450
+    ],
+    "drawers": 1
+   },
+   {
+    "id": "wardrobe",
+    "zh": "衣柜",
+    "en": "Wardrobe",
+    "rect": [
+     2100,
+     300,
+     1300,
+     600
+    ],
+    "drawers": 2
+   }
+  ],
+  "f2/east-bedroom": [
+   {
+    "id": "bed",
+    "zh": "床",
+    "en": "Bed",
+    "rect": [
+     900,
+     2300,
+     1500,
+     2000
+    ],
+    "drawers": 0
+   },
+   {
+    "id": "bedside-table",
+    "zh": "床头柜",
+    "en": "Bedside table",
+    "rect": [
+     400,
+     2300,
+     450,
+     450
+    ],
+    "drawers": 1
+   },
+   {
+    "id": "writing-desk",
+    "zh": "写字台",
+    "en": "Writing desk",
+    "rect": [
+     1900,
+     4400,
+     1100,
+     600
+    ],
+    "drawers": 1
+   }
+  ]
+ }
+}

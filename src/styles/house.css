@@ -168,3 +168,43 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 .deal .move { display: block; font-size: 0.8em; color: #555; }
 .deal .digits { font-family: 'Courier New', monospace; }
 .appendix h3.hidden { color: #c00; }
+
+/* Room interiors: furniture plan, drawers, objects */
+.interior { margin: 0.6em 0 1em; }
+.interior-plan { width: 100%; max-height: 46vh; display: block; background: #fff; }
+.interior-walls { fill: #fff; stroke: #000; stroke-width: 3px; vector-effect: non-scaling-stroke; }
+.furniture-body { fill: #fafafa; stroke: #000; stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.furniture-label { text-anchor: middle; font-family: 'Times New Roman', Times, serif; font-size: 150px; fill: #000; pointer-events: none; }
+.furniture-en { font-size: 110px; font-style: italic; }
+.furniture-label-small { font-size: 120px; }
+.drawer { cursor: pointer; outline: none; }
+.drawer rect { fill: #ececec; stroke: #000; stroke-width: 1px; vector-effect: non-scaling-stroke; transition: transform 0.25s ease-out, fill 0.15s; transform-box: fill-box; }
+.drawer circle { fill: #000; }
+.drawer:hover rect, .drawer:focus-visible rect { fill: var(--hover); }
+.drawer:focus-visible rect { stroke: var(--link); stroke-width: 2px; }
+.drawer[aria-expanded='true'] rect { fill: var(--here); transform: translateY(18%); }
+.interior-hint { font-size: 0.85em; font-style: italic; margin: 2px 0 6px; }
+.drawer-contents { border: 1px solid #000; padding: 6px 10px; background: #fffff0; }
+.drawer-title { margin: 0 0 4px; font-size: 0.95em; }
+.drawer-empty { margin: 0; }
+.object { display: inline-flex; align-items: center; gap: 8px; }
+.object-icon { width: 34px; height: 34px; fill: #fff; stroke: #000; stroke-width: 1.5; }
+.object:hover .object-icon { fill: var(--hover); }
+
+/* The sheet of paper */
+.sheet-dialog { width: min(720px, calc(100vw - 24px)); max-height: calc(100vh - 48px); padding: 0; border: 1px solid #000; background: transparent; }
+.sheet-dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+.sheet-close { position: sticky; top: 0; display: flex; justify-content: flex-end; padding: 4px; background: var(--grey); border-bottom: 1px solid #000; }
+.sheet-close button { font: inherit; background: var(--grey); border: 2px solid; border-color: #fff #404040 #404040 #fff; cursor: pointer; }
+.sheet-holder { max-height: calc(100vh - 100px); overflow: auto; }
+.sheet { background: #fffef6; color: #111; padding: 28px 36px 32px; font-family: 'Times New Roman', Times, serif; line-height: 1.5; box-shadow: inset 0 0 40px rgba(120, 100, 40, 0.08); }
+.sheet h1 { font-weight: normal; font-size: 1.8em; margin: 0 0 0.2em; }
+.sheet-date { margin: 0 0 1.2em; color: #555; }
+.sheet-notebook { background-image: repeating-linear-gradient(#fffef6 0 23px, #d8e2f0 23px 24px); background-attachment: local; background-position: 0 4px; line-height: 24px; }
+.sheet-notebook .prose p, .sheet-notebook .prose .small { font-size: 16px; line-height: 24px; margin: 0 0 24px; }
+.sheet-notebook h1 { line-height: 48px; margin: 0; }
+.sheet-notebook .sheet-date { line-height: 24px; margin: 0 0 24px; }
+.sheet-letter { transform: rotate(-0.4deg); }
+.sheet-footer { margin-top: 2em; padding-top: 0.8em; border-top: 1px dashed #999; font-size: 0.9em; color: #333; }
+.room-panel .sheet { margin: 0 -16px; }
+@media (max-width: 600px) { .sheet { padding: 20px 18px; } }

@@ -1,5 +1,6 @@
 import houseJson from '../content/house.json';
 import perecJson from '../content/perec.json';
+import drawersJson from '../content/drawers.json';
 import { projects, site, about, contact } from './content';
 import type { Block, Section } from './types';
 
@@ -200,6 +201,8 @@ function buildRooms(): Room[] {
 
 /** Every room in the house, in chapter order. */
 export const rooms = buildRooms();
+export const roomByKey = new Map(rooms.map((r) => [r.key, r]));
+export const roomBySlug = new Map(rooms.map((r) => [r.slug, r]));
 
 // ---------------------------------------------------------------------------
 // Constraints (perec.json): lists dealt by orthogonal Latin squares of order 5.
@@ -252,7 +255,99 @@ function touches(a: RoomData, b: RoomData) {
   return (overlapX >= 0 && overlapY > 0) || (overlapY >= 0 && overlapX > 0);
 }
 
-const texts = new Map(rooms.map((r) => [r.key, roomText(r).toLowerCase()]));
+// ---------------------------------------------------------------------------
+// Drawers (drawers.json + writings/*.json). Pieces are placed by rule:
+// 1. a piece goes to the room whose dealt list items it mentions most;
+// 2. ties go to the earlier chapter; 3. one piece per drawer, oldest piece first.
+// ---------------------------------------------------------------------------
+
+export interface Furniture { id: string; zh: string; en: string; rect: [number, number, number, number]; drawers: number }
+export interface Piece {
+  id: string;
+  title: string;
+  date: string;
+  excerpt?: string;
+  object: 'letter' | 'page' | 'notebook';
+  objectLabel: string;
+  references: ({ project: string } | { room: string } | { piece: string })[];
+  html: string;
+}
+export interface Placement {
+  piece: Piece;
+  room: Room;
+  furniture: Furniture;
+  drawer: number;
+  /** The dealt constraints this piece fulfils in its room. */
+  fulfils: { name: string; value: string }[];
+}
+
+const furnitureByRoom = (drawersJson as { rooms: Record<string, Furniture[]> }).rooms;
+const pieceFiles = import.meta.glob<Omit<Piece, 'id'>>('../content/writings/*.json', { eager: true, import: 'default' });
+export const pieces: Piece[] = Object.entries(pieceFiles)
+  .map(([path, data]) => ({ ...data, id: path.split('/').pop()!.replace(/\.json$/, '') }))
+  .sort((a, b) => a.date.localeCompare(b.date));
+
+for (const key of Object.keys(furnitureByRoom)) {
+  if (!roomByKey.has(key)) throw new Error(`drawers.json: unknown room "${key}"`);
+}
+
+const plain = (html: string) => html.replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ');
+const dealt = (room: Room) =>
+  perec.lists.map((list) => ({ list, item: list.items[latin(list.square, room.cell)] }));
+
+function place(): Placement[] {
+  const free = new Map<string, { furniture: Furniture; drawer: number }[]>(
+    Object.entries(furnitureByRoom).map(([key, fs]) => [key, fs.flatMap((f) => Array.from({ length: f.drawers }, (_, i) => ({ furniture: f, drawer: i + 1 })))]),
+  );
+  const out: Placement[] = [];
+  for (const piece of pieces) {
+    const text = plain(piece.title + ' ' + piece.html).toLowerCase();
+    const candidates = Object.keys(furnitureByRoom)
+      .map((key) => roomByKey.get(key)!)
+      .filter((room) => free.get(room.key)!.length > 0)
+      .map((room) => {
+        const fulfils = dealt(room)
+          .filter(({ item }) => item.match.some((w) => text.includes(w.toLowerCase())))
+          .map(({ list, item }) => ({ name: list.name, value: item.label }));
+        return { room, fulfils };
+      })
+      .sort((a, b) => b.fulfils.length - a.fulfils.length || a.room.chapter - b.room.chapter);
+    const best = candidates[0];
+    if (!best) throw new Error(`No free drawer for "${piece.title}". Add drawers in drawers.json.`);
+    const slot = free.get(best.room.key)!.shift()!;
+    out.push({ piece, room: best.room, ...slot, fulfils: best.fulfils });
+  }
+  return out;
+}
+
+export const placements = place();
+export const furnitureOf = (room: Room) => furnitureByRoom[room.key] ?? [];
+export const placementsIn = (room: Room) => placements.filter((p) => p.room === room);
+export const placementOf = (id: string) => placements.find((p) => p.piece.id === id);
+
+// References are declared once and must resolve, or the build stops.
+for (const p of pieces) {
+  for (const ref of p.references) {
+    const ok =
+      ('project' in ref && projects.some((x) => x.slug === ref.project)) ||
+      ('room' in ref && roomByKey.has(ref.room)) ||
+      ('piece' in ref && pieces.some((x) => x.id === ref.piece));
+    if (!ok) throw new Error(`writings/${p.id}.json: reference ${JSON.stringify(ref)} does not exist`);
+  }
+}
+
+/** Projects whose own text shares a list item with a piece: references found by the rules. */
+export function sharedItems(piece: Piece) {
+  const text = plain(piece.title + ' ' + piece.html).toLowerCase();
+  const items = perec.lists.flatMap((l) => l.items).filter((i) => i.match.some((w) => text.includes(w.toLowerCase())));
+  return items.map((item) => ({
+    item,
+    rooms: rooms.filter((r) => r.contents && item.match.some((w) => texts.get(r.key)!.includes(w.toLowerCase()))),
+  }));
+}
+
+const drawerText = (r: Room) => placementsIn(r).map((p) => plain(p.piece.html)).join(' ');
+const texts = new Map(rooms.map((r) => [r.key, (roomText(r) + ' ' + drawerText(r)).toLowerCase()]));
 const has = (key: string, words: string[]) => words.some((w) => texts.get(key)!.includes(w.toLowerCase()));
 
 /** Neighbouring rooms (sharing a wall) on the same floor. */
@@ -288,8 +383,6 @@ for (const room of rooms) {
 export function roomsMentioning(words: string[]) {
   return rooms.filter((r) => has(r.key, words));
 }
-export const roomByKey = new Map(rooms.map((r) => [r.key, r]));
-export const roomBySlug = new Map(rooms.map((r) => [r.slug, r]));
 
 export function roomForProject(slug: string) {
   return rooms.find((r) => r.contents && 'project' in r.contents && r.contents.project === slug);

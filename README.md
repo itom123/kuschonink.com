@@ -69,6 +69,29 @@ holds the **Chronology**.
 Appendices (after the last chapter): `/house/appendix/index`, `chronology`,
 `checklist`, `rules`.
 
+### Drawers: `src/content/drawers.json` and `src/content/writings/`
+
+Private writings are kept as objects in drawers (a folded letter, a printed
+page, a notebook). The study and bedrooms have furniture drawn in plan (positions
+in mm inside the room). Click a drawer to open it, then an object to read it on
+a sheet of paper.
+
+- **Placement is by rule** (`src/lib/house.ts`), oldest piece first: each piece
+  goes to the room whose *dealt* list items it mentions most, ties go to the
+  earlier chapter, and there's one piece per drawer. A piece in a drawer also
+  fulfils its room's constraints.
+- **References are controlled.** Add `references` to a piece
+  (`{ "project": "<slug>" }`, `{ "room": "f2/study" }` or `{ "piece": "<id>" }`).
+  A reference that doesn't exist stops the build. The sheet also lists, by rule,
+  the list items it shares with the rest of the house.
+- **Unlisted, not secret.** Each piece lives at `/house/drawer/<id>` with
+  `noindex` (meta tag and `X-Robots-Tag` in `public/_headers`). Its text is
+  fetched only when the drawer is opened, and it's left out of the sitemap,
+  the Index and the simple view. Anyone who opens the drawer can read it.
+
+To add a piece, add `src/content/writings/<id>.json` (title, date, object,
+objectLabel, html, references). The rules find it a drawer.
+
 ### Contact form
 
 The form posts to the `kuschonink-contact` Worker (Turnstile anti-spam + Email

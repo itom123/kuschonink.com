@@ -1,5 +1,6 @@
 ---
 import Section from '../Section.astro';
+import RoomInterior from './RoomInterior.astro';
 import { projects, about, contact, site } from '../../lib/content';
 import { neighbours, house, rooms, type Room } from '../../lib/house';
 
@@ -40,6 +41,8 @@ const chapterLabel = (r: Room) => (r.locked ? 'Chapter —' : `Chapter ${r.chapt
       <p class="constraints-note">Hidden constraints in red. <a href="/house/appendix/rules">How the constraints are dealt</a>.</p>
     </details>
     <hr />
+
+    <RoomInterior room={room} />
 
     {room.locked && (
       <div class="missing">

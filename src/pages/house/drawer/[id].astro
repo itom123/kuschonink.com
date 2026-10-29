@@ -1,0 +1,51 @@
+---
+// An unlisted page for one piece kept in a drawer. Not in the sitemap, the
+// Index or the simple view; served with noindex (see public/_headers).
+import House from '../../../layouts/House.astro';
+import HouseMap from '../../../components/house/HouseMap.astro';
+import { placements, sharedItems, pieces, roomByKey, type Placement } from '../../../lib/house';
+import { projects, site } from '../../../lib/content';
+
+export function getStaticPaths() {
+  return placements.map((p) => ({ params: { id: p.piece.id }, props: { p } }));
+}
+const { p } = Astro.props as { p: Placement };
+const { piece, room, furniture, drawer, fulfils } = p;
+const shared = sharedItems(piece).filter((s) => s.rooms.some((r) => r !== room));
+const refLabel = (ref: Placement['piece']['references'][number]) => {
+  if ('project' in ref) { const x = projects.find((y) => y.slug === ref.project)!; return { href: `/image/${x.slug}`, label: x.title }; }
+  if ('room' in ref) { const r = roomByKey.get(ref.room)!; return { href: `/house/${r.slug}`, label: `${r.title} (ch. ${r.chapter})` }; }
+  const q = pieces.find((y) => y.id === ref.piece)!; return { href: `/house/drawer/${q.id}`, label: q.title };
+};
+---
+<House seo={{ title: `${piece.title} — ${site.name}` }} noindex bodyClass="house-map-page">
+  <HouseMap current={room} />
+  <aside class="room-panel" data-room-page={room.slug} aria-labelledby="room-title">
+    <div class="panel-bar">
+      <span>Chapter {room.chapter} · {room.en} · {furniture.en}, drawer {drawer}</span>
+      <a class="panel-close" href={`/house/${room.slug}`} aria-label="Close the drawer">[×]</a>
+    </div>
+    <div class="panel-body">
+      <article class={`sheet sheet-${piece.object}`} data-sheet>
+        <header>
+          <h1 id="room-title">{piece.title}</h1>
+          <p class="sheet-date"><time datetime={piece.date}>{piece.date}</time>{piece.excerpt && <> · <i>{piece.excerpt}</i></>}</p>
+        </header>
+        <div class="prose" set:html={piece.html} />
+        <footer class="sheet-footer">
+          <p>Kept in the {furniture.en.toLowerCase()} ({furniture.zh}), drawer {drawer}, {room.en.toLowerCase()}, chapter {room.chapter}.
+            {fulfils.length ? <> It fulfils the room’s constraints: {fulfils.map((f) => `${f.name.toLowerCase()}, “${f.value}”`).join('; ')}.</> : <> It fulfils none of the room’s constraints; it was placed by the tie rule (earliest chapter).</>}
+          </p>
+          {piece.references.length > 0 && (
+            <p>See also: {piece.references.map((r, i) => { const l = refLabel(r); return <>{i > 0 && ', '}<a href={l.href}>{l.label}</a></>; })}.</p>
+          )}
+          {shared.length > 0 && (
+            <p>Shares with the house: {shared.map((s, i) => <>{i > 0 && '; '}{s.item.label} ({s.rooms.filter((r) => r !== room).map((r, j) => <>{j > 0 && ', '}<a href={`/house/${r.slug}`}>ch. {r.chapter}</a></>)})</>)}.</p>
+          )}
+        </footer>
+      </article>
+      <hr />
+      <p><a href={`/house/${room.slug}`}>← Close the drawer</a></p>
+    </div>
+  </aside>
+</House>

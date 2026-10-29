@@ -1,0 +1,135 @@
+---
+// A plan of the room's furniture. Drawers can be opened; objects inside open
+// on a sheet of paper. The pieces' text is NOT in this page: it is fetched
+// from its own unlisted page (/house/drawer/<id>) only when opened.
+import { furnitureOf, placementsIn, type Room } from '../../lib/house';
+
+interface Props { room: Room }
+const { room } = Astro.props;
+const furniture = furnitureOf(room);
+const placed = placementsIn(room);
+const [, , W, H] = room.rect;
+const pad = 120;
+const inDrawer = (fid: string, n: number) => placed.find((p) => p.furniture.id === fid && p.drawer === n);
+const years = (d: string) => d.slice(0, 4);
+---
+{furniture.length > 0 && (
+  <section class="interior" aria-label="Furniture in this room">
+    <svg class="interior-plan" viewBox={`${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}`} role="group" aria-label={`Plan of the ${room.en.toLowerCase()} with furniture`}>
+      <rect class="interior-walls" x="0" y="0" width={W} height={H} />
+      {furniture.map((f) => {
+        const [x, y, w, h] = f.rect;
+        const horizontal = w >= h;
+        return (
+          <g class:list={['furniture', { 'has-drawers': f.drawers > 0 }]}>
+            <rect class="furniture-body" x={x} y={y} width={w} height={h} />
+            {Array.from({ length: f.drawers }, (_, i) => {
+              const n = i + 1;
+              const dw = horizontal ? (w - 60) / f.drawers - 30 : w - 80;
+              const dh = horizontal ? h - 80 : (h - 60) / f.drawers - 30;
+              const dx = horizontal ? x + 45 + i * ((w - 60) / f.drawers) : x + 40;
+              const dy = horizontal ? y + 40 : y + 45 + i * ((h - 60) / f.drawers);
+              const p = inDrawer(f.id, n);
+              return (
+                <g class:list={['drawer', { full: !!p }]} tabindex="0" role="button" aria-expanded="false"
+                   data-drawer={`${f.id}-${n}`} aria-label={`Open ${f.en.toLowerCase()}, drawer ${n}`}>
+                  <rect x={dx} y={dy} width={dw} height={dh} />
+                  <circle cx={dx + dw / 2} cy={dy + dh / 2} r={Math.min(dw, dh) * 0.08} />
+                </g>
+              );
+            })}
+            <title>{f.en} {f.zh}{f.drawers ? `, ${f.drawers} drawer${f.drawers > 1 ? 's' : ''}` : ''}</title>
+            {Math.min(w, h) >= 500 ? (
+              <text x={x + w / 2} y={y + h / 2} class="furniture-label">
+                <tspan x={x + w / 2} dy={f.drawers ? '-0.2em' : '0.35em'}>{f.zh}</tspan>
+                {f.drawers > 0 && <tspan x={x + w / 2} dy="1.2em" class="furniture-en">{f.en}</tspan>}
+              </text>
+            ) : (
+              // Small furniture: label beside it, outside the room's edge if needed.
+              <text x={x + w / 2} y={y - 60} class="furniture-label furniture-label-small">{f.zh}</text>
+            )}
+          </g>
+        );
+      })}
+    </svg>
+    <p class="interior-hint">Click a drawer to open it.</p>
+
+    {furniture.flatMap((f) =>
+      Array.from({ length: f.drawers }, (_, i) => {
+        const n = i + 1;
+        const p = inDrawer(f.id, n);
+        return (
+          <div class="drawer-contents" data-for={`${f.id}-${n}`} hidden>
+            <p class="drawer-title">{f.en} {f.zh && <span lang="zh">{f.zh}</span>}, drawer {n}:</p>
+            {p ? (
+              <a class={`object object-${p.piece.object}`} href={`/house/drawer/${p.piece.id}`} rel="nofollow" data-astro-reload data-piece={p.piece.id}>
+                <svg class="object-icon" viewBox="0 0 40 40" aria-hidden="true">
+                  {p.piece.object === 'letter' && <><rect x="5" y="10" width="30" height="20" /><path d="M5 10 L20 22 L35 10" /></>}
+                  {p.piece.object === 'page' && <><rect x="10" y="4" width="20" height="32" /><path d="M14 12h12M14 17h12M14 22h12M14 27h8" /></>}
+                  {p.piece.object === 'notebook' && <><rect x="9" y="5" width="22" height="30" /><path d="M13 5v30M17 13h10M17 18h10" /></>}
+                </svg>
+                <span>{p.piece.objectLabel}, {years(p.piece.date)}</span>
+              </a>
+            ) : (
+              <p class="drawer-empty"><i>Empty.</i></p>
+            )}
+          </div>
+        );
+      }),
+    )}
+  </section>
+)}
+
+<script>
+  // Open drawers; read objects on a sheet of paper (fetched on demand).
+  const cache = new Map<string, string>();
+  function sheetDialog() {
+    let d = document.getElementById('sheet-dialog') as HTMLDialogElement | null;
+    if (!d) {
+      d = document.createElement('dialog');
+      d.id = 'sheet-dialog';
+      d.className = 'sheet-dialog';
+      d.innerHTML = '<form method="dialog" class="sheet-close"><button aria-label="Put it back">Put it back</button></form><div class="sheet-holder"></div>';
+      d.addEventListener('click', (e) => { if (e.target === d) d!.close(); });
+      document.body.appendChild(d);
+    }
+    return d;
+  }
+  async function openPiece(id: string, href: string) {
+    const d = sheetDialog();
+    const holder = d.querySelector('.sheet-holder')!;
+    holder.innerHTML = '<p><i>Unfolding…</i></p>';
+    d.showModal();
+    try {
+      if (!cache.has(id)) {
+        const html = await (await fetch(href)).text();
+        const sheet = new DOMParser().parseFromString(html, 'text/html').querySelector('[data-sheet]');
+        cache.set(id, sheet ? sheet.outerHTML : '<p>This sheet could not be read.</p>');
+      }
+      holder.innerHTML = cache.get(id)!;
+      holder.scrollTop = 0;
+    } catch {
+      holder.innerHTML = `<p>This sheet could not be read. <a href="${href}">Open it on its own</a>.</p>`;
+    }
+  }
+  function initDrawers() {
+    for (const section of document.querySelectorAll<HTMLElement>('.interior:not([data-ready])')) {
+      section.dataset.ready = '1';
+      const toggle = (g: SVGGElement) => {
+        const id = g.dataset.drawer!;
+        const open = g.getAttribute('aria-expanded') !== 'true';
+        section.querySelectorAll<SVGGElement>('.drawer').forEach((x) => x.setAttribute('aria-expanded', String(x === g && open)));
+        section.querySelectorAll<HTMLElement>('.drawer-contents').forEach((c) => (c.hidden = !(open && c.dataset.for === id)));
+      };
+      section.querySelectorAll<SVGGElement>('.drawer').forEach((g) => {
+        g.addEventListener('click', () => toggle(g));
+        g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(g); } });
+      });
+      section.querySelectorAll<HTMLAnchorElement>('a[data-piece]').forEach((a) =>
+        a.addEventListener('click', (e) => { e.preventDefault(); openPiece(a.dataset.piece!, a.href); }),
+      );
+    }
+  }
+  initDrawers();
+  document.addEventListener('astro:page-load', initDrawers);
+</script>
