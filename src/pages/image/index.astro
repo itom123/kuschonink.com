@@ -1,10 +1,29 @@
 ---
-// Same as the home page: the old site served the project list at /image too.
-import Base from '../../layouts/Base.astro';
-import ProjectList from '../../components/ProjectList.astro';
-import { home } from '../../lib/content';
+import { getImage } from 'astro:assets';
+import Win98 from '../../layouts/Win98.astro';
+import { home, projects, imagesOf, site } from '../../lib/content';
+import { img } from '../../lib/images';
+
+const items = await Promise.all(
+  projects.map(async (p) => {
+    const all = imagesOf(p.sections);
+    const t = await getImage({ src: img(all[0]), width: 320, height: 240, fit: 'cover', format: 'webp', quality: 72 });
+    return { p, thumb: t.src, count: all.length };
+  }),
+);
 ---
-<Base seo={home.seo} bodyClass="page-home">
-  <h1 class="visually-hidden">Image</h1>
-  <ProjectList />
-</Base>
+<Win98 seo={{ title: `Projects — ${site.name}`, description: home.seo.description }} title="Projects" address="C:\kuschonink\image" status={`${projects.length} object(s)`}>
+  <h1>Projects</h1>
+  <p>All work by {site.name}. <a href="/image/all">See every project on one page</a>, or <a href="/house">walk through the house</a>.</p>
+  <ul class="explorer">
+    {items.map(({ p, thumb, count }) => (
+      <li>
+        <a href={`/image/${p.slug}`}>
+          <img class="thumb" src={thumb} alt="" width="140" height="105" loading="lazy" />
+          <span class="name">{p.title}</span>
+          <span class="meta">{count} image{count === 1 ? '' : 's'}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Win98>

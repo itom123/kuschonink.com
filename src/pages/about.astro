@@ -1,8 +1,11 @@
 ---
-import Base from '../layouts/Base.astro';
+import Win98 from '../layouts/Win98.astro';
 import Section from '../components/Section.astro';
-import { about as page } from '../lib/content';
+import { about as page, site } from '../lib/content';
+import { roomForPage } from '../lib/house';
+const room = roomForPage('about');
 ---
-<Base seo={page.seo} bodyClass="page-about">
+<Win98 seo={page.seo} title={page.title} address={`C:\\kuschonink\\about.txt`} houseHref={room ? `/house/${room.slug}` : '/house'} status={room ? `In the house: ${room.en}, ${room.floor.name.toLowerCase()}` : site.name}>
+  <h1>{page.title}</h1>
   {page.sections.map((s, i) => <Section section={s} first={i === 0} />)}
-</Base>
+</Win98>

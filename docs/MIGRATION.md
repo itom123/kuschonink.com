@@ -1,12 +1,15 @@
 # Migration from Squarespace
 
+> The site has since been redesigned as *the house* (see the README). The old
+> URLs `/image/<slug>`, `/about` and `/contact` still work, in the simple view.
+
 Migrated on 29 October 2026 by crawling the live site (https://kuschonink.com).
 
 ## What was migrated
 
 **Pages (17 routes, same URLs as before)**
 
-- `/` and `/image`: project index over the archive background image
+- `/` and `/image`: project index over the archive background image (now: `/` is the house façade, `/image` the simple view)
 - `/about`: biography and *Selected Conferences, Exhibitions & Programs*
 - `/contact`: email, phone, contact form, closing banner
 - 13 projects under `/image/…`: Failure of Memory, Dissecting Memories,

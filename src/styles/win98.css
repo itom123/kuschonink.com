@@ -1,0 +1,76 @@
+/* ===== Simple view: Windows 98 desktop ===== */
+body.win98 { margin: 0; background: #008080; min-height: 100vh; }
+.desktop { display: flex; gap: 16px; align-items: flex-start; padding: 12px 12px 56px; }
+.desktop-icons { display: flex; flex-direction: column; gap: 14px; width: 76px; flex: none; }
+.desk-icon { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #fff; text-decoration: none; text-align: center; font-size: 11px; }
+.desk-icon:focus, .desk-icon:hover { outline: 1px dotted #fff; background: rgba(0, 0, 128, 0.6); }
+.ico { width: 32px; height: 32px; display: block; image-rendering: pixelated; background-size: contain; background-repeat: no-repeat; }
+/* Tiny pixel icons drawn with SVG data URIs */
+.ico-folder { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill='%23000' d='M1 3h5l1 1h8v10H1z'/%3E%3Cpath fill='%23ffd75e' d='M2 5h12v8H2z'/%3E%3Cpath fill='%23fff3a8' d='M2 4h4v1H2z'/%3E%3C/svg%3E"); }
+.ico-house { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill='%23000' d='M8 1 1 8h2v7h10V8h2z'/%3E%3Cpath fill='%23fff' d='M4 8 8 4l4 4v6H4z'/%3E%3Cpath fill='%23c00' d='M7 10h2v4H7z'/%3E%3C/svg%3E"); }
+.ico-doc { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill='%23000' d='M3 1h7l3 3v11H3z'/%3E%3Cpath fill='%23fff' d='M4 2h6v3h2v9H4z'/%3E%3Cpath fill='%23000080' d='M5 7h6v1H5zm0 2h6v1H5zm0 2h4v1H5z'/%3E%3C/svg%3E"); }
+.ico-mail { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill='%23000' d='M1 4h14v9H1z'/%3E%3Cpath fill='%23fff' d='M2 5h12v7H2z'/%3E%3Cpath fill='%23000' d='M2 5l6 4 6-4v1l-6 4-6-4z'/%3E%3C/svg%3E"); }
+
+.main-window { flex: 1; min-width: 0; max-width: 1100px; }
+.close-link { display: inline-flex; }
+.close-link button { pointer-events: none; }
+.menu-bar { display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 4px; }
+.menu-bar a { color: #000; text-decoration: none; padding: 2px 6px; }
+.menu-bar a:hover, .menu-bar a:focus { background: #000080; color: #fff; }
+.address-row { margin-bottom: 6px; }
+.address-row input { flex: 1; }
+
+/* The "page" inside the window renders like an old browser. */
+.page.sunken-panel { background: #fff; padding: 16px 20px 32px; font-family: 'Times New Roman', Times, serif; font-size: 16px; line-height: 1.4; color: #000; overflow: visible; height: auto; }
+.page a { color: #0000ee; }
+.page a:visited { color: #551a8b; }
+.page h1, .page h2, .page h3 { font-family: 'Times New Roman', Times, serif; font-weight: bold; }
+.page h1 { font-size: 2em; margin: 0.3em 0; }
+.page img { max-width: 100%; height: auto; }
+.page .section-bg img, .page .block-image img, .page .banner-slide img { max-height: 80vh; width: auto; margin: 0 auto; display: block; }
+
+/* Explorer: large icons view */
+.explorer { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px 12px; }
+.explorer a { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; text-decoration: none; color: #000 !important; padding: 4px; }
+.explorer a:hover .name, .explorer a:focus .name { background: #000080; color: #fff; }
+.explorer .thumb { width: 140px; height: 105px; object-fit: cover; border: 2px inset #808080; background: #c0c0c0; }
+.explorer .name { padding: 0 2px; }
+.explorer .meta { font-size: 12px; color: #444; }
+
+/* In the simple view, every gallery is laid out flat: everything visible at once. */
+.win98 [data-gallery] .gallery-track { overflow: visible; flex-wrap: wrap; scroll-snap-type: none; }
+.win98 [data-gallery] .gallery-item { flex: 1 1 220px; }
+.win98 [data-gallery] .gallery-item img { max-height: none; width: 100%; height: auto; }
+.win98 .gallery-reel .gallery-item img { height: auto; max-width: 100%; }
+.win98 .gallery-controls { display: none; }
+.win98 .section { margin: 1.5em 0; }
+.win98 .section-bg { margin-bottom: 0.8em; }
+.win98 .project-nav { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.win98 .project-block + .project-block { margin-top: 3em; padding-top: 1em; border-top: 2px groove #c0c0c0; }
+.win98 .contact-form .button { font-family: inherit; }
+
+.taskbar {
+  position: fixed; left: 0; right: 0; bottom: 0; height: 36px; z-index: 50;
+  display: flex; align-items: center; gap: 6px; padding: 3px 4px;
+  background: #c0c0c0; box-shadow: inset 0 1px #fff, inset 0 2px #dfdfdf;
+}
+.start { position: relative; }
+.start summary { list-style: none; display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 8px; cursor: pointer;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; }
+.start summary::-webkit-details-marker { display: none; }
+.start[open] summary { box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; }
+.start-flag { width: 16px; height: 16px; background: conic-gradient(#f00 0 25%, #0a0 0 50%, #ff0 0 75%, #00f 0); }
+.start-menu { position: absolute; bottom: 34px; left: 0; min-width: 220px; list-style: none; margin: 0; padding: 3px; }
+.start-menu a { display: block; padding: 6px 12px; color: #000; text-decoration: none; }
+.start-menu a:hover, .start-menu a:focus { background: #000080; color: #fff; }
+.task-current { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; height: 28px; line-height: 28px; padding: 0 8px; max-width: 260px;
+  box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; background: #dcdcdc; }
+.tray { margin-left: auto; height: 28px; line-height: 28px; padding: 0 10px; box-shadow: inset -1px -1px #fff, inset 1px 1px #808080; }
+
+@media (max-width: 700px) {
+  .desktop { flex-direction: column; padding: 8px 8px 52px; }
+  .desktop-icons { flex-direction: row; width: auto; flex-wrap: wrap; }
+  .page.sunken-panel { padding: 12px; }
+  .explorer { grid-template-columns: repeat(2, 1fr); }
+  .explorer .thumb { width: 100%; height: auto; aspect-ratio: 4 / 3; }
+}

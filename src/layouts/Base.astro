@@ -1,11 +1,6 @@
 ---
-import '@fontsource/poppins/400.css';
-import '@fontsource/poppins/600.css';
-import '@fontsource/manrope/500.css';
-import '../styles/global.css';
+// Shared <head>: SEO, social cards, favicon. Each view (house / Win98) wraps this.
 import { getImage } from 'astro:assets';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
 import { site } from '../lib/content';
 import { img } from '../lib/images';
 import type { Seo } from '../lib/types';
@@ -36,12 +31,9 @@ const ogUrl = new URL(og.src, site.url).href;
     <meta name="twitter:title" content={seo.title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogUrl} />
+    <slot name="head" />
   </head>
   <body class={bodyClass}>
-    <Header />
-    <main id="main">
-      <slot />
-    </main>
-    <Footer />
+    <slot />
   </body>
 </html>

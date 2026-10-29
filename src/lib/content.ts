@@ -19,3 +19,16 @@ export const projects: (Project & { slug: string })[] = Object.entries(projectFi
     const ib = home.projects.indexOf(b.slug);
     return (ia === -1 ? 999 + a.order : ia) - (ib === -1 ? 999 + b.order : ib);
   });
+
+/** Image paths used on a page, in order of appearance (backgrounds included). */
+export function imagesOf(sections: import('./types').Section[]): string[] {
+  const out: string[] = [];
+  for (const s of sections) {
+    if (s.background) out.push(s.background.src);
+    for (const b of s.blocks) {
+      if (b.type === 'image') out.push(b.src);
+      if (b.type === 'gallery' || b.type === 'banner') out.push(...b.images.map((i) => i.src));
+    }
+  }
+  return [...new Set(out)];
+}

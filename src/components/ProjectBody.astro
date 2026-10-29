@@ -1,0 +1,10 @@
+---
+// A whole project for the simple view: every section, galleries laid flat.
+import Section from './Section.astro';
+import type { Project } from '../lib/types';
+interface Props { project: Project; headingLevel?: 'h1' | 'h2'; eager?: boolean }
+const { project, headingLevel = 'h1', eager = false } = Astro.props;
+const H = headingLevel;
+---
+<H>{project.title}</H>
+{project.sections.map((s, i) => <Section section={s} first={eager && i === 0} />)}

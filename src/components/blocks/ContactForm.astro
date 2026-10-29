@@ -19,7 +19,9 @@ const { email, form } = site.contact;
   <p class="form-success" hidden>{form.successMessage}</p>
 </form>
 <script>
-  for (const form of document.querySelectorAll<HTMLFormElement>('.contact-form')) {
+  function initForms() {
+  for (const form of document.querySelectorAll<HTMLFormElement>('.contact-form:not([data-ready])')) {
+    form.dataset.ready = '1';
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const data = new FormData(form);
@@ -30,4 +32,7 @@ const { email, form } = site.contact;
       form.querySelector<HTMLElement>('.form-success')!.hidden = false;
     });
   }
+  }
+  initForms();
+  document.addEventListener('astro:page-load', initForms);
 </script>

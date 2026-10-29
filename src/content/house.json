@@ -1,0 +1,745 @@
+{
+ "_comment": "The house. Rooms are rectangles in millimetres [x, y, width, height] traced from the 2008 renovation drawings. 'contents' decides what is in each room: {project: slug} or {page: about|contact|writings|colophon}. Rooms without contents are only described (inventory). 'locked' rooms cannot be entered.",
+ "grid": {
+  "columns": [
+   0,
+   3600,
+   7200,
+   10800,
+   14000,
+   16000
+  ],
+  "rows": [
+   0,
+   2800,
+   5600,
+   8600,
+   13400,
+   14800
+  ]
+ },
+ "tourStart": [
+  0,
+  0
+ ],
+ "floors": [
+  {
+   "id": "f1",
+   "label": "1",
+   "name": "Ground floor",
+   "zh": "一层平面图",
+   "level": "±0.000",
+   "area": "190.5 m²",
+   "scan": {
+    "src": "plan-f1.png",
+    "x": -6931,
+    "y": -8861,
+    "width": 29703,
+    "height": 34653
+   },
+   "rooms": [
+    {
+     "id": "kitchen",
+     "zh": "厨房",
+     "en": "Kitchen",
+     "rect": [
+      0,
+      0,
+      3600,
+      2800
+     ],
+     "contents": {
+      "project": "farewell-and-resurrection"
+     }
+    },
+    {
+     "id": "dining-room",
+     "zh": "餐厅",
+     "en": "Dining room",
+     "rect": [
+      0,
+      2800,
+      3600,
+      2800
+     ],
+     "contents": {
+      "project": "hanabi"
+     }
+    },
+    {
+     "id": "back-stairs",
+     "zh": "楼梯",
+     "en": "Stairs",
+     "rect": [
+      3600,
+      1000,
+      4200,
+      4600
+     ],
+     "stairs": "f2"
+    },
+    {
+     "id": "garage",
+     "zh": "车库",
+     "en": "Garage",
+     "rect": [
+      7800,
+      1600,
+      7000,
+      4000
+     ],
+     "level": "−0.450",
+     "contents": {
+      "project": "fragmented-ocean"
+     }
+    },
+    {
+     "id": "west-bathroom",
+     "zh": "卫生间",
+     "en": "Bathroom (west)",
+     "rect": [
+      0,
+      5600,
+      2100,
+      3000
+     ],
+     "windows": [
+      "C0915"
+     ],
+     "contents": {
+      "project": "dissecting-memories"
+     }
+    },
+    {
+     "id": "closet",
+     "zh": "",
+     "en": "Passage",
+     "rect": [
+      2100,
+      5600,
+      1500,
+      3000
+     ]
+    },
+    {
+     "id": "hall",
+     "zh": "过道",
+     "en": "Hall",
+     "rect": [
+      3600,
+      5600,
+      7200,
+      1700
+     ],
+     "level": "±0.000"
+    },
+    {
+     "id": "side-entrance",
+     "zh": "",
+     "en": "Side entrance",
+     "rect": [
+      10800,
+      5600,
+      3200,
+      2600
+     ],
+     "doors": [
+      "M-2"
+     ],
+     "contents": {
+      "project": "a-suivre"
+     }
+    },
+    {
+     "id": "side-steps",
+     "zh": "台阶",
+     "en": "Side steps",
+     "rect": [
+      14000,
+      5600,
+      2000,
+      2600
+     ],
+     "level": "−0.600",
+     "outdoor": true
+    },
+    {
+     "id": "east-bathroom",
+     "zh": "卫生间",
+     "en": "Bathroom (east)",
+     "rect": [
+      12000,
+      8200,
+      2000,
+      2200
+     ],
+     "windows": [
+      "C1215"
+     ],
+     "contents": {
+      "project": "it-says-forget"
+     }
+    },
+    {
+     "id": "south-west-room",
+     "zh": "",
+     "en": "Room (south-west)",
+     "rect": [
+      0,
+      8600,
+      3600,
+      4800
+     ],
+     "level": "±0.000",
+     "contents": {
+      "project": "anterior-future"
+     }
+    },
+    {
+     "id": "living-room",
+     "zh": "客厅",
+     "en": "Living room",
+     "rect": [
+      3600,
+      7300,
+      7200,
+      6100
+     ],
+     "level": "−0.300",
+     "contents": {
+      "project": "failure-of-memory"
+     }
+    },
+    {
+     "id": "east-room",
+     "zh": "",
+     "en": "Room (east)",
+     "rect": [
+      10800,
+      8200,
+      3200,
+      5200
+     ],
+     "poly": [
+      [
+       10800,
+       8200
+      ],
+      [
+       12000,
+       8200
+      ],
+      [
+       12000,
+       10400
+      ],
+      [
+       14000,
+       10400
+      ],
+      [
+       14000,
+       13400
+      ],
+      [
+       10800,
+       13400
+      ]
+     ]
+    },
+    {
+     "id": "porch",
+     "zh": "门廊",
+     "en": "Front porch",
+     "rect": [
+      3600,
+      13400,
+      7200,
+      1700
+     ],
+     "level": "−0.280",
+     "doors": [
+      "M-1"
+     ],
+     "outdoor": true,
+     "arc": true,
+     "contents": {
+      "page": "contact"
+     }
+    }
+   ]
+  },
+  {
+   "id": "f2",
+   "label": "2",
+   "name": "First floor",
+   "zh": "二层平面图",
+   "level": "3.600",
+   "area": "145.6 m²",
+   "scan": {
+    "src": "plan-f2.png",
+    "x": -6105,
+    "y": -6879,
+    "width": 27335,
+    "height": 31891
+   },
+   "rooms": [
+    {
+     "id": "north-balcony",
+     "zh": "",
+     "en": "North balcony",
+     "rect": [
+      -660,
+      -660,
+      4960,
+      3460
+     ],
+     "outdoor": true
+    },
+    {
+     "id": "study",
+     "zh": "书房",
+     "en": "Study",
+     "rect": [
+      0,
+      2800,
+      3600,
+      2800
+     ],
+     "contents": {
+      "project": "eternal-return"
+     }
+    },
+    {
+     "id": "stairs",
+     "zh": "楼梯",
+     "en": "Stairs",
+     "rect": [
+      3600,
+      2800,
+      4200,
+      2800
+     ],
+     "stairs": "attic"
+    },
+    {
+     "id": "terrace",
+     "zh": "露台",
+     "en": "Terrace",
+     "rect": [
+      7100,
+      900,
+      7700,
+      4700
+     ],
+     "outdoor": true,
+     "contents": {
+      "project": "an-entangled-past"
+     }
+    },
+    {
+     "id": "west-bathroom",
+     "zh": "卫生间",
+     "en": "Bathroom (west)",
+     "rect": [
+      0,
+      5600,
+      2100,
+      3000
+     ],
+     "windows": [
+      "C0913"
+     ]
+    },
+    {
+     "id": "landing",
+     "zh": "过道",
+     "en": "Landing",
+     "rect": [
+      2100,
+      5600,
+      8700,
+      1700
+     ]
+    },
+    {
+     "id": "east-bathroom",
+     "zh": "卫生间",
+     "en": "Bathroom (east)",
+     "rect": [
+      10800,
+      5600,
+      3300,
+      2600
+     ],
+     "windows": [
+      "C1316"
+     ]
+    },
+    {
+     "id": "east-balcony",
+     "zh": "",
+     "en": "East balcony",
+     "rect": [
+      14100,
+      5000,
+      2600,
+      3800
+     ],
+     "outdoor": true
+    },
+    {
+     "id": "west-bedroom",
+     "zh": "卧室",
+     "en": "Bedroom (west)",
+     "rect": [
+      0,
+      8600,
+      3600,
+      4800
+     ],
+     "contents": {
+      "project": "into-the-woods"
+     }
+    },
+    {
+     "id": "sitting-room",
+     "zh": "起居室",
+     "en": "Sitting room",
+     "rect": [
+      3600,
+      7300,
+      3600,
+      5500
+     ],
+     "contents": {
+      "page": "about"
+     }
+    },
+    {
+     "id": "middle-bedroom",
+     "zh": "卧室",
+     "en": "Bedroom (middle)",
+     "rect": [
+      7200,
+      7300,
+      3600,
+      5500
+     ],
+     "contents": {
+      "project": "sisyphus-flower"
+     }
+    },
+    {
+     "id": "east-bedroom",
+     "zh": "卧室",
+     "en": "Bedroom (east)",
+     "rect": [
+      10800,
+      8200,
+      3200,
+      5200
+     ],
+     "contents": {
+      "project": "gestalt-lost-in-time"
+     }
+    },
+    {
+     "id": "south-balcony",
+     "zh": "阳台",
+     "en": "South balcony",
+     "rect": [
+      0,
+      13400,
+      10800,
+      1600
+     ],
+     "outdoor": true,
+     "arc": true
+    }
+   ]
+  },
+  {
+   "id": "attic",
+   "label": "A",
+   "name": "Attic",
+   "zh": "阁楼层平面图",
+   "level": "7.000",
+   "scan": {
+    "src": "plan-attic.png",
+    "x": -7338,
+    "y": -7847,
+    "width": 29851,
+    "height": 34826
+   },
+   "rooms": [
+    {
+     "id": "north-west-room",
+     "zh": "",
+     "en": "Room (north-west)",
+     "rect": [
+      0,
+      2800,
+      3600,
+      2800
+     ],
+     "windows": [
+      "C1206",
+      "C1518"
+     ]
+    },
+    {
+     "id": "wooden-stairs",
+     "zh": "木楼梯",
+     "en": "Wooden stairs",
+     "rect": [
+      3600,
+      2800,
+      4200,
+      2800
+     ],
+     "stairs": "roof"
+    },
+    {
+     "id": "bathroom",
+     "zh": "卫生间",
+     "en": "Bathroom",
+     "rect": [
+      0,
+      5600,
+      2100,
+      3000
+     ],
+     "windows": [
+      "C0905"
+     ]
+    },
+    {
+     "id": "blind-room",
+     "zh": "",
+     "en": "Room without a door",
+     "rect": [
+      7900,
+      6300,
+      2700,
+      900
+     ],
+     "locked": true
+    },
+    {
+     "id": "north-east-room",
+     "zh": "",
+     "en": "Room (north-east)",
+     "rect": [
+      10800,
+      6200,
+      3200,
+      2000
+     ],
+     "windows": [
+      "C1506"
+     ],
+     "doors": [
+      "M0822"
+     ]
+    },
+    {
+     "id": "west-room",
+     "zh": "",
+     "en": "Room (west)",
+     "rect": [
+      0,
+      8600,
+      3600,
+      4200
+     ],
+     "windows": [
+      "C2406"
+     ]
+    },
+    {
+     "id": "central-room",
+     "zh": "",
+     "en": "Central room",
+     "rect": [
+      3600,
+      7300,
+      7200,
+      4000
+     ],
+     "doors": [
+      "TLM2718",
+      "TLM2718"
+     ],
+     "contents": {
+      "page": "writings"
+     }
+    },
+    {
+     "id": "east-room",
+     "zh": "",
+     "en": "Room (east)",
+     "rect": [
+      10800,
+      8200,
+      3200,
+      4600
+     ],
+     "windows": [
+      "C1215",
+      "C1506"
+     ]
+    },
+    {
+     "id": "south-terrace",
+     "zh": "",
+     "en": "South terrace",
+     "rect": [
+      3600,
+      11300,
+      7200,
+      3500
+     ],
+     "outdoor": true
+    }
+   ]
+  },
+  {
+   "id": "roof",
+   "label": "R",
+   "name": "Roof",
+   "zh": "屋顶平面图",
+   "level": "11.160",
+   "scan": {
+    "src": "plan-roof.png",
+    "x": -7911,
+    "y": -8767,
+    "width": 31332,
+    "height": 36554
+   },
+   "rooms": [
+    {
+     "id": "roof",
+     "zh": "屋顶",
+     "en": "Roof",
+     "rect": [
+      0,
+      2800,
+      16000,
+      12000
+     ],
+     "outdoor": true,
+     "contents": {
+      "page": "colophon"
+     }
+    }
+   ]
+  }
+ ],
+ "elevation": {
+  "src": "elevation-south.png",
+  "hotspots": [
+   {
+    "room": "f1/porch",
+    "label": "Front door M-1",
+    "box": [
+     488,
+     738,
+     149,
+     130
+    ]
+   },
+   {
+    "room": "f1/south-west-room",
+    "label": "Window",
+    "box": [
+     267,
+     738,
+     116,
+     88
+    ]
+   },
+   {
+    "room": "f1/east-room",
+    "label": "Window",
+    "box": [
+     757,
+     738,
+     75,
+     88
+    ]
+   },
+   {
+    "room": "f2/west-bedroom",
+    "label": "Window",
+    "box": [
+     267,
+     588,
+     116,
+     76
+    ]
+   },
+   {
+    "room": "f2/sitting-room",
+    "label": "Window",
+    "box": [
+     430,
+     588,
+     125,
+     70
+    ]
+   },
+   {
+    "room": "f2/middle-bedroom",
+    "label": "Window",
+    "box": [
+     572,
+     588,
+     125,
+     70
+    ]
+   },
+   {
+    "room": "f2/east-bedroom",
+    "label": "Window",
+    "box": [
+     757,
+     588,
+     75,
+     76
+    ]
+   },
+   {
+    "room": "attic/central-room",
+    "label": "Window",
+    "box": [
+     432,
+     455,
+     263,
+     50
+    ]
+   },
+   {
+    "room": "attic/west-room",
+    "label": "Window",
+    "box": [
+     267,
+     510,
+     116,
+     32
+    ]
+   },
+   {
+    "room": "attic/east-room",
+    "label": "Window",
+    "box": [
+     757,
+     510,
+     75,
+     32
+    ]
+   }
+  ]
+ },
+ "lockedNote": "Floor/house plan, traced back to early 2008. The original blueprint is supposedly lost."
+}

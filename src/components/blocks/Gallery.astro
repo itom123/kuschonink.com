@@ -33,7 +33,9 @@ const sizes = style === 'masonry' || style === 'grid' ? '(max-width: 800px) 50vw
   )}
 </div>
 <script>
-  for (const g of document.querySelectorAll<HTMLElement>('[data-gallery]')) {
+  function initGalleries() {
+  for (const g of document.querySelectorAll<HTMLElement>('[data-gallery]:not([data-ready])')) {
+    g.dataset.ready = '1';
     const track = g.querySelector<HTMLElement>('.gallery-track')!;
     const items = [...track.children] as HTMLElement[];
     const count = g.querySelector('.gallery-count');
@@ -61,4 +63,7 @@ const sizes = style === 'masonry' || style === 'grid' ? '(max-width: 800px) 50vw
       if (e.key === 'ArrowRight') go(current() + 1);
     });
   }
+  }
+  initGalleries();
+  document.addEventListener('astro:page-load', initGalleries);
 </script>

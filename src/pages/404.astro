@@ -1,11 +1,13 @@
 ---
-import Base from '../layouts/Base.astro';
+import Win98 from '../layouts/Win98.astro';
+import { site } from '../lib/content';
 ---
-<Base seo={{ title: 'Page not found — Xiangyin Gu' }}>
-  <section class="section theme-light not-found">
-    <div class="section-inner prose">
-      <h1>Page not found</h1>
-      <p>The page you’re looking for doesn’t exist. <a href="/">Back to the work</a>.</p>
-    </div>
-  </section>
-</Base>
+<Win98 seo={{ title: `Not found — ${site.name}` }} title="Error" address="C:\kuschonink\???" status="1 error">
+  <h1>The page cannot be found</h1>
+  <p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+  <ul>
+    <li><a href="/">Go to the front door</a></li>
+    <li><a href="/image">See all projects</a></li>
+  </ul>
+  <p><small>HTTP 404 — File not found</small></p>
+</Win98>

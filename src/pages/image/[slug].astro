@@ -1,33 +1,31 @@
 ---
-import Base from '../../layouts/Base.astro';
-import Section from '../../components/Section.astro';
-import { projects } from '../../lib/content';
+import Win98 from '../../layouts/Win98.astro';
+import ProjectBody from '../../components/ProjectBody.astro';
+import { projects, imagesOf } from '../../lib/content';
+import { roomForProject } from '../../lib/house';
+import type { Project } from '../../lib/types';
 
 export function getStaticPaths() {
-  return projects.map((project, i) => ({
-    params: { slug: project.slug },
-    props: { project, prev: projects[i - 1], next: projects[i + 1] },
-  }));
+  return projects.map((project, i) => ({ params: { slug: project.slug }, props: { project, prev: projects[i - 1], next: projects[i + 1] } }));
 }
-const { project, prev, next } = Astro.props;
-// Use the first image on the page as the social-share image.
-const firstImage = (() => {
-  for (const s of project.sections) {
-    if (s.background) return s.background.src;
-    for (const b of s.blocks) {
-      if (b.type === 'image') return b.src;
-      if ((b.type === 'gallery' || b.type === 'banner') && b.images[0]) return b.images[0].src;
-    }
-  }
-})();
+const { project, prev, next } = Astro.props as { project: Project & { slug: string }; prev?: Project & { slug: string }; next?: Project & { slug: string } };
+const room = roomForProject(project.slug);
+const n = imagesOf(project.sections).length;
 ---
-<Base seo={project.seo} image={firstImage} bodyClass="page-project">
-  <article class="project">
-    <h1 class="visually-hidden">{project.title}</h1>
-    {project.sections.map((s, i) => <Section section={s} first={i === 0} />)}
-  </article>
-  <nav class="project-pager" aria-label="More projects">
-    {prev ? <a class="pager-prev" href={`/image/${prev.slug}`}><span>Previous</span>{prev.title}</a> : <span />}
-    {next ? <a class="pager-next" href={`/image/${next.slug}`}><span>Next</span>{next.title}</a> : <span />}
+<Win98
+  seo={project.seo}
+  image={imagesOf(project.sections)[0]}
+  title={project.title}
+  address={`C:\\kuschonink\\image\\${project.slug}`}
+  houseHref={room ? `/house/${room.slug}` : '/house'}
+  status={`${n} image${n === 1 ? '' : 's'}${room ? ` · in the house: ${room.en}, ${room.floor.name.toLowerCase()}` : ''}`}
+>
+  <p><a href="/image">↑ Up to Projects</a></p>
+  <ProjectBody project={project} eager />
+  <hr />
+  <nav class="project-nav" aria-label="More projects">
+    {prev ? <a href={`/image/${prev.slug}`}>← {prev.title}</a> : <span />}
+    {room && <a href={`/house/${room.slug}`}>Find it in the house</a>}
+    {next ? <a href={`/image/${next.slug}`}>{next.title} →</a> : <span />}
   </nav>
-</Base>
+</Win98>

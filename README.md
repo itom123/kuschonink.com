@@ -13,21 +13,59 @@ npm run preview   # run the built site on the local Workers runtime (wrangler)
 npm run deploy    # build and deploy to Cloudflare Workers
 ```
 
-## How the project is organised
+## Two ways in
 
-Content and design are kept separate, so the site can be restyled without
-touching the content.
+**The house** (`/`, `/house`, `/house/<room>`): the site is the family house, drawn from
+the 2008 renovation plans. The façade (`/`) is the south elevation: the door and
+windows lead inside. The floorplan works like an indoor map: drag to move, scroll
+or pinch to zoom, switch floors with **R / A / 2 / 1**, search with *Search this
+house*, and tick **Blueprint** to see the original drawings. Rooms hold projects,
+About and Contact. Everything is set in Times New Roman.
+
+**The simple view** (`/image`, `/image/<slug>`, `/image/all`, `/about`, `/contact`):
+a Windows 98 desktop for anyone who wants to see the work quickly. Every gallery
+is laid flat, so a project is one page. `/image/all` puts every project on one page.
+
+### The rules of the house (after Perec)
+
+Like Georges Perec's *Life A User's Manual*, the order is set by a constraint, not
+by hand. Every floor sits on the same 5 × 5 structural grid (columns 3600 · 3600 ·
+3600 · 3200 · 2000 mm, rows 2800 · 2800 · 3000 · 4800 · 1400 mm). A knight's tour of
+that grid, repeated on each floor from the ground up, numbers the rooms: chapter 1
+is the first room the knight lands in, and so on (37 chapters). Each room lists an
+inventory built only from facts: name, size, floor level, window and door codes,
+and what's inside. One room, drawn in the attic with no door, can't be entered.
+It's the missing chapter.
+
+### Editing the house: `src/content/house.json`
+
+- Each floor has `rooms`. A room is a rectangle in millimetres `[x, y, width, height]`
+  (or a `poly` for L-shaped rooms), traced from the drawings.
+- **What's in a room** is its `contents`: `{ "project": "<slug>" }`, or
+  `{ "page": "about" | "contact" | "writings" | "colophon" }`. To move a project,
+  move its `contents` to another room. Rooms without `contents` are only described.
+- `locked: true` makes a room impossible to enter.
+- `scan` places the original drawing under the traced rooms (the Blueprint layer).
+- `elevation.hotspots` are the clickable door and windows on the façade.
+
+Chapter numbers recompute automatically whenever rooms change.
+
+## How the project is organised
 
 | Path | What it is |
 | --- | --- |
-| `src/content/site.json` | Site name, menu, Instagram link, email, phone, contact form fields |
-| `src/content/home.json` | Home page background and the **order** of projects |
-| `src/content/about.json`, `contact.json` | About and Contact pages |
-| `src/content/projects/*.json` | One file per project (`/image/<file-name>`) |
+| `src/content/house.json` | The house: floors, rooms, what's in each room |
+| `src/content/site.json` | Site name, Instagram link, email, phone, contact form fields |
+| `src/content/home.json` | Order of projects (simple view) and site description |
+| `src/content/about.json`, `contact.json` | About and Contact |
+| `src/content/projects/*.json` | One file per project |
 | `src/assets/images/` | All photos, grouped by page |
-| `src/styles/global.css` | All styling. Design tokens (fonts, colours, spacing) are at the top |
-| `src/components/` | Header, footer, sections and content blocks |
-| `src/pages/` | Routes (`/`, `/about`, `/contact`, `/image`, `/image/<slug>`) |
+| `src/assets/house/` | The floorplans and elevation drawings |
+| `src/lib/house.ts` | Knight's tour, chapter order, inventories |
+| `src/scripts/map.ts` | Map interaction (pan, zoom, floors, search) |
+| `src/components/house/` | Floorplan map and room panel |
+| `src/layouts/House.astro`, `Win98.astro` | The two views |
+| `src/styles/house.css`, `win98.css`, `blocks.css` | Styling (98.css is vendored in `src/styles/vendor/`) |
 | `wrangler.jsonc` | Cloudflare Workers config |
 
 ### Page content format
@@ -51,27 +89,31 @@ Image `src` paths are relative to `src/assets/images`. Images may also have a
 ### Common edits
 
 - **Add a project:** create `src/content/projects/my-project.json` (copy an
-  existing one), put its photos in `src/assets/images/projects/my-project/`, and
-  add `"my-project"` to `projects` in `src/content/home.json`.
+  existing one), put its photos in `src/assets/images/projects/my-project/`, add
+  `"my-project"` to `projects` in `src/content/home.json`, and give it a room in
+  `src/content/house.json` (`"contents": { "project": "my-project" }`).
 - **Reorder projects:** change the `projects` list in `src/content/home.json`.
 - **Swap in a higher-resolution photo:** replace the file in
   `src/assets/images/...` with the new one, keeping the same file name. Astro
   generates all the web sizes (up to 2500 px wide, WebP) at build time.
-- **Restyle:** start with the tokens at the top of `src/styles/global.css`.
+- **Restyle the house:** the colours are at the top of `src/styles/house.css`.
 
 ## Deploying to Cloudflare Workers
 
 The site is deployed as a Worker serving static assets (`dist/`).
 
 **Option A: Cloudflare Git integration (recommended).** In the Cloudflare
-dashboard go to *Workers & Pages → Create → Import a repository*, choose this
-repo, and set:
+dashboard go to *Workers & Pages → Create → Import a repository*, choose
+`itom123/kuschonink.com`, and set:
 
+- Project name: `kuschonink` (must match `name` in `wrangler.jsonc`)
+- Production branch: `main`
 - Build command: `npm run build`
 - Deploy command: `npx wrangler deploy`
+- Non-production branch deploy command: `npx wrangler versions upload`
+  (this gives every pull request a preview link)
 
-Every push to the main branch then deploys automatically, and pull requests get
-preview URLs.
+Every push to `main` then deploys automatically.
 
 **Option B: from your computer.** Run `npx wrangler login` once, then
 `npm run deploy`.

@@ -1,0 +1,84 @@
+---
+// The simple view: a Windows 98 desktop. Window chrome from 98.css; the page
+// inside the window renders like a 1998 browser (Times New Roman).
+import Base from './Base.astro';
+import '../styles/vendor/98css/98.css';
+import '../styles/blocks.css';
+import '../styles/win98.css';
+import { site } from '../lib/content';
+import type { Seo } from '../lib/types';
+
+interface Props {
+  seo: Seo;
+  image?: string;
+  /** Window title */
+  title: string;
+  /** Fake address, e.g. C:\kuschonink\image */
+  address: string;
+  houseHref?: string;
+  status?: string;
+}
+const { seo, image, title, address, houseHref = '/house', status } = Astro.props;
+---
+<Base seo={seo} image={image} bodyClass="win98">
+  <div class="desktop">
+    <nav class="desktop-icons" aria-label="Desktop">
+      <a href="/image" class="desk-icon"><span class="ico ico-folder" aria-hidden="true"></span>Projects</a>
+      <a href={houseHref} class="desk-icon"><span class="ico ico-house" aria-hidden="true"></span>The House</a>
+      <a href="/about" class="desk-icon"><span class="ico ico-doc" aria-hidden="true"></span>About.txt</a>
+      <a href="/contact" class="desk-icon"><span class="ico ico-mail" aria-hidden="true"></span>Contact</a>
+    </nav>
+    <main class="window main-window">
+      <div class="title-bar">
+        <div class="title-bar-text">{title} — {site.name}</div>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize" disabled></button>
+          <button aria-label="Maximize" disabled></button>
+          <a href={houseHref} class="close-link" aria-label="Close and go to the house"><button aria-label="Close" tabindex="-1"></button></a>
+        </div>
+      </div>
+      <div class="window-body">
+        <div class="menu-bar" role="navigation" aria-label="Menu">
+          <a href="/image"><u>P</u>rojects</a>
+          <a href="/image/all"><u>A</u>ll on one page</a>
+          <a href="/about">A<u>b</u>out</a>
+          <a href="/contact"><u>C</u>ontact</a>
+          <a href={houseHref}><u>T</u>he House</a>
+        </div>
+        <div class="field-row address-row">
+          <label for="address">Address</label>
+          <input id="address" type="text" value={address} readonly />
+        </div>
+        <div class="page sunken-panel">
+          <slot />
+        </div>
+        {status && (
+          <div class="status-bar">
+            <p class="status-bar-field">{status}</p>
+            <p class="status-bar-field">{site.name}</p>
+          </div>
+        )}
+      </div>
+    </main>
+  </div>
+  <footer class="taskbar">
+    <details class="start">
+      <summary><span class="start-flag" aria-hidden="true"></span><b>Start</b></summary>
+      <ul class="start-menu window">
+        <li><a href={houseHref}>The House</a></li>
+        <li><a href="/image">Projects</a></li>
+        <li><a href="/image/all">All projects on one page</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href={site.social[0].href} target="_blank" rel="noopener">Instagram</a></li>
+      </ul>
+    </details>
+    <span class="task-current">{title}</span>
+    <span class="tray"><time class="clock"></time></span>
+  </footer>
+  <script>
+    const c = document.querySelector('.clock');
+    const tick = () => { if (c) c.textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); };
+    tick(); setInterval(tick, 15000);
+  </script>
+</Base>
