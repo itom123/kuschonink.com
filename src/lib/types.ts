@@ -64,7 +64,7 @@ export interface Site {
   contact: {
     email: string;
     phone: string;
-    form: { fields: FormField[]; submitText: string; successMessage: string };
+    form: { fields: FormField[]; submitText: string; successMessage: string; endpoint?: string; turnstileSiteKey?: string };
   };
 }
 

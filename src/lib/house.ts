@@ -1,6 +1,7 @@
 import houseJson from '../content/house.json';
-import { projects, site } from './content';
-import type { Block } from './types';
+import perecJson from '../content/perec.json';
+import { projects, site, about, contact } from './content';
+import type { Block, Section } from './types';
 
 export type RoomContents =
   | { project: string }
@@ -41,8 +42,21 @@ export interface Room extends RoomData {
   slug: string;
   floor: FloorData;
   chapter: number;
+  /** Grid square [column, row] where the knight first enters the room. */
+  cell: [number, number];
   title: string;
   inventory: string[];
+  constraints: Constraint[];
+}
+
+export type ConstraintStatus = 'fulfilled' | 'echoing' | 'semi-fulfilled' | 'not fulfilled' | 'clinamen';
+
+export interface Constraint {
+  list: string;
+  name: string;
+  value: string;
+  hidden: boolean;
+  status: ConstraintStatus;
 }
 
 interface HouseData {
@@ -137,15 +151,35 @@ function inventory(r: RoomData, floor: FloorData): string[] {
   return list;
 }
 
+/** The grid square containing a point, clamped to the grid. */
+function cellAt(x: number, y: number): [number, number] {
+  const find = (lines: number[], v: number) => {
+    for (let i = 0; i < lines.length - 1; i++) if (v < lines[i + 1]) return i;
+    return lines.length - 2;
+  };
+  return [Math.max(0, find(columns, x)), Math.max(0, find(rows, y))];
+}
+
 function buildRooms(): Room[] {
   const out: Room[] = [];
   let chapter = 0;
   for (const floor of floors) {
     const order: RoomData[] = [];
+    const entry = new Map<RoomData, [number, number]>();
     for (const [c, row] of tour) {
-      for (const r of floor.rooms) if (!order.includes(r) && overlaps(r, c, row)) order.push(r);
+      for (const r of floor.rooms) {
+        if (!order.includes(r) && overlaps(r, c, row)) {
+          order.push(r);
+          entry.set(r, [c, row]);
+        }
+      }
     }
-    for (const r of floor.rooms) if (!order.includes(r)) order.push(r);
+    for (const r of floor.rooms) {
+      if (!order.includes(r)) {
+        order.push(r);
+        entry.set(r, cellAt(r.rect[0] + r.rect[2] / 2, r.rect[1] + r.rect[3] / 2));
+      }
+    }
     for (const r of order) {
       chapter++;
       out.push({
@@ -154,8 +188,10 @@ function buildRooms(): Room[] {
         slug: `${floor.id}-${r.id}`,
         floor,
         chapter,
+        cell: entry.get(r)!,
         title: contentTitle(r.contents) ?? r.en,
         inventory: inventory(r, floor),
+        constraints: [],
       });
     }
   }
@@ -164,6 +200,94 @@ function buildRooms(): Room[] {
 
 /** Every room in the house, in chapter order. */
 export const rooms = buildRooms();
+
+// ---------------------------------------------------------------------------
+// Constraints (perec.json): lists dealt by orthogonal Latin squares of order 5.
+// ---------------------------------------------------------------------------
+
+export interface PerecList {
+  id: string;
+  name: string;
+  hidden?: boolean;
+  /** 'row' = the grid row; k = the Latin square L_k(c, r) = (k·c + r) mod 5. */
+  square: 'row' | number;
+  items: { label: string; match: string[] }[];
+}
+export const perec = perecJson as unknown as {
+  lists: PerecList[];
+  clinamen: string;
+  chronology: { when: string; what: string; room?: string }[];
+};
+
+const N = columns.length - 1;
+export function latin(square: 'row' | number, [c, r]: [number, number]) {
+  return square === 'row' ? r : (square * c + r) % N;
+}
+
+/** Column letter + row number, e.g. "B3". */
+export const coordinate = ([c, r]: [number, number]) => `${String.fromCharCode(65 + c)}${r + 1}`;
+
+/** Plain text of whatever is kept in a room. */
+function roomText(r: Room): string {
+  const c = r.contents;
+  let sections: Section[] = [];
+  let extra = '';
+  if (c && 'project' in c) {
+    const p = projects.find((x) => x.slug === c.project);
+    if (p) { sections = p.sections; extra = p.title; }
+  } else if (c && 'page' in c) {
+    if (c.page === 'about') sections = about.sections;
+    if (c.page === 'contact') sections = contact.sections;
+  }
+  const html = sections.flatMap((s) => s.blocks).map((b) =>
+    b.type === 'text' ? b.html : b.type === 'marquee' ? b.items.join(' ') : 'caption' in b && b.caption ? b.caption : '',
+  );
+  return (extra + ' ' + html.join(' ')).replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ');
+}
+
+function touches(a: RoomData, b: RoomData) {
+  const [ax, ay, aw, ah] = a.rect, [bx, by, bw, bh] = b.rect;
+  const overlapX = Math.min(ax + aw, bx + bw) - Math.max(ax, bx);
+  const overlapY = Math.min(ay + ah, by + bh) - Math.max(ay, by);
+  return (overlapX >= 0 && overlapY > 0) || (overlapY >= 0 && overlapX > 0);
+}
+
+const texts = new Map(rooms.map((r) => [r.key, roomText(r).toLowerCase()]));
+const has = (key: string, words: string[]) => words.some((w) => texts.get(key)!.includes(w.toLowerCase()));
+
+/** Neighbouring rooms (sharing a wall) on the same floor. */
+export const adjacent = new Map(
+  rooms.map((r) => [r.key, rooms.filter((o) => o !== r && o.floor === r.floor && touches(r, o))]),
+);
+
+// The clinamen: on each floor, the last room the knight reaches (doors only).
+const clinamenRooms = new Set(
+  floors.map((f) => [...rooms].reverse().find((r) => r.floor === f && !r.locked && r.contents)?.key ?? ''),
+);
+
+for (const room of rooms) {
+  room.constraints = perec.lists.map((list) => {
+    const item = list.items[latin(list.square, room.cell)];
+    let status: ConstraintStatus = 'not fulfilled';
+    if (has(room.key, item.match)) status = 'fulfilled';
+    else if (adjacent.get(room.key)!.some((o) => has(o.key, item.match))) status = 'echoing';
+    else if (rooms.some((o) => o !== room && has(o.key, item.match))) status = 'semi-fulfilled';
+    if (list.id === 'quote' && clinamenRooms.has(room.key)) status = 'clinamen';
+    return { list: list.id, name: list.name, value: item.label, hidden: !!list.hidden, status };
+  });
+  room.constraints.unshift({
+    list: 'coordinates',
+    name: 'Room coordinates',
+    value: `${room.floor.name.toLowerCase()}, square ${coordinate(room.cell)}`,
+    hidden: true,
+    status: 'fulfilled',
+  });
+}
+
+/** Rooms whose own content mentions any of these words. */
+export function roomsMentioning(words: string[]) {
+  return rooms.filter((r) => has(r.key, words));
+}
 export const roomByKey = new Map(rooms.map((r) => [r.key, r]));
 export const roomBySlug = new Map(rooms.map((r) => [r.slug, r]));
 

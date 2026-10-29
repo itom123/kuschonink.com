@@ -22,6 +22,23 @@ const chapterLabel = (r: Room) => (r.locked ? 'Chapter —' : `Chapter ${r.chapt
     <p class="room-name">{room.zh && <span lang="zh">{room.zh}</span>} {room.en}</p>
 
     <p class="inventory"><b>Inventory:</b> {room.inventory.join('; ')}.</p>
+
+    <details class="constraints" open={!room.contents ? true : undefined}>
+      <summary>Constraints for chapter {room.locked ? '—' : room.chapter}</summary>
+      <table>
+        <thead><tr><th scope="col">List</th><th scope="col">Value</th><th scope="col">Status</th></tr></thead>
+        <tbody>
+          {room.constraints.map((c) => (
+            <tr class:list={{ hidden: c.hidden }} data-status={c.status}>
+              <th scope="row">{c.name}</th>
+              <td>{c.value}</td>
+              <td>{c.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p class="constraints-note">Hidden constraints in red. <a href="/house/appendix/rules">How the constraints are dealt</a>.</p>
+    </details>
     <hr />
 
     {room.locked && (
@@ -42,6 +59,8 @@ const chapterLabel = (r: Room) => (r.locked ? 'Chapter —' : `Chapter ${r.chapt
         <p>{site.name}. <a href="/">kuschonink.com</a></p>
         <p>The house is drawn from the plans of the 2008 renovation of the family house: ground floor, first floor, attic and roof, and the south elevation. {house.lockedNote}</p>
         <p>Its {rooms.length} chapters follow a knight’s tour of the house’s 5 × 5 structural grid, floor by floor, after Georges Perec’s <i>Life A User’s Manual</i> (1978). One room has no door.</p>
+        <p>The house collects: every room keeps one thing. The <a href="/image">simple view</a> classifies the same things into an array.</p>
+        <p>Appendices: <a href="/house/appendix/index">Index</a> · <a href="/house/appendix/chronology">Chronology</a> · <a href="/house/appendix/checklist">Checklist</a> · <a href="/house/appendix/rules">Rules</a>.</p>
         <p>Set in Times New Roman.</p>
       </div>
     )}
@@ -55,7 +74,7 @@ const chapterLabel = (r: Room) => (r.locked ? 'Chapter —' : `Chapter ${r.chapt
     <hr />
     <nav class="chapter-nav" aria-label="Chapters">
       {prev ? <a href={`/house/${prev.slug}`} rel="prev">← {chapterLabel(prev)}: {prev.title}</a> : <span />}
-      {next ? <a href={`/house/${next.slug}`} rel="next">{chapterLabel(next)}: {next.title} →</a> : <span />}
+      {next ? <a href={`/house/${next.slug}`} rel="next">{chapterLabel(next)}: {next.title} →</a> : <a href="/house/appendix/index" rel="next">Appendices: Index →</a>}
     </nav>
   </div>
 </aside>

@@ -44,3 +44,5 @@ figcaption { font-size: 0.85em; margin-top: 0.3em; }
 .contact-form { display: grid; gap: 12px; max-width: 32rem; }
 .field { display: grid; gap: 4px; }
 .field input, .field textarea { font: inherit; width: 100%; }
+.field-trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.form-status { margin: 0; }

@@ -143,3 +143,28 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 }
 
 .noscript-index { position: relative; z-index: 10; background: #fff; padding: calc(var(--top) + 12px) 16px; }
+
+/* Constraint tables (hidden constraints in red, as on the Wauquaire chapter site) */
+.constraints { margin: 0.5em 0 0; }
+.constraints summary { cursor: pointer; color: var(--link); text-decoration: underline; }
+.constraints table { border-collapse: collapse; width: 100%; margin-top: 6px; font-size: 0.92em; }
+.constraints th, .constraints td { border: 1px solid #808080; padding: 2px 6px; text-align: left; vertical-align: top; }
+.constraints thead th { background: var(--grey); }
+.constraints tr.hidden th, .constraints tr.hidden td { color: #c00; }
+.constraints td:last-child { white-space: nowrap; font-style: italic; }
+.constraints tr[data-status='not fulfilled'] td:last-child { color: #808080; }
+.constraints tr[data-status='clinamen'] td:last-child { font-weight: bold; }
+.constraints-note { font-size: 0.85em; margin: 4px 0 0; }
+
+/* Appendices */
+.index-list { list-style: none; padding: 0; columns: 2 200px; column-gap: 24px; }
+.index-list li { break-inside: avoid; text-indent: -1em; padding-left: 1em; margin-bottom: 2px; }
+.chronology dt { font-weight: bold; margin-top: 0.6em; }
+.chronology dd { margin: 0 0 0 1.5em; }
+.checklist li { margin-bottom: 3px; }
+.deal { border-collapse: collapse; margin: 8px 0 16px; }
+.deal th, .deal td { border: 1px solid #000; padding: 4px 6px; text-align: center; }
+.deal td { min-width: 64px; }
+.deal .move { display: block; font-size: 0.8em; color: #555; }
+.deal .digits { font-family: 'Courier New', monospace; }
+.appendix h3.hidden { color: #c00; }

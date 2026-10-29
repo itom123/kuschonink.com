@@ -50,6 +50,36 @@ It's the missing chapter.
 
 Chapter numbers recompute automatically whenever rooms change.
 
+### Constraints: `src/content/perec.json`
+
+Five lists of five items (Source, Time, and the hidden Object, Quoted
+document and Autobiographical sign) are dealt over the 5 × 5 grid by mutually
+orthogonal Latin squares of order 5: `L_k(column, row) = (k·column + row) mod 5`,
+plus the plain row for Source. Every room receives the items of the square where
+the knight entered it, and shows them in a constraint table (hidden constraints
+in red). Each item has `match` words. If one appears in the room's own content,
+the constraint is *fulfilled*. If it appears next door, it's *echoing*;
+elsewhere in the house, *semi-fulfilled*; nowhere, *not fulfilled*. The
+*clinamen* rule breaks one constraint per floor on purpose.
+
+Edit the items freely (keep five per list). Statuses update on the next build,
+so writing new content into a room can fulfil its constraints. The same file
+holds the **Chronology**.
+
+Appendices (after the last chapter): `/house/appendix/index`, `chronology`,
+`checklist`, `rules`.
+
+### Contact form
+
+The form posts to the `kuschonink-contact` Worker (Turnstile anti-spam + Email
+Sending). Set `contact.form.turnstileSiteKey` in `src/content/site.json` to the
+site key of the Turnstile widget (Cloudflare dashboard → Turnstile). Until it's
+set, the form opens the visitor's email app instead. `contact.form.endpoint` is
+the Worker's URL. The default `/v1/contact/kuschonink` assumes the Worker is
+routed on `kuschonink.com/v1/contact/*`. The Worker only accepts requests from
+`https://kuschonink.com` and `https://www.kuschonink.com`, so the form works on
+the real domain, not on `*.workers.dev` previews.
+
 ## How the project is organised
 
 | Path | What it is |

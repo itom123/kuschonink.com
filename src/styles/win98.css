@@ -37,6 +37,20 @@ body.win98 { margin: 0; background: #008080; min-height: 100vh; }
 .explorer .name { padding: 0 2px; }
 .explorer .meta { font-size: 12px; color: #444; }
 
+/* Explorer views: Large icons / Details */
+.view-switch { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0; font-family: 'Pixelated MS Sans Serif', Arial, sans-serif; font-size: 11px; }
+.view-switch > label { margin-right: 12px; }
+.view-switch > .explorer, .view-switch > .view-details { flex: 1 1 100%; margin-top: 10px; font-family: 'Times New Roman', Times, serif; font-size: 16px; }
+.view-details { display: none; height: auto; overflow-x: auto; }
+#view-details:checked ~ .view-details { display: block; }
+#view-details:checked ~ .view-icons { display: none; }
+table.details { width: 100%; }
+table.details th { cursor: pointer; white-space: nowrap; }
+table.details th[data-dir='asc']::after { content: ' ▲'; }
+table.details th[data-dir='desc']::after { content: ' ▼'; }
+table.details td { font-family: 'Times New Roman', Times, serif; font-size: 14px; }
+.classify-note { margin-top: 2em; color: #555; }
+
 /* In the simple view, every gallery is laid out flat: everything visible at once. */
 .win98 [data-gallery] .gallery-track { overflow: visible; flex-wrap: wrap; scroll-snap-type: none; }
 .win98 [data-gallery] .gallery-item { flex: 1 1 220px; }

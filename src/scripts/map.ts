@@ -333,7 +333,7 @@ export function initMap() {
   // After every page (initial and ClientRouter navigations), follow the current room.
   const sync = () => {
     const page = document.querySelector<HTMLElement>('[data-room-page]');
-    root!.classList.toggle('has-panel', !!page);
+    root!.classList.toggle('has-panel', !!page || !!document.querySelector('[data-panel]'));
     if (page) focusRoom(page.dataset.roomPage!, !!root!.dataset.synced);
     else root!.querySelectorAll('.room.current').forEach((r) => r.classList.remove('current'));
     root!.dataset.synced = '1';
