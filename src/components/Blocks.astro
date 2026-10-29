@@ -12,11 +12,11 @@ const { blocks, eager = false } = Astro.props;
 ---
 {blocks.map((b, i) => {
   switch (b.type) {
-    case 'text': return <Text html={b.html} />;
+    case 'text': return <Text html={b.html} htmlZh={b.htmlZh} />;
     case 'image': return <Figure image={b} eager={eager && i === 0} />;
     case 'gallery': return <Gallery style={b.style} images={b.images} eager={eager && i === 0} />;
     case 'video': return <Video block={b} />;
-    case 'marquee': return <Marquee items={b.items} />;
+    case 'marquee': return <Marquee items={b.items} itemsZh={b.itemsZh} />;
     case 'banner': return <Banner images={b.images} eager={eager && i === 0} />;
     case 'contactForm': return <ContactForm />;
   }

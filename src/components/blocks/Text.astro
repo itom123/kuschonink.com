@@ -1,5 +1,13 @@
 ---
-interface Props { html: string }
-const { html } = Astro.props;
+// A text block. With a Chinese version, both are in the page and the 中/EN toggle picks one.
+interface Props { html: string; htmlZh?: string }
+const { html, htmlZh } = Astro.props;
 ---
-<div class="block block-text prose" set:html={html} />
+{htmlZh ? (
+  <>
+    <div class="block block-text prose" data-l="en" set:html={html} />
+    <div class="block block-text prose" data-l="zh" lang="zh-Hans" set:html={htmlZh} />
+  </>
+) : (
+  <div class="block block-text prose" set:html={html} />
+)}
