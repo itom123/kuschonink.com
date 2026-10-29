@@ -2,11 +2,18 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "kuschonink",
   "compatibility_date": "2026-10-01",
-  // Static site served by Cloudflare Workers (static assets).
-  // To add server features later (API routes, forms), add a "main" script here.
+  // Static site (dist/) served by Cloudflare. The Worker only runs for the
+  // contact form endpoint, which it forwards to the kuschonink-contact Worker.
+  "main": "worker/index.ts",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "404-page",
-    "html_handling": "drop-trailing-slash"
-  }
+    "html_handling": "drop-trailing-slash",
+    "run_worker_first": ["/v1/contact/*"]
+  },
+  "services": [
+    { "binding": "CONTACT", "service": "kuschonink-contact" }
+  ],
+  "observability": { "enabled": true }
 }

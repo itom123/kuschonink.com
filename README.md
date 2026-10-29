@@ -94,14 +94,22 @@ objectLabel, html, references). The rules find it a drawer.
 
 ### Contact form
 
-The form posts to the `kuschonink-contact` Worker (Turnstile anti-spam + Email
-Sending). Set `contact.form.turnstileSiteKey` in `src/content/site.json` to the
+The form posts to `/v1/contact/kuschonink` on the site itself. The site's small
+Worker (`worker/index.ts`) hands those requests to the existing
+`kuschonink-contact` Worker over a service binding (`wrangler.jsonc`), and that
+Worker checks Turnstile and emails the message. No extra route is needed.
+
+Set `contact.form.turnstileSiteKey` in `src/content/site.json` to the public
 site key of the Turnstile widget (Cloudflare dashboard → Turnstile). Until it's
-set, the form opens the visitor's email app instead. `contact.form.endpoint` is
-the Worker's URL. The default `/v1/contact/kuschonink` assumes the Worker is
-routed on `kuschonink.com/v1/contact/*`. The Worker only accepts requests from
-`https://kuschonink.com` and `https://www.kuschonink.com`, so the form works on
-the real domain, not on `*.workers.dev` previews.
+set, the form opens the visitor's email app instead. The contact Worker only
+accepts requests from `https://kuschonink.com` and `https://www.kuschonink.com`,
+so sending works on the real domain, not on preview links.
+
+### Analytics
+
+Cloudflare Web Analytics is enabled for the kuschonink.com zone with automatic
+setup: Cloudflare injects the beacon into every page as it passes through.
+There's no code in this repo and no cookie banner is needed.
 
 ## How the project is organised
 
@@ -177,9 +185,9 @@ Worker's *Settings → Domains & Routes*. Until then the site is available at
 
 ### Adding server features later
 
-`wrangler.jsonc` currently serves static files only. To add things like a
-contact-form backend or other API routes, add a `main` Worker script (or the
-`@astrojs/cloudflare` adapter for server-rendered Astro pages).
+`worker/index.ts` runs only for the paths listed in `assets.run_worker_first`
+(currently `/v1/contact/*`). Everything else is served as static files. Add a
+path there and handle it in the Worker to add an API route.
 
 ## Migration notes
 
