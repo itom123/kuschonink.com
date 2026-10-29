@@ -27,13 +27,7 @@
         "src": "contact/the-scene-of-thousands-of-people-carrying-soil-at-the-liuhetang-water-conservancy-construction-site-in-1958.jpg",
         "overlay": 0.15
       },
-      "blocks": [
-        {
-          "type": "text",
-          "html": "<h1 class=\"display align-center\"><mark>Xiangyin Gu</mark></h1>",
-          "htmlZh": "<h1 class=\"display align-center\"><mark>Xiangyin Gu</mark></h1>"
-        }
-      ]
+      "blocks": []
     }
   ]
 }
