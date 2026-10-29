@@ -38,6 +38,7 @@ const live = Boolean(form.turnstileSiteKey && form.endpoint);
     missing_required_field: 'Please fill in every field.',
     field_too_long: 'One of the fields is too long.',
     invalid_submission: 'Please check your email address.',
+    delivery_in_progress: 'Your message is already on its way. Please wait a moment.',
   };
   type TS = { render: (el: Element, o: object) => string; reset: (id?: string) => void };
   let turnstileLoading: Promise<TS> | null = null;
@@ -108,7 +109,8 @@ const live = Boolean(form.turnstileSiteKey && form.endpoint);
             return;
           }
           const err = (await res.json().catch(() => ({}))) as { error?: string };
-          say(ERRORS[err.error ?? ''] ?? `The message could not be sent. Please write to ${form.dataset.email}.`);
+          // Unknown failures show their code, so a problem can be traced.
+          say(ERRORS[err.error ?? ''] ?? `The message could not be sent (${err.error ?? 'error'}, ${res.status}). Please write to ${form.dataset.email}.`);
         } catch {
           say(`The message could not be sent. Please write to ${form.dataset.email}.`);
         } finally {
