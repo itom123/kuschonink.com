@@ -13,11 +13,6 @@
       "blocks": [
         {
           "type": "text",
-          "html": "<p><strong>Email<br/></strong><a href=\"mailto:hi@kuschonink.com\">hi@kuschonink.com</a></p>",
-          "htmlZh": "<p><strong>电子邮箱<br/></strong><a href=\"mailto:hi@kuschonink.com\">hi@kuschonink.com</a></p>"
-        },
-        {
-          "type": "text",
           "html": "<p><strong>Phone</strong><br/>+44  (0) 7928 164 076</p>",
           "htmlZh": "<p><strong>电话</strong><br/>+44  (0) 7928 164 076</p>"
         },
@@ -35,13 +30,8 @@
       "blocks": [
         {
           "type": "text",
-          "html": "<p class=\"align-center\">kuschonink</p>",
-          "htmlZh": "<p class=\"align-center\">kuschonink</p>"
-        },
-        {
-          "type": "text",
-          "html": "<h1 class=\"display align-center\"><mark>Xiangyin Tom Gu</mark></h1>",
-          "htmlZh": "<h1 class=\"display align-center\"><mark>Xiangyin Tom Gu</mark></h1>"
+          "html": "<h1 class=\"display align-center\"><mark>Xiangyin Gu</mark></h1>",
+          "htmlZh": "<h1 class=\"display align-center\"><mark>Xiangyin Gu</mark></h1>"
         }
       ]
     }

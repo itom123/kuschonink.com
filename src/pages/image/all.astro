@@ -5,7 +5,7 @@ import Bi from '../../components/Bi.astro';
 import { projects, site, home } from '../../lib/content';
 import { t, seoTitle } from '../../lib/i18n';
 ---
-<Win98 seo={{ ...seoTitle(t.allProjects, site.name), description: home.seo.description }} title={t.allProjects} address="C:\kuschonink\image\*.*" status={{ en: `${projects.length} projects`, zh: `${projects.length} 件作品` }}>
+<Win98 seo={{ ...seoTitle(t.allProjects, site.name), description: home.seo.description }} title={t.allProjects} address="C:\xiangyin\image\*.*" status={{ en: `${projects.length} projects`, zh: `${projects.length} 件作品` }}>
   <h1><Bi t={t.allProjects} /></h1>
   <ol>
     {projects.map((p) => <li><a href={`#${p.slug}`}><Bi t={{ en: p.title, zh: p.titleZh ?? '' }} /></a></li>)}

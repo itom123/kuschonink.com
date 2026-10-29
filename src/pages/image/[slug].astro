@@ -19,7 +19,7 @@ const title = (p: Project) => ({ en: p.title, zh: p.titleZh ?? '' });
   seo={project.seo}
   image={imagesOf(project.sections)[0]}
   title={title(project)}
-  address={`C:\\kuschonink\\image\\${project.slug}`}
+  address={`C:\\xiangyin\\image\\${project.slug}`}
   houseHref={room ? `/house/${room.slug}` : '/house'}
   status={{
     en: `${n} image${n === 1 ? '' : 's'}${room ? ` · in the house: ${room.en}, ${room.floor.name.toLowerCase()}` : ''}`,
