@@ -23,10 +23,10 @@ const { seo, image, title, address, houseHref = '/house/facade', status } = Astr
 <Base seo={seo} image={image} bodyClass="win98">
   <div class="desktop">
     <nav class="desktop-icons" aria-label="Desktop">
-      <a href="/image" class="desk-icon"><span class="ico ico-folder" aria-hidden="true"></span>Projects</a>
-      <a href={houseHref} class="desk-icon"><span class="ico ico-house" aria-hidden="true"></span>The House</a>
-      <a href="/about" class="desk-icon"><span class="ico ico-doc" aria-hidden="true"></span>About.txt</a>
-      <a href="/contact" class="desk-icon"><span class="ico ico-mail" aria-hidden="true"></span>Contact</a>
+      <a href="/image" class="desk-icon"><span class="ico ico-folder" aria-hidden="true"></span><span class="label">Projects</span></a>
+      <a href={houseHref} class="desk-icon"><span class="ico ico-house" aria-hidden="true"></span><span class="label">The House</span></a>
+      <a href="/about" class="desk-icon"><span class="ico ico-doc" aria-hidden="true"></span><span class="label">About.txt</span></a>
+      <a href="/contact" class="desk-icon"><span class="ico ico-mail" aria-hidden="true"></span><span class="label">Contact</span></a>
     </nav>
     <main class="window main-window">
       <div class="title-bar">
@@ -77,6 +77,8 @@ const { seo, image, title, address, houseHref = '/house/facade', status } = Astr
     <span class="tray"><time class="clock"></time></span>
   </footer>
   <script>
+    import { startWindowManager } from '../scripts/win98-wm';
+    startWindowManager();
     const c = document.querySelector('.clock');
     const tick = () => { if (c) c.textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); };
     tick(); setInterval(tick, 15000);

@@ -25,6 +25,12 @@ About and Contact. Everything is set in Times New Roman.
 **The simple view** (`/`, `/image`, `/image/<slug>`, `/image/all`, `/about`, `/contact`):
 the default view visitors land on at `/`. A Windows 98 desktop for anyone who wants to see the work quickly. Every gallery
 is laid flat, so a project is one page. `/image/all` puts every project on one page.
+On a computer with a mouse and a wide screen, the desktop works like Windows 98
+(`src/scripts/win98-wm.ts`): drag windows by the title bar, resize from the corner,
+minimise, maximise and close them, and open several at once. Double-click a desktop
+icon (or use Start) to open a window; links load inside their window, and
+Shift-click opens a link in a new one. The taskbar lists open windows. Phones and
+narrow screens get plain pages.
 
 ### The rules of the house (after Perec)
 

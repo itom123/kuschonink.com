@@ -33,9 +33,9 @@ const items = await Promise.all(
   <p>All work by {site.name}. <a href="/image/all">See every project on one page</a>, or <a href="/house/facade">walk through the house</a>.</p>
 
   <div class="view-switch" role="radiogroup" aria-label="View">
-    <input type="radio" name="view" id="view-icons" checked />
+    <input type="radio" name="view" id="view-icons" class="view-radio-icons" checked />
     <label for="view-icons">Large icons</label>
-    <input type="radio" name="view" id="view-details" />
+    <input type="radio" name="view" id="view-details" class="view-radio-details" />
     <label for="view-details">Details</label>
 
     <ul class="explorer view-icons">
@@ -86,7 +86,9 @@ const items = await Promise.all(
 
 <script>
   // Click a column heading to sort, like Explorer's Details view.
-  for (const table of document.querySelectorAll<HTMLTableElement>('table[data-sortable]')) {
+  function initSort() {
+  for (const table of document.querySelectorAll<HTMLTableElement>('table[data-sortable]:not([data-ready])')) {
+    table.dataset.ready = '1';
     const heads = [...table.tHead!.rows[0].cells];
     heads.forEach((th, i) => {
       th.tabIndex = 0;
@@ -107,4 +109,8 @@ const items = await Promise.all(
       th.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sort(); } });
     });
   }
+  }
+  initSort();
+  // Runs again when a window loads this page (see src/scripts/win98-wm.ts).
+  document.addEventListener('astro:page-load', initSort);
 </script>
