@@ -13,8 +13,8 @@
       "blocks": [
         {
           "type": "text",
-          "html": "<p><strong>Email<br/></strong><a href=\"mailto:Xiangyin.Tom.Gu@gmail.com\">Xiangyin.Tom.Gu@gmail.com</a></p>",
-          "htmlZh": "<p><strong>电子邮箱<br/></strong><a href=\"mailto:Xiangyin.Tom.Gu@gmail.com\">Xiangyin.Tom.Gu@gmail.com</a></p>"
+          "html": "<p><strong>Email<br/></strong><a href=\"mailto:hi@kuschonink.com\">hi@kuschonink.com</a></p>",
+          "htmlZh": "<p><strong>电子邮箱<br/></strong><a href=\"mailto:hi@kuschonink.com\">hi@kuschonink.com</a></p>"
         },
         {
           "type": "text",

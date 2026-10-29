@@ -17,7 +17,7 @@ const { seo, image, simpleHref = '/image', bodyClass, noindex = false } = Astro.
   <ClientRouter slot="head" fallback="swap" />
   {noindex && <meta slot="head" name="robots" content="noindex, nofollow, noarchive" />}
   <header class="house-top" transition:persist="house-top">
-    <a class="house-name" href="/">{site.name}</a>
+    <a class="house-name" href="/house/facade">{site.name}</a>
     <nav>
       <a href="/house"><Bi t={t.theHouse} /></a>
       <span aria-hidden="true">|</span>

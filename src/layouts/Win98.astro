@@ -21,7 +21,7 @@ interface Props {
   houseHref?: string;
   status?: BiText;
 }
-const { seo, image, title, address, houseHref = '/house', status } = Astro.props;
+const { seo, image, title, address, houseHref = '/house/facade', status } = Astro.props;
 // Menu items with their keyboard letter underlined, Windows style: "Projects" / "作品(P)".
 const menu = (en: string, key: string, zh: string) => ({ en, key, zh });
 const menuItems = [
@@ -39,10 +39,10 @@ const underline = (text: string, key: string) => {
 <Base seo={seo} image={image} bodyClass="win98">
   <div class="desktop">
     <nav class="desktop-icons" {...attr('aria-label', t.desktop)}>
-      <a href="/image" class="desk-icon"><span class="ico ico-folder" aria-hidden="true"></span><Bi t={t.projects} /></a>
-      <a href={houseHref} class="desk-icon"><span class="ico ico-house" aria-hidden="true"></span><Bi t={t.theHouse} /></a>
-      <a href="/about" class="desk-icon"><span class="ico ico-doc" aria-hidden="true"></span><Bi t={{ en: 'About.txt', zh: '关于.txt' }} /></a>
-      <a href="/contact" class="desk-icon"><span class="ico ico-mail" aria-hidden="true"></span><Bi t={t.contact} /></a>
+      <a href="/image" class="desk-icon"><span class="ico ico-folder" aria-hidden="true"></span><span class="label"><Bi t={t.projects} /></span></a>
+      <a href={houseHref} class="desk-icon"><span class="ico ico-house" aria-hidden="true"></span><span class="label"><Bi t={t.theHouse} /></span></a>
+      <a href="/about" class="desk-icon"><span class="ico ico-doc" aria-hidden="true"></span><span class="label"><Bi t={{ en: 'About.txt', zh: '关于.txt' }} /></span></a>
+      <a href="/contact" class="desk-icon"><span class="ico ico-mail" aria-hidden="true"></span><span class="label"><Bi t={t.contact} /></span></a>
     </nav>
     <main class="window main-window">
       <div class="title-bar">
@@ -92,6 +92,8 @@ const underline = (text: string, key: string) => {
     <span class="tray"><time class="clock"></time></span>
   </footer>
   <script>
+    import { startWindowManager } from '../scripts/win98-wm';
+    startWindowManager();
     const c = document.querySelector('.clock');
     const tick = () => { if (c) c.textContent = new Date().toLocaleTimeString(document.documentElement.lang || [], { hour: 'numeric', minute: '2-digit' }); };
     tick(); setInterval(tick, 15000);
