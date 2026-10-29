@@ -8,10 +8,28 @@ interface IndexRoom { slug: string; floor: string; title: string; zh: string; en
 const MIN_Z = 0.6;
 const MAX_Z = 12;
 
-export function initMap() {
+// The map currently on the page. ClientRouter can drop the map (e.g. on the
+// façade page) and bring a fresh, uninitialised copy back later, so set up
+// whichever map is present after every navigation.
+let active: { root: HTMLElement; sync: () => void; off: AbortController } | null = null;
+
+export function startMap() {
+  initMap();
+  document.addEventListener('astro:page-load', () => {
+    initMap();
+    active?.sync();
+  });
+  if (document.readyState === 'complete') active?.sync();
+}
+
+function initMap() {
   const root = document.getElementById('house-map');
-  if (!root || root.dataset.ready) return;
+  if (root && root === active?.root) return;
+  active?.off.abort();
+  active = null;
+  if (!root) return;
   root.dataset.ready = '1';
+  const off = new AbortController();
 
   const viewport = root.querySelector<HTMLElement>('.map-viewport')!;
   const svgs = [...root.querySelectorAll<SVGSVGElement>('svg.floor')];
@@ -328,7 +346,7 @@ export function initMap() {
     z: Number(params.get('z')) || 1,
   };
   setFloor(floor, start);
-  window.addEventListener('resize', () => render());
+  window.addEventListener('resize', () => render(), { signal: off.signal });
 
   // After every page (initial and ClientRouter navigations), follow the current room.
   const sync = () => {
@@ -338,8 +356,7 @@ export function initMap() {
     else root!.querySelectorAll('.room.current').forEach((r) => r.classList.remove('current'));
     root!.dataset.synced = '1';
   };
-  document.addEventListener('astro:page-load', sync);
-  if (document.readyState === 'complete') sync();
+  active = { root, sync, off };
 }
 
 function escape(s: string) {
