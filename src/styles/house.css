@@ -208,3 +208,8 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 .sheet-footer { margin-top: 2em; padding-top: 0.8em; border-top: 1px dashed #999; font-size: 0.9em; color: #333; }
 .room-panel .sheet { margin: 0 -16px; }
 @media (max-width: 600px) { .sheet { padding: 20px 18px; } }
+
+/* Bilingual text: Chinese sits beside or under the English. */
+.chapter-nav a[rel='next'] { text-align: right; }
+.label-sub-zh { font-style: normal; }
+.furniture-label-small .furniture-en { font-size: 1em; }

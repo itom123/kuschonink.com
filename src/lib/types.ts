@@ -43,12 +43,15 @@ export interface Page {
 }
 
 export interface Project extends Page {
+  /** Chinese title. */
+  titleZh?: string;
   order: number;
 }
 
 export interface FormField {
   name: string;
   label: string;
+  labelZh?: string;
   type: 'text' | 'email' | 'textarea';
   required: boolean;
 }
@@ -64,7 +67,7 @@ export interface Site {
   contact: {
     email: string;
     phone: string;
-    form: { fields: FormField[]; submitText: string; successMessage: string; endpoint?: string; turnstileSiteKey?: string };
+    form: { fields: FormField[]; submitText: string; submitTextZh?: string; successMessage: string; successMessageZh?: string; endpoint?: string; turnstileSiteKey?: string };
   };
 }
 

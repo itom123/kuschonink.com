@@ -92,6 +92,23 @@ a sheet of paper.
 To add a piece, add `src/content/writings/<id>.json` (title, date, object,
 objectLabel, html, references). The rules find it a drawer.
 
+### Bilingual text (English · 中文)
+
+Everything on the site is shown in English and Chinese.
+
+- **Interface words** (buttons, headings, table labels, messages) live in
+  `src/lib/i18n.ts`, each as `{ en, zh }`. `src/components/Bi.astro` prints one
+  pair as "English 中文".
+- **Content** keeps its Chinese next to the English: rooms and furniture have
+  `zh` and `en`; projects and writings have `titleZh`; list items, list names,
+  chronology entries and façade hotspots have `zh` / `whenZh` / `whatZh`;
+  contact form fields have `labelZh`.
+- When you add a room, project, list item or chronology entry, fill in both
+  languages. The inventory, constraint table and chapter links build their
+  Chinese from these fields automatically.
+- Project texts, About and the writings themselves are still in their original
+  language only.
+
 ### Contact form
 
 The form posts to `/v1/contact/kuschonink`, handled by the site's own Worker

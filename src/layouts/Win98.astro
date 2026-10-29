@@ -6,6 +6,9 @@ import '../styles/vendor/98css/98.css';
 import '../styles/blocks.css';
 import '../styles/win98.css';
 import { site } from '../lib/content';
+import { t, both } from '../lib/i18n';
+
+const zh = (s: { zh: string }) => s.zh;
 import type { Seo } from '../lib/types';
 
 interface Props {
@@ -22,31 +25,31 @@ const { seo, image, title, address, houseHref = '/house', status } = Astro.props
 ---
 <Base seo={seo} image={image} bodyClass="win98">
   <div class="desktop">
-    <nav class="desktop-icons" aria-label="Desktop">
-      <a href="/image" class="desk-icon"><span class="ico ico-folder" aria-hidden="true"></span>Projects</a>
-      <a href={houseHref} class="desk-icon"><span class="ico ico-house" aria-hidden="true"></span>The House</a>
-      <a href="/about" class="desk-icon"><span class="ico ico-doc" aria-hidden="true"></span>About.txt</a>
-      <a href="/contact" class="desk-icon"><span class="ico ico-mail" aria-hidden="true"></span>Contact</a>
+    <nav class="desktop-icons" aria-label={both(t.desktop, ' ')}>
+      <a href="/image" class="desk-icon"><span class="ico ico-folder" aria-hidden="true"></span>Projects<span lang="zh" class="zh">{zh(t.projects)}</span></a>
+      <a href={houseHref} class="desk-icon"><span class="ico ico-house" aria-hidden="true"></span>The House<span lang="zh" class="zh">{zh(t.theHouse)}</span></a>
+      <a href="/about" class="desk-icon"><span class="ico ico-doc" aria-hidden="true"></span>About.txt<span lang="zh" class="zh">{zh(t.about)}</span></a>
+      <a href="/contact" class="desk-icon"><span class="ico ico-mail" aria-hidden="true"></span>Contact<span lang="zh" class="zh">{zh(t.contact)}</span></a>
     </nav>
     <main class="window main-window">
       <div class="title-bar">
         <div class="title-bar-text">{title} — {site.name}</div>
         <div class="title-bar-controls">
-          <button aria-label="Minimize" disabled></button>
-          <button aria-label="Maximize" disabled></button>
-          <a href={houseHref} class="close-link" aria-label="Close and go to the house"><button aria-label="Close" tabindex="-1"></button></a>
+          <button aria-label="Minimize 最小化" disabled></button>
+          <button aria-label="Maximize 最大化" disabled></button>
+          <a href={houseHref} class="close-link" aria-label="Close and go to the house 关闭并前往房子"><button aria-label="Close 关闭" tabindex="-1"></button></a>
         </div>
       </div>
       <div class="window-body">
-        <div class="menu-bar" role="navigation" aria-label="Menu">
-          <a href="/image"><u>P</u>rojects</a>
-          <a href="/image/all"><u>A</u>ll on one page</a>
-          <a href="/about">A<u>b</u>out</a>
-          <a href="/contact"><u>C</u>ontact</a>
-          <a href={houseHref}><u>T</u>he House</a>
+        <div class="menu-bar" role="navigation" aria-label={both(t.menu, ' ')}>
+          <a href="/image"><u>P</u>rojects <span lang="zh">{zh(t.projects)}</span></a>
+          <a href="/image/all"><u>A</u>ll on one page <span lang="zh">{zh(t.allOnOnePage)}</span></a>
+          <a href="/about">A<u>b</u>out <span lang="zh">{zh(t.about)}</span></a>
+          <a href="/contact"><u>C</u>ontact <span lang="zh">{zh(t.contact)}</span></a>
+          <a href={houseHref}><u>T</u>he House <span lang="zh">{zh(t.theHouse)}</span></a>
         </div>
         <div class="field-row address-row">
-          <label for="address">Address</label>
+          <label for="address">Address <span lang="zh">{zh(t.address)}</span></label>
           <input id="address" type="text" value={address} readonly />
         </div>
         <div class="page sunken-panel">
@@ -63,13 +66,13 @@ const { seo, image, title, address, houseHref = '/house', status } = Astro.props
   </div>
   <footer class="taskbar">
     <details class="start">
-      <summary><span class="start-flag" aria-hidden="true"></span><b>Start</b></summary>
+      <summary><span class="start-flag" aria-hidden="true"></span><b>Start</b> <span lang="zh">{zh(t.start)}</span></summary>
       <ul class="start-menu window">
-        <li><a href={houseHref}>The House</a></li>
-        <li><a href="/image">Projects</a></li>
-        <li><a href="/image/all">All projects on one page</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/contact">Contact</a></li>
+        <li><a href={houseHref}>The House <span lang="zh">{zh(t.theHouse)}</span></a></li>
+        <li><a href="/image">Projects <span lang="zh">{zh(t.projects)}</span></a></li>
+        <li><a href="/image/all">All projects on one page <span lang="zh">{zh(t.allProjectsOnOnePage)}</span></a></li>
+        <li><a href="/about">About <span lang="zh">{zh(t.about)}</span></a></li>
+        <li><a href="/contact">Contact <span lang="zh">{zh(t.contact)}</span></a></li>
         <li><a href={site.social[0].href} target="_blank" rel="noopener">Instagram</a></li>
       </ul>
     </details>

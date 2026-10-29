@@ -1,13 +1,16 @@
 ---
 import Win98 from '../layouts/Win98.astro';
 import { site } from '../lib/content';
+import Bi from '../components/Bi.astro';
+import { t } from '../lib/i18n';
 ---
-<Win98 seo={{ title: `Not found — ${site.name}` }} title="Error" address="C:\kuschonink\???" status="1 error">
-  <h1>The page cannot be found</h1>
-  <p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+<Win98 seo={{ title: `Not found — ${site.name}` }} title="Error 错误" address="C:\kuschonink\???" status="1 error · 1 个错误">
+  <h1><Bi t={t.notFoundTitle} /></h1>
+  <p>{t.notFoundBody.en}</p>
+  <p lang="zh">{t.notFoundBody.zh}</p>
   <ul>
-    <li><a href="/">Go to the front door</a></li>
-    <li><a href="/image">See all projects</a></li>
+    <li><a href="/"><Bi t={t.frontDoor} /></a></li>
+    <li><a href="/image"><Bi t={t.seeAllProjects} /></a></li>
   </ul>
-  <p><small>HTTP 404 — File not found</small></p>
+  <p><small>HTTP 404 — File not found · 找不到文件</small></p>
 </Win98>

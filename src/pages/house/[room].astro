@@ -14,7 +14,7 @@ const project = c && 'project' in c ? projects.find((p) => p.slug === c.project)
 const simpleHref = project ? `/image/${project.slug}` : c && 'page' in c && (c.page === 'about' || c.page === 'contact') ? `/${c.page}` : '/image';
 const description = project?.seo.description ?? `${room.en}${room.zh ? ' (' + room.zh + ')' : ''}, ${room.floor.name.toLowerCase()} of the house. ${room.inventory.join('; ')}.`;
 ---
-<House seo={{ title: `${room.title} — ${site.name}`, description }} simpleHref={simpleHref} bodyClass="house-map-page">
+<House seo={{ title: `${room.title}${room.titleZh && room.titleZh !== room.title ? ' ' + room.titleZh : ''} — ${site.name}`, description }} simpleHref={simpleHref} bodyClass="house-map-page">
   <HouseMap current={room} />
   <RoomView room={room} transition:animate="fade" />
 </House>

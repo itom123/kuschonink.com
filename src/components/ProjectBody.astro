@@ -6,5 +6,5 @@ interface Props { project: Project; headingLevel?: 'h1' | 'h2'; eager?: boolean 
 const { project, headingLevel = 'h1', eager = false } = Astro.props;
 const H = headingLevel;
 ---
-<H>{project.title}</H>
+<H>{project.title}{project.titleZh && project.titleZh !== project.title && <> <span lang="zh">{project.titleZh}</span></>}</H>
 {project.sections.map((s, i) => <Section section={s} first={eager && i === 0} />)}

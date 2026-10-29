@@ -5,6 +5,8 @@ import Base from './Base.astro';
 import '../styles/blocks.css';
 import '../styles/house.css';
 import { site } from '../lib/content';
+import Bi from '../components/Bi.astro';
+import { t } from '../lib/i18n';
 import type { Seo } from '../lib/types';
 
 interface Props { seo: Seo; image?: string; simpleHref?: string; bodyClass?: string; noindex?: boolean }
@@ -16,9 +18,9 @@ const { seo, image, simpleHref = '/image', bodyClass, noindex = false } = Astro.
   <header class="house-top" transition:persist="house-top">
     <a class="house-name" href="/">{site.name}</a>
     <nav>
-      <a href="/house">The House</a>
+      <a href="/house"><Bi t={t.theHouse} /></a>
       <span aria-hidden="true">|</span>
-      <a href={simpleHref} data-simple-link>Simple view</a>
+      <a href={simpleHref} data-simple-link><Bi t={t.simpleView} /></a>
       <span aria-hidden="true">|</span>
       <a href={site.social[0].href} target="_blank" rel="noopener">Instagram</a>
     </nav>

@@ -1,0 +1,7 @@
+---
+// One piece of text in both languages: English, then Chinese.
+import type { Bi } from '../lib/i18n';
+interface Props { t: Bi; sep?: string }
+const { t, sep = ' ' } = Astro.props;
+---
+{t.en}{t.zh && t.zh !== t.en && <>{sep}<span lang="zh" class="zh">{t.zh}</span></>}

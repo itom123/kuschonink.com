@@ -3,6 +3,7 @@ import perecJson from '../content/perec.json';
 import drawersJson from '../content/drawers.json';
 import { projects, site, about, contact } from './content';
 import type { Block, Section } from './types';
+import { floorZh, t } from './i18n';
 
 export type RoomContents =
   | { project: string }
@@ -46,7 +47,9 @@ export interface Room extends RoomData {
   /** Grid square [column, row] where the knight first enters the room. */
   cell: [number, number];
   title: string;
+  titleZh: string;
   inventory: string[];
+  inventoryZh: string[];
   constraints: Constraint[];
 }
 
@@ -55,7 +58,9 @@ export type ConstraintStatus = 'fulfilled' | 'echoing' | 'semi-fulfilled' | 'not
 export interface Constraint {
   list: string;
   name: string;
+  nameZh: string;
   value: string;
+  valueZh: string;
   hidden: boolean;
   status: ConstraintStatus;
 }
@@ -64,8 +69,9 @@ interface HouseData {
   grid: { columns: number[]; rows: number[] };
   tourStart: [number, number];
   floors: FloorData[];
-  elevation: { src: string; hotspots: { room: string; label: string; box: [number, number, number, number] }[] };
+  elevation: { src: string; hotspots: { room: string; label: string; zh: string; box: [number, number, number, number] }[] };
   lockedNote: string;
+  lockedNoteZh: string;
 }
 
 export const house = houseJson as unknown as HouseData;
@@ -105,10 +111,13 @@ function overlaps(r: RoomData, c: number, row: number) {
   return x < cx1 && x + w > cx0 && y < cy1 && y + h > cy0;
 }
 
-function contentTitle(c?: RoomContents): string | undefined {
+function contentTitle(c?: RoomContents): { en: string; zh: string } | undefined {
   if (!c) return undefined;
-  if ('project' in c) return projects.find((p) => p.slug === c.project)?.title;
-  return { about: 'About', contact: 'Contact', writings: 'Writings', colophon: 'Colophon' }[c.page];
+  if ('project' in c) {
+    const p = projects.find((p) => p.slug === c.project);
+    return p && { en: p.title, zh: p.titleZh ?? '' };
+  }
+  return { about: t.about, contact: t.contact, writings: t.writings, colophon: t.colophon }[c.page];
 }
 
 function countBlocks(blocks: Block[]) {
@@ -124,14 +133,26 @@ function countBlocks(blocks: Block[]) {
 
 const plural = (n: number, one: string, many = one + 's') => `${n} ${n === 1 ? one : many}`;
 
-/** A Perec-style inventory, built only from facts in the drawings and the content. */
-function inventory(r: RoomData, floor: FloorData): string[] {
+/** A Perec-style inventory, built only from facts in the drawings and the content. English and Chinese. */
+function inventory(r: RoomData, floor: FloorData): { en: string[]; zh: string[] } {
   const [, , w, h] = r.rect;
-  const list = [`${r.zh ? r.zh + ' · ' : ''}${r.en}`, `${w} × ${h} mm`, `floor level ${r.level ?? floor.level}`];
-  if (r.windows?.length) list.push(`window${r.windows.length > 1 ? 's' : ''} ${r.windows.join(', ')}`);
-  if (r.doors?.length) list.push(`door${r.doors.length > 1 ? 's' : ''} ${r.doors.join(', ')}`);
-  if (r.stairs) list.push(`stairs up to the ${floors.find((f) => f.id === r.stairs)?.name.toLowerCase()}`);
-  if (r.outdoor) list.push('open to the sky');
+  const level = r.level ?? floor.level;
+  const list = [r.en, `${w} × ${h} mm`, `floor level ${level}`];
+  const zh = [r.zh || r.en, `${w} × ${h} 毫米`, `楼面标高 ${level}`];
+  if (r.windows?.length) {
+    list.push(`window${r.windows.length > 1 ? 's' : ''} ${r.windows.join(', ')}`);
+    zh.push(`窗 ${r.windows.join('、')}`);
+  }
+  if (r.doors?.length) {
+    list.push(`door${r.doors.length > 1 ? 's' : ''} ${r.doors.join(', ')}`);
+    zh.push(`门 ${r.doors.join('、')}`);
+  }
+  if (r.stairs) {
+    const up = floors.find((f) => f.id === r.stairs);
+    list.push(`stairs up to the ${up?.name.toLowerCase()}`);
+    zh.push(`楼梯通往${up ? floorZh(up.zh) : ''}`);
+  }
+  if (r.outdoor) { list.push('open to the sky'); zh.push('露天'); }
   if (r.contents && 'project' in r.contents) {
     const p = projects.find((p) => p.slug === (r.contents as { project: string }).project);
     if (p) {
@@ -143,13 +164,14 @@ function inventory(r: RoomData, floor: FloorData): string[] {
         { images: 0, texts: 0, videos: 0 },
       );
       list.push(`“${p.title}”`);
-      if (n.images) list.push(plural(n.images, 'photograph'));
-      if (n.texts) list.push(plural(n.texts, 'text'));
-      if (n.videos) list.push(plural(n.videos, 'video'));
+      zh.push(`《${p.titleZh ?? p.title}》`);
+      if (n.images) { list.push(plural(n.images, 'photograph')); zh.push(`${n.images} 张照片`); }
+      if (n.texts) { list.push(plural(n.texts, 'text')); zh.push(`${n.texts} 段文字`); }
+      if (n.videos) { list.push(plural(n.videos, 'video')); zh.push(`${n.videos} 段视频`); }
     }
   }
-  if (r.locked) list.push('no door', 'no window');
-  return list;
+  if (r.locked) { list.push('no door', 'no window'); zh.push('无门', '无窗'); }
+  return { en: list, zh };
 }
 
 /** The grid square containing a point, clamped to the grid. */
@@ -183,6 +205,8 @@ function buildRooms(): Room[] {
     }
     for (const r of order) {
       chapter++;
+      const title = contentTitle(r.contents);
+      const inv = inventory(r, floor);
       out.push({
         ...r,
         key: `${floor.id}/${r.id}`,
@@ -190,8 +214,10 @@ function buildRooms(): Room[] {
         floor,
         chapter,
         cell: entry.get(r)!,
-        title: contentTitle(r.contents) ?? r.en,
-        inventory: inventory(r, floor),
+        title: title?.en ?? r.en,
+        titleZh: title?.zh || r.zh,
+        inventory: inv.en,
+        inventoryZh: inv.zh,
         constraints: [],
       });
     }
@@ -211,15 +237,17 @@ export const roomBySlug = new Map(rooms.map((r) => [r.slug, r]));
 export interface PerecList {
   id: string;
   name: string;
+  zh: string;
   hidden?: boolean;
   /** 'row' = the grid row; k = the Latin square L_k(c, r) = (k·c + r) mod 5. */
   square: 'row' | number;
-  items: { label: string; match: string[] }[];
+  items: { label: string; zh: string; match: string[] }[];
 }
 export const perec = perecJson as unknown as {
   lists: PerecList[];
   clinamen: string;
-  chronology: { when: string; what: string; room?: string }[];
+  clinamenZh: string;
+  chronology: { when: string; whenZh: string; what: string; whatZh: string; room?: string }[];
 };
 
 const N = columns.length - 1;
@@ -265,10 +293,12 @@ export interface Furniture { id: string; zh: string; en: string; rect: [number, 
 export interface Piece {
   id: string;
   title: string;
+  titleZh?: string;
   date: string;
   excerpt?: string;
   object: 'letter' | 'page' | 'notebook';
   objectLabel: string;
+  objectLabelZh?: string;
   references: ({ project: string } | { room: string } | { piece: string })[];
   html: string;
 }
@@ -278,7 +308,7 @@ export interface Placement {
   furniture: Furniture;
   drawer: number;
   /** The dealt constraints this piece fulfils in its room. */
-  fulfils: { name: string; value: string }[];
+  fulfils: { name: string; nameZh: string; value: string; valueZh: string }[];
 }
 
 const furnitureByRoom = (drawersJson as { rooms: Record<string, Furniture[]> }).rooms;
@@ -308,7 +338,7 @@ function place(): Placement[] {
       .map((room) => {
         const fulfils = dealt(room)
           .filter(({ item }) => item.match.some((w) => text.includes(w.toLowerCase())))
-          .map(({ list, item }) => ({ name: list.name, value: item.label }));
+          .map(({ list, item }) => ({ name: list.name, nameZh: list.zh, value: item.label, valueZh: item.zh }));
         return { room, fulfils };
       })
       .sort((a, b) => b.fulfils.length - a.fulfils.length || a.room.chapter - b.room.chapter);
@@ -368,12 +398,14 @@ for (const room of rooms) {
     else if (adjacent.get(room.key)!.some((o) => has(o.key, item.match))) status = 'echoing';
     else if (rooms.some((o) => o !== room && has(o.key, item.match))) status = 'semi-fulfilled';
     if (list.id === 'quote' && clinamenRooms.has(room.key)) status = 'clinamen';
-    return { list: list.id, name: list.name, value: item.label, hidden: !!list.hidden, status };
+    return { list: list.id, name: list.name, nameZh: list.zh, value: item.label, valueZh: item.zh, hidden: !!list.hidden, status };
   });
   room.constraints.unshift({
     list: 'coordinates',
     name: 'Room coordinates',
+    nameZh: '房间坐标',
     value: `${room.floor.name.toLowerCase()}, square ${coordinate(room.cell)}`,
+    valueZh: `${floorZh(room.floor.zh)}，${coordinate(room.cell)} 格`,
     hidden: true,
     status: 'fulfilled',
   });

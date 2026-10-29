@@ -1,5 +1,6 @@
 ---
 import { site } from '../../lib/content';
+import { t } from '../../lib/i18n';
 const { email, form } = site.contact;
 // With a Turnstile site key, the form posts to the kuschonink-contact Worker.
 // Without one, it opens the visitor's email app with the message filled in.
@@ -16,7 +17,7 @@ const live = Boolean(form.turnstileSiteKey && form.endpoint);
 >
   {form.fields.map((f) => (
     <label class="field">
-      <span class="field-label">{f.label}{f.required && <span class="field-required"> (required)</span>}</span>
+      <span class="field-label">{f.label}{f.labelZh && <> <span lang="zh">{f.labelZh}</span></>}{f.required && <span class="field-required"> ({t.required.en} <span lang="zh">{t.required.zh}</span>)</span>}</span>
       {f.type === 'textarea' ? (
         <textarea name={f.name} required={f.required} rows="6" maxlength="4000"></textarea>
       ) : (
@@ -27,19 +28,13 @@ const live = Boolean(form.turnstileSiteKey && form.endpoint);
   {/* Spam trap: people never see or fill this. */}
   <label class="field-trap" aria-hidden="true">Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
   {live && <div class="turnstile"></div>}
-  <button type="submit" class="button">{form.submitText}</button>
+  <button type="submit" class="button">{form.submitText}{form.submitTextZh && <> <span lang="zh">{form.submitTextZh}</span></>}</button>
   <p class="form-status" role="status" aria-live="polite" hidden></p>
-  <p class="form-success" hidden>{form.successMessage}</p>
+  <p class="form-success" hidden>{form.successMessage}{form.successMessageZh && <><br /><span lang="zh">{form.successMessageZh}</span></>}</p>
 </form>
 <script>
-  const ERRORS: Record<string, string> = {
-    verification_failed: 'The anti-spam check failed. Please try again.',
-    rate_limited: 'Too many messages just now. Please try again later.',
-    missing_required_field: 'Please fill in every field.',
-    field_too_long: 'One of the fields is too long.',
-    invalid_submission: 'Please check your email address.',
-    delivery_in_progress: 'Your message is already on its way. Please wait a moment.',
-  };
+  import { formErrors } from '../../lib/i18n';
+  const ERRORS: Record<string, string> = Object.fromEntries(Object.entries(formErrors).map(([k, v]) => [k, `${v.en} ${v.zh}`]));
   type TS = { render: (el: Element, o: object) => string; reset: (id?: string) => void };
   let turnstileLoading: Promise<TS> | null = null;
   function loadTurnstile(): Promise<TS> {
@@ -76,7 +71,7 @@ const live = Boolean(form.turnstileSiteKey && form.endpoint);
               'expired-callback': () => { token = ''; },
             });
           })
-          .catch(() => say('The anti-spam check could not load. You can also write to ' + form.dataset.email + '.'));
+          .catch(() => say(`The anti-spam check could not load. You can also write to ${form.dataset.email}. 反垃圾验证无法加载，你也可以写信到 ${form.dataset.email}。`));
       }
 
       form.addEventListener('submit', async (e) => {
@@ -91,10 +86,10 @@ const live = Boolean(form.turnstileSiteKey && form.endpoint);
           success.hidden = false;
           return;
         }
-        if (!token) return say('Please wait for the anti-spam check to finish.');
+        if (!token) return say('Please wait for the anti-spam check to finish. 请等待反垃圾验证完成。');
         const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
         button.disabled = true;
-        say('Sending…');
+        say('Sending… 正在发送……');
         try {
           const res = await fetch(endpoint, {
             method: 'POST',
@@ -111,9 +106,9 @@ const live = Boolean(form.turnstileSiteKey && form.endpoint);
           const err = (await res.json().catch(() => ({}))) as { error?: string; detail?: string };
           // Unknown failures show their code, so a problem can be traced.
           const code = [err.error ?? 'error', err.detail].filter(Boolean).join(': ');
-          say(ERRORS[err.error ?? ''] ?? `The message could not be sent (${code}, ${res.status}). Please write to ${form.dataset.email}.`);
+          say(ERRORS[err.error ?? ''] ?? `The message could not be sent (${code}, ${res.status}). Please write to ${form.dataset.email}. 消息未能发送，请写信到 ${form.dataset.email}。`);
         } catch {
-          say(`The message could not be sent. Please write to ${form.dataset.email}.`);
+          say(`The message could not be sent. Please write to ${form.dataset.email}. 消息未能发送，请写信到 ${form.dataset.email}。`);
         } finally {
           button.disabled = false;
           token = '';

@@ -4,20 +4,23 @@ import House from '../../../layouts/House.astro';
 import HouseMap from '../../../components/house/HouseMap.astro';
 import { rooms, roomByKey, perec, tour, latin, coordinate, roomsMentioning, house, type Room } from '../../../lib/house';
 import { projects, site } from '../../../lib/content';
+import Bi from '../../../components/Bi.astro';
+import { t as tr, chapter, floorZh, statusZh, type Bi as BiText } from '../../../lib/i18n';
 
-const PAGES = {
-  index: 'Index',
-  chronology: 'Chronology',
-  checklist: 'Checklist of the chapters',
-  rules: 'Rules of the house',
-} as const;
+const PAGES: Record<'index' | 'chronology' | 'checklist' | 'rules', BiText> = {
+  index: tr.index,
+  chronology: tr.chronology,
+  checklist: tr.checklist,
+  rules: tr.rules,
+};
 type PageId = keyof typeof PAGES;
 
 export function getStaticPaths() {
   return (['index', 'chronology', 'checklist', 'rules'] as const).map((page) => ({ params: { page } }));
 }
 const page = Astro.params.page as PageId;
-const title = PAGES[page];
+const titleBi = PAGES[page];
+const title = titleBi.en;
 const order = Object.keys(PAGES) as PageId[];
 const prevPage = order[order.indexOf(page) - 1];
 const nextPage = order[order.indexOf(page) + 1];
@@ -34,11 +37,24 @@ const add = (label: string, room: Room, strong = false) => {
 for (const r of rooms) {
   add(r.en.replace(/ \(.*\)$/, ''), r);
   if (r.zh) add(r.zh, r);
-  if (r.contents && 'project' in r.contents) add(r.title, r, true);
-  for (const c of r.constraints) if (c.list !== 'coordinates') add(c.value, r, c.status === 'fulfilled');
+  if (r.contents && 'project' in r.contents) {
+    add(r.title, r, true);
+    if (r.titleZh && r.titleZh !== r.title) add(r.titleZh, r, true);
+  }
+  for (const c of r.constraints) {
+    if (c.list === 'coordinates') continue;
+    add(c.value, r, c.status === 'fulfilled');
+    if (c.valueZh && c.valueZh !== c.value) add(c.valueZh, r, c.status === 'fulfilled');
+  }
 }
-for (const list of perec.lists) for (const item of list.items) for (const r of roomsMentioning(item.match)) add(item.label, r, true);
-for (const p of projects) for (const r of roomsMentioning([p.title])) add(p.title, r, true);
+for (const list of perec.lists) for (const item of list.items) for (const r of roomsMentioning(item.match)) {
+  add(item.label, r, true);
+  if (item.zh && item.zh !== item.label) add(item.zh, r, true);
+}
+for (const p of projects) for (const r of roomsMentioning([p.title])) {
+  add(p.title, r, true);
+  if (p.titleZh && p.titleZh !== p.title) add(p.titleZh, r, true);
+}
 const sortKey = (s: string) => s.replace(/^[“"‘(]+/, '').replace(/^(the|a|an) /i, '').toLowerCase();
 const isLatin = (s: string) => /^[“"‘(]*[A-Za-zÀ-ÿ0-9]/.test(s);
 const latinEntries = [...entries.values()].filter((e) => isLatin(e.label)).sort((a, b) => sortKey(a.label).localeCompare(sortKey(b.label)));
@@ -50,25 +66,25 @@ const chapters = (e: Entry) =>
 const N = 5;
 const visit = new Map(tour.map(([c, r], i) => [`${c},${r}`, i + 1]));
 ---
-<House seo={{ title: `${title} — ${site.name}`, description: `${title} of the house, after Georges Perec’s Life A User’s Manual.` }} bodyClass="house-map-page">
+<House seo={{ title: `${title} ${titleBi.zh} — ${site.name}`, description: `${title} of the house, after Georges Perec’s Life A User’s Manual.` }} bodyClass="house-map-page">
   <HouseMap />
   <aside class="room-panel" data-panel="appendix" aria-labelledby="room-title" transition:animate="fade">
     <div class="panel-bar">
-      <span>Appendix · {title}</span>
-      <a class="panel-close" href="/house" aria-label="Close and return to the floorplan">[×]</a>
+      <span><Bi t={tr.appendix} sep=" · " /> · <Bi t={titleBi} sep=" · " /></span>
+      <a class="panel-close" href="/house" aria-label={tr.close.en} title={tr.close.zh}>[×]</a>
     </div>
     <div class="panel-body appendix">
-      <h1 id="room-title">{title}</h1>
+      <h1 id="room-title"><Bi t={titleBi} /></h1>
 
       {page === 'index' && (
         <>
-          <p class="room-name">Numbers are chapters. Bold: the thing is really there. Plain: it was only dealt to the room.</p>
+          <p class="room-name">{tr.indexNote.en}<br /><span lang="zh">{tr.indexNote.zh}</span></p>
           <ul class="index-list">
             {latinEntries.map((e) => (
               <li>{e.label}, {chapters(e).map((c, i) => <>{i > 0 && ', '}<a href={`/house/${c.room.slug}`}>{c.strong ? <b>{c.n}</b> : c.n}</a></>)}.</li>
             ))}
           </ul>
-          <h2>中文</h2>
+          <h2>中文 · Chinese</h2>
           <ul class="index-list">
             {zhEntries.map((e) => (
               <li lang="zh">{e.label}，{chapters(e).map((c, i) => <>{i > 0 && ', '}<a href={`/house/${c.room.slug}`}>{c.strong ? <b>{c.n}</b> : c.n}</a></>)}</li>
@@ -83,8 +99,8 @@ const visit = new Map(tour.map(([c, r], i) => [`${c},${r}`, i + 1]));
             const r = c.room ? roomByKey.get(c.room) : undefined;
             return (
               <>
-                <dt>{c.when}</dt>
-                <dd>{c.what}{r && <> <a href={`/house/${r.slug}`}>(ch. {r.locked ? '—' : r.chapter})</a></>}</dd>
+                <dt>{c.when} · <span lang="zh">{c.whenZh}</span></dt>
+                <dd>{c.what}{r && <> <a href={`/house/${r.slug}`}>(ch. {r.locked ? '—' : r.chapter})</a></>}<br /><span lang="zh">{c.whatZh}{r && <a href={`/house/${r.slug}`}>（{chapter(r.locked ? undefined : r.chapter).zh}）</a>}</span></dd>
               </>
             );
           })}
@@ -95,8 +111,8 @@ const visit = new Map(tour.map(([c, r], i) => [`${c},${r}`, i + 1]));
         <ol class="checklist">
           {rooms.map((r) => (
             <li value={r.chapter}>
-              <a href={`/house/${r.slug}`}>{r.en}{r.zh && <span lang="zh"> {r.zh}</span>}</a>, {r.floor.name.toLowerCase()}:{' '}
-              {r.locked ? <i>the room without a door. This chapter is missing.</i> : r.contents ? <i>{r.title}</i> : 'an inventory'}.
+              <a href={`/house/${r.slug}`}>{r.en}{r.zh && <span lang="zh"> {r.zh}</span>}</a>, {r.floor.name.toLowerCase()} <span lang="zh">{floorZh(r.floor.zh)}</span>:{' '}
+              {r.locked ? <i><Bi t={tr.roomWithoutDoor} /></i> : r.contents ? <i><Bi t={{ en: r.title, zh: r.titleZh }} /></i> : <Bi t={tr.anInventory} />}.
             </li>
           ))}
         </ol>
@@ -110,8 +126,17 @@ const visit = new Map(tour.map(([c, r], i) => [`${c},${r}`, i + 1]));
           <p><b>Fulfilment.</b> A constraint is <i>fulfilled</i> when the item really appears in the room, <i>echoing</i> when it appears next door, <i>semi-fulfilled</i> when it appears elsewhere in the house, and <i>not fulfilled</i> otherwise. Hidden constraints (coordinates, objects, quoted documents, autobiographical signs) are shown in red.</p>
           <p><b>Clinamen.</b> {perec.clinamen} And one room in the attic has no door: its chapter is missing. {house.lockedNote}</p>
 
-          <h2>The grid</h2>
+          <div lang="zh">
+            <p>房子的每一层都立在同一个5 × 5的结构网格上（A–E列：3600、3600、3600、3200、2000毫米；1–5行：2800、2800、3000、4800、1400毫米）。</p>
+            <p><b>顺序。</b>一个骑士在网格上移动，每格只走一次（沃恩斯多夫规则，从A1出发）。每一层从下往上，房间按骑士第一次进入的先后编号：共{rooms.length}章。</p>
+            <p><b>列表。</b>{perec.lists.length}个列表、每个五项，用五阶相互正交的拉丁方分配到网格上，因此来自两个不同列表的任意两项恰好在一个格子里相遇。房间获得骑士进入它时所在格子的各项。房间的坐标也算作一项约束。</p>
+            <p><b>满足。</b>一项约束在该项真的出现在房间里时为<i>已满足</i>，出现在隔壁时为<i>回响</i>，出现在房子别处时为<i>半满足</i>，否则为<i>未满足</i>。隐藏的约束（坐标、物件、引用文献、自传符号）以红色显示。</p>
+            <p><b>偏移（clinamen）。</b>{perec.clinamenZh}阁楼里还有一个房间没有门：它的那一章缺失了。{house.lockedNoteZh}</p>
+          </div>
+
+          <h2><Bi t={tr.theGrid} /></h2>
           <p>Each square shows the knight’s move number, then the item number dealt from each list ({perec.lists.map((l) => l.name.toLowerCase()).join(', ')}).</p>
+          <p lang="zh">每个格子先显示骑士的步数，再显示从各列表分配的项目编号（{perec.lists.map((l) => l.zh).join('、')}）。</p>
           <table class="deal">
             <thead><tr><th></th>{Array.from({ length: N }, (_, c) => <th scope="col">{String.fromCharCode(65 + c)}</th>)}</tr></thead>
             <tbody>
@@ -131,17 +156,17 @@ const visit = new Map(tour.map(([c, r], i) => [`${c},${r}`, i + 1]));
 
           {perec.lists.map((l) => (
             <>
-              <h3 class:list={{ hidden: l.hidden }}>{l.name}</h3>
-              <ol>{l.items.map((i) => <li>{i.label}</li>)}</ol>
+              <h3 class:list={{ hidden: l.hidden }}><Bi t={{ en: l.name, zh: l.zh }} /></h3>
+              <ol>{l.items.map((i) => <li>{i.label} <span lang="zh" class="zh">{i.zh}</span></li>)}</ol>
             </>
           ))}
         </div>
       )}
 
       <hr />
-      <nav class="chapter-nav" aria-label="Appendices">
-        {prevPage ? <a href={`/house/appendix/${prevPage}`} rel="prev">← {PAGES[prevPage]}</a> : <a href={`/house/${lastRoom.slug}`} rel="prev">← Chapter {lastRoom.chapter}: {lastRoom.title}</a>}
-        {nextPage ? <a href={`/house/appendix/${nextPage}`} rel="next">{PAGES[nextPage]} →</a> : <a href={`/house/${rooms[0].slug}`} rel="next">Chapter 1: {rooms[0].title} →</a>}
+      <nav class="chapter-nav" aria-label="Appendices 附录">
+        {prevPage ? <a href={`/house/appendix/${prevPage}`} rel="prev">← <Bi t={PAGES[prevPage]} /></a> : <a href={`/house/${lastRoom.slug}`} rel="prev">← Chapter {lastRoom.chapter}: {lastRoom.title}<br /><span lang="zh" class="zh">第{lastRoom.chapter}章：{lastRoom.titleZh}</span></a>}
+        {nextPage ? <a href={`/house/appendix/${nextPage}`} rel="next"><Bi t={PAGES[nextPage]} /> →</a> : <a href={`/house/${rooms[0].slug}`} rel="next">Chapter 1: {rooms[0].title} →<br /><span lang="zh" class="zh">第1章：{rooms[0].titleZh}</span></a>}
       </nav>
     </div>
   </aside>

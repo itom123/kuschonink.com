@@ -3,15 +3,16 @@ import House from '../../layouts/House.astro';
 import HouseMap from '../../components/house/HouseMap.astro';
 import { rooms, floors } from '../../lib/house';
 import { site } from '../../lib/content';
+import { both, t } from '../../lib/i18n';
 ---
-<House seo={{ title: `The House — ${site.name}`, description: site.description }} bodyClass="house-map-page">
+<House seo={{ title: `${both(t.theHouse, ' ')} — ${site.name}`, description: site.description }} bodyClass="house-map-page">
   <HouseMap />
   <noscript>
     <div class="noscript-index">
       {floors.map((f) => (
         <>
           <h2>{f.name} · {f.zh}</h2>
-          <ul>{rooms.filter((r) => r.floor.id === f.id).map((r) => <li><a href={`/house/${r.slug}`}>Chapter {r.locked ? '—' : r.chapter}: {r.title}</a></li>)}</ul>
+          <ul>{rooms.filter((r) => r.floor.id === f.id).map((r) => <li><a href={`/house/${r.slug}`}>Chapter {r.locked ? '—' : r.chapter}: {r.title} · <span lang="zh">第{r.locked ? '—' : r.chapter}章：{r.titleZh}</span></a></li>)}</ul>
         </>
       ))}
     </div>

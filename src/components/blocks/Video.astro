@@ -14,7 +14,7 @@ const embed = block.youtubeId
       <iframe src={embed} title={block.caption ?? 'Video'} loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
   ) : (
-    <a href={block.url} target="_blank" rel="noopener">Watch video</a>
+    <a href={block.url} target="_blank" rel="noopener">Watch video <span lang="zh">观看视频</span></a>
   )}
   {block.caption && <figcaption set:html={block.caption} />}
 </figure>

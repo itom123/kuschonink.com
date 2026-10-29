@@ -3,7 +3,7 @@
 
 type View = { cx: number; cy: number; z: number };
 type Bounds = { x: number; y: number; w: number; h: number };
-interface IndexRoom { slug: string; floor: string; title: string; zh: string; en: string; chapter: number; locked: boolean }
+interface IndexRoom { slug: string; floor: string; title: string; titleZh: string; zh: string; en: string; chapter: number; locked: boolean }
 
 const MIN_Z = 0.6;
 const MAX_Z = 12;
@@ -18,6 +18,7 @@ export function initMap() {
   const index = JSON.parse(document.getElementById('house-index')!.textContent!) as {
     rooms: IndexRoom[];
     floors: { id: string; name: string; zh: string; level: string }[];
+    text: { none: string; noDoor: string };
   };
   const floorName = root.querySelector<HTMLElement>('.map-floorname')!;
 
@@ -237,7 +238,7 @@ export function initMap() {
       return;
     }
     const locked = (e.target as Element).closest('.room.locked');
-    if (locked) toast('This room has no door.');
+    if (locked) toast(index.text.noDoor);
   }, true);
 
   viewport.addEventListener('wheel', (e) => {
@@ -282,14 +283,14 @@ export function initMap() {
   const input = root.querySelector<HTMLInputElement>('.map-search input')!;
   const results = root.querySelector<HTMLUListElement>('.search-results')!;
   const norm = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
-  const floorLabel = (id: string) => index.floors.find((f) => f.id === id)!.name;
+  const floorLabel = (id: string) => { const f = index.floors.find((f) => f.id === id)!; return `${f.name} ${f.zh.replace(/平面图$/, '')}`; };
   function showResults() {
     const q = norm(input.value.trim());
     if (!q) { results.hidden = true; results.innerHTML = ''; return; }
-    const hits = index.rooms.filter((r) => [r.title, r.en, r.zh, String(r.chapter)].some((t) => norm(t).includes(q))).slice(0, 8);
+    const hits = index.rooms.filter((r) => [r.title, r.titleZh, r.en, r.zh, String(r.chapter)].some((t) => norm(t).includes(q))).slice(0, 8);
     results.innerHTML = hits.length
-      ? hits.map((r) => `<li><a href="/house/${r.slug}" data-slug="${r.slug}" ${r.locked ? 'data-locked' : ''}><b>${escape(r.title)}</b> <small>${escape(r.zh)} ${escape(r.en === r.title ? '' : r.en)} · ${floorLabel(r.floor)} · ch. ${r.locked ? '—' : r.chapter}</small></a></li>`).join('')
-      : '<li class="none">Nothing in this house by that name.</li>';
+      ? hits.map((r) => `<li><a href="/house/${r.slug}" data-slug="${r.slug}" ${r.locked ? 'data-locked' : ''}><b>${escape(r.title)}</b>${r.titleZh && r.titleZh !== r.title && r.titleZh !== r.zh ? ` <b lang="zh">${escape(r.titleZh)}</b>` : ''} <small>${escape(r.zh)} ${escape(r.en === r.title ? '' : r.en)} · ${floorLabel(r.floor)} · ch. ${r.locked ? '—' : r.chapter} · 第${r.locked ? '—' : r.chapter}章</small></a></li>`).join('')
+      : `<li class="none">${escape(index.text.none)}</li>`;
     results.hidden = false;
   }
   input.addEventListener('input', showResults);
@@ -303,7 +304,7 @@ export function initMap() {
   results.addEventListener('click', (e) => {
     const a = (e.target as Element).closest<HTMLAnchorElement>('a');
     if (!a) return;
-    if (a.hasAttribute('data-locked')) { e.preventDefault(); focusRoom(a.dataset.slug!); toast('This room has no door.'); }
+    if (a.hasAttribute('data-locked')) { e.preventDefault(); focusRoom(a.dataset.slug!); toast(index.text.noDoor); }
     input.value = '';
     showResults();
   });

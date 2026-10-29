@@ -4,6 +4,9 @@ import ProjectBody from '../../components/ProjectBody.astro';
 import { projects, imagesOf } from '../../lib/content';
 import { roomForProject } from '../../lib/house';
 import type { Project } from '../../lib/types';
+import Bi from '../../components/Bi.astro';
+import { t, floorZh } from '../../lib/i18n';
+const label = (p: Project) => (p.titleZh && p.titleZh !== p.title ? `${p.title} ${p.titleZh}` : p.title);
 
 export function getStaticPaths() {
   return projects.map((project, i) => ({ params: { slug: project.slug }, props: { project, prev: projects[i - 1], next: projects[i + 1] } }));
@@ -15,17 +18,17 @@ const n = imagesOf(project.sections).length;
 <Win98
   seo={project.seo}
   image={imagesOf(project.sections)[0]}
-  title={project.title}
+  title={label(project)}
   address={`C:\\kuschonink\\image\\${project.slug}`}
   houseHref={room ? `/house/${room.slug}` : '/house'}
-  status={`${n} image${n === 1 ? '' : 's'}${room ? ` · in the house: ${room.en}, ${room.floor.name.toLowerCase()}` : ''}`}
+  status={`${n} image${n === 1 ? '' : 's'} · ${n} 张图片${room ? ` · in the house: ${room.en}, ${room.floor.name.toLowerCase()} · 在房子里：${floorZh(room.floor.zh)}${room.zh}` : ''}`}
 >
-  <p><a href="/image">↑ Up to Projects</a></p>
+  <p><a href="/image"><Bi t={t.upToProjects} /></a></p>
   <ProjectBody project={project} eager />
   <hr />
-  <nav class="project-nav" aria-label="More projects">
-    {prev ? <a href={`/image/${prev.slug}`}>← {prev.title}</a> : <span />}
-    {room && <a href={`/house/${room.slug}`}>Find it in the house</a>}
-    {next ? <a href={`/image/${next.slug}`}>{next.title} →</a> : <span />}
+  <nav class="project-nav" aria-label={`${t.moreProjects.en} ${t.moreProjects.zh}`}>
+    {prev ? <a href={`/image/${prev.slug}`}>← {label(prev)}</a> : <span />}
+    {room && <a href={`/house/${room.slug}`}><Bi t={t.findInHouse} /></a>}
+    {next ? <a href={`/image/${next.slug}`}>{label(next)} →</a> : <span />}
   </nav>
 </Win98>
