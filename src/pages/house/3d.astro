@@ -1,0 +1,52 @@
+---
+// The house in 3D (a test): a rough dollhouse model built from the same rooms
+// as the floorplan. Drag to turn it, pick a floor, click a room, step inside.
+import House from '../../layouts/House.astro';
+import Bi from '../../components/Bi.astro';
+import { model3d } from '../../lib/house';
+import { site } from '../../lib/content';
+import { t, attr, seoTitle } from '../../lib/i18n';
+
+const data = model3d();
+const buttons = [...data.floors].reverse();
+---
+<House seo={{ ...seoTitle(t.model3d, site.name), description: t.model3dHelp.en }} noindex bodyClass="house-3d-page">
+  <div class="house-3d" id="house-3d">
+    <div class="h3d-stage" tabindex="0" {...attr('aria-label', t.model3dHelp)}></div>
+
+    <div class="map-ui h3d-floors" role="toolbar" {...attr('aria-label', t.floors)}>
+      {buttons.map((f, i) => (
+        <button type="button" data-floor-btn={f.id} aria-pressed={String(i === 0)}
+          {...attr('title', i === 0 ? t.wholeHouse : { en: f.name, zh: f.zh })}>{f.label}</button>
+      ))}
+    </div>
+    <label class="map-ui h3d-lift"><input type="checkbox" data-lift /> <Bi t={t.liftFloors} /></label>
+    <a class="map-ui h3d-plan" href="/house">← <Bi t={t.backToPlan} /></a>
+    <p class="map-ui h3d-help" data-help-outside><Bi t={t.model3dHelp} /></p>
+    <p class="map-ui h3d-help" data-help-inside hidden><Bi t={t.lookAround} /></p>
+    <button type="button" class="map-ui h3d-out" hidden><Bi t={t.backToDollhouse} /></button>
+
+    <section class="h3d-card" hidden aria-live="polite">
+      <div class="panel-bar"><span class="h3d-card-where"></span><button type="button" class="h3d-card-close" {...attr('aria-label', t.close)}>[×]</button></div>
+      <div class="h3d-card-body">
+        <h2 class="h3d-card-title"></h2>
+        <p class="h3d-card-name"></p>
+        <div class="h3d-card-exits" hidden></div>
+        <p class="h3d-card-links">
+          <a class="h3d-open" href="#"><Bi t={t.openChapter} /> →</a>
+          <button type="button" class="h3d-in"><Bi t={t.stepInside} /></button>
+        </p>
+      </div>
+    </section>
+
+    <div class="map-toast h3d-toast" role="status"></div>
+    <p class="h3d-nogl" hidden><Bi t={t.noWebgl} /> <a href="/house"><Bi t={t.backToPlan} /></a></p>
+    <noscript><p class="h3d-nogl"><Bi t={t.noWebgl} /> <a href="/house"><Bi t={t.backToPlan} /></a></p></noscript>
+    <script type="application/json" id="house-3d-data" set:html={JSON.stringify({ ...data, text: { noDoor: t.noDoorToast, chapter: { en: 'Chapter', zh: '第' }, up: t.up, down: t.down, nextDoor: t.nextDoor } })} />
+  </div>
+</House>
+
+<script>
+  import { start3d } from '../../scripts/house3d';
+  start3d();
+</script>
