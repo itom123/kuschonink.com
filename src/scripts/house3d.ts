@@ -148,6 +148,8 @@ function init() {
     brick: lambert(C.brick), cream: lambert(C.cream), wall: lambert(C.wall), step: lambert(C.step),
     roof: lambert(C.roof, { side: THREE.DoubleSide }), gable: lambert(C.brick, { side: THREE.DoubleSide }),
     locked: lambert(C.locked), ground: lambert(C.ground), stone: lambert(0xe9e4d8), glass: lambert(0x46525a),
+    wood: lambert(0x8a5a36),
+    pane: new THREE.MeshLambertMaterial({ color: 0x9fb6c2, transparent: true, opacity: 0.35, depthWrite: false, side: THREE.DoubleSide }),
     line: new THREE.LineBasicMaterial({ color: C.line }),
     grid: new THREE.LineBasicMaterial({ color: 0xbbbbbb }),
     edge: new THREE.LineBasicMaterial({ color: 0x9a948a }),
@@ -192,16 +194,28 @@ function init() {
     facade.set(f.id, { windows, quoins });
   }
 
-  // Stairs: one run per floor that has stairs up, alternating direction like a switchback.
-  const runs = new Map<string, { x0: number; x1: number; z0: number; z1: number; rise: number; east: boolean }>();
-  data.floors.forEach((f, i) => {
-    if (!f.stairs?.up || i >= data.floors.length - 1) return;
-    const [bx, bz, bw, bd] = f.stairs.box;
-    const above = data.floors[i + 1].stairs?.box ?? f.stairs.box;
-    const zc = Math.min(bz + bd - 0.6, Math.max(bz + 0.6, above[1] + above[3] / 2));
-    const toRoof = i + 1 === data.floors.length - 1;
-    runs.set(f.id, { x0: bx + 0.3, x1: bx + bw - 0.3, z0: zc - 0.55, z1: zc + 0.55, rise: toRoof ? 2.4 : f.storey, east: i % 2 === 0 });
-  });
+  // The stairs as they are in the house: a wooden spiral staircase from the ground
+  // floor to the first floor, then a straight flight up to the attic. None to the roof.
+  const SPIRAL = { floor: 'f1', above: 'f2', cx: 6.75, cz: 4.8, r: 0.75 };
+  const FLIGHT = { floor: 'f2', above: 'attic', x0: 3.9, x1: 7.5, z0: 2.95, z1: 3.95 };
+  const hasStairs = floorIndex.has(SPIRAL.floor) && floorIndex.has(FLIGHT.floor) && floorIndex.has(FLIGHT.above);
+  /** Where the way up or down is, on a floor (for the labels when you're inside). */
+  const stairSpot = (floor: string, dir: string): Pt | null => {
+    if (!hasStairs) return null;
+    if ((floor === SPIRAL.floor && dir === 'up') || (floor === SPIRAL.above && dir === 'down')) return [SPIRAL.cx, SPIRAL.cz];
+    if ((floor === FLIGHT.floor && dir === 'up') || (floor === FLIGHT.above && dir === 'down')) return [(FLIGHT.x0 + FLIGHT.x1) / 2, (FLIGHT.z0 + FLIGHT.z1) / 2];
+    return null;
+  };
+  // No stairs lead to the roof, so you can't walk there from the attic.
+  const roofSlugs = new Set(data.rooms.filter((r) => r.floor === roofFloor.id).map((r) => r.slug));
+  for (const r of data.rooms) r.exits = r.exits.filter((e) => !roofSlugs.has(e.to) && !(roofSlugs.has(r.slug) && e.dir === 'down'));
+
+  // The south front of the living room, onto the porch: a tall picture window and, to its
+  // right as you face the house, a wide glass door. Plan x ranges in metres.
+  const OPENINGS: Record<string, { x0: number; x1: number; door: boolean }[]> = {
+    'f1-living-room:south': [{ x0: 4.0, x1: 8.3, door: false }, { x0: 8.7, x1: 10.4, door: true }],
+  };
+  const OPENING_TOP = 2.6;
 
   const fullFor = (f: FloorM) => Math.min(FULL, Math.max(0.5, f.storey - 0.25));
   const unitBox = new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0);
@@ -214,18 +228,23 @@ function init() {
   );
   const beamGeo = new THREE.BoxGeometry(0.26, 0.32, 1);
   const colGeo = new THREE.CylinderGeometry(0.17, 0.17, 1, 14).translate(0, 0.5, 0);
+  const spindleGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.9, 5).translate(0, 0.45, 0);
 
   function slabMesh(r: RoomM, f: FloorM, i: number) {
     const shape = new THREE.Shape(r.points.map(([x, z]) => new THREE.Vector2(x, -z)));
     // Leave a stairwell where the stairs come up from the floor below.
-    const below = data.floors[i - 1];
-    const run = below && runs.get(below.id);
-    if (run && !r.outdoor) {
+    if (hasStairs && !r.outdoor) {
       const [rx, rz, rw, rd] = r.rect;
-      const x0 = Math.max(run.x0, rx + 0.05), x1 = Math.min(run.x1, rx + rw - 0.05);
-      const z0 = Math.max(run.z0, rz + 0.05), z1 = Math.min(run.z1, rz + rd - 0.05);
-      if (x1 - x0 > 0.3 && z1 - z0 > 0.3) {
-        shape.holes.push(new THREE.Path([new THREE.Vector2(x0, -z0), new THREE.Vector2(x0, -z1), new THREE.Vector2(x1, -z1), new THREE.Vector2(x1, -z0)]));
+      const within = (x: number, z: number, m: number) => x - m > rx && x + m < rx + rw && z - m > rz && z + m < rz + rd;
+      if (f.id === SPIRAL.above && within(SPIRAL.cx, SPIRAL.cz, SPIRAL.r + 0.12)) {
+        shape.holes.push(new THREE.Path().absarc(SPIRAL.cx, -SPIRAL.cz, SPIRAL.r + 0.1, 0, Math.PI * 2, true));
+      }
+      if (f.id === FLIGHT.above) {
+        const x0 = Math.max(FLIGHT.x0, rx + 0.05), x1 = Math.min(FLIGHT.x1, rx + rw - 0.05);
+        const z0 = Math.max(FLIGHT.z0, rz + 0.05), z1 = Math.min(FLIGHT.z1, rz + rd - 0.05);
+        if (x1 - x0 > 0.3 && z1 - z0 > 0.3) {
+          shape.holes.push(new THREE.Path([new THREE.Vector2(x0, -z0), new THREE.Vector2(x0, -z1), new THREE.Vector2(x1, -z1), new THREE.Vector2(x1, -z0)]));
+        }
       }
     }
     const depth = i === 0 ? r.level - GROUND : 0.2;
@@ -283,21 +302,22 @@ function init() {
         const key = `${f.id}:${[a, b].map((p) => p.map((v) => v.toFixed(2)).join(',')).sort().join('|')}`;
         if (seen.has(key)) continue;
         seen.add(key);
-        const theta = Math.atan2(-dz, dx);
-        const plusZOut = -dz * nx + dx * nz > 0;
-        const brick = exterior ? brickFor(len + THICK, LOW) : null;
-        const outsideFace = brick ?? M.wall;
-        // Box faces: +x, -x (the ends), +y (the top), -y, +z, -z (the two sides).
-        const ends = brick ?? M.wall;
-        const mats = [ends, ends, M.cream, M.wall, plusZOut ? outsideFace : M.wall, plusZOut ? M.wall : outsideFace];
-        const mesh = new THREE.Mesh(wallBox, mats);
-        mesh.rotation.y = theta;
-        mesh.position.set(mid[0], rel, mid[1]);
-        mesh.scale.set(len + THICK, LOW, 1);
-        mesh.add(new THREE.LineSegments(wallEdges, M.edge));
-        group.add(mesh);
-        walls.push({ mesh, floor: f.id, map: brick?.map ?? undefined });
-        if (exterior && len >= 2.4 && !r.stairs) addWindow(f.id, mid, theta, nx, nz, len, rel);
+        const side = Math.abs(nz) > Math.abs(nx) ? (nz > 0 ? 'south' : 'north') : nx > 0 ? 'east' : 'west';
+        const openings = OPENINGS[`${r.slug}:${side}`];
+        if (openings && Math.abs(dz) < 0.01) {
+          // Wall pieces between the openings, glazing in them, and a lintel above.
+          const lo = Math.min(a[0], b[0]), hi = Math.max(a[0], b[0]);
+          let x = lo;
+          for (const o of [...openings].sort((p, q) => p.x0 - q.x0)) {
+            if (o.x0 - x > 0.05) wall(group, f.id, [x, a[1]], [o.x0, a[1]], nx, nz, exterior, rel);
+            glazing(f.id, o.x0, o.x1, a[1], rel, o.door, exterior);
+            x = o.x1;
+          }
+          if (hi - x > 0.05) wall(group, f.id, [x, a[1]], [hi, a[1]], nx, nz, exterior, rel);
+          continue;
+        }
+        wall(group, f.id, a, b, nx, nz, exterior, rel);
+        if (exterior && len >= 2.4 && !r.stairs) addWindow(f.id, mid, Math.atan2(-dz, dx), nx, nz, len, rel);
       }
       addQuoins(f.id, r, indoor, rel, fullFor(f));
       if (r.contents || r.stairs) {
@@ -312,21 +332,107 @@ function init() {
       }
     }
     // The stairs up from this floor.
-    const run = runs.get(f.id);
-    if (run) {
-      const steps = 16;
-      const inst = new THREE.InstancedMesh(unitBox, M.step, steps);
-      const w = (run.x1 - run.x0) / steps;
-      const m4 = new THREE.Matrix4();
-      for (let s = 0; s < steps; s++) {
-        const h = (run.rise * (s + 1)) / steps;
-        const x = run.east ? run.x0 + w * (s + 0.5) : run.x1 - w * (s + 0.5);
-        m4.compose(new THREE.Vector3(x, 0, (run.z0 + run.z1) / 2), new THREE.Quaternion(), new THREE.Vector3(w, h, run.z1 - run.z0));
-        inst.setMatrixAt(s, m4);
-      }
-      group.add(inst);
-    }
+    if (hasStairs && f.id === SPIRAL.floor) group.add(spiral(data.floors[floorIndex.get(SPIRAL.above)!].level - f.level));
+    if (hasStairs && f.id === FLIGHT.floor) group.add(flight(data.floors[floorIndex.get(FLIGHT.above)!].level - f.level));
   });
+
+  /** The wooden spiral staircase: wedge treads round a post, a balustrade and a handrail on the outside. */
+  function spiral(rise: number) {
+    const g = new THREE.Group();
+    const { cx, cz, r } = SPIRAL;
+    const steps = 20, turn = Math.PI * 2 * 0.95;
+    const tread = new THREE.BoxGeometry(r - 0.06, 0.05, 0.3).translate((r + 0.06) / 2, 0, 0);
+    const treads = new THREE.InstancedMesh(tread, M.wood, steps);
+    const spindles = new THREE.InstancedMesh(spindleGeo, M.wood, steps);
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), one = new THREE.Vector3(1, 1, 1);
+    const rail: THREE.Vector3[] = [];
+    for (let s = 0; s < steps; s++) {
+      const ang = (turn * s) / steps;
+      const y = (rise * (s + 1)) / steps - 0.025;
+      q.setFromAxisAngle(up, ang);
+      m4.compose(new THREE.Vector3(cx, y, cz), q, one);
+      treads.setMatrixAt(s, m4);
+      const px = cx + Math.cos(ang) * (r - 0.04), pz = cz - Math.sin(ang) * (r - 0.04);
+      m4.makeTranslation(px, y, pz);
+      spindles.setMatrixAt(s, m4);
+      rail.push(new THREE.Vector3(px, y + 0.9, pz));
+    }
+    g.add(treads, spindles);
+    const post = new THREE.Mesh(colGeo, M.wood);
+    post.scale.set(0.45, rise + 0.9, 0.45);
+    post.position.set(cx, 0, cz);
+    g.add(post);
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rail), 80, 0.03, 6), M.wood));
+    return g;
+  }
+
+  /** The straight flight from the first floor to the attic. */
+  function flight(rise: number) {
+    const { x0, x1, z0, z1 } = FLIGHT;
+    const steps = 18;
+    const inst = new THREE.InstancedMesh(unitBox, M.step, steps);
+    const w = (x1 - x0) / steps;
+    const m4 = new THREE.Matrix4();
+    for (let s = 0; s < steps; s++) {
+      m4.compose(new THREE.Vector3(x0 + w * (s + 0.5), 0, (z0 + z1) / 2), new THREE.Quaternion(), new THREE.Vector3(w, (rise * (s + 1)) / steps, z1 - z0));
+      inst.setMatrixAt(s, m4);
+    }
+    return inst;
+  }
+
+  /** One wall from a to b: brick outside if it's an outside wall, white inside, a cream top. */
+  function wall(group: THREE.Group, floor: string, a: Pt, b: Pt, nx: number, nz: number, exterior: boolean, rel: number) {
+    const dx = b[0] - a[0], dz = b[1] - a[1];
+    const len = Math.hypot(dx, dz);
+    const plusZOut = -dz * nx + dx * nz > 0;
+    const brick = exterior ? brickFor(len + THICK, LOW) : null;
+    const outsideFace = brick ?? M.wall;
+    // Box faces: +x, -x (the ends), +y (the top), -y, +z, -z (the two sides).
+    const ends = brick ?? M.wall;
+    const mats = [ends, ends, M.cream, M.wall, plusZOut ? outsideFace : M.wall, plusZOut ? M.wall : outsideFace];
+    const mesh = new THREE.Mesh(wallBox, mats);
+    mesh.rotation.y = Math.atan2(-dz, dx);
+    mesh.position.set((a[0] + b[0]) / 2, rel, (a[1] + b[1]) / 2);
+    mesh.scale.set(len + THICK, LOW, 1);
+    mesh.add(new THREE.LineSegments(wallEdges, M.edge));
+    group.add(mesh);
+    walls.push({ mesh, floor, map: brick?.map ?? undefined });
+  }
+
+  /** A floor-to-ceiling picture window or a glass door in an east–west wall, with white frames and a lintel. */
+  function glazing(floor: string, x0: number, x1: number, z: number, rel: number, door: boolean, exterior: boolean) {
+    const f = data.floors[floorIndex.get(floor)!];
+    const g = new THREE.Group();
+    const bar = (mat: THREE.Material, cx: number, y0: number, w: number, h: number, d: number) => {
+      const m = new THREE.Mesh(unitBox, mat);
+      m.scale.set(w, h, d);
+      m.position.set(cx, rel + y0, z);
+      g.add(m);
+    };
+    const w = x1 - x0, mid = (x0 + x1) / 2, d = THICK + 0.04;
+    bar(M.pane, mid, 0, w, OPENING_TOP, 0.03);
+    bar(M.wall, x0 + 0.05, 0, 0.1, OPENING_TOP, d); // jambs
+    bar(M.wall, x1 - 0.05, 0, 0.1, OPENING_TOP, d);
+    bar(M.wall, mid, OPENING_TOP - 0.1, w, 0.1, d); // head
+    bar(M.wall, mid, 0, w, 0.06, d); // sill / threshold
+    if (door) {
+      bar(M.wall, mid, 0, 0.08, OPENING_TOP, d); // two leaves
+      for (const s of [-1, 1]) bar(M.cream, mid + s * 0.12, 1.0, 0.04, 0.35, d + 0.08); // handles
+    } else {
+      const panes = Math.max(2, Math.round(w / 1.1));
+      for (let k = 1; k < panes; k++) bar(M.wall, x0 + (w * k) / panes, 0, 0.06, OPENING_TOP, d);
+      bar(M.wall, mid, 2.0, w, 0.06, d); // transom
+    }
+    // The lintel above, up to the top of the wall.
+    const top = fullFor(f);
+    if (top > OPENING_TOP) {
+      const lintel = new THREE.Mesh(unitBox, exterior ? brickFor(w, top - OPENING_TOP) : M.wall);
+      lintel.scale.set(w, top - OPENING_TOP, THICK);
+      lintel.position.set(mid, rel + OPENING_TOP, z);
+      g.add(lintel);
+    }
+    facade.get(floor)!.windows.add(g);
+  }
 
   // A balcony edge, as in the porch photo: a brick parapet over the slab edge,
   // white bottle balusters on it, and a cream rail on top.
@@ -411,13 +517,16 @@ function init() {
   };
   const f2Level = data.floors[1]?.level ?? 3.6;
   if (floorIndex.has('f1') && floorIndex.has('f2')) {
+    // Each column starts and ends inside the slab it stands on or holds up: faces that
+    // meet exactly (or a column grazing a parapet) flicker on screen.
+    const atticLevel = data.floors[floorIndex.get('attic') ?? 2]?.level ?? 7.0;
     for (const x of [4.95, 9.45]) {
-      col('f1', x, 14.85, -0.28, f2Level); // the porch
-      col('f2', x, 14.75, f2Level, EAVE); // the south balcony
+      col('f1', x, 14.85, -0.4, f2Level - 0.1); // the porch
+      col('f2', x, 14.4, f2Level - 0.1, atticLevel - 0.1); // the south balcony, under the attic terrace
     }
     for (const z of [5.3, 8.5]) {
-      col('f1', 16.35, z, GROUND, f2Level);
-      col('f2', 16.35, z, f2Level, EAVE); // the east balcony, as in the photo
+      col('f1', 16.35, z, GROUND - 0.05, f2Level - 0.1);
+      col('f2', 16.35, z, f2Level - 0.1, EAVE + 0.1); // the east balcony, as in the photo
     }
     const cap = new THREE.Mesh(unitBox, M.cream);
     cap.scale.set(2.9, 0.22, 4.1);
@@ -668,7 +777,8 @@ function init() {
       let pos: THREE.Vector3;
       if (ex.dir === 'up' || ex.dir === 'down') {
         const box = f.stairs?.box ?? r.rect;
-        pos = new THREE.Vector3(box[0] + box[2] / 2, f.level + (ex.dir === 'up' ? EYE + 0.3 : 0.5), box[1] + box[3] / 2);
+        const [sx, sz] = stairSpot(f.id, ex.dir) ?? [box[0] + box[2] / 2, box[1] + box[3] / 2];
+        pos = new THREE.Vector3(sx, f.level + (ex.dir === 'up' ? EYE + 0.3 : 0.5), sz);
         el.innerHTML = exitText(ex, to);
       } else {
         pos = new THREE.Vector3(ex.at![0], f.level + (r.level - f.level) + EYE - 0.2, ex.at![1]);
@@ -824,6 +934,16 @@ function init() {
       if (current && current.floor !== selected) deselect();
       applyFloors();
       if (selected === roofFloor.id) flyTo(home.pos, home.target);
+      else {
+        // Look at the chosen floor from where you are, standing back far enough to see it whole.
+        const f = data.floors[floorIndex.get(selected)!];
+        const target = controls.target.clone().setY(floorY(f) + 0.5);
+        const dir = camera.position.clone().sub(controls.target);
+        const min = 22 * (camera.aspect < 1 ? 1 / Math.sqrt(camera.aspect) : 1);
+        if (dir.length() < min) dir.setLength(min);
+        if (dir.y < min * 0.45) dir.setY(min * 0.45);
+        flyTo(target.clone().add(dir), target);
+      }
     }, { signal }),
   );
   root.querySelector<HTMLInputElement>('[data-lift]')!.addEventListener('change', (e) => {

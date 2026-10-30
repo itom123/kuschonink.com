@@ -42,7 +42,10 @@ scroll or pinch to zoom, use **R / A / 2 / 1** to cut the house away down to a
 floor, and tick **Lift floors** to pull the storeys apart. Click a room for its
 chapter, or **Step inside** to stand in it at eye height and walk to the rooms next
 door or up and down the stairs (Esc to step out). Rooms, levels and stairs come
-from `house.json`. The brick, cream trim, bottle balusters, columns, corner stones
+from `house.json`. The stairs follow the house itself: a wooden spiral staircase
+from the ground floor to the first floor, then a straight flight to the attic, and
+none to the roof. The living room opens onto the porch through a floor-to-ceiling
+window and a glass door to its right. The brick, cream trim, bottle balusters, columns, corner stones
 and gables are approximations from the south elevation and photos of the house,
 not a survey. three.js is loaded only on this page. The page is `noindex` and is
 not in the sitemap.
