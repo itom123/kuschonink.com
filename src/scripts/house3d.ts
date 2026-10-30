@@ -1,4 +1,4 @@
-// The house in 3D: a black-and-white dollhouse built from the floorplan's rooms,
+// The house in 3D: a dollhouse built from the floorplan's rooms, in the house's own colours,
 // and a place to imagine the work shown inside it. Click a room and its walls go
 // up with the project's photographs and text hung on them; the walls between you
 // and the room drop away as you turn. Drawers with writings stand in as cabinets.
@@ -34,10 +34,12 @@ const THICK = 0.18;
 const LIFT = 3.4; // extra gap between floors when they're lifted apart
 const HANG = 1.5; // centre of a hung piece above the floor
 
-// Black and white, like a drawing; the work keeps its colour. Yellow marks the room, as on the plan.
+// The house's own colours, from the photos: brick with lighter bricks mixed in, cream trim
+// and corner stones, white balusters, a brown roof. Yellow marks the room, as on the plan.
 const C = {
-  white: 0xffffff, wall: 0xfafafa, floor: 0xf4f4f4, outdoor: 0xeaeaea, locked: 0xcfcfcf, roof: 0xededed,
-  step: 0xdedede, glass: 0x4d4d4d, ground: 0xffffff, line: 0x222222, edge: 0x6a6a6a, grid: 0xc4c4c4,
+  white: 0xffffff, cream: 0xefe6cf, stone: 0xe9e4d8, wall: 0xfbfbf9, floor: 0xf3f0e8, outdoor: 0xe4e0d6,
+  locked: 0xc9c9c9, roof: 0x8e5b49, brick: 0xa65d45, step: 0xe8e2d4, wood: 0x8a5a36, furniture: 0xd9c4a3,
+  glass: 0x46525a, ground: 0xf4f3ee, line: 0x555555, edge: 0x9a948a, grid: 0xbbbbbb,
   hover: 0xffffcc, here: 0xffff66,
 };
 
@@ -97,8 +99,8 @@ function init() {
   const scene = new THREE.Scene();
   scene.fog = new THREE.Fog(0xffffff, 70, 170);
   const camera = new THREE.PerspectiveCamera(40, 1, 0.05, 500);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xb8b8b8, 2.3));
-  const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xcfc8b8, 2.2));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.8);
   sun.position.set(25, 40, 30);
   scene.add(sun);
 
@@ -109,38 +111,24 @@ function init() {
   controls.maxDistance = 120;
   controls.maxPolarAngle = Math.PI * 0.49;
 
-  // ---- Brick, drawn: courses of bricks in fine grey lines, a few bricks shaded,
-  // as the lighter bricks are mixed into the walls. One tile is 1.2 m × 0.6 m. ----
+  // ---- Brick: terracotta with lighter cream bricks mixed in, as in the photos ----
+  // One tile is 1.2 m × 0.6 m (four bricks across, eight courses).
   function brickTexture() {
     const c = document.createElement('canvas');
     c.width = 256;
     c.height = 128;
     const g = c.getContext('2d')!;
-    g.fillStyle = '#ffffff';
+    g.fillStyle = '#e4dccf';
     g.fillRect(0, 0, 256, 128);
+    const red = ['#b9694f', '#c47a5f', '#a95e47', '#bf7458'], light = ['#dcc29c', '#e6d2ad'];
     let seed = 11;
     const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
     for (let row = 0; row < 8; row++) {
       const off = row % 2 ? 32 : 0;
       for (let x = -64; x < 256; x += 64) {
-        if (rnd() < 0.2) {
-          g.fillStyle = '#e9e9e9';
-          g.fillRect(x + off + 1, row * 16 + 1, 62, 14);
-        }
+        g.fillStyle = rnd() < 0.22 ? light[Math.floor(rnd() * 2)] : red[Math.floor(rnd() * 4)];
+        g.fillRect(x + off + 1, row * 16 + 1, 62, 14);
       }
-    }
-    g.strokeStyle = '#8a8a8a';
-    g.lineWidth = 1.5;
-    for (let row = 0; row < 8; row++) {
-      const off = row % 2 ? 32 : 0;
-      g.beginPath();
-      g.moveTo(0, row * 16 + 0.5);
-      g.lineTo(256, row * 16 + 0.5);
-      for (let x = off; x < 256 + 64; x += 64) {
-        g.moveTo((x % 256) + 0.5, row * 16);
-        g.lineTo((x % 256) + 0.5, row * 16 + 16);
-      }
-      g.stroke();
     }
     const tex = new THREE.CanvasTexture(c);
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
@@ -160,10 +148,11 @@ function init() {
   // ---- Materials (shared; disposed with the scene) ----
   const lambert = (color: number, extra: THREE.MeshLambertMaterialParameters = {}) => new THREE.MeshLambertMaterial({ color, ...extra });
   const M = {
-    white: lambert(C.white), wall: lambert(C.wall), step: lambert(C.step), locked: lambert(C.locked), ground: lambert(C.ground),
-    roof: lambert(C.roof, { side: THREE.DoubleSide }), gable: lambert(C.white, { side: THREE.DoubleSide }),
-    glass: lambert(C.glass), frame: lambert(0x1a1a1a), placeholder: lambert(0xd8d8d8),
-    pane: new THREE.MeshLambertMaterial({ color: 0xa8a8a8, transparent: true, opacity: 0.35, depthWrite: false, side: THREE.DoubleSide }),
+    white: lambert(C.white), cream: lambert(C.cream), stone: lambert(C.stone), wall: lambert(C.wall), step: lambert(C.step),
+    wood: lambert(C.wood), furniture: lambert(C.furniture), locked: lambert(C.locked), ground: lambert(C.ground),
+    roof: lambert(C.roof, { side: THREE.DoubleSide }), gable: lambert(C.brick, { side: THREE.DoubleSide }),
+    glass: lambert(C.glass), frame: lambert(0x1a1a1a),
+    pane: new THREE.MeshLambertMaterial({ color: 0x9fb6c2, transparent: true, opacity: 0.35, depthWrite: false, side: THREE.DoubleSide }),
     line: new THREE.LineBasicMaterial({ color: C.line }),
     edge: new THREE.LineBasicMaterial({ color: C.edge }),
     grid: new THREE.LineBasicMaterial({ color: C.grid }),
@@ -370,7 +359,7 @@ function init() {
     const outsideFace = brick ?? M.wall;
     // Box faces: +x, -x (the ends), +y (the top), -y, +z, -z (the two sides).
     const ends = brick ?? M.wall;
-    const mats = [ends, ends, M.white, M.wall, plusZOut ? outsideFace : M.wall, plusZOut ? M.wall : outsideFace];
+    const mats = [ends, ends, M.cream, M.wall, plusZOut ? outsideFace : M.wall, plusZOut ? M.wall : outsideFace];
     const mesh = new THREE.Mesh(wallBox, mats);
     mesh.rotation.y = Math.atan2(-dz, dx);
     mesh.position.set((a[0] + b[0]) / 2, rel, (a[1] + b[1]) / 2);
@@ -399,7 +388,7 @@ function init() {
     bar(M.white, mid, 0, w, 0.06, d);
     if (door) {
       bar(M.white, mid, 0, 0.08, OPENING_TOP, d); // two leaves
-      for (const s of [-1, 1]) bar(M.frame, mid + s * 0.12, 1.0, 0.04, 0.35, d + 0.08); // handles
+      for (const s of [-1, 1]) bar(M.cream, mid + s * 0.12, 1.0, 0.04, 0.35, d + 0.08); // handles
     } else {
       const panes = Math.max(2, Math.round(w / 1.1));
       for (let k = 1; k < panes; k++) bar(M.white, x0 + (w * k) / panes, 0, 0.06, OPENING_TOP, d);
@@ -428,10 +417,10 @@ function init() {
       m.position.set(0, py - sy / 2, 0);
       win.add(m);
     };
-    box(M.white, w + 0.26, h + 0.26, 0.05);
+    box(M.cream, w + 0.26, h + 0.26, 0.05);
     box(M.glass, w, h, 0.07);
-    box(M.white, 0.06, h, 0.09);
-    box(M.white, w, 0.06, 0.09, h * 0.18);
+    box(M.cream, 0.06, h, 0.09);
+    box(M.cream, w, 0.06, 0.09, h * 0.18);
     group.add(win);
     return win;
   }
@@ -444,7 +433,7 @@ function init() {
       const free = (p: Pt) => !indoor.some((o) => inside(p, o.points));
       if (!free([vx + sx * 0.4, vz + sz * 0.4]) || !free([vx + sx * 0.4, vz - sz * 0.4]) || !free([vx - sx * 0.4, vz + sz * 0.4])) continue;
       const n = Math.floor(height / 0.3);
-      const inst = new THREE.InstancedMesh(unitBox, M.white, n);
+      const inst = new THREE.InstancedMesh(unitBox, M.stone, n);
       const m4 = new THREE.Matrix4();
       const edge = THICK / 2 + 0.03;
       for (let j = 0; j < n; j++) {
@@ -467,7 +456,7 @@ function init() {
     parapet.scale.set(len + 0.02, 0.55, 0.22);
     parapet.position.copy(at(-0.3));
     group.add(parapet);
-    const rail = new THREE.Mesh(unitBox, M.white);
+    const rail = new THREE.Mesh(unitBox, M.cream);
     rail.rotation.y = theta;
     rail.scale.set(len + 0.02, 0.1, 0.24);
     rail.position.copy(at(0.95));
@@ -507,11 +496,11 @@ function init() {
     const tB = (U.xTurn - U.xEnd) / nB;
     const zB = (U.zNorth + U.zSplit) / 2, dB = U.zSplit - U.zNorth;
     for (let s = 0; s < nB; s++) list.push([U.xTurn - tB * (s + 0.5), zB, tB, dB, riser * (nA + nTurn + s + 1)]);
-    g.add(blocks(list, M.step));
+    g.add(blocks(list, M.wood));
     // The half-turn: wedge-shaped winders round the end.
     const r = U.zSouth - U.zSplit;
     const wedge = new THREE.BoxGeometry(r, 1, (Math.PI * r) / nTurn + 0.05).translate(r / 2, 0.5, 0);
-    const winders = new THREE.InstancedMesh(wedge, M.step, nTurn);
+    const winders = new THREE.InstancedMesh(wedge, M.wood, nTurn);
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
     for (let s = 0; s < nTurn; s++) {
       // From pointing south (+z) round through east to north (−z).
@@ -561,15 +550,15 @@ function init() {
     const g = new THREE.Group();
     if (fu.drawers > 0) {
       const each = h / fu.drawers;
-      for (let i = 0; i < fu.drawers; i++) g.add(edged(M.white, w, each - 0.01, d, x + w / 2, rel + i * each, z + d / 2));
-    } else g.add(edged(M.white, w, h, d, x + w / 2, rel, z + d / 2));
+      for (let i = 0; i < fu.drawers; i++) g.add(edged(M.furniture, w, each - 0.01, d, x + w / 2, rel + i * each, z + d / 2));
+    } else g.add(edged(M.furniture, w, h, d, x + w / 2, rel, z + d / 2));
     return g;
   }
 
   // ---- Details from the elevation and the photos: columns and the east balcony's roof ----
   const col = (floor: string, x: number, z: number, y0: number, y1: number) => {
     const f = data.floors[floorIndex.get(floor)!];
-    const m = new THREE.Mesh(colGeo, M.white);
+    const m = new THREE.Mesh(colGeo, M.cream);
     m.scale.y = y1 - y0;
     m.position.set(x, y0 - f.level, z);
     parts.get(floor)!.group.add(m);
@@ -587,7 +576,7 @@ function init() {
       col('f1', 16.35, z, GROUND - 0.05, f2Level - 0.1);
       col('f2', 16.35, z, f2Level - 0.1, EAVE + 0.1); // the east balcony, as in the photo
     }
-    parts.get('f2')!.group.add(edged(M.white, 2.9, 0.22, 4.1, 15.45, EAVE - f2Level, 6.9));
+    parts.get('f2')!.group.add(edged(M.cream, 2.9, 0.22, 4.1, 15.45, EAVE - f2Level, 6.9));
   }
 
   // ---- The roof: two gables facing east and one facing south ----
@@ -644,7 +633,7 @@ function init() {
   }
   function beam(g: THREE.Group, p: number[], q: number[]) {
     const a = new THREE.Vector3(p[0], p[1], p[2]), b = new THREE.Vector3(q[0], q[1], q[2]);
-    const m = new THREE.Mesh(beamGeo, M.white);
+    const m = new THREE.Mesh(beamGeo, M.cream);
     m.position.copy(a).add(b).multiplyScalar(0.5);
     m.scale.z = a.distanceTo(b) + 0.3;
     m.add(new THREE.LineSegments(new THREE.EdgesGeometry(beamGeo), M.edge));

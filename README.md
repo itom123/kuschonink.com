@@ -37,7 +37,7 @@ You can also walk through the house:
   storey you're on.
 
 **The house in 3D (test)** (`/house/3d`, `/house/3d?room=<room>`): a rough
-black-and-white model of the same rooms (`src/scripts/house3d.ts`), and a first
+model of the same rooms, in the house's own colours (`src/scripts/house3d.ts`), and a first
 sketch of the house as an exhibition space. Drag to turn it, scroll or pinch to
 zoom, use **R / A / 2 / 1** to cut the house away down to a floor, and tick
 **Lift floors** to pull the storeys apart. Click a room: its walls go up with the
