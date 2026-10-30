@@ -1,14 +1,50 @@
 ---
-// The house in 3D (a test): a rough dollhouse model built from the same rooms
-// as the floorplan. Drag to turn it, pick a floor, click a room, step inside.
+// The house in 3D (a test): a black-and-white dollhouse built from the same rooms
+// as the floorplan, and a first go at an exhibition inside it: click a room and its
+// photographs and text hang on its walls; drawers with writings stand as cabinets.
+import { getImage } from 'astro:assets';
 import House from '../../layouts/House.astro';
 import Bi from '../../components/Bi.astro';
-import { model3d } from '../../lib/house';
-import { site } from '../../lib/content';
+import { model3d, rooms, furnitureOf } from '../../lib/house';
+import { site, projects, about, contact, imagesOf } from '../../lib/content';
+import { img } from '../../lib/images';
 import { t, attr, seoTitle } from '../../lib/i18n';
+import type { Section } from '../../lib/types';
 
 const data = model3d();
 const buttons = [...data.floors].reverse();
+
+// What hangs in each room: up to six photographs and the opening of its text.
+const plain = (h: string) => h.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&[a-z#0-9]+;/g, ' ').replace(/\s+/g, ' ').trim();
+const cut = (s: string, n: number) => (s.length > n ? s.slice(0, n).replace(/\s+\S*$/, '') + '…' : s);
+const exhibits: Record<string, { title: { en: string; zh: string }; text: { en: string; zh: string }; images: { src: string; ratio: number }[] }> = {};
+for (const r of rooms) {
+  const c = r.contents;
+  if (!c || r.floor.id === 'roof') continue;
+  let sections: Section[] = [];
+  if ('project' in c) sections = projects.find((p) => p.slug === c.project)?.sections ?? [];
+  else if (c.page === 'about') sections = about.sections;
+  else if (c.page === 'contact') sections = contact.sections;
+  const blocks = sections.flatMap((s) => s.blocks);
+  const texts = blocks.flatMap((b) => (b.type === 'text' ? [b] : []));
+  let en = cut(plain(texts.map((b) => b.html).join(' ')), 420);
+  let zh = cut(plain(texts.map((b) => b.htmlZh ?? b.html).join(' ')), 200);
+  if ('page' in c && c.page === 'writings') ({ en, zh } = t.writingsKept);
+  const images = await Promise.all(
+    imagesOf(sections).slice(0, 6).map(async (src) => {
+      const meta = img(src);
+      const out = await getImage({ src: meta, width: 640, format: 'webp', quality: 72 });
+      return { src: out.src, ratio: meta.width / meta.height };
+    }),
+  );
+  exhibits[r.slug] = { title: { en: r.title, zh: r.titleZh }, text: { en, zh }, images };
+}
+// The archive: furniture with drawers (drawers.json), in metres, in house coordinates.
+const furniture = Object.fromEntries(
+  rooms
+    .map((r) => [r.slug, furnitureOf(r).map((f) => ({ en: f.en, zh: f.zh, drawers: f.drawers, rect: [(r.rect[0] + f.rect[0]) / 1000, (r.rect[1] + f.rect[1]) / 1000, f.rect[2] / 1000, f.rect[3] / 1000] }))] as const)
+    .filter(([, list]) => list.length),
+);
 ---
 <House seo={{ ...seoTitle(t.model3d, site.name), description: t.model3dHelp.en }} noindex bodyClass="house-3d-page">
   <div class="house-3d" id="house-3d">
@@ -22,27 +58,21 @@ const buttons = [...data.floors].reverse();
     </div>
     <label class="map-ui h3d-lift"><input type="checkbox" data-lift /> <Bi t={t.liftFloors} /></label>
     <a class="map-ui h3d-plan" href="/house">← <Bi t={t.backToPlan} /></a>
-    <p class="map-ui h3d-help" data-help-outside><Bi t={t.model3dHelp} /></p>
-    <p class="map-ui h3d-help" data-help-inside hidden><Bi t={t.lookAround} /></p>
-    <button type="button" class="map-ui h3d-out" hidden><Bi t={t.backToDollhouse} /></button>
+    <p class="map-ui h3d-help"><Bi t={t.model3dHelp} /></p>
 
     <section class="h3d-card" hidden aria-live="polite">
       <div class="panel-bar"><span class="h3d-card-where"></span><button type="button" class="h3d-card-close" {...attr('aria-label', t.close)}>[×]</button></div>
       <div class="h3d-card-body">
         <h2 class="h3d-card-title"></h2>
         <p class="h3d-card-name"></p>
-        <div class="h3d-card-exits" hidden></div>
-        <p class="h3d-card-links">
-          <a class="h3d-open" href="#"><Bi t={t.openChapter} /> →</a>
-          <button type="button" class="h3d-in"><Bi t={t.stepInside} /></button>
-        </p>
+        <p class="h3d-card-links"><a class="h3d-open" href="#"><Bi t={t.openChapter} /> →</a></p>
       </div>
     </section>
 
     <div class="map-toast h3d-toast" role="status"></div>
     <p class="h3d-nogl" hidden><Bi t={t.noWebgl} /> <a href="/house"><Bi t={t.backToPlan} /></a></p>
     <noscript><p class="h3d-nogl"><Bi t={t.noWebgl} /> <a href="/house"><Bi t={t.backToPlan} /></a></p></noscript>
-    <script type="application/json" id="house-3d-data" set:html={JSON.stringify({ ...data, text: { noDoor: t.noDoorToast, chapter: { en: 'Chapter', zh: '第' }, up: t.up, down: t.down, nextDoor: t.nextDoor } })} />
+    <script type="application/json" id="house-3d-data" set:html={JSON.stringify({ ...data, exhibits, furniture, text: { noDoor: t.noDoorToast } })} />
   </div>
 </House>
 

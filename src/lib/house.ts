@@ -533,14 +533,6 @@ export function levelMetres(s: string): number {
   return Number(s.replace('±', '').replace('−', '-')) || 0;
 }
 
-/** Midpoint of the wall two rooms share, in metres (plan x, plan y). */
-function sharedWall(a: RoomData, b: RoomData): [number, number] {
-  const [ax, ay, aw, ah] = a.rect, [bx, by, bw, bh] = b.rect;
-  const x0 = Math.max(ax, bx), x1 = Math.min(ax + aw, bx + bw);
-  const y0 = Math.max(ay, by), y1 = Math.min(ay + ah, by + bh);
-  return [(x0 + x1) / 2000, (y0 + y1) / 2000];
-}
-
 /** The curved front of the porch and of the balcony above it (the rooms marked `arc`), bulging south over the porch's width. */
 function arcPoints(r: RoomData): [number, number][] {
   const porch = floors[0].rooms.find((o) => o.arc);
@@ -567,13 +559,8 @@ export function model3d() {
     floors: floors.map((f, i) => ({
       id: f.id, label: f.label, name: f.name, zh: floorZh(f.zh), level: levels[i],
       storey: i < floors.length - 1 ? levels[i + 1] - levels[i] : 0,
-      stairs: (() => {
-        const s = stairsByFloor.get(f.id);
-        return s ? { box: s.box.map(m), up: s.up?.to.slug, down: s.down?.to.slug } : undefined;
-      })(),
     })),
     rooms: rooms.map((r) => {
-      const ex = exitsOf(r);
       return {
         slug: r.slug, floor: r.floor.id, chapter: r.locked ? null : r.chapter,
         en: r.en, zh: r.zh || r.en, title: r.title, titleZh: r.titleZh,
@@ -581,11 +568,6 @@ export function model3d() {
         rect: r.rect.map(m),
         level: levelMetres(r.level ?? r.floor.level),
         outdoor: !!r.outdoor, locked: !!r.locked, stairs: !!r.stairs, contents: !!r.contents,
-        exits: [
-          ...ex.byDir.flatMap((g) => g.rooms.map((o) => ({ to: o.slug, dir: g.dir, at: sharedWall(r, o) }))),
-          ...(ex.up ? [{ to: ex.up.to.slug, dir: 'up', floorName: ex.up.floor.name, floorZh: floorZh(ex.up.floor.zh) }] : []),
-          ...(ex.down ? [{ to: ex.down.to.slug, dir: 'down', floorName: ex.down.floor.name, floorZh: floorZh(ex.down.floor.zh) }] : []),
-        ],
       };
     }),
   };

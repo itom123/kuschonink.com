@@ -275,31 +275,16 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 }
 .h3d-label.has-contents { color: var(--link); }
 .h3d-label small { color: #555; }
-.h3d-exit {
-  pointer-events: auto; font: inherit; font-family: 'Times New Roman', Times, serif; font-size: 15px; white-space: nowrap; cursor: pointer;
-  background: #ffffe1; color: var(--link); border: 1px solid var(--ink); padding: 2px 8px; text-decoration: underline;
-}
-.h3d-exit small { color: #555; text-decoration: none; font-style: italic; }
-.h3d-exit:hover, .h3d-exit:focus-visible { background: var(--here); }
 .h3d-floors { right: 12px; bottom: 20px; display: flex; flex-direction: column; }
 .h3d-lift { left: 12px; bottom: 20px; background: rgba(255, 255, 255, 0.9); padding: 2px 6px; border: 1px solid var(--ink); }
 .h3d-plan { left: 12px; top: 12px; background: rgba(255, 255, 255, 0.9); padding: 2px 6px; border: 1px solid var(--ink); }
 .h3d-help { left: 12px; top: 40px; margin: 0; max-width: min(420px, calc(100vw - 24px)); font-style: italic; font-size: 14px; background: rgba(255, 255, 255, 0.85); padding: 0 4px; }
-button.h3d-out {
-  left: 50%; top: 12px; transform: translateX(-50%); font: inherit; font-size: 15px; padding: 4px 10px; cursor: pointer;
-  background: var(--grey); color: var(--ink); border: 2px solid; border-color: #fff #404040 #404040 #fff;
-}
 .h3d-card { position: absolute; z-index: 7; right: 64px; top: 12px; width: min(340px, calc(100vw - 88px)); background: var(--paper); border: 1px solid var(--ink); }
 .h3d-card .panel-bar button { font: inherit; background: none; border: 0; color: var(--link); cursor: pointer; padding: 0; }
 .h3d-card-body { padding: 8px 12px 10px; }
 .h3d-card-title { font-size: 1.5em; font-weight: normal; margin: 0; }
 .h3d-card-name { margin: 0 0 0.4em; font-style: italic; }
-.h3d-card-exits { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; margin: 0.3em 0; max-height: 30vh; overflow: auto; }
-.h3d-card-exits button { font: inherit; background: none; border: 0; padding: 0; color: var(--link); text-decoration: underline; cursor: pointer; text-align: left; }
-.h3d-card-exits small { color: #555; font-style: italic; }
 .h3d-card-links { margin: 0.4em 0 0; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.h3d-in { font: inherit; background: var(--grey); border: 2px solid; border-color: #fff #404040 #404040 #fff; cursor: pointer; padding: 2px 10px; }
-.h3d-in:active { border-color: #404040 #fff #fff #404040; }
 .h3d-nogl { position: absolute; inset: auto 16px 50% 16px; text-align: center; z-index: 8; background: #fff; }
 @media (max-width: 800px) {
   .h3d-card { left: 0; right: 0; top: auto; bottom: 0; width: auto; border-width: 1px 0 0; }

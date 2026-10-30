@@ -36,19 +36,23 @@ You can also walk through the house:
   balconies, the roof). The little section beside the floor buttons shows which
   storey you're on.
 
-**The house in 3D (test)** (`/house/3d`, `/house/3d?room=<room>`): a rough model
-of the same rooms (`src/scripts/house3d.ts`), as a guide. Drag to turn it,
-scroll or pinch to zoom, use **R / A / 2 / 1** to cut the house away down to a
-floor, and tick **Lift floors** to pull the storeys apart. Click a room for its
-chapter, or **Step inside** to stand in it at eye height and walk to the rooms next
-door or up and down the stairs (Esc to step out). Rooms, levels and stairs come
-from `house.json`. The stairs follow the house itself: a wooden spiral staircase
-from the ground floor to the first floor, then a straight flight to the attic, and
-none to the roof. The living room opens onto the porch through a floor-to-ceiling
-window and a glass door to its right. The brick, cream trim, bottle balusters, columns, corner stones
-and gables are approximations from the south elevation and photos of the house,
-not a survey. three.js is loaded only on this page. The page is `noindex` and is
-not in the sitemap.
+**The house in 3D (test)** (`/house/3d`, `/house/3d?room=<room>`): a rough
+black-and-white model of the same rooms (`src/scripts/house3d.ts`), and a first
+sketch of the house as an exhibition space. Drag to turn it, scroll or pinch to
+zoom, use **R / A / 2 / 1** to cut the house away down to a floor, and tick
+**Lift floors** to pull the storeys apart. Click a room: its walls go up with the
+project's photographs (up to six, framed) and the opening of its text on a panel,
+and the walls between you and the room drop away as you turn around it. Furniture
+with drawers (`drawers.json`) stands in the rooms as the archive. Rooms and levels
+come from `house.json`. The stairs follow the house: a wooden staircase that turns
+back on itself (a U) from the ground floor to the first floor, then a straight flight
+to the attic, and none to the roof. The garage is a cellar a few steps down from the
+hall, for wine and things kept a long time, with a small stair on the right up to a
+narrow loft. The living room opens onto the porch through a floor-to-ceiling window
+and a glass door to its right. The brick pattern, corner stones, bottle balusters,
+columns and gables are approximations from the south elevation and photos of the
+house, not a survey. three.js is loaded only on this page. The page is `noindex`
+and is not in the sitemap.
 
 **The simple view** (`/`, `/image`, `/image/<slug>`, `/image/all`, `/about`, `/contact`):
 the default view visitors land on at `/`. A Windows 98 desktop for anyone who wants to see the work quickly. Every gallery
