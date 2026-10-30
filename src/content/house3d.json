@@ -1,0 +1,87 @@
+{
+  "_comment": "Details for the 3D house (/house/3d), traced from the floor plans and from notes on how the house really is. Millimetres in plan coordinates, like house.json. doors: openings in walls, [x0, y0, x1, y1] along a wall (a door, an archway, or where two rooms are open to each other). glazing: floor-to-ceiling windows and glass doors in a wall (kind: window, door or sliding). floors: floor the rooms leave out. partitions: walls the rooms in house.json don't draw, [x0, y0, x1, y1]. stairs: the staircases as they are (u: up the east side, across the north, down the west side, round the core; flight: one straight run). wells: holes in a floor where stairs come up, as polygons. cellar: the garage's steps down from the hall, the stair up to the loft, and the loft.",
+  "doors": {
+    "f1": [
+      [2480, 2800, 3380, 2800],
+      [3600, 3000, 3600, 3700],
+      [2380, 5600, 3280, 5600],
+      [2100, 6600, 2100, 7300],
+      [3600, 5750, 3600, 7200],
+      [2500, 8600, 3400, 8600],
+      [3600, 8800, 3600, 11500],
+      [8050, 7300, 10050, 7300],
+      [10800, 5700, 10800, 7250],
+      [8000, 5600, 8850, 5600],
+      [6860, 5600, 7750, 5600],
+      [3750, 2800, 4600, 2800],
+      [14000, 6000, 14000, 7300],
+      [10900, 8200, 11800, 8200],
+      [12000, 9050, 12000, 9750]
+    ],
+    "f2": [
+      [2380, 5600, 3280, 5600],
+      [3750, 5600, 7650, 5600],
+      [2100, 6600, 2100, 7300],
+      [3900, 7300, 4800, 7300],
+      [2470, 8600, 3370, 8600],
+      [9600, 7300, 10450, 7300],
+      [10800, 8550, 10800, 9350],
+      [11700, 8200, 12500, 8200],
+      [7950, 5600, 8850, 5600]
+    ],
+    "attic": [
+      [2480, 5600, 3380, 5600],
+      [3750, 5600, 7650, 5600],
+      [2100, 6600, 2100, 7300],
+      [3930, 7300, 4830, 7300],
+      [2480, 8600, 3380, 8600],
+      [11700, 8200, 12450, 8200],
+      [10800, 8500, 10800, 9400]
+    ]
+  },
+  "glazing": {
+    "f1": [
+      { "_": "living room onto the porch: a floor-to-ceiling window", "line": [4000, 13400, 8300, 13400], "kind": "window" },
+      { "_": "and a wide glass door to its right, as you face the house", "line": [8700, 13400, 10400, 13400], "kind": "door" }
+    ],
+    "attic": [
+      { "_": "TLM2718: sliding glass doors onto the south terrace", "line": [4250, 11300, 6950, 11300], "kind": "sliding" },
+      { "line": [7450, 11300, 10150, 11300], "kind": "sliding" }
+    ]
+  },
+  "floors": {
+    "_": "floor the rooms in house.json leave out, [x, y, width, height]: a lobby on the first floor, the corridor in the attic",
+    "f2": [[2100, 7300, 1500, 1300]],
+    "attic": [[2100, 5600, 8700, 1700]]
+  },
+  "partitions": {
+    "f1": [
+      [3600, 2800, 7800, 2800],
+      [4630, 3780, 6860, 3780],
+      [4630, 3780, 4630, 5600],
+      [6860, 3780, 6860, 5600]
+    ]
+  },
+  "stairs": {
+    "u": {
+      "_": "wooden, ground floor to first floor: north up the east side, west along the north, south down the west side",
+      "from": "f1", "to": "f2",
+      "east": [6900, 7750], "north": [2950, 3780], "west": [3750, 4620], "start": 5500, "end": 5450
+    },
+    "flight": {
+      "_": "straight, first floor to attic, north up the east strip of the stairwell",
+      "from": "f2", "to": "attic",
+      "x": [6900, 7700], "y": [5500, 2950]
+    }
+  },
+  "wells": {
+    "f2": [[3700, 2900], [6880, 2900], [6880, 3800], [4650, 3800], [4650, 5500], [3700, 5500]],
+    "attic": [[6880, 2900], [7720, 2900], [7720, 4700], [6880, 4700]]
+  },
+  "cellar": {
+    "room": "f1/garage",
+    "steps": { "x": [8100, 8800], "y": 5600 },
+    "stair": { "x": [9000, 11200], "y": [5000, 5500] },
+    "loft": { "x": [11200, 14600], "y": [4300, 5500], "height": 1600 }
+  }
+}

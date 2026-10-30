@@ -276,7 +276,7 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 .h3d-label.has-contents { color: var(--link); }
 .h3d-label small { color: #555; }
 .h3d-floors { right: 12px; bottom: 20px; display: flex; flex-direction: column; }
-.h3d-lift { left: 12px; bottom: 20px; background: rgba(255, 255, 255, 0.9); padding: 2px 6px; border: 1px solid var(--ink); }
+.h3d-toggles { left: 12px; bottom: 20px; display: flex; flex-direction: column; gap: 2px; background: rgba(255, 255, 255, 0.9); padding: 2px 6px; border: 1px solid var(--ink); }
 .h3d-plan { left: 12px; top: 12px; background: rgba(255, 255, 255, 0.9); padding: 2px 6px; border: 1px solid var(--ink); }
 .h3d-help { left: 12px; top: 40px; margin: 0; max-width: min(420px, calc(100vw - 24px)); font-style: italic; font-size: 14px; background: rgba(255, 255, 255, 0.85); padding: 0 4px; }
 .h3d-card { position: absolute; z-index: 7; right: 64px; top: 12px; width: min(340px, calc(100vw - 88px)); background: var(--paper); border: 1px solid var(--ink); }
@@ -289,7 +289,7 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 @media (max-width: 800px) {
   .h3d-card { left: 0; right: 0; top: auto; bottom: 0; width: auto; border-width: 1px 0 0; }
   .house-3d:has(.h3d-card:not([hidden])) .h3d-floors { bottom: 170px; }
-  .house-3d:has(.h3d-card:not([hidden])) .h3d-lift { display: none; }
+  .house-3d:has(.h3d-card:not([hidden])) .h3d-toggles { display: none; }
   .h3d-help { display: none; }
 }
 .map-3d { left: 120px; bottom: 20px; background: rgba(255, 255, 255, 0.9); padding: 2px 6px; border: 1px solid var(--ink); }
