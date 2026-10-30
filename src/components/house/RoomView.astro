@@ -89,6 +89,7 @@ const nameOf = (r: Room) => (r.contents ? { en: `${r.en}: ${r.title}`, zh: `${r.
     {project && (
       <p class="simple-link"><a href={`/image/${project.slug}`}><Bi t={{ en: `See “${project.title}” in the simple view`, zh: `在简易视图中查看《${project.titleZh ?? project.title}》` }} /></a></p>
     )}
+    {!room.locked && <p class="simple-link"><a href={`/house/3d?room=${room.slug}`}><Bi t={t.seeIn3d} /></a></p>}
     {page === 'about' && <p class="simple-link"><a href="/about"><Bi t={{ en: 'About, in the simple view', zh: '在简易视图中查看“关于”' }} /></a></p>}
     {page === 'contact' && <p class="simple-link"><a href="/contact"><Bi t={{ en: 'Contact, in the simple view', zh: '在简易视图中查看“联系”' }} /></a></p>}
 

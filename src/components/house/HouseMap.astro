@@ -218,6 +218,7 @@ const roofIsPitch = (f: (typeof floors)[number]) => f.rooms.every((r) => r.outdo
     <ul class="search-results" hidden></ul>
   </div>
   <label class="map-ui map-blueprint"><input type="checkbox" data-blueprint /> <Bi t={tr.blueprint} /></label>
+  <a class="map-ui map-3d" href="/house/3d" {...attr('title', tr.model3d)}><Bi t={tr.in3d} /></a>
   <div class="map-ui map-floorname" aria-live="polite"></div>
   <script type="application/json" id="house-index" set:html={JSON.stringify({ text: { none: tr.searchNone, noDoor: tr.noDoorToast }, rooms: search, floors: floors.map((f) => ({ id: f.id, name: f.name, zh: f.zh, zhShort: floorZh(f.zh), level: f.level })) })} />
 </div>

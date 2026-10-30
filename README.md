@@ -36,6 +36,22 @@ You can also walk through the house:
   balconies, the roof). The little section beside the floor buttons shows which
   storey you're on.
 
+**The house in 3D (test)** (`/house/3d`, `/house/3d?room=<room>`): a rough model
+of the same rooms, in the house's own colours (`src/scripts/house3d.ts`), as a guide.
+Drag to turn it, scroll or pinch to zoom, use **R / A / 2 / 1** to cut the house away
+down to a floor, tick **Lift floors** to pull the storeys apart, and tick
+**Blueprint** to lay the original drawing on each floor and check the model against
+it. Click a room for its chapter. Rooms and levels come from `house.json`; the rest is
+traced from the drawings into `src/content/house3d.json`: doors and openings, glazing
+(the living room's picture window and glass door onto the porch, the attic's sliding
+doors), walls the rooms don't draw (the stair core), floor they leave out (the attic
+corridor), the stairs (a wooden U round the core from the ground floor to the first
+floor, then a straight flight to the attic; none to the roof), the stairwells, and the
+garage as a cellar a few steps down from the hall with a small stair up to a narrow
+loft. Edit that file to correct a door or a stair. The roof, columns, balustrades and
+corner stones are approximations from the south elevation and photos of the house.
+three.js is loaded only on this page. The page is `noindex` and is not in the sitemap.
+
 **The simple view** (`/`, `/image`, `/image/<slug>`, `/image/all`, `/about`, `/contact`):
 the default view visitors land on at `/`. A Windows 98 desktop for anyone who wants to see the work quickly. Every gallery
 is laid flat, so a project is one page. `/image/all` puts every project on one page.
