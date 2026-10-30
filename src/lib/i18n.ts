@@ -27,6 +27,12 @@ export const floorZh = (zh: string) => zh.replace(/平面图$/, '');
 export const chapter = (n: number | undefined): Bi =>
   n === undefined ? { en: 'Chapter —', zh: '第—章' } : { en: `Chapter ${n}`, zh: `第${n}章` };
 
+/** "Up to the first floor" / "上楼到二层". */
+export const stairsTo = (dir: 'up' | 'down', floor: { name: string; zh: string }): Bi => ({
+  en: `${dir === 'up' ? 'Up' : 'Down'} to the ${floor.name.toLowerCase()}`,
+  zh: `${dir === 'up' ? '上楼' : '下楼'}到${floorZh(floor.zh)}`,
+});
+
 export const drawerN = (n: number): Bi => ({ en: `drawer ${n}`, zh: `第${n}格抽屉` });
 
 export const t = {
@@ -41,7 +47,16 @@ export const t = {
   zoom: { en: 'Zoom', zh: '缩放' },
   zoomIn: { en: 'Zoom in', zh: '放大' },
   zoomOut: { en: 'Zoom out', zh: '缩小' },
-  mapHelp: { en: 'Floorplan. Drag to move, scroll to zoom, PageUp and PageDown change floors.', zh: '平面图。拖动以移动，滚动以缩放，PageUp 和 PageDown 切换楼层。' },
+  mapHelp: { en: 'Floorplan. Drag to move, scroll to zoom. PageUp and PageDown, or R, A, 2 and 1, change floors.', zh: '平面图。拖动以移动，滚动以缩放。PageUp 和 PageDown，或 R、A、2、1 键切换楼层。' },
+  up: { en: 'Up', zh: '上楼' },
+  down: { en: 'Down', zh: '下楼' },
+  nextDoor: { en: 'Next door', zh: '隔壁' },
+  stairs: { en: 'Stairs', zh: '楼梯' },
+  north: { en: 'North', zh: '北' },
+  east: { en: 'East', zh: '东' },
+  south: { en: 'South', zh: '南' },
+  west: { en: 'West', zh: '西' },
+  section: { en: 'Section through the house', zh: '房子剖面' },
   locked: { en: 'locked', zh: '上锁' },
   noDoorToast: { en: 'This room has no door.', zh: '这个房间没有门。' },
   close: { en: 'Close and return to the floorplan', zh: '关闭并回到平面图' },

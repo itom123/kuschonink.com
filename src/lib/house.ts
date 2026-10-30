@@ -432,6 +432,82 @@ export function neighbours(room: Room) {
   return { prev: rooms[i - 1], next: rooms[i + 1] };
 }
 
+// ---------------------------------------------------------------------------
+// Walking: stairs between floors, and the rooms next door.
+// ---------------------------------------------------------------------------
+
+export interface StairLink { from: Room; to: Room; floor: FloorData }
+export interface Stairs {
+  /** Where the stairs are drawn on this floor, in mm. */
+  box: [number, number, number, number];
+  up?: StairLink;
+  down?: StairLink;
+}
+
+const contains = (r: RoomData, x: number, y: number) => {
+  const [rx, ry, rw, rh] = r.rect;
+  return x >= rx && x <= rx + rw && y >= ry && y <= ry + rh;
+};
+
+/** The room you arrive in on `floor` when the stairs in `from` lead there. */
+function landing(floor: FloorData, from: RoomData): Room {
+  const [x, y, w, h] = from.rect;
+  const data =
+    floor.rooms.find((r) => r.stairs) ??
+    floor.rooms.find((r) => !r.locked && contains(r, x + w / 2, y + h / 2)) ??
+    floor.rooms.find((r) => !r.locked)!;
+  return roomByKey.get(`${floor.id}/${data.id}`)!;
+}
+
+/** The stairs on a floor: up to the next floor (a room's `stairs`), down to the floor whose stairs lead here. */
+export function stairsOf(floor: FloorData): Stairs | undefined {
+  const own = floor.rooms.find((r) => r.stairs);
+  const below = floors.find((f) => f.rooms.some((r) => r.stairs === floor.id));
+  const belowStairs = below?.rooms.find((r) => r.stairs === floor.id);
+  const here = own ?? belowStairs;
+  if (!here) return undefined;
+  const fromRoom = landing(floor, here);
+  const out: Stairs = { box: here.rect };
+  if (own) {
+    const upFloor = floors.find((f) => f.id === own.stairs);
+    if (!upFloor) throw new Error(`house.json: ${floor.id}/${own.id} has stairs to unknown floor "${own.stairs}"`);
+    out.up = { from: fromRoom, to: landing(upFloor, own), floor: upFloor };
+  }
+  if (below && belowStairs) {
+    out.down = { from: fromRoom, to: roomByKey.get(`${below.id}/${belowStairs.id}`)!, floor: below };
+  }
+  return out;
+}
+
+export const stairsByFloor = new Map(floors.map((f) => [f.id, stairsOf(f)]));
+
+export type Direction = 'north' | 'east' | 'south' | 'west';
+const DIRECTIONS: Direction[] = ['north', 'east', 'south', 'west'];
+const centre = (r: RoomData) => [r.rect[0] + r.rect[2] / 2, r.rect[1] + r.rect[3] / 2];
+
+/** Which way a neighbour lies, from the shared wall (top of the plan is north). */
+function directionTo(a: RoomData, b: RoomData): Direction {
+  const [ax, ay, aw, ah] = a.rect, [bx, by, bw, bh] = b.rect;
+  const overlapX = Math.min(ax + aw, bx + bw) - Math.max(ax, bx);
+  const overlapY = Math.min(ay + ah, by + bh) - Math.max(ay, by);
+  const [acx, acy] = centre(a), [bcx, bcy] = centre(b);
+  // A wall shared along x means the neighbour is above or below; along y, beside.
+  const vertical = overlapX > overlapY || (overlapX === overlapY && Math.abs(bcy - acy) > Math.abs(bcx - acx));
+  return vertical ? (bcy < acy ? 'north' : 'south') : bcx < acx ? 'west' : 'east';
+}
+
+/** The ways out of a room: neighbours by direction (no locked rooms), and the stairs if it has them. */
+export function exitsOf(room: Room) {
+  const next = (adjacent.get(room.key) ?? []).filter((o) => !o.locked);
+  const byDir = DIRECTIONS.map((dir) => ({
+    dir,
+    rooms: next.filter((o) => directionTo(room, o) === dir).sort((a, b) => a.chapter - b.chapter),
+  })).filter((g) => g.rooms.length);
+  const s = stairsByFloor.get(room.floor.id);
+  const onStairs = s && (s.up?.from === room || s.down?.from === room);
+  return { byDir, up: onStairs ? s.up : undefined, down: onStairs ? s.down : undefined };
+}
+
 /** Bounding box of a floor (rooms only), in mm. */
 export function floorBounds(floor: FloorData) {
   const xs = floor.rooms.flatMap((r) => [r.rect[0], r.rect[0] + r.rect[2]]);

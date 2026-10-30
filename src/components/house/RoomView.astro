@@ -2,9 +2,9 @@
 import Section from '../Section.astro';
 import RoomInterior from './RoomInterior.astro';
 import { projects, about, contact, site } from '../../lib/content';
-import { neighbours, house, rooms, type Room } from '../../lib/house';
+import { neighbours, exitsOf, house, rooms, type Room } from '../../lib/house';
 import Bi from '../Bi.astro';
-import { t, attr, chapter, statusZh } from '../../lib/i18n';
+import { t, attr, chapter, statusZh, stairsTo } from '../../lib/i18n';
 
 interface Props { room: Room }
 const { room } = Astro.props;
@@ -16,6 +16,9 @@ const sections = project?.sections ?? (page === 'about' ? about.sections : page 
 const chapterOf = (r: Room) => chapter(r.locked ? undefined : r.chapter);
 const titleOf = (r: Room) => ({ en: r.title, zh: r.titleZh });
 const chapterLink = (r: Room) => ({ en: `${chapterOf(r).en}: ${r.title}`, zh: `${chapterOf(r).zh}：${r.titleZh}` });
+// The ways out of this room: up or down the stairs, and the rooms next door.
+const exits = exitsOf(room);
+const nameOf = (r: Room) => (r.contents ? { en: `${r.en}: ${r.title}`, zh: `${r.zh}：${r.titleZh}` } : { en: r.en, zh: r.zh || r.en });
 ---
 <aside class="room-panel" data-room-page={room.slug} aria-labelledby="room-title">
   <div class="panel-bar">
@@ -90,6 +93,31 @@ const chapterLink = (r: Room) => ({ en: `${chapterOf(r).en}: ${r.title}`, zh: `$
     {page === 'contact' && <p class="simple-link"><a href="/contact"><Bi t={{ en: 'Contact, in the simple view', zh: '在简易视图中查看“联系”' }} /></a></p>}
 
     <hr />
+    {(exits.up || exits.down || exits.byDir.length > 0) && (
+      <nav class="exits" {...attr('aria-label', t.nextDoor)}>
+        {(exits.up || exits.down) && (
+          <p class="exits-stairs">
+            {exits.up && <a href={`/house/${exits.up.to.slug}`} data-stairs="up">↑ <Bi t={stairsTo('up', exits.up.floor)} /></a>}
+            {exits.up && exits.down && ' · '}
+            {exits.down && <a href={`/house/${exits.down.to.slug}`} data-stairs="down">↓ <Bi t={stairsTo('down', exits.down.floor)} /></a>}
+          </p>
+        )}
+        {exits.byDir.length > 0 && (
+          <p class="exits-doors">
+            <b><Bi t={t.nextDoor} /><span data-l="en">:</span><span data-l="zh">：</span></b>
+            {exits.byDir.map((g, i) => (
+              <>
+                {i > 0 && ' · '}
+                <span class="exit-dir"><Bi t={t[g.dir]} /></span>{' '}
+                {g.rooms.map((r, j) => (
+                  <>{j > 0 && ', '}<a href={`/house/${r.slug}`}><Bi t={nameOf(r)} /></a></>
+                ))}
+              </>
+            ))}
+          </p>
+        )}
+      </nav>
+    )}
     <nav class="chapter-nav" {...attr('aria-label', t.chapters)}>
       {prev ? <a href={`/house/${prev.slug}`} rel="prev">← <Bi t={chapterLink(prev)} /></a> : <span />}
       {next ? <a href={`/house/${next.slug}`} rel="next"><Bi t={chapterLink(next)} /> →</a> : <a href="/house/appendix/index" rel="next"><Bi t={t.appendicesIndex} /> →</a>}

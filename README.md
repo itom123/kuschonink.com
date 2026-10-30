@@ -18,9 +18,23 @@ npm run deploy    # build and deploy to Cloudflare Workers
 **The house** (`/house/facade`, `/house`, `/house/<room>`): the site is the family house, drawn from
 the 2008 renovation plans. The façade (`/house/facade`) is the south elevation: the door and
 windows lead inside. The floorplan works like an indoor map: drag to move, scroll
-or pinch to zoom, switch floors with **R / A / 2 / 1**, search with *Search this
-house*, and tick **Blueprint** to see the original drawings. Rooms hold projects,
-About and Contact. Everything is set in Times New Roman.
+or pinch to zoom, switch floors with **R / A / 2 / 1** (buttons or keys) or
+PageUp / PageDown, search with *Search this house*, and tick **Blueprint** to see
+the original drawings. Rooms hold projects, About and Contact. Everything is set
+in Times New Roman.
+
+You can also walk through the house:
+
+- **Stairs.** The stairs are drawn on every floor: click *▲ Up* at the top of the
+  stairs or *▼ Down* at the bottom to arrive on the stairs of the next floor. The
+  roof has a hatch down to the attic.
+- **Next door.** Every room's panel lists the rooms beside it, by direction
+  (north is the top of the plan), plus the way up or down if you're on the stairs.
+- **How the floors stack.** All floors share one camera, so changing floors keeps
+  the same spot in view. Going up, the old floor sinks away; going down, it rises.
+  The floor below shows as dashed lines, and through open-air rooms (terraces,
+  balconies, the roof). The little section beside the floor buttons shows which
+  storey you're on.
 
 **The simple view** (`/`, `/image`, `/image/<slug>`, `/image/all`, `/about`, `/contact`):
 the default view visitors land on at `/`. A Windows 98 desktop for anyone who wants to see the work quickly. Every gallery
@@ -50,6 +64,9 @@ It's the missing chapter.
 - **What's in a room** is its `contents`: `{ "project": "<slug>" }`, or
   `{ "page": "about" | "contact" | "writings" | "colophon" }`. To move a project,
   move its `contents` to another room. Rooms without `contents` are only described.
+- `stairs: "<floor id>"` marks the stairs room and where it leads up to. It draws
+  the *Up* link there and the *Down* link on that floor. "Next door" comes from
+  rooms that share a wall (locked rooms are left out).
 - `locked: true` makes a room impossible to enter.
 - `scan` places the original drawing under the traced rooms (the Blueprint layer).
 - `elevation.hotspots` are the clickable door and windows on the façade.

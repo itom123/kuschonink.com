@@ -41,10 +41,13 @@ function initMap() {
     text: { none: { en: string; zh: string }; noDoor: { en: string; zh: string } };
   };
   const floorName = root.querySelector<HTMLElement>('.map-floorname')!;
+  // The arrow shows which way the last change of floor went, until the next one.
+  let arrow = '';
   const showFloorName = () => {
     const info = index.floors.find((x) => x.id === floor)!;
-    floorName.textContent = `${getLang() === 'zh' ? info.zh : info.name} · ${info.level}`;
+    floorName.textContent = `${arrow}${getLang() === 'zh' ? info.zh : info.name} · ${info.level}`;
   };
+  const order = index.floors.map((f) => f.id);
 
   const bounds = new Map<string, Bounds>(
     svgs.map((s) => {
@@ -53,32 +56,38 @@ function initMap() {
     }),
   );
 
+  // Every floor is drawn on the same grid, so one camera serves them all:
+  // zoom 1 fits the whole house, and changing floors keeps the same spot in view.
+  const all: Bounds = (() => {
+    const bs = [...bounds.values()];
+    const x = Math.min(...bs.map((b) => b.x)), y = Math.min(...bs.map((b) => b.y));
+    return { x, y, w: Math.max(...bs.map((b) => b.x + b.w)) - x, h: Math.max(...bs.map((b) => b.y + b.h)) - y };
+  })();
+
   let floor = root.dataset.floor || 'f1';
-  const views = new Map<string, View>();
-  const home = (f: string): View => {
-    const b = bounds.get(f)!;
-    return { cx: b.x + b.w / 2, cy: b.y + b.h / 2, z: 1 };
-  };
-  let view: View = home(floor);
+  const home = (): View => ({ cx: all.x + all.w / 2, cy: all.y + all.h / 2, z: 1 });
+  let view: View = home();
 
   const svgOf = (f: string) => svgs.find((s) => s.dataset.floor === f)!;
+  // The floor fading out after a change of floor, kept in step with the camera.
+  let leaving: SVGSVGElement | null = null;
+  let leaveTimer = 0;
 
-  // Pixels per millimetre at zoom 1 (floor fits the viewport).
-  const baseScale = () => {
-    const b = bounds.get(floor)!;
-    return Math.min(viewport.clientWidth / b.w, viewport.clientHeight / b.h);
-  };
+  // Pixels per millimetre at zoom 1 (the house fits the viewport).
+  const baseScale = () => Math.min(viewport.clientWidth / all.w, viewport.clientHeight / all.h);
   const scale = () => baseScale() * view.z;
 
   function render() {
     const s = scale();
     const w = viewport.clientWidth / s;
     const h = viewport.clientHeight / s;
+    for (const svg of leaving ? [svgOf(floor), leaving] : [svgOf(floor)]) {
+      svg.setAttribute('viewBox', `${view.cx - w / 2} ${view.cy - h / 2} ${w} ${h}`);
+      svg.setAttribute('preserveAspectRatio', 'none');
+      // Keep labels a constant size on screen: 1 screen px in mm.
+      svg.style.setProperty('--px', String(1 / s));
+    }
     const svg = svgOf(floor);
-    svg.setAttribute('viewBox', `${view.cx - w / 2} ${view.cy - h / 2} ${w} ${h}`);
-    svg.setAttribute('preserveAspectRatio', 'none');
-    // Keep labels a constant size on screen: 1 screen px in mm.
-    svg.style.setProperty('--px', String(1 / s));
     const level = view.z < 1.8 ? 1 : view.z < 3.5 ? 2 : 3;
     if (root!.dataset.zoomLevel !== String(level)) {
       root!.dataset.zoomLevel = String(level);
@@ -148,22 +157,41 @@ function initMap() {
     render();
   }
 
+  function endLeave() {
+    clearTimeout(leaveTimer);
+    if (!leaving) return;
+    leaving.classList.remove('floor-leave');
+    if (leaving.dataset.floor !== floor) leaving.setAttribute('hidden', '');
+    leaving = null;
+  }
+
   function setFloor(f: string, v?: View) {
     if (!bounds.has(f)) return;
-    views.set(floor, view);
+    endLeave();
     const prev = svgOf(floor);
+    const dir = order.indexOf(f) > order.indexOf(floor) ? 'up' : 'down';
     floor = f;
     root!.dataset.floor = f;
-    svgs.forEach((s) => s.toggleAttribute('hidden', s.dataset.floor !== f));
     const next = svgOf(f);
+    svgs.forEach((s) => s.toggleAttribute('hidden', s !== next));
     if (prev !== next) {
+      arrow = dir === 'up' ? '↑ ' : '↓ ';
+      root!.dataset.dir = dir;
       next.classList.remove('floor-enter');
       void next.getBoundingClientRect();
       next.classList.add('floor-enter');
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        // Let the old floor fade away under the new one, on the same grid.
+        leaving = prev;
+        prev.removeAttribute('hidden');
+        prev.classList.add('floor-leave');
+        leaveTimer = window.setTimeout(endLeave, 400);
+      }
     }
     root!.querySelectorAll<HTMLButtonElement>('[data-floor-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.floorBtn === f)));
+    root!.querySelectorAll<SVGGElement>('[data-sec]').forEach((g) => g.classList.toggle('on', g.dataset.sec === f));
     showFloorName();
-    view = clampView(v ?? views.get(f) ?? { ...view, ...{ cx: home(f).cx, cy: home(f).cy } });
+    view = clampView(v ?? view);
     root!.dataset.zoomLevel = '';
     render();
   }
@@ -174,7 +202,7 @@ function initMap() {
     if (!el) return null;
     const f = (el.closest('svg') as SVGSVGElement).dataset.floor!;
     const box = el.getBBox();
-    const b = bounds.get(f)!;
+    const b = all;
     const panel = window.innerWidth > 800 ? Math.min(560, window.innerWidth * 0.45) : 0;
     const availW = viewport.clientWidth - panel;
     const availH = window.innerWidth > 800 ? viewport.clientHeight : viewport.clientHeight * 0.45;
@@ -274,6 +302,10 @@ function initMap() {
     zoomAt(factor, e.clientX, e.clientY);
   }, { passive: false });
 
+  // R / A / 2 / 1: the labels on the floor buttons.
+  const floorKeys = new Map(
+    [...root.querySelectorAll<HTMLButtonElement>('[data-floor-btn]')].map((b) => [b.textContent!.trim().toUpperCase(), b.dataset.floorBtn!]),
+  );
   viewport.addEventListener('keydown', (e) => {
     const step = 120 / scale();
     const k = e.key;
@@ -284,9 +316,10 @@ function initMap() {
     else if (k === '+' || k === '=') return zoomAt(1.4);
     else if (k === '-') return zoomAt(1 / 1.4);
     else if (k === 'PageUp' || k === 'PageDown') {
-      const order = index.floors.map((f) => f.id);
       const i = order.indexOf(floor) + (k === 'PageUp' ? 1 : -1);
       if (order[i]) setFloor(order[i]);
+    } else if (!e.ctrlKey && !e.metaKey && !e.altKey && floorKeys.has(k.toUpperCase())) {
+      setFloor(floorKeys.get(k.toUpperCase())!);
     } else return;
     e.preventDefault();
     view = clampView(view);
@@ -357,12 +390,15 @@ function initMap() {
   const startFloor = params.get('floor');
   if (startFloor && bounds.has(startFloor)) floor = startFloor;
   const start: View = {
-    cx: Number(params.get('x')) || home(floor).cx,
-    cy: Number(params.get('y')) || home(floor).cy,
+    cx: Number(params.get('x')) || home().cx,
+    cy: Number(params.get('y')) || home().cy,
     z: Number(params.get('z')) || 1,
   };
   setFloor(floor, start);
+  arrow = '';
+  showFloorName();
   window.addEventListener('resize', () => render(), { signal: off.signal });
+  off.signal.addEventListener('abort', () => { endLeave(); cancelAnimationFrame(anim); });
 
   // After every page (initial and ClientRouter navigations), follow the current room.
   const sync = () => {

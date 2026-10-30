@@ -1,10 +1,10 @@
 ---
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import { floors, rooms, house, floorBounds, roomPoints, type Room } from '../../lib/house';
+import { floors, rooms, house, floorBounds, roomPoints, stairsByFloor, type Room } from '../../lib/house';
 import { projects, imagesOf } from '../../lib/content';
 import { img } from '../../lib/images';
-import { t as tr, attr, chapter, floorZh } from '../../lib/i18n';
+import { t as tr, attr, text, chapter, floorZh, stairsTo } from '../../lib/i18n';
 import Bi from '../Bi.astro';
 
 interface Props { current?: Room }
@@ -62,12 +62,36 @@ function thumbBoxes(r: Room, n: number) {
   const cw = (w - pad * 2) / cols, chh = (h - pad * 2 - 500) / rws;
   return Array.from({ length: n }, (_, i) => ({ x: x + pad + (i % cols) * cw + 40, y: y + pad + 500 + Math.floor(i / cols) * chh + 40, w: cw - 80, h: chh - 80 }));
 }
+
+// Stairs drawn as links: a band of treads with an arrow, the top band goes up, the bottom band goes down.
+// The middle of the stairs stays the stairs room itself (its own chapter).
+function stairBands(f: (typeof floors)[number]) {
+  const s = stairsByFloor.get(f.id);
+  if (!s) return [];
+  const [x, y, w, h] = s.box;
+  const onlyOne = !s.up || !s.down;
+  // A floor without its own stairs room (the roof): the whole hatch is the way down.
+  const hatch = !f.rooms.some((r) => r.stairs);
+  const band = hatch ? h : h * (onlyOne ? 0.4 : 0.32);
+  const out: { dir: 'up' | 'down'; to: Room; label: string; x: number; y: number; w: number; h: number; treads: number[] }[] = [];
+  const treads = (bx: number, bw: number) => Array.from({ length: Math.floor(bw / 300) - 1 }, (_, i) => bx + 300 * (i + 1));
+  if (s.up) out.push({ dir: 'up', to: s.up.to, label: s.up.floor.label, x, y, w, h: band, treads: treads(x, w) });
+  if (s.down) out.push({ dir: 'down', to: s.down.to, label: s.down.floor.label, x, y: y + h - band, w, h: band, treads: treads(x, w) });
+  return out;
+}
+const floorOf = (id: string) => floors.find((f) => f.id === id)!;
+
+// The section beside the floor buttons: one storey per button, top floor first.
+const storeys = [...floors].reverse();
+const STOREY = 34;
+const roofIsPitch = (f: (typeof floors)[number]) => f.rooms.every((r) => r.outdoor);
 ---
 <div class="house-map" id="house-map" data-floor={initialFloor} data-current={current?.slug ?? ''} data-zoom-level="1" transition:persist="house-map">
   <div class="map-viewport" tabindex="0" {...attr('aria-label', tr.mapHelp)}>
-    {floors.map((f) => {
+    {floors.map((f, fi) => {
       const b = floorBounds(f);
       const m = 2400;
+      const below = floors[fi - 1];
       return (
         <svg
           class="floor"
@@ -86,6 +110,11 @@ function thumbBoxes(r: Room, n: number) {
             {columns.slice(1).map((cx, i) => <text class="dim" x={(cx + columns[i]) / 2} y={rows[0] - 1700}>{cx - columns[i]}</text>)}
             {rows.slice(1).map((cy, i) => <text class="dim" x={columns[0] - 1700} y={(cy + rows[i]) / 2} transform={`rotate(-90 ${columns[0] - 1700} ${(cy + rows[i]) / 2})`}>{cy - rows[i]}</text>)}
           </g>
+          {below && (
+            <g class="ghost" aria-hidden="true">
+              {below.rooms.map((r) => <polygon points={roomPoints(r).map((p) => p.join(',')).join(' ')} />)}
+            </g>
+          )}
           {rooms.filter((r) => r.floor.id === f.id).map((r) => {
             const pts = roomPoints(r).map((p) => p.join(',')).join(' ');
             const [x, y, w, h] = r.rect;
@@ -121,12 +150,61 @@ function thumbBoxes(r: Room, n: number) {
               <a class:list={['room', { 'has-contents': !!r.contents, outdoor: r.outdoor, current: current?.slug === r.slug }]} href={`/house/${r.slug}`} data-slug={r.slug} {...attr('aria-label', { en: name('en'), zh: name('zh') })}>{inner}</a>
             );
           })}
+          {stairBands(f).map((sb) => {
+            const to = floorOf(sb.to.floor.id);
+            const label = stairsTo(sb.dir, to);
+            // Treads and arrow in the outer half of the band, the words in the inner half (nearer the room).
+            const half = sb.h / 2;
+            const outerY = sb.dir === 'up' ? sb.y : sb.y + half;
+            const arrowY = outerY + half / 2;
+            const labelY = (sb.dir === 'up' ? sb.y + half : sb.y) + half / 2;
+            const ax0 = sb.x + sb.w * 0.12, ax1 = sb.x + sb.w * 0.88;
+            const [tail, head] = sb.dir === 'up' ? [ax0, ax1] : [ax1, ax0];
+            const tip = sb.dir === 'up' ? -1 : 1;
+            const barb = Math.min(260, half * 0.35);
+            return (
+              <a class:list={['stair-link', sb.dir]} href={`/house/${sb.to.slug}`} data-stairs={sb.dir} data-to-floor={to.id} {...attr('aria-label', label)}>
+                <title {...text(label)}>{label.en}</title>
+                <rect class="stair-band" x={sb.x} y={sb.y} width={sb.w} height={sb.h} />
+                <g class="treads">{sb.treads.map((tx) => <line x1={tx} x2={tx} y1={outerY} y2={outerY + half} />)}</g>
+                <line class="stair-split" x1={sb.x} x2={sb.x + sb.w} y1={sb.dir === 'up' ? outerY + half : outerY} y2={sb.dir === 'up' ? outerY + half : outerY} />
+                <path class="stair-arrow" d={`M ${tail} ${arrowY} L ${head} ${arrowY} M ${head + tip * barb * 1.3} ${arrowY - barb} L ${head} ${arrowY} L ${head + tip * barb * 1.3} ${arrowY + barb}`} />
+                <text class="stair-label" x={sb.x + sb.w / 2} y={labelY} data-l="en" lang="en">{sb.dir === 'up' ? '▲ Up' : '▼ Down'} · {to.label}</text>
+                <text class="stair-label" x={sb.x + sb.w / 2} y={labelY} data-l="zh" lang="zh-Hans">{sb.dir === 'up' ? '▲ 上楼' : '▼ 下楼'} · {floorZh(to.zh)}</text>
+              </a>
+            );
+          })}
         </svg>
       );
     })}
   </div>
 
   <div class="map-ui map-floors" role="toolbar" {...attr('aria-label', tr.floors)}>
+    <svg class="map-section" viewBox={`0 0 44 ${storeys.length * STOREY}`} aria-hidden="true" focusable="false">
+      {storeys.map((f, i) => {
+        const top = i * STOREY, bottom = top + STOREY;
+        const on = f.id === initialFloor;
+        if (i === 0 && roofIsPitch(f)) {
+          return (
+            <g class:list={['storey', 'pitch', { on }]} data-sec={f.id}>
+              <path class="storey-fill" d={`M 2 ${bottom} L 22 ${top + 6} L 42 ${bottom} Z`} />
+              <path class="storey-line" d={`M 2 ${bottom} L 22 ${top + 6} L 42 ${bottom}`} />
+              <circle class="here" cx="22" cy={bottom - 9} r="3" />
+            </g>
+          );
+        }
+        return (
+          <g class:list={['storey', { on }]} data-sec={f.id}>
+            <rect class="storey-fill" x="6" y={top} width="32" height={STOREY} />
+            <line class="storey-wall" x1="6" x2="6" y1={top} y2={bottom} />
+            <line class="storey-wall" x1="38" x2="38" y1={top} y2={bottom} />
+            <line class="storey-slab" x1="2" x2="42" y1={bottom} y2={bottom} />
+            {(i > 0 || !roofIsPitch(f)) && <path class="storey-stair" d={(storeys.length - 1 - i) % 2 ? `M 22 ${bottom} L 12 ${top}` : `M 12 ${bottom} L 22 ${top}`} />}
+            <circle class="here" cx="29" cy={bottom - 9} r="3" />
+          </g>
+        );
+      })}
+    </svg>
     {[...floors].reverse().map((f) => (
       <button type="button" data-floor-btn={f.id} aria-pressed={String(f.id === initialFloor)} {...attr('title', { en: `${f.name} · ${f.level}`, zh: `${f.zh} · ${f.level}` })}>{f.label}</button>
     ))}
