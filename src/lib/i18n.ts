@@ -60,6 +60,7 @@ export const t = {
   in3d: { en: '3D', zh: '3D' },
   seeIn3d: { en: 'See this room in 3D', zh: '在3D模型中查看这个房间' },
   model3d: { en: 'The house in 3D', zh: '3D房子' },
+  miniHouse: { en: 'Where you are in the house. Drag to turn it; double-click to face the front.', zh: '你在房子里的位置。拖动以旋转；双击回到正面。' },
   model3dHelp: { en: 'A rough model of the house, after the drawings. Drag to turn it, scroll or pinch to zoom, click a room. Blueprint lays the drawing on each floor.', zh: '按图纸做的房子粗略模型。拖动以旋转，滚动或双指缩放，点击一个房间。“蓝图”把图纸铺在每层楼面上。' },
   liftFloors: { en: 'Lift floors', zh: '分开楼层' },
   openChapter: { en: 'Open this chapter', zh: '打开这一章' },

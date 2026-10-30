@@ -2,6 +2,7 @@
 // Works like an indoor map: the viewport shows one floor at a time, rooms are links.
 import { getLang, pick } from './lang';
 import { searchRooms, type SearchRoom } from './search';
+import { startMini, type MiniData } from './house-mini';
 
 type View = { cx: number; cy: number; z: number };
 type Bounds = { x: number; y: number; w: number; h: number };
@@ -34,6 +35,12 @@ function initMap() {
   const off = new AbortController();
 
   const viewport = root.querySelector<HTMLElement>('.map-viewport')!;
+  // The small turning house beside the floor buttons.
+  const mini = startMini(
+    root.querySelector<HTMLCanvasElement>('.map-mini')!,
+    JSON.parse(document.getElementById('house-mini')!.textContent!) as MiniData,
+    off.signal,
+  );
   const svgs = [...root.querySelectorAll<SVGSVGElement>('svg.floor')];
   const index = JSON.parse(document.getElementById('house-index')!.textContent!) as {
     rooms: IndexRoom[];
@@ -87,6 +94,7 @@ function initMap() {
       // Keep labels a constant size on screen: 1 screen px in mm.
       svg.style.setProperty('--px', String(1 / s));
     }
+    mini.set({ view: visibleArea(s, w, h) });
     const svg = svgOf(floor);
     const level = view.z < 1.8 ? 1 : view.z < 3.5 ? 2 : 3;
     if (root!.dataset.zoomLevel !== String(level)) {
@@ -94,6 +102,16 @@ function initMap() {
       if (level >= 2) loadThumbs(svg);
     }
     scheduleUrl();
+  }
+
+  /** The part of the plan that isn't under the room panel, in mm: [x, y, w, h]. */
+  function visibleArea(s: number, w: number, h: number): [number, number, number, number] {
+    let vw = w, vh = h;
+    if (root!.classList.contains('has-panel')) {
+      if (window.innerWidth > 800) vw -= Math.min(560, window.innerWidth * 0.45) / s;
+      else vh -= (window.innerHeight * 0.55) / s;
+    }
+    return [view.cx - w / 2, view.cy - h / 2, Math.max(0, vw), Math.max(0, vh)];
   }
 
   function loadThumbs(svg: SVGSVGElement) {
@@ -189,7 +207,7 @@ function initMap() {
       }
     }
     root!.querySelectorAll<HTMLButtonElement>('[data-floor-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.floorBtn === f)));
-    root!.querySelectorAll<SVGGElement>('[data-sec]').forEach((g) => g.classList.toggle('on', g.dataset.sec === f));
+    mini.set({ floor: f });
     showFloorName();
     view = clampView(v ?? view);
     root!.dataset.zoomLevel = '';
@@ -218,6 +236,7 @@ function initMap() {
 
   function focusRoom(slug: string, animate = true) {
     root!.querySelectorAll('.room.current').forEach((r) => r.classList.remove('current'));
+    mini.set({ room: slug });
     root!.querySelector(`.room[data-slug="${slug}"]`)?.classList.add('current');
     const el = root!.querySelector(`.room[data-slug="${slug}"]`);
     if (!el) return;
@@ -405,7 +424,11 @@ function initMap() {
     const page = document.querySelector<HTMLElement>('[data-room-page]');
     root!.classList.toggle('has-panel', !!page || !!document.querySelector('[data-panel]'));
     if (page) focusRoom(page.dataset.roomPage!, !!root!.dataset.synced);
-    else root!.querySelectorAll('.room.current').forEach((r) => r.classList.remove('current'));
+    else {
+      root!.querySelectorAll('.room.current').forEach((r) => r.classList.remove('current'));
+      mini.set({ room: null });
+    }
+    render();
     root!.dataset.synced = '1';
   };
   active = { root, sync, off };

@@ -9,6 +9,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import { EAVE, GABLES } from '../lib/house-shell';
 
 type Pt = [number, number];
 type Seg = [number, number, number, number];
@@ -44,7 +45,6 @@ const LOW = 1.1; // cut-away wall height in the dollhouse
 const FULL = 2.9; // wall height
 const DOOR = 2.1; // top of a door opening
 const GLAZED = 2.6; // top of a floor-to-ceiling window or glass door
-const EAVE = 7.35; // from the south elevation
 const THICK = 0.18;
 const LIFT = 3.4; // extra gap between floors when they're lifted apart
 const mm = (v: number) => v / 1000;
@@ -610,9 +610,7 @@ function init() {
   {
     const g = parts.get(roofFloor.id)!.group;
     const base = EAVE - roofFloor.level;
-    gable(g, -0.3, 8.1, 2.4, 6.0, 'x', base, -1.0);
-    gable(g, -0.3, 14.4, 5.6, 11.5, 'x', base, 0);
-    gable(g, 3.4, 11.0, 7.8, 11.8, 'z', base, -0.8);
+    for (const r of GABLES) gable(g, r.x[0], r.x[1], r.z[0], r.z[1], r.axis, base, r.ridge);
     const roof = data.rooms.find((r) => r.floor === roofFloor.id);
     g.traverse((o) => {
       if ((o as THREE.Mesh).isMesh && roof) {

@@ -136,16 +136,14 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 .map-ui button:active, .map-ui button[aria-pressed='true'] { border-color: #404040 #fff #fff #404040; background: #a8a8a8; font-weight: bold; }
 .map-floors { right: 12px; bottom: 96px; display: flex; flex-direction: column; }
 .map-floors button { height: 34px; box-sizing: border-box; }
-/* A section through the house beside the floor buttons: you are on the yellow storey. */
-.map-section { position: absolute; right: 100%; top: 0; width: 44px; height: 100%; margin-right: 4px; pointer-events: none; overflow: visible; }
-.storey-fill { fill: rgba(255, 255, 255, 0.85); stroke: none; }
-.storey.on .storey-fill { fill: var(--here); }
-.storey-wall, .storey-line { fill: none; stroke: var(--ink); stroke-width: 1px; }
-.storey-slab { stroke: var(--ink); stroke-width: 2px; }
-.storey-stair { fill: none; stroke: #808080; stroke-width: 1px; stroke-dasharray: 2 2; }
-.storey .here { fill: var(--ink); display: none; }
-.storey.on .here { display: inline; }
-@media (max-width: 600px) { .map-section { width: 28px; } }
+/* The small house beside the floor buttons: turns slowly; you are on the open, yellow floor. */
+.map-mini {
+  position: absolute; right: 100%; bottom: 0; width: 156px; height: 156px; margin-right: 6px;
+  background: var(--paper); border: 1px solid var(--ink); box-sizing: border-box;
+  cursor: grab; touch-action: none;
+}
+.map-mini.turning { cursor: grabbing; }
+@media (max-width: 600px) { .map-mini { width: 108px; height: 108px; } }
 .map-zoom { right: 12px; bottom: 20px; display: flex; flex-direction: column; }
 .map-search { z-index: 6; left: 12px; top: 12px; width: min(320px, calc(100vw - 24px)); }
 .map-search input { font: inherit; width: 100%; padding: 4px 6px; border: 2px inset #808080; background: #fff; }

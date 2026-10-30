@@ -1,7 +1,8 @@
 ---
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import { floors, rooms, house, floorBounds, roomPoints, stairsByFloor, type Room } from '../../lib/house';
+import { floors, rooms, house, floorBounds, roomPoints, stairsByFloor, model3d, type Room } from '../../lib/house';
+import details from '../../content/house3d.json';
 import { projects, imagesOf } from '../../lib/content';
 import { img } from '../../lib/images';
 import { t as tr, attr, text, chapter, floorZh, stairsTo } from '../../lib/i18n';
@@ -81,10 +82,18 @@ function stairBands(f: (typeof floors)[number]) {
 }
 const floorOf = (id: string) => floors.find((f) => f.id === id)!;
 
-// The section beside the floor buttons: one storey per button, top floor first.
-const storeys = [...floors].reverse();
-const STOREY = 34;
-const roofIsPitch = (f: (typeof floors)[number]) => f.rooms.every((r) => r.outdoor);
+// The small turning house beside the floor buttons (src/scripts/house-mini.ts), in metres.
+const model = model3d();
+const toM = (list: number[][]) => list.map((v) => v.map((n) => n / 1000));
+const byFloor = <T,>(rec: Record<string, T>, f: (v: T) => number[][]) =>
+  Object.fromEntries(Object.entries(rec).filter(([, v]) => Array.isArray(v)).map(([k, v]) => [k, toM(f(v))]));
+const mini = {
+  floors: model.floors.map((f) => ({ id: f.id, level: f.level })),
+  rooms: model.rooms.map((r) => ({ slug: r.slug, floor: r.floor, points: r.points, level: r.level, outdoor: r.outdoor, locked: r.locked, stairs: r.stairs })),
+  fills: byFloor(details.floors as Record<string, unknown>, (v) => v as number[][]),
+  doors: byFloor(details.doors, (v) => v),
+  glazing: byFloor(details.glazing, (v) => v.map((g) => g.line)),
+};
 ---
 <div class="house-map" id="house-map" data-floor={initialFloor} data-current={current?.slug ?? ''} data-zoom-level="1" transition:persist="house-map">
   <div class="map-viewport" tabindex="0" {...attr('aria-label', tr.mapHelp)}>
@@ -180,31 +189,7 @@ const roofIsPitch = (f: (typeof floors)[number]) => f.rooms.every((r) => r.outdo
   </div>
 
   <div class="map-ui map-floors" role="toolbar" {...attr('aria-label', tr.floors)}>
-    <svg class="map-section" viewBox={`0 0 44 ${storeys.length * STOREY}`} aria-hidden="true" focusable="false">
-      {storeys.map((f, i) => {
-        const top = i * STOREY, bottom = top + STOREY;
-        const on = f.id === initialFloor;
-        if (i === 0 && roofIsPitch(f)) {
-          return (
-            <g class:list={['storey', 'pitch', { on }]} data-sec={f.id}>
-              <path class="storey-fill" d={`M 2 ${bottom} L 22 ${top + 6} L 42 ${bottom} Z`} />
-              <path class="storey-line" d={`M 2 ${bottom} L 22 ${top + 6} L 42 ${bottom}`} />
-              <circle class="here" cx="22" cy={bottom - 9} r="3" />
-            </g>
-          );
-        }
-        return (
-          <g class:list={['storey', { on }]} data-sec={f.id}>
-            <rect class="storey-fill" x="6" y={top} width="32" height={STOREY} />
-            <line class="storey-wall" x1="6" x2="6" y1={top} y2={bottom} />
-            <line class="storey-wall" x1="38" x2="38" y1={top} y2={bottom} />
-            <line class="storey-slab" x1="2" x2="42" y1={bottom} y2={bottom} />
-            {(i > 0 || !roofIsPitch(f)) && <path class="storey-stair" d={(storeys.length - 1 - i) % 2 ? `M 22 ${bottom} L 12 ${top}` : `M 12 ${bottom} L 22 ${top}`} />}
-            <circle class="here" cx="29" cy={bottom - 9} r="3" />
-          </g>
-        );
-      })}
-    </svg>
+    <canvas class="map-mini" aria-hidden="true" {...attr('title', tr.miniHouse)}></canvas>
     {[...floors].reverse().map((f) => (
       <button type="button" data-floor-btn={f.id} aria-pressed={String(f.id === initialFloor)} {...attr('title', { en: `${f.name} · ${f.level}`, zh: `${f.zh} · ${f.level}` })}>{f.label}</button>
     ))}
@@ -220,6 +205,7 @@ const roofIsPitch = (f: (typeof floors)[number]) => f.rooms.every((r) => r.outdo
   <label class="map-ui map-blueprint"><input type="checkbox" data-blueprint /> <Bi t={tr.blueprint} /></label>
   <a class="map-ui map-3d" href="/house/3d" {...attr('title', tr.model3d)}><Bi t={tr.in3d} /></a>
   <div class="map-ui map-floorname" aria-live="polite"></div>
+  <script type="application/json" id="house-mini" set:html={JSON.stringify(mini)} />
   <script type="application/json" id="house-index" set:html={JSON.stringify({ text: { none: tr.searchNone, noDoor: tr.noDoorToast }, rooms: search, floors: floors.map((f) => ({ id: f.id, name: f.name, zh: f.zh, zhShort: floorZh(f.zh), level: f.level })) })} />
 </div>
 

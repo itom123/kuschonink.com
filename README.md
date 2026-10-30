@@ -33,8 +33,14 @@ You can also walk through the house:
 - **How the floors stack.** All floors share one camera, so changing floors keeps
   the same spot in view. Going up, the old floor sinks away; going down, it rises.
   The floor below shows as dashed lines, and through open-air rooms (terraces,
-  balconies, the roof). The little section beside the floor buttons shows which
-  storey you're on.
+  balconies, the roof).
+- **Where you are.** A small model of the whole house turns slowly beside the floor
+  buttons (`src/scripts/house-mini.ts`, plain canvas, no three.js): the floors below
+  yours stand whole with their doors, glass and windows, yours is cut open at waist
+  height, the floors above are faint. The room you're in is yellow, the part of the
+  plan on screen is outlined in blue, and the dot is where you are. Drag it to turn
+  it, double-click to face the front; it stands still with reduced motion. Its roof
+  and eaves come from `src/lib/house-shell.ts`, shared with the 3D house.
 
 **The house in 3D (test)** (`/house/3d`, `/house/3d?room=<room>`): a rough model
 of the same rooms, in the house's own colours (`src/scripts/house3d.ts`), as a guide.
