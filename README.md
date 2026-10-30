@@ -133,10 +133,13 @@ objectLabel, html, references). The rules find it a drawer.
 
 ### Two languages: the 中/EN toggle
 
-Every page can be read in English or Chinese, one at a time. The **中 / EN**
-switch sits top right (in the house header, and in the simple view's menu bar).
-The choice is remembered in the browser; first-time visitors get Chinese if
-their browser is set to Chinese, English otherwise.
+Every page can be read in English or Chinese, one at a time. The language is
+picked automatically: first-time visitors get the first of their browser's
+preferred languages that the site has (so a browser set to French, then Chinese,
+gets Chinese), and English if neither is listed. The **中 / EN** switch changes it
+at any time: top right in the house header, and in the simple view as two
+buttons in the taskbar tray next to the clock (always visible, on phones too).
+Once someone uses the switch, their choice is remembered in the browser.
 
 How it works: each page carries both languages. Elements marked `data-l="en"` /
 `data-l="zh"` show only when that language is on (`src/styles/lang.css`), and

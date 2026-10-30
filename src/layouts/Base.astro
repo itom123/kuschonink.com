@@ -22,11 +22,19 @@ const ogUrl = new URL(og.src, site.url).href;
     <meta name="title-en" content={seo.title} />
     {seo.titleZh && <meta name="title-zh" content={seo.titleZh} />}
     <script is:inline>
-      // Pick the language before the page paints: saved choice, else the browser's.
+      // Pick the language before the page paints: the visitor's saved choice, else
+      // the first of their browser's preferred languages that the site has.
       (function () {
         var d = document.documentElement, l;
         try { l = localStorage.getItem('lang'); } catch (e) {}
-        if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+        if (l !== 'zh' && l !== 'en') {
+          var prefs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']);
+          l = 'en';
+          for (var i = 0; i < prefs.length; i++) {
+            var m = /^(zh|en)\b/i.exec(prefs[i] || '');
+            if (m) { l = m[1].toLowerCase(); break; }
+          }
+        }
         function apply(root, lang) { root.dataset.lang = lang; root.lang = lang === 'zh' ? 'zh-Hans' : 'en-GB'; }
         apply(d, l);
         // Page changes (Astro view transitions) replace <html>'s attributes: keep the language.
