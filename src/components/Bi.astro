@@ -1,0 +1,8 @@
+---
+// Text in both languages. Only the language picked with the 中/EN toggle shows
+// (see src/styles/lang.css). Without Chinese, the English shows in both.
+import type { Bi } from '../lib/i18n';
+interface Props { t: Bi }
+const { t } = Astro.props;
+---
+{t.zh && t.zh !== t.en ? <><span data-l="en">{t.en}</span><span data-l="zh" lang="zh-Hans">{t.zh}</span></> : t.en}

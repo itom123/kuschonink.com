@@ -1,8 +1,10 @@
 {
   "title": "Farewell and Resurrection",
+  "titleZh": "告别与复活",
   "order": 9,
   "seo": {
-    "title": "Farewell and Resurrection — Xiangyin Gu"
+    "title": "Farewell and Resurrection — Xiangyin Gu",
+    "titleZh": "告别与复活 — Xiangyin Gu"
   },
   "sections": [
     {
@@ -86,11 +88,13 @@
         },
         {
           "type": "text",
-          "html": "<p class=\"display\">Farewell and Resurrection</p>"
+          "html": "<p class=\"display\">Farewell and Resurrection</p>",
+          "htmlZh": "<p class=\"display\">告别与复活</p>"
         },
         {
           "type": "text",
-          "html": "<p class=\"align-center\">\"Farewell and Resurrection\" is a performance of mine during which period I felt pushed to the point of destruction for resurrection.<br/><br/>Through this act, all the archives of my previous collected negatives and the single copy of my most treasured piece are burned into ashes. I chose my birthplace where the river meets the ocean to make this performative act. Footages are recorded during the whole process and showcased in this feed.<br/><br/>It is negation of negation, namely quintessential gesture to begin anew.<br/><br/>前者に拠って、自己批判の对象となった中平の初期作品を、あえて展示することの是非に関する問いが生起するであらう。これに対し、私たちわ、過去の否定という重い意味を伝えるために、是非とも当の初期作品を充分に示す必要があると考えた。<br/><br/>原点復帰－横浜 中平卓马<br/><br/>Based on the former, questions arise about the pros and cons of exhibiting Nakahira's early works, which became the object of self-criticism. On the other hand, in order to convey the heavy meaning of denial of the past, we thought that it was necessary to fully show the initial work in question.<br/><br/>DEGREE ZERO - YOKOHAMA NAKAHIRA TAKUMA</p>"
+          "html": "<p class=\"align-center\">\"Farewell and Resurrection\" is a performance of mine during which period I felt pushed to the point of destruction for resurrection.<br/><br/>Through this act, all the archives of my previous collected negatives and the single copy of my most treasured piece are burned into ashes. I chose my birthplace where the river meets the ocean to make this performative act. Footages are recorded during the whole process and showcased in this feed.<br/><br/>It is negation of negation, namely quintessential gesture to begin anew.<br/><br/>前者に拠って、自己批判の对象となった中平の初期作品を、あえて展示することの是非に関する問いが生起するであらう。これに対し、私たちわ、過去の否定という重い意味を伝えるために、是非とも当の初期作品を充分に示す必要があると考えた。<br/><br/>原点復帰－横浜 中平卓马<br/><br/>Based on the former, questions arise about the pros and cons of exhibiting Nakahira's early works, which became the object of self-criticism. On the other hand, in order to convey the heavy meaning of denial of the past, we thought that it was necessary to fully show the initial work in question.<br/><br/>DEGREE ZERO - YOKOHAMA NAKAHIRA TAKUMA</p>",
+          "htmlZh": "<p class=\"align-center\">《告别与复活》是我的一次行为表演。那段时间，我感到自己被推向毁灭的境地，以求复活。<br/><br/>在这一行为中，我此前收集的全部底片档案，连同我最珍视的一件作品的唯一副本，都被焚烧成灰烬。我选择在我的出生地——江河入海之处——完成这一行为。整个过程都有影像记录，并在此呈现。<br/><br/>这是否定之否定，也即重新开始最本质的姿态。<br/><br/>前者に拠って、自己批判の对象となった中平の初期作品を、あえて展示することの是非に関する問いが生起するであらう。これに対し、私たちわ、過去の否定という重い意味を伝えるために、是非とも当の初期作品を充分に示す必要があると考えた。<br/><br/>原点復帰－横浜 中平卓马<br/><br/>由于前者，人们自然会问：特意展出那些已成为中平自我批判对象的早期作品，是否妥当？对此，我们认为，为了传达“否定过去”这一沉重的意义，务必要充分展示这些早期作品。<br/><br/>原点复归——横滨　中平卓马</p>"
         }
       ]
     },

@@ -1,12 +1,18 @@
 ---
-interface Props { items: string[] }
-const { items } = Astro.props;
-const run = Array.from({ length: 6 }, () => items).flat();
+// Scrolling words. With a Chinese version, both runs are in the page and the 中/EN toggle picks one.
+interface Props { items: string[]; itemsZh?: string[] }
+const { items, itemsZh } = Astro.props;
+const versions: [string[], 'en' | 'zh' | undefined][] = itemsZh?.length ? [[items, 'en'], [itemsZh, 'zh']] : [[items, undefined]];
 ---
-<div class="block block-marquee" aria-label={items.filter((t) => t.trim() !== '*').join(' ')} role="marquee">
-  <div class="marquee-track" aria-hidden="true">
-    {[0, 1].map(() => (
-      <div class="marquee-run">{run.map((t) => <span>{t}</span>)}</div>
-    ))}
-  </div>
-</div>
+{versions.map(([list, l]) => {
+  const run = Array.from({ length: 6 }, () => list).flat();
+  return (
+    <div class="block block-marquee" data-l={l} lang={l === 'zh' ? 'zh-Hans' : undefined} aria-label={list.filter((x) => x.trim() !== '*').join(' ')} role="marquee">
+      <div class="marquee-track" aria-hidden="true">
+        {[0, 1].map(() => (
+          <div class="marquee-run">{run.map((x) => <span>{x}</span>)}</div>
+        ))}
+      </div>
+    </div>
+  );
+})}

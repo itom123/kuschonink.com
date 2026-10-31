@@ -112,7 +112,7 @@
     },
     {
      "id": "closet",
-     "zh": "",
+     "zh": "走道",
      "en": "Passage",
      "rect": [
       2100,
@@ -135,7 +135,7 @@
     },
     {
      "id": "side-entrance",
-     "zh": "",
+     "zh": "侧门",
      "en": "Side entrance",
      "rect": [
       10800,
@@ -182,7 +182,7 @@
     },
     {
      "id": "south-west-room",
-     "zh": "",
+     "zh": "西南房间",
      "en": "Room (south-west)",
      "rect": [
       0,
@@ -212,7 +212,7 @@
     },
     {
      "id": "east-room",
-     "zh": "",
+     "zh": "东房间",
      "en": "Room (east)",
      "rect": [
       10800,
@@ -286,7 +286,7 @@
    "rooms": [
     {
      "id": "north-balcony",
-     "zh": "",
+     "zh": "北阳台",
      "en": "North balcony",
      "rect": [
       -660,
@@ -378,7 +378,7 @@
     },
     {
      "id": "east-balcony",
-     "zh": "",
+     "zh": "东阳台",
      "en": "East balcony",
      "rect": [
       14100,
@@ -475,7 +475,7 @@
    "rooms": [
     {
      "id": "north-west-room",
-     "zh": "",
+     "zh": "西北房间",
      "en": "Room (north-west)",
      "rect": [
       0,
@@ -516,7 +516,7 @@
     },
     {
      "id": "blind-room",
-     "zh": "",
+     "zh": "无门之室",
      "en": "Room without a door",
      "rect": [
       7900,
@@ -528,7 +528,7 @@
     },
     {
      "id": "north-east-room",
-     "zh": "",
+     "zh": "东北房间",
      "en": "Room (north-east)",
      "rect": [
       10800,
@@ -545,7 +545,7 @@
     },
     {
      "id": "west-room",
-     "zh": "",
+     "zh": "西房间",
      "en": "Room (west)",
      "rect": [
       0,
@@ -559,7 +559,7 @@
     },
     {
      "id": "central-room",
-     "zh": "",
+     "zh": "中央房间",
      "en": "Central room",
      "rect": [
       3600,
@@ -577,7 +577,7 @@
     },
     {
      "id": "east-room",
-     "zh": "",
+     "zh": "东房间",
      "en": "Room (east)",
      "rect": [
       10800,
@@ -592,7 +592,7 @@
     },
     {
      "id": "south-terrace",
-     "zh": "",
+     "zh": "南露台",
      "en": "South terrace",
      "rect": [
       3600,
@@ -647,7 +647,8 @@
      738,
      149,
      130
-    ]
+    ],
+    "zh": "正门 M-1"
    },
    {
     "room": "f1/south-west-room",
@@ -657,7 +658,8 @@
      738,
      116,
      88
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "f1/east-room",
@@ -667,7 +669,8 @@
      738,
      75,
      88
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "f2/west-bedroom",
@@ -677,7 +680,8 @@
      588,
      116,
      76
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "f2/sitting-room",
@@ -687,7 +691,8 @@
      588,
      125,
      70
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "f2/middle-bedroom",
@@ -697,7 +702,8 @@
      588,
      125,
      70
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "f2/east-bedroom",
@@ -707,7 +713,8 @@
      588,
      75,
      76
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "attic/central-room",
@@ -717,7 +724,8 @@
      455,
      263,
      50
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "attic/west-room",
@@ -727,7 +735,8 @@
      510,
      116,
      32
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "attic/east-room",
@@ -737,9 +746,11 @@
      510,
      75,
      32
-    ]
+    ],
+    "zh": "窗"
    }
   ]
  },
- "lockedNote": "Floor/house plan, traced back to early 2008. The original blueprint is supposedly lost."
+ "lockedNote": "Floor/house plan, traced back to early 2008. The original blueprint is supposedly lost.",
+ "lockedNoteZh": "平面图，可追溯至2008年初。原始蓝图据说已经遗失。"
 }

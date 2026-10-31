@@ -1,7 +1,9 @@
 {
   "seo": {
     "title": "Xiangyin Gu",
-    "description": "Xiangyin Gu, also known as Tom, is an emerging artist who works and is based in London. His work focuses on memory, fantasy, history and archive in combination with his reserach around art and photography."
+    "titleZh": "Xiangyin Gu",
+    "description": "Xiangyin Gu is an emerging artist who works and is based in London. His work focuses on memory, fantasy, history and archive in combination with his reserach around art and photography.",
+    "descriptionZh": "Xiangyin Gu 是一位在伦敦生活和工作的新锐艺术家。他的创作聚焦于记忆、幻想、历史与档案，并与他对艺术和摄影的研究相结合。"
   },
   "background": {
     "src": "home/250304-archive-of-xiang-s-p-36.jpg",

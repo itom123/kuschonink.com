@@ -15,16 +15,64 @@ npm run deploy    # build and deploy to Cloudflare Workers
 
 ## Two ways in
 
-**The house** (`/`, `/house`, `/house/<room>`): the site is the family house, drawn from
-the 2008 renovation plans. The façade (`/`) is the south elevation: the door and
+**The house** (`/house/facade`, `/house`, `/house/<room>`): the site is the family house, drawn from
+the 2008 renovation plans. The façade (`/house/facade`) is the south elevation: the door and
 windows lead inside. The floorplan works like an indoor map: drag to move, scroll
-or pinch to zoom, switch floors with **R / A / 2 / 1**, search with *Search this
-house*, and tick **Blueprint** to see the original drawings. Rooms hold projects,
-About and Contact. Everything is set in Times New Roman.
+or pinch to zoom, switch floors with **R / A / 2 / 1** (buttons or keys) or
+PageUp / PageDown, search with *Search this house*, and tick **Blueprint** to see
+the original drawings. Rooms hold projects, About and Contact. Everything is set
+in Times New Roman.
 
-**The simple view** (`/image`, `/image/<slug>`, `/image/all`, `/about`, `/contact`):
-a Windows 98 desktop for anyone who wants to see the work quickly. Every gallery
+You can also walk through the house:
+
+- **Stairs.** The stairs are drawn on every floor: click *▲ Up* at the top of the
+  stairs or *▼ Down* at the bottom to arrive on the stairs of the next floor. The
+  roof has a hatch down to the attic.
+- **Next door.** Every room's panel lists the rooms beside it, by direction
+  (north is the top of the plan), plus the way up or down if you're on the stairs.
+- **How the floors stack.** All floors share one camera, so changing floors keeps
+  the same spot in view. Going up, the old floor sinks away; going down, it rises.
+  The floor below shows as dashed lines, and through open-air rooms (terraces,
+  balconies, the roof).
+- **Where you are.** A small model of the whole house turns slowly beside the floor
+  buttons (`src/scripts/house-mini.ts`, plain canvas, no three.js): the floors below
+  yours stand whole with their doors, glass and windows, yours is cut open at waist
+  height, the floors above are faint. The room you're in is yellow, the part of the
+  plan on screen is outlined in blue, and the dot is where you are. Drag it to turn
+  it, double-click to face the front; it stands still with reduced motion. Its roof
+  and eaves come from `src/lib/house-shell.ts`, shared with the 3D house.
+
+**The house in 3D (test)** (`/house/3d`, `/house/3d?room=<room>`): a rough model
+of the same rooms, in the house's own colours (`src/scripts/house3d.ts`), as a guide.
+Drag to turn it, scroll or pinch to zoom, use **R / A / 2 / 1** to cut the house away
+down to a floor, tick **Lift floors** to pull the storeys apart, and tick
+**Blueprint** to lay the original drawing on each floor and check the model against
+it. Click a room for its chapter. Rooms and levels come from `house.json`; the rest is
+traced from the drawings into `src/content/house3d.json`: doors and openings, glazing
+(the living room's picture window and glass door onto the porch, the attic's sliding
+doors), walls the rooms don't draw (the stair core), floor they leave out (the attic
+corridor), the stairs (a wooden U round the core from the ground floor to the first
+floor, then a straight flight to the attic; none to the roof), the stairwells, and the
+garage as a cellar a few steps down from the hall with a small stair up to a narrow
+loft. Edit that file to correct a door or a stair. The roof, columns, balustrades and
+corner stones are approximations from the south elevation and photos of the house.
+Both 3D views (this page and the small turning house on the floorplan) redraw when
+Chrome drops and restores their graphics context (a GPU process restart, a driver reset,
+sleep, GPU memory running short) and when the device pixel ratio changes (another monitor,
+browser zoom). If WebGL doesn't come back, the page says so and offers to draw it again.
+To see what a browser reports about its graphics (WebGL / WebGL2, the GPU and ANGLE
+backend, limits, canvas sizes, context losses), add `?debug=3d` to `/house/3d` or `/house`.
+three.js is loaded only on this page. The page is `noindex` and is not in the sitemap.
+
+**The simple view** (`/`, `/image`, `/image/<slug>`, `/image/all`, `/about`, `/contact`):
+the default view visitors land on at `/`. A Windows 98 desktop for anyone who wants to see the work quickly. Every gallery
 is laid flat, so a project is one page. `/image/all` puts every project on one page.
+On a computer with a mouse and a wide screen, the desktop works like Windows 98
+(`src/scripts/win98-wm.ts`): drag windows by the title bar, resize from the corner,
+minimise, maximise and close them, and open several at once. Double-click a desktop
+icon (or use Start) to open a window; links load inside their window, and
+Shift-click opens a link in a new one. The taskbar lists open windows. Phones and
+narrow screens get plain pages.
 
 ### The rules of the house (after Perec)
 
@@ -44,6 +92,9 @@ It's the missing chapter.
 - **What's in a room** is its `contents`: `{ "project": "<slug>" }`, or
   `{ "page": "about" | "contact" | "writings" | "colophon" }`. To move a project,
   move its `contents` to another room. Rooms without `contents` are only described.
+- `stairs: "<floor id>"` marks the stairs room and where it leads up to. It draws
+  the *Up* link there and the *Down* link on that floor. "Next door" comes from
+  rooms that share a wall (locked rooms are left out).
 - `locked: true` makes a room impossible to enter.
 - `scan` places the original drawing under the traced rooms (the Blueprint layer).
 - `elevation.hotspots` are the clickable door and windows on the façade.
@@ -91,6 +142,34 @@ a sheet of paper.
 
 To add a piece, add `src/content/writings/<id>.json` (title, date, object,
 objectLabel, html, references). The rules find it a drawer.
+
+### Two languages: the 中/EN toggle
+
+Every page can be read in English or Chinese, one at a time. The language is
+picked automatically: first-time visitors get the first of their browser's
+preferred languages that the site has (so a browser set to French, then Chinese,
+gets Chinese), and English if neither is listed. The **中 / EN** switch changes it
+at any time: top right in the house header, and in the simple view as two
+buttons in the taskbar tray next to the clock (always visible, on phones too).
+Once someone uses the switch, their choice is remembered in the browser.
+
+How it works: each page carries both languages. Elements marked `data-l="en"` /
+`data-l="zh"` show only when that language is on (`src/styles/lang.css`), and
+`src/scripts/lang.ts` swaps attributes like `aria-label` and the page title.
+
+Where the words live:
+
+- **Interface words** (buttons, headings, table labels, messages):
+  `src/lib/i18n.ts`, each as `{ en, zh }`. `src/components/Bi.astro` prints one.
+- **Content** keeps its Chinese next to the English:
+  - pages: `titleZh`, `seo.titleZh`, `seo.descriptionZh`;
+  - text blocks: `htmlZh`; images: `captionZh`, `altZh`; marquees: `itemsZh`;
+  - rooms and furniture: `zh` / `en`; list items, list names, façade hotspots: `zh`;
+    chronology: `whenZh` / `whatZh`; contact form: `labelZh`, `submitTextZh`;
+  - writings: `titleZh`, `excerptZh`, `htmlZh` (in Traditional Chinese, as the
+    artist writes them).
+- Anything without a Chinese version shows its English in both modes, so a new
+  project still works before it's translated. Fill in both when you can.
 
 ### Contact form
 

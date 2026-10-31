@@ -1,0 +1,10 @@
+---
+// A figure caption in English and, when there is one, Chinese.
+interface Props { text?: string; zh?: string }
+const { text, zh } = Astro.props;
+---
+{text && (zh ? (
+  <figcaption><span data-l="en" set:html={text} /><span data-l="zh" lang="zh-Hans" set:html={zh} /></figcaption>
+) : (
+  <figcaption set:html={text} />
+))}

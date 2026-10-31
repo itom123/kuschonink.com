@@ -43,10 +43,22 @@ img { max-width: 100%; height: auto; }
 .map-viewport { position: absolute; inset: 0; touch-action: none; cursor: grab; outline: none; }
 .map-viewport.dragging { cursor: grabbing; }
 .map-viewport:focus-visible { outline: 2px dotted var(--ink); outline-offset: -4px; }
-svg.floor { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; }
+svg.floor { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; display: block; user-select: none; }
 svg.floor[hidden] { display: none; }
-.floor-enter { animation: floor-in 0.35s ease-out; }
-@keyframes floor-in { from { opacity: 0; transform: scale(0.97); } }
+/* Changing floors: going up, the floor you leave sinks away and the new one comes up to meet you;
+   going down, the reverse. Both are drawn on the same grid, so the stairs stay put. */
+.floor-enter { animation: floor-in-up 0.35s ease-out; }
+.house-map[data-dir='down'] .floor-enter { animation-name: floor-in-down; }
+.floor-leave { z-index: 0; pointer-events: none; animation: floor-out-up 0.35s ease-in forwards; }
+.house-map[data-dir='down'] .floor-leave { animation-name: floor-out-down; }
+@keyframes floor-in-up { from { opacity: 0; transform: scale(1.04); } }
+@keyframes floor-in-down { from { opacity: 0; transform: scale(0.96); } }
+@keyframes floor-out-up { to { opacity: 0; transform: scale(0.94); } }
+@keyframes floor-out-down { to { opacity: 0; transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) {
+  .floor-enter, .floor-leave { animation: none; }
+  .floor-leave { display: none; }
+}
 
 .scan { opacity: 0; transition: opacity 0.3s; pointer-events: none; }
 .blueprint .scan { opacity: 1; }
@@ -55,8 +67,12 @@ svg.floor[hidden] { display: none; }
 .blueprint .grid { display: none; }
 .dim { font-size: calc(var(--px) * 11px); fill: #666; text-anchor: middle; dominant-baseline: middle; font-family: 'Times New Roman', serif; }
 
+/* The floor below, seen faintly through open-air rooms and around the edges. */
+.ghost polygon { fill: none; stroke: #9a9a9a; stroke-width: 1px; vector-effect: non-scaling-stroke; stroke-dasharray: 3 3; pointer-events: none; }
+.blueprint .ghost { display: none; }
+
 .room polygon { fill: var(--paper); stroke: var(--ink); stroke-width: 2px; vector-effect: non-scaling-stroke; transition: fill 0.15s; }
-.room.outdoor polygon { stroke-dasharray: 5 3; stroke-width: 1px; }
+.room.outdoor polygon { stroke-dasharray: 5 3; stroke-width: 1px; fill-opacity: 0.55; }
 .room .arc { fill: none; stroke: var(--ink); stroke-width: 1px; vector-effect: non-scaling-stroke; }
 a.room:hover polygon, a.room:focus polygon { fill: var(--hover); }
 a.room:focus { outline: none; }
@@ -92,6 +108,24 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 .house-map[data-zoom-level='3'] .room.has-contents .label { paint-order: stroke; stroke: var(--paper); stroke-width: calc(var(--px) * 4px); }
 .house-map[data-zoom-level='2'] .thumbs image { opacity: 0.35; }
 
+/* Stairs: a band of treads with an arrow; up at the top of the stairs, down at the bottom. */
+.stair-link { cursor: pointer; outline: none; }
+.stair-band { fill: #f2f2f2; stroke: var(--ink); stroke-width: 1px; vector-effect: non-scaling-stroke; transition: fill 0.15s; }
+.stair-link.down .stair-band { fill: #e6e6e6; }
+.treads line { stroke: #8a8a8a; stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.stair-split { stroke: #8a8a8a; stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.stair-arrow { fill: none; stroke: var(--ink); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.stair-label {
+  font-family: 'Times New Roman', Times, serif; font-size: calc(var(--px) * 13px); fill: var(--link);
+  text-anchor: middle; dominant-baseline: middle; paint-order: stroke; stroke: #f2f2f2; stroke-width: calc(var(--px) * 6px); stroke-linejoin: round; pointer-events: none;
+}
+.stair-link:hover .stair-band, .stair-link:focus-visible .stair-band { fill: var(--hover); }
+.stair-link.down .stair-label { stroke: #e6e6e6; }
+.stair-link:hover .stair-label, .stair-link:focus-visible .stair-label { stroke: var(--hover); text-decoration: underline; }
+.stair-link:focus-visible .stair-band { stroke: var(--link); stroke-width: 3px; }
+.blueprint .stair-band { fill: rgba(255, 255, 255, 0.6); }
+.blueprint .treads, .blueprint .stair-split { display: none; }
+
 /* Map controls: grey 3D buttons, like an old toolbar */
 .map-ui { position: absolute; z-index: 5; font-family: 'Times New Roman', Times, serif; }
 .map-ui button {
@@ -101,8 +135,17 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 }
 .map-ui button:active, .map-ui button[aria-pressed='true'] { border-color: #404040 #fff #fff #404040; background: #a8a8a8; font-weight: bold; }
 .map-floors { right: 12px; bottom: 96px; display: flex; flex-direction: column; }
+.map-floors button { height: 34px; box-sizing: border-box; }
+/* The small house beside the floor buttons: turns slowly; you are on the open, yellow floor. */
+.map-mini {
+  position: absolute; right: 100%; bottom: 0; width: 156px; height: 156px; margin-right: 6px;
+  background: var(--paper); border: 1px solid var(--ink); box-sizing: border-box;
+  cursor: grab; touch-action: none;
+}
+.map-mini.turning { cursor: grabbing; }
+@media (max-width: 600px) { .map-mini { width: 108px; height: 108px; } }
 .map-zoom { right: 12px; bottom: 20px; display: flex; flex-direction: column; }
-.map-search { left: 12px; top: 12px; width: min(320px, calc(100vw - 24px)); }
+.map-search { z-index: 6; left: 12px; top: 12px; width: min(320px, calc(100vw - 24px)); }
 .map-search input { font: inherit; width: 100%; padding: 4px 6px; border: 2px inset #808080; background: #fff; }
 .search-results { list-style: none; margin: 0; padding: 0; background: #fff; border: 1px solid var(--ink); border-top: 0; max-height: 50vh; overflow: auto; }
 .search-results li a, .search-results .none { display: block; padding: 6px 8px; }
@@ -126,6 +169,11 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 .room-name { margin: 0 0 0.6em; font-style: italic; }
 .inventory { font-size: 0.95em; }
 .missing { padding: 2em 0; text-align: center; }
+.exits { margin: 0 0 0.8em; }
+.exits p { margin: 0.3em 0; }
+.exits-stairs a { font-size: 1.05em; }
+.exit-dir { font-style: italic; }
+.exits-doors b { margin-right: 0.3em; }
 .chapter-nav { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .simple-link { font-size: 0.95em; }
 .room-panel .section { margin: 1em 0; }
@@ -139,7 +187,7 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
   .has-panel .map-zoom { bottom: calc(55vh + 12px); }
   .has-panel .map-floors { bottom: calc(55vh + 92px); }
   .has-panel .map-blueprint { display: none; }
-  .house-top nav a[target] , .house-top nav span:last-of-type { display: none; }
+  .house-top nav a[target], .house-top nav .sep-social { display: none; }
 }
 
 .noscript-index { position: relative; z-index: 10; background: #fff; padding: calc(var(--top) + 12px) 16px; }
@@ -175,7 +223,7 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 .interior-walls { fill: #fff; stroke: #000; stroke-width: 3px; vector-effect: non-scaling-stroke; }
 .furniture-body { fill: #fafafa; stroke: #000; stroke-width: 1px; vector-effect: non-scaling-stroke; }
 .furniture-label { text-anchor: middle; font-family: 'Times New Roman', Times, serif; font-size: 150px; fill: #000; pointer-events: none; }
-.furniture-en { font-size: 110px; font-style: italic; }
+.furniture-en { font-style: italic; }
 .furniture-label-small { font-size: 120px; }
 .drawer { cursor: pointer; outline: none; }
 .drawer rect { fill: #ececec; stroke: #000; stroke-width: 1px; vector-effect: non-scaling-stroke; transition: transform 0.25s ease-out, fill 0.15s; transform-box: fill-box; }
@@ -208,3 +256,44 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 .sheet-footer { margin-top: 2em; padding-top: 0.8em; border-top: 1px dashed #999; font-size: 0.9em; color: #333; }
 .room-panel .sheet { margin: 0 -16px; }
 @media (max-width: 600px) { .sheet { padding: 20px 18px; } }
+
+/* Bilingual text: Chinese sits beside or under the English. */
+.chapter-nav a[rel='next'] { text-align: right; }
+.label-sub-zh { font-style: normal; }
+.house-top .lang-toggle button { color: var(--link); }
+
+/* ===== The house in 3D (a test) ===== */
+.house-3d { position: fixed; inset: var(--top) 0 0; overflow: hidden; background: #fff; }
+.h3d-stage { position: absolute; inset: 0; outline: none; touch-action: none; }
+.h3d-stage canvas { display: block; }
+.h3d-labels { position: absolute; inset: 0; pointer-events: none; }
+.h3d-label {
+  font-family: 'Times New Roman', Times, serif; font-size: 13px; line-height: 1.2; white-space: nowrap;
+  background: rgba(255, 255, 255, 0.88); padding: 0 4px; border: 1px solid #999;
+}
+.h3d-label.has-contents { color: var(--link); }
+.h3d-label small { color: #555; }
+.h3d-floors { right: 12px; bottom: 20px; display: flex; flex-direction: column; }
+.h3d-toggles { left: 12px; bottom: 20px; display: flex; flex-direction: column; gap: 2px; background: rgba(255, 255, 255, 0.9); padding: 2px 6px; border: 1px solid var(--ink); }
+.h3d-plan { left: 12px; top: 12px; background: rgba(255, 255, 255, 0.9); padding: 2px 6px; border: 1px solid var(--ink); }
+.h3d-help { left: 12px; top: 40px; margin: 0; max-width: min(420px, calc(100vw - 24px)); font-style: italic; font-size: 14px; background: rgba(255, 255, 255, 0.85); padding: 0 4px; }
+.h3d-card { position: absolute; z-index: 7; right: 64px; top: 12px; width: min(340px, calc(100vw - 88px)); background: var(--paper); border: 1px solid var(--ink); }
+.h3d-card .panel-bar button { font: inherit; background: none; border: 0; color: var(--link); cursor: pointer; padding: 0; }
+.h3d-card-body { padding: 8px 12px 10px; }
+.h3d-card-title { font-size: 1.5em; font-weight: normal; margin: 0; }
+.h3d-card-name { margin: 0 0 0.4em; font-style: italic; }
+.h3d-card-links { margin: 0.4em 0 0; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.h3d-nogl { position: absolute; inset: auto 16px 50% 16px; text-align: center; z-index: 8; background: #fff; }
+.h3d-lost { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); z-index: 8; margin: 0; max-width: calc(100vw - 32px); background: #ffffe1; border: 1px solid var(--ink); padding: 8px 12px; text-align: center; }
+.h3d-lost button { font: inherit; margin-left: 8px; background: var(--grey); border: 2px solid; border-color: #fff #404040 #404040 #fff; cursor: pointer; padding: 2px 10px; }
+/* ?debug=3d: what the browser reports about its graphics */
+.gl-diag { position: absolute; z-index: 9; left: 12px; top: 72px; margin: 0; max-width: calc(100vw - 24px); white-space: pre-wrap; font: 12px/1.4 'Courier New', monospace; background: rgba(255, 255, 255, 0.95); border: 1px solid var(--ink); padding: 6px 8px; pointer-events: none; }
+@media (max-width: 800px) {
+  .h3d-card { left: 0; right: 0; top: auto; bottom: 0; width: auto; border-width: 1px 0 0; }
+  .house-3d:has(.h3d-card:not([hidden])) .h3d-floors { bottom: 170px; }
+  .house-3d:has(.h3d-card:not([hidden])) .h3d-toggles { display: none; }
+  .h3d-help { display: none; }
+}
+.map-3d { left: 120px; bottom: 20px; background: rgba(255, 255, 255, 0.9); padding: 2px 6px; border: 1px solid var(--ink); }
+/* With a room open the panel sits at the bottom on phones (and Blueprint is hidden), so the 3D link moves above it. */
+@media (max-width: 800px) { .has-panel .map-3d { left: 12px; bottom: calc(55vh + 12px); } }
