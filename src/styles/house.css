@@ -291,4 +291,5 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
   .h3d-help { display: none; }
 }
 .map-3d { left: 120px; bottom: 20px; background: rgba(255, 255, 255, 0.9); padding: 2px 6px; border: 1px solid var(--ink); }
-.has-panel .map-3d { display: none; }
+/* With a room open the panel sits at the bottom on phones (and Blueprint is hidden), so the 3D link moves above it. */
+@media (max-width: 800px) { .has-panel .map-3d { left: 12px; bottom: calc(55vh + 12px); } }

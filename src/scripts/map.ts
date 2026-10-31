@@ -423,6 +423,9 @@ function initMap() {
   const sync = () => {
     const page = document.querySelector<HTMLElement>('[data-room-page]');
     root!.classList.toggle('has-panel', !!page || !!document.querySelector('[data-panel]'));
+    // The 3D link opens the model at the room you're in.
+    const link3d = root!.querySelector<HTMLAnchorElement>('.map-3d');
+    if (link3d) link3d.href = page ? `/house/3d?room=${encodeURIComponent(page.dataset.roomPage!)}` : '/house/3d';
     if (page) focusRoom(page.dataset.roomPage!, !!root!.dataset.synced);
     else {
       root!.querySelectorAll('.room.current').forEach((r) => r.classList.remove('current'));
