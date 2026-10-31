@@ -3,6 +3,7 @@
 import { getLang, pick } from './lang';
 import { searchRooms, type SearchRoom } from './search';
 import { startMini, type MiniData } from './house-mini';
+import { showDiag } from './gl-diag';
 
 type View = { cx: number; cy: number; z: number };
 type Bounds = { x: number; y: number; w: number; h: number };
@@ -41,6 +42,7 @@ function initMap() {
     JSON.parse(document.getElementById('house-mini')!.textContent!) as MiniData,
     off.signal,
   );
+  showDiag(root, () => [...root.querySelectorAll<HTMLCanvasElement>('canvas')], off.signal);
   const svgs = [...root.querySelectorAll<SVGSVGElement>('svg.floor')];
   const index = JSON.parse(document.getElementById('house-index')!.textContent!) as {
     rooms: IndexRoom[];

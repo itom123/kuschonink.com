@@ -56,6 +56,12 @@ floor, then a straight flight to the attic; none to the roof), the stairwells, a
 garage as a cellar a few steps down from the hall with a small stair up to a narrow
 loft. Edit that file to correct a door or a stair. The roof, columns, balustrades and
 corner stones are approximations from the south elevation and photos of the house.
+Both 3D views (this page and the small turning house on the floorplan) redraw when
+Chrome drops and restores their graphics context (a GPU process restart, a driver reset,
+sleep, GPU memory running short) and when the device pixel ratio changes (another monitor,
+browser zoom). If WebGL doesn't come back, the page says so and offers to draw it again.
+To see what a browser reports about its graphics (WebGL / WebGL2, the GPU and ANGLE
+backend, limits, canvas sizes, context losses), add `?debug=3d` to `/house/3d` or `/house`.
 three.js is loaded only on this page. The page is `noindex` and is not in the sitemap.
 
 **The simple view** (`/`, `/image`, `/image/<slug>`, `/image/all`, `/about`, `/contact`):

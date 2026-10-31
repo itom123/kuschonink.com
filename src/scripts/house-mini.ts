@@ -9,6 +9,7 @@
 // Drag it to turn it. With reduced motion it stands still, facing the front door.
 // Canvas 2D and a hand-rolled projection, so the map pages don't need three.js.
 import { EAVE, GABLES } from '../lib/house-shell';
+import { countLosses, onDprChange } from './gl-diag';
 
 type Pt = [number, number];
 type Seg = [number, number, number, number];
@@ -230,10 +231,11 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
   let dragging = false;
   let resumeAt = 0;
   let dirty = true;
-  let W = 0, H = 0, S = 1;
+  let lost = false;
+  let W = 0, H = 0, S = 1, dpr = 1;
 
   function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
     W = canvas.clientWidth;
     H = canvas.clientHeight;
     if (!W || !H) return;
@@ -394,6 +396,9 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
     if (!W || !H) return;
     ct = Math.cos(angle);
     st = Math.sin(angle);
+    // Set the scale on every draw: a restored context comes back with none, and at a device
+    // pixel ratio of 1.5 the house would otherwise be drawn at 2/3 size in the corner.
+    ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx!.clearRect(0, 0, W, H);
     const si = Math.max(0, floors.findIndex((f) => f.id === state.floor));
     const onRoof = floors[si] === roofFloor;
@@ -446,7 +451,7 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
       angle += SPIN * dt;
       dirty = true;
     }
-    if (dirty) draw();
+    if (dirty && !lost) draw();
     raf = requestAnimationFrame(frame);
   };
   raf = requestAnimationFrame(frame);
@@ -478,6 +483,22 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
   const ro = new ResizeObserver(resize);
   ro.observe(canvas);
   resize();
+
+  // Chrome drops a GPU-backed canvas's pixels when the GPU process restarts, the driver resets
+  // or GPU memory runs short, then restores an empty context. The house turns every frame,
+  // but with reduced motion it stands still and would stay blank, so redraw when that happens,
+  // when the tab is shown again, and when the device pixel ratio changes (another monitor, zoom).
+  countLosses(canvas, 'contextlost', 'contextrestored', signal);
+  canvas.addEventListener('contextlost', () => (lost = true), { signal });
+  canvas.addEventListener('contextrestored', () => {
+    lost = false;
+    resize();
+    dirty = true;
+  }, { signal });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) dirty = true;
+  }, { signal });
+  onDprChange(resize, signal);
   signal.addEventListener('abort', () => {
     cancelAnimationFrame(raf);
     ro.disconnect();

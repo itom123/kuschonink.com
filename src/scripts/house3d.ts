@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { EAVE, GABLES } from '../lib/house-shell';
+import { countLosses, glSummary, onDprChange, showDiag } from './gl-diag';
 
 type Pt = [number, number];
 type Seg = [number, number, number, number];
@@ -120,12 +121,18 @@ function init() {
   const D = data.details;
   const stage = root.querySelector<HTMLElement>('.h3d-stage')!;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const lostBox = root.querySelector<HTMLElement>('.h3d-lost')!;
+  lostBox.hidden = true;
 
   let renderer: THREE.WebGLRenderer;
   try {
     renderer = new THREE.WebGLRenderer({ antialias: true });
-  } catch {
+  } catch (e) {
+    // No WebGL2: hardware acceleration off, the GPU blocklisted, or WebGL blocked for this site
+    // after GPU crashes. Say so, and leave the evidence in the console (and in ?debug=3d).
+    console.warn('house3d: no WebGL2 context:', e instanceof Error ? e.message : e);
     root.querySelector<HTMLElement>('.h3d-nogl')!.hidden = false;
+    showDiag(root, () => [], new AbortController().signal);
     return;
   }
   const off = new AbortController();
@@ -902,11 +909,41 @@ function init() {
   const ro = new ResizeObserver(resize);
   ro.observe(stage);
   resize();
+  onDprChange(() => {
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    resize();
+  }, signal);
+  console.info('house3d:', glSummary(renderer.getContext(), renderer.domElement));
+
+  // ---- When the graphics context is lost ----
+  // On Windows this happens when the GPU process restarts, the driver resets, after sleep, or
+  // when GPU memory runs short. three.js asks for the context back; if Chrome gives it back,
+  // drawing simply resumes. If it doesn't within 2 s, say so and offer to rebuild the view.
+  let lost = false;
+  let lostTimer = 0;
+  countLosses(renderer.domElement, 'webglcontextlost', 'webglcontextrestored', signal);
+  renderer.domElement.addEventListener('webglcontextlost', () => {
+    lost = true;
+    clearTimeout(lostTimer);
+    lostTimer = window.setTimeout(() => (lostBox.hidden = !lost), 2000);
+  }, { signal });
+  renderer.domElement.addEventListener('webglcontextrestored', () => {
+    lost = false;
+    clearTimeout(lostTimer);
+    lostBox.hidden = true;
+  }, { signal });
+  lostBox.querySelector('button')!.addEventListener('click', () => {
+    lostBox.hidden = true;
+    active?.dispose();
+    active = null;
+    init(); // a fresh renderer and context, without reloading the page
+  }, { signal });
+  showDiag(root, () => [...root!.querySelectorAll<HTMLCanvasElement>('canvas')], signal);
 
   let frame = 0;
   const loop = (now: number) => {
     frame = requestAnimationFrame(loop);
-    if (document.hidden) return;
+    if (document.hidden || lost) return;
     if (tweens.length) {
       tweens = tweens.filter((t) => {
         const k = Math.min(1, (now - t.t0) / t.ms);
@@ -935,6 +972,7 @@ function init() {
       ro.disconnect();
       off.abort();
       clearTimeout(toastTimer);
+      clearTimeout(lostTimer);
       controls.dispose();
       const geos = new Set<THREE.BufferGeometry>(), mats = new Set<THREE.Material>();
       scene.traverse((o) => {

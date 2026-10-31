@@ -58,7 +58,8 @@ const furniture = Object.fromEntries(
     </section>
 
     <div class="map-toast h3d-toast" role="status"></div>
-    <p class="h3d-nogl" hidden><Bi t={t.noWebgl} /> <a href="/house"><Bi t={t.backToPlan} /></a></p>
+    <p class="h3d-nogl" hidden><Bi t={t.noWebgl} /> <Bi t={t.noWebglWhy} /> <a href="/house"><Bi t={t.backToPlan} /></a></p>
+    <p class="h3d-lost" role="alert" hidden><Bi t={t.glLost} /> <button type="button"><Bi t={t.glRetry} /></button></p>
     <noscript><p class="h3d-nogl"><Bi t={t.noWebgl} /> <a href="/house"><Bi t={t.backToPlan} /></a></p></noscript>
     <script type="application/json" id="house-3d-data" set:html={JSON.stringify({ ...data, furniture, details, scans, text: { noDoor: t.noDoorToast } })} />
   </div>

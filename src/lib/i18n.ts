@@ -67,6 +67,9 @@ export const t = {
   backToPlan: { en: 'Floorplan', zh: '平面图' },
   wholeHouse: { en: 'Whole house, with the roof', zh: '整座房子（含屋顶）' },
   noWebgl: { en: 'This browser can’t draw the 3D house. The floorplan works everywhere.', zh: '这个浏览器无法绘制3D房子。平面图在任何地方都能用。' },
+  noWebglWhy: { en: 'Its graphics (WebGL) are off or blocked. In Chrome, check Settings → System → “Use graphics acceleration when available”, or open chrome://gpu.', zh: '它的图形功能（WebGL）被关闭或被阻止。在 Chrome 中，请检查“设置 → 系统 → 使用图形加速功能（如果可用）”，或打开 chrome://gpu。' },
+  glLost: { en: 'The graphics card stopped drawing the house.', zh: '显卡停止绘制这座房子了。' },
+  glRetry: { en: 'Draw it again', zh: '重新绘制' },
 
   locked: { en: 'locked', zh: '上锁' },
   noDoorToast: { en: 'This room has no door.', zh: '这个房间没有门。' },
