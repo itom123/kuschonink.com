@@ -1,7 +1,7 @@
 ---
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import { floors, rooms, house, floorBounds, roomPoints, stairsByFloor, model3d, type Room } from '../../lib/house';
+import { floors, rooms, house, floorBounds, roomPoints, stairsByFloor, doorsByFloor, doorPlan, model3d, type Room } from '../../lib/house';
 import details from '../../content/house3d.json';
 import { projects, imagesOf } from '../../lib/content';
 import { img } from '../../lib/images';
@@ -84,15 +84,19 @@ const floorOf = (id: string) => floors.find((f) => f.id === id)!;
 
 // The small turning house beside the floor buttons (src/scripts/house-mini.ts), in metres.
 const model = model3d();
-const toM = (list: number[][]) => list.map((v) => v.map((n) => n / 1000));
-const byFloor = <T,>(rec: Record<string, T>, f: (v: T) => number[][]) =>
-  Object.fromEntries(Object.entries(rec).filter(([, v]) => Array.isArray(v)).map(([k, v]) => [k, toM(f(v))]));
+const glassy = (kind: string) => kind === 'glass' || kind === 'sliding';
+const byFloor = (list: { floor: string; at: number[] }[]) =>
+  Object.fromEntries(floors.map((f) => [f.id, list.filter((d) => d.floor === f.id).map((d) => d.at)]));
 const mini = {
   floors: model.floors.map((f) => ({ id: f.id, level: f.level })),
   rooms: model.rooms.map((r) => ({ slug: r.slug, floor: r.floor, points: r.points, level: r.level, outdoor: r.outdoor, locked: r.locked, stairs: r.stairs })),
-  fills: byFloor(details.floors as Record<string, unknown>, (v) => v as number[][]),
-  doors: byFloor(details.doors, (v) => v),
-  glazing: byFloor(details.glazing, (v) => v.map((g) => g.line)),
+  // The same doors, passages and glass as the plan and the 3D model (house.json, house3d.json).
+  fills: Object.fromEntries(floors.map((f) => [f.id, model.passages.filter((p) => p.floor === f.id).map((p) => p.points)])),
+  doors: byFloor(model.doors.filter((d) => !glassy(d.kind))),
+  glazing: Object.fromEntries(floors.map((f) => [f.id, [
+    ...model.doors.filter((d) => d.floor === f.id && glassy(d.kind)).map((d) => d.at),
+    ...((details.glazing as Record<string, { line: number[] }[]>)[f.id] ?? []).map((g) => g.line.map((n) => n / 1000)),
+  ]])),
 };
 ---
 <div class="house-map" id="house-map" data-floor={initialFloor} data-current={current?.slug ?? ''} data-zoom-level="1" transition:persist="house-map">
@@ -159,6 +163,20 @@ const mini = {
               <a class:list={['room', { 'has-contents': !!r.contents, outdoor: r.outdoor, current: current?.slug === r.slug }]} href={`/house/${r.slug}`} data-slug={r.slug} {...attr('aria-label', { en: name('en'), zh: name('zh') })}>{inner}</a>
             );
           })}
+          {/* Doors as on the drawings: a gap in the wall, the leaf and its swing. */}
+          <g class="doors" aria-hidden="true">
+            {(f.walls ?? []).map(([x0, y0, x1, y1]) => <line class="wall" x1={x0} y1={y0} x2={x1} y2={y1} />)}
+            {(doorsByFloor.get(f.id) ?? []).map((d) => {
+              const p = doorPlan(d);
+              return (
+                <g class:list={['door', d.kind]}>
+                  <line class="door-gap" x1={p.gap[0]} y1={p.gap[1]} x2={p.gap[2]} y2={p.gap[3]} />
+                  {p.swing && <path class="door-swing" d={p.swing} />}
+                  <path class="door-leaf" d={p.marks} />
+                </g>
+              );
+            })}
+          </g>
           {stairBands(f).map((sb) => {
             const to = floorOf(sb.to.floor.id);
             const label = stairsTo(sb.dir, to);

@@ -1,7 +1,8 @@
 // The house in 3D: a dollhouse built from the floorplan's rooms, in the house's own colours.
-// It follows the drawings: rooms from house.json; doors, glazing, extra walls, the stairs,
-// the stairwells and the cellar from house3d.json (traced from the plans and from notes
-// on how the house really is). "Blueprint" lays the original drawing on each floor.
+// It follows the drawings: rooms, doors, passages and extra walls from house.json (the same
+// ones the 2D plan draws); glazing, the stairs, the stairwells and the cellar from
+// house3d.json (traced from the plans and from notes on how the house really is).
+// "Blueprint" lays the original drawing on each floor.
 //
 // Not a survey: heights come from the floor levels; the roof, columns and balustrades
 // follow the south elevation and photos of the house.
@@ -23,10 +24,7 @@ interface FloorM { id: string; label: string; name: string; zh: string; level: n
 interface Furniture { en: string; zh: string; drawers: number; rect: number[] }
 /** house3d.json, in millimetres. */
 interface Details {
-  doors: Record<string, Seg[]>;
-  glazing: Record<string, { line: Seg; kind: 'window' | 'door' | 'sliding' }[]>;
-  partitions: Record<string, Seg[]>;
-  floors: Record<string, Seg[] | string>;
+  glazing: Record<string, { line: Seg; kind: 'window' }[]>;
   stairs: {
     u?: { from: string; to: string; east: Pt; north: Pt; west: Pt; start: number; end: number };
     flight?: { from: string; to: string; x: Pt; y: Pt };
@@ -34,8 +32,11 @@ interface Details {
   wells: Record<string, Pt[]>;
   cellar?: { room: string; steps: { x: Pt; y: number }; stair: { x: Pt; y: Pt }; loft: { x: Pt; y: Pt; height: number } };
 }
+/** A door from house.json, in metres; `normal` points into the side it swings into. */
+interface DoorM { floor: string; at: Seg; kind: 'door' | 'double' | 'opening' | 'glass' | 'sliding' | 'garage'; code: string | null; hinge: 'start' | 'end' | null; height: number; normal: Pt }
 interface Data {
   floors: FloorM[]; rooms: RoomM[]; grid: { columns: number[]; rows: number[] }; text: { noDoor: Bi };
+  doors: DoorM[]; walls: { floor: string; at: Seg }[]; passages: { floor: string; id: string; points: Pt[] }[];
   furniture: Record<string, Furniture[]>; details: Details;
   scans: Record<string, { src: string; x: number; y: number; w: number; h: number }>;
 }
@@ -55,7 +56,7 @@ const mm = (v: number) => v / 1000;
 const C = {
   white: 0xffffff, cream: 0xefe6cf, stone: 0xe9e4d8, wall: 0xfbfbf9, floor: 0xf3f0e8, outdoor: 0xe4e0d6,
   locked: 0xc9c9c9, roof: 0x8e5b49, brick: 0xa65d45, step: 0xe8e2d4, wood: 0x8a5a36, furniture: 0xd9c4a3,
-  glass: 0x46525a, ground: 0xf4f3ee, line: 0x555555, edge: 0x9a948a, grid: 0xbbbbbb,
+  glass: 0x46525a, door: 0xf6f1e6, ground: 0xf4f3ee, line: 0x555555, edge: 0x9a948a, grid: 0xbbbbbb,
   hover: 0xffffcc, here: 0xffff66,
 };
 
@@ -199,11 +200,12 @@ function init() {
     white: lambert(C.white), cream: lambert(C.cream), stone: lambert(C.stone), wall: lambert(C.wall), step: lambert(C.step),
     wood: lambert(C.wood), furniture: lambert(C.furniture), locked: lambert(C.locked), ground: lambert(C.ground),
     roof: lambert(C.roof, { side: THREE.DoubleSide }), gable: lambert(C.brick, { side: THREE.DoubleSide }),
-    glass: lambert(C.glass),
+    glass: lambert(C.glass), floor: lambert(C.floor), door: lambert(C.door),
     pane: new THREE.MeshLambertMaterial({ color: 0x9fb6c2, transparent: true, opacity: 0.35, depthWrite: false, side: THREE.DoubleSide }),
     line: new THREE.LineBasicMaterial({ color: C.line }),
     edge: new THREE.LineBasicMaterial({ color: C.edge }),
     grid: new THREE.LineBasicMaterial({ color: C.grid }),
+    swing: new THREE.LineBasicMaterial({ color: C.edge }),
   };
 
   // ---- The ground and the structural grid ----
@@ -242,7 +244,8 @@ function init() {
   const roomBySlug = new Map(data.rooms.map((r) => [r.slug, r]));
   const fullFor = (f: FloorM) => Math.min(FULL, Math.max(0.5, f.storey - 0.25));
 
-  interface Wall { mesh: THREE.Mesh; floor: string; map?: THREE.Texture }
+  /** `extra`: how much lower one side's floor is than the other's; the wall reaches down to it. */
+  interface Wall { mesh: THREE.Mesh; floor: string; map?: THREE.Texture; extra: number }
   const walls: Wall[] = [];
   interface FloorParts {
     group: THREE.Group; labels: CSS2DObject[];
@@ -261,11 +264,30 @@ function init() {
     parts.set(f.id, { group, labels: [], tall });
   }
 
-  // house3d.json in metres.
-  const segs = (list?: Seg[]) => (list ?? []).map((s) => s.map(mm) as Seg);
-  const doorsOf = (floor: string) => segs(D.doors[floor]);
+  // house3d.json in metres; doors, passages and extra walls (house.json) come in metres already.
   const glazingOf = (floor: string) => (D.glazing[floor] ?? []).map((g) => ({ line: g.line.map(mm) as Seg, kind: g.kind }));
   const wellOf = (floor: string) => (D.wells[floor] ?? []).map((p) => p.map(mm) as Pt);
+  const doorsOf = (floor: string) => data.doors.filter((d) => d.floor === floor);
+  const passagesOf = (floor: string) => data.passages.filter((p) => p.floor === floor);
+
+  /** What's at a point on a floor: a room, a passage (floor that is no room), or nothing (outside). */
+  type Space = { room?: RoomM; passage?: string } | null;
+  function spaceAt(floor: string, p: Pt): Space {
+    const room = data.rooms.find((r) => r.floor === floor && inside(p, r.points));
+    if (room) return { room };
+    const pa = data.passages.find((x) => x.floor === floor && inside(p, x.points));
+    return pa ? { passage: pa.id } : null;
+  }
+  const idOf = (s: Space) => s?.room?.slug ?? s?.passage ?? 'outside';
+  const indoorAt = (s: Space) => !!s && (!!s.passage || !s.room!.outdoor);
+  /** The floor heights (relative to the storey) on the indoor sides of a wall at `mid` with normal n. */
+  function sidesOf(f: FloorM, mid: Pt, nx: number, nz: number) {
+    const s1 = spaceAt(f.id, [mid[0] + nx * 0.15, mid[1] + nz * 0.15]);
+    const s2 = spaceAt(f.id, [mid[0] - nx * 0.15, mid[1] - nz * 0.15]);
+    const levels = [s1, s2].filter(indoorAt).map((s) => (s!.room ? s!.room.level - f.level : 0));
+    if (!levels.length) levels.push(0);
+    return { s1, s2, base: Math.min(...levels), high: Math.max(...levels), exterior: !indoorAt(s1) || !indoorAt(s2) };
+  }
 
   function slabMesh(r: RoomM, f: FloorM, i: number) {
     const shape = new THREE.Shape(r.points.map(([x, z]) => new THREE.Vector2(x, -z)));
@@ -285,8 +307,16 @@ function init() {
     return mesh;
   }
 
-  function outline(r: RoomM, y: number) {
-    const pts = r.points.map(([x, z]) => new THREE.Vector3(x, y, z));
+  /** Floor that is no room (the first floor's lobby, the attic corridor). */
+  function passageSlab(points: Pt[]) {
+    const shape = new THREE.Shape(points.map(([x, z]) => new THREE.Vector2(x, -z)));
+    const mesh = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: 0.2, bevelEnabled: false }).rotateX(-Math.PI / 2), M.floor);
+    mesh.position.y = -0.2;
+    return mesh;
+  }
+
+  function outline(points: Pt[], y: number) {
+    const pts = points.map(([x, z]) => new THREE.Vector3(x, y, z));
     return new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), M.line);
   }
 
@@ -298,38 +328,87 @@ function init() {
     return m;
   }
 
-  const seen = new Set<string>();
-  const keyOf = (floor: string, a: Pt, b: Pt) => `${floor}:${[a, b].map((p) => p.map((v) => v.toFixed(2)).join(',')).sort().join('|')}`;
+  /** A stretch of wall on a floor: from a to b, the normal pointing out (or either way inside). */
+  interface Piece { a: Pt; b: Pt; nx: number; nz: number; exterior: boolean; base: number; extra: number; windows: boolean; extA: boolean; extB: boolean }
 
   /**
-   * A stretch of wall a→b with its doors and glazing cut out: wall pieces, a lintel over
-   * each opening, glass where it's glazed, and a window in long outside pieces.
+   * Every wall on a floor, once: the rooms' edges and the extra walls, split where they meet so
+   * no two walls overlap (overlapping faces flicker), then joined again where they're alike.
+   * A wall with an outdoor room or nothing on one side is an outside wall.
    */
-  function wallRun(f: FloorM, a: Pt, b: Pt, nx: number, nz: number, exterior: boolean, rel: number, windows: boolean) {
-    const { group, tall } = parts.get(f.id)!;
-    const glazing = glazingOf(f.id);
-    const doors = doorsOf(f.id);
-    const { pieces, gaps } = cutWall(a, b, [...doors, ...glazing.map((g) => g.line)]);
-    for (const [p, q] of pieces) {
-      wall(group, f.id, p, q, nx, nz, exterior, rel);
-      const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
-      if (windows && exterior && len >= 2.4) tall.add(windowOn([(p[0] + q[0]) / 2, (p[1] + q[1]) / 2], Math.atan2(-(q[1] - p[1]), q[0] - p[0]), nx, nz, len, rel));
+  function wallPieces(f: FloorM): Piece[] {
+    const lines = new Map<string, { alongX: boolean; at: number; spans: [number, number, boolean][] }>();
+    const odd: [Pt, Pt][] = [];
+    const add = (a: Pt, b: Pt, partition: boolean) => {
+      const alongX = Math.abs(a[1] - b[1]) < 1e-6, alongZ = Math.abs(a[0] - b[0]) < 1e-6;
+      if (!alongX && !alongZ) return odd.push([a, b]);
+      const at = alongX ? a[1] : a[0], k = alongX ? 0 : 1;
+      const key = `${alongX ? 'x' : 'z'}${at.toFixed(3)}`;
+      const line = lines.get(key) ?? { alongX, at, spans: [] };
+      line.spans.push([Math.min(a[k], b[k]), Math.max(a[k], b[k]), partition]);
+      lines.set(key, line);
+    };
+    for (const r of data.rooms) {
+      if (r.floor !== f.id || r.outdoor || r.locked) continue;
+      r.points.forEach((p, i) => add(p, r.points[(i + 1) % r.points.length], false));
     }
-    const alongX = Math.abs(b[1] - a[1]) < 1e-3;
-    const top = fullFor(f);
-    for (const [c0, c1] of gaps) {
-      const mid = (c0 + c1) / 2, w = c1 - c0;
-      const at: Pt = alongX ? [mid, a[1]] : [a[0], mid];
-      const g = glazing.find((gl) => cutWall(a, b, [gl.line]).gaps.some(([g0, g1]) => Math.abs(g0 - c0) < 0.06 && Math.abs(g1 - c1) < 0.06));
-      const lintelFrom = g ? GLAZED : DOOR;
-      if (top > lintelFrom) {
-        const lintel = new THREE.Mesh(wallBox, exterior ? brickFor(w, top - lintelFrom) : M.wall);
-        lintel.rotation.y = alongX ? 0 : Math.PI / 2;
-        lintel.scale.set(w, top - lintelFrom, 1);
-        lintel.position.set(at[0], rel + lintelFrom, at[1]);
-        tall.add(lintel);
+    for (const w of data.walls) if (w.floor === f.id) add([w.at[0], w.at[1]], [w.at[2], w.at[3]], true);
+
+    const out: Piece[] = [];
+    const piece = (a: Pt, b: Pt, partition: boolean): (Piece & { key: string }) | null => {
+      const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      if (len < 0.01) return null;
+      const mid: Pt = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+      const nx = (b[1] - a[1]) / len, nz = -(b[0] - a[0]) / len;
+      const { s1, s2, base, high, exterior } = sidesOf(f, mid, nx, nz);
+      if (idOf(s1) === idOf(s2) && !partition) return null;
+      if (!indoorAt(s1) && !indoorAt(s2)) return null;
+      // Outside walls face out: from the indoor side towards s1 or s2, whichever is outside.
+      const flip = exterior && indoorAt(s1);
+      const windows = !s1?.room?.stairs && !s2?.room?.stairs;
+      return {
+        a, b, nx: flip ? -nx : nx, nz: flip ? -nz : nz, exterior, base, extra: high - base, windows, extA: true, extB: true,
+        key: `${[idOf(s1), idOf(s2)].sort().join('|')}:${exterior}:${base}:${high}:${windows}`,
+      };
+    };
+    for (const [a, b] of odd) {
+      const p = piece(a, b, false);
+      if (p) out.push(p);
+    }
+    for (const { alongX, at, spans } of lines.values()) {
+      const cuts = [...new Set(spans.flatMap(([p, q]) => [p, q]).map((v) => Math.round(v * 1000) / 1000))].sort((p, q) => p - q);
+      const pt = (v: number): Pt => (alongX ? [v, at] : [at, v]);
+      let run: (Piece & { key: string }) | null = null;
+      for (let i = 0; i < cuts.length - 1; i++) {
+        const p0 = cuts[i], p1 = cuts[i + 1];
+        const covering = spans.filter(([s0, s1]) => s0 <= p0 + 1e-6 && s1 >= p1 - 1e-6);
+        const next = covering.length ? piece(pt(p0), pt(p1), covering.some((c) => c[2])) : null;
+        if (run && next && run.key === next.key && Math.abs(run.nx - next.nx) < 1e-6 && Math.abs(run.nz - next.nz) < 1e-6) {
+          run.b = next.b; // same kind of wall going on: one piece
+          continue;
+        }
+        if (run && next) { run.extB = false; next.extA = false; } // a different wall carries on along the line
+        if (run) out.push(run);
+        run = next;
       }
-      if (g) tall.add(glazed(at, w, alongX, rel, g.kind));
+      if (run) out.push(run);
+    }
+    return out;
+  }
+
+  /** A wall with its doors and windows cut out: wall pieces, and a guessed window in long outside pieces. */
+  function wallRun(f: FloorM, p: Piece) {
+    const { group, tall } = parts.get(f.id)!;
+    const cuts = [...doorsOf(f.id).map((d) => d.at), ...glazingOf(f.id).map((g) => g.line)];
+    const { pieces } = cutWall(p.a, p.b, cuts);
+    const same = (u: Pt, v: Pt) => Math.abs(u[0] - v[0]) < 1e-6 && Math.abs(u[1] - v[1]) < 1e-6;
+    // Pieces come back west to east (north to south); find which end of the run each touches.
+    const lo = p.a[0] + p.a[1] <= p.b[0] + p.b[1] ? { at: p.a, ext: p.extA } : { at: p.b, ext: p.extB };
+    const hi = lo.at === p.a ? { at: p.b, ext: p.extB } : { at: p.a, ext: p.extA };
+    for (const [q0, q1] of pieces) {
+      wall(group, f.id, q0, q1, p.nx, p.nz, p.exterior, p.base, p.extra, same(q0, lo.at) && lo.ext, same(q1, hi.at) && hi.ext);
+      const len = Math.hypot(q1[0] - q0[0], q1[1] - q0[1]);
+      if (p.windows && p.exterior && len >= 2.4) tall.add(windowOn([(q0[0] + q1[0]) / 2, (q0[1] + q1[1]) / 2], Math.atan2(-(q1[1] - q0[1]), q1[0] - q0[0]), p.nx, p.nz, len, p.base));
     }
   }
 
@@ -337,38 +416,29 @@ function init() {
     if (f === roofFloor) return;
     const { group, labels } = parts.get(f.id)!;
     const here = data.rooms.filter((r) => r.floor === f.id);
-    const indoor = here.filter((r) => !r.outdoor);
+    const indoorShapes = [...here.filter((r) => !r.outdoor).map((r) => r.points), ...passagesOf(f.id).map((p) => p.points)];
     for (const r of here) {
       const rel = r.level - f.level;
       group.add(slabMesh(r, f, i));
-      group.add(outline(r, rel + 0.005));
+      group.add(outline(r.points, rel + 0.005));
       if (r.locked) {
         group.add(edged(M.locked, r.rect[2], 2.2, r.rect[3], r.rect[0] + r.rect[2] / 2, rel, r.rect[1] + r.rect[3] / 2));
         continue;
       }
-      const n = r.points.length;
-      for (let k = 0; k < n; k++) {
-        const a = r.points[k], b = r.points[(k + 1) % n];
-        const dx = b[0] - a[0], dz = b[1] - a[1];
-        const len = Math.hypot(dx, dz);
-        if (len < 0.05) continue;
-        const mid: Pt = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-        let nx = dz / len, nz = -dx / len;
-        if (inside([mid[0] + nx * 0.05, mid[1] + nz * 0.05], r.points)) { nx = -nx; nz = -nz; }
-        const out: Pt = [mid[0] + nx * 0.3, mid[1] + nz * 0.3];
-        const neighbour = here.find((o) => o !== r && inside(out, o.points));
-        if (r.outdoor) {
-          // Balconies and terraces upstairs get a balustrade where they meet the air.
-          if (!neighbour && i > 0) balustrade(group, a, b, rel);
-          continue;
+      if (r.outdoor) {
+        // Balconies and terraces upstairs get a balustrade where they meet the air.
+        const n = r.points.length;
+        for (let k = 0; i > 0 && k < n; k++) {
+          const a = r.points[k], b = r.points[(k + 1) % n];
+          const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+          if (len < 0.05) continue;
+          const mid: Pt = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+          let nx = (b[1] - a[1]) / len, nz = -(b[0] - a[0]) / len;
+          if (inside([mid[0] + nx * 0.05, mid[1] + nz * 0.05], r.points)) { nx = -nx; nz = -nz; }
+          const out: Pt = [mid[0] + nx * 0.3, mid[1] + nz * 0.3];
+          if (!here.some((o) => o !== r && inside(out, o.points))) balustrade(group, a, b, rel);
         }
-        const key = keyOf(f.id, a, b);
-        if (seen.has(key)) continue;
-        seen.add(key);
-        const exterior = !indoor.some((o) => o !== r && inside(out, o.points));
-        wallRun(f, a, b, nx, nz, exterior, rel, !r.stairs);
-      }
-      addQuoins(f.id, r, indoor, rel, fullFor(f));
+      } else addQuoins(f.id, r, indoorShapes, rel, fullFor(f));
       for (const fu of data.furniture[r.slug] ?? []) group.add(cabinet(fu, rel));
       if (r.contents || r.stairs) {
         const el = document.createElement('div');
@@ -381,72 +451,171 @@ function init() {
         labels.push(label);
       }
     }
-    // Floor the rooms leave out (a lobby, the attic corridor), just under the rooms' own floors.
-    const fills = D.floors[f.id];
-    if (Array.isArray(fills)) {
-      for (const [x, z, w, d] of segs(fills)) {
-        const fill = new THREE.Mesh(unitBox, M.wall);
-        fill.scale.set(w, 0.2, d);
-        fill.position.set(x + w / 2, -0.205, z + d / 2);
-        group.add(fill);
-      }
+    for (const p of passagesOf(f.id)) {
+      group.add(passageSlab(p.points));
+      group.add(outline(p.points, 0.005));
     }
-    // Walls the rooms don't draw (the stair core, a store), with their doors.
-    for (const [x0, z0, x1, z1] of segs(D.partitions[f.id])) {
-      const a: Pt = [x0, z0], b: Pt = [x1, z1];
-      if (seen.has(keyOf(f.id, a, b))) continue;
-      seen.add(keyOf(f.id, a, b));
-      const len = Math.hypot(x1 - x0, z1 - z0);
-      wallRun(f, a, b, (z1 - z0) / len, -(x1 - x0) / len, false, 0, false);
-    }
+    for (const p of wallPieces(f)) wallRun(f, p);
+    for (const d of doorsOf(f.id)) doorway(f, d.at, d.kind, d.height, d.hinge, d.normal);
+    for (const g of glazingOf(f.id)) doorway(f, g.line, 'window', GLAZED, null, [0, 0]);
     if (D.stairs.u?.from === f.id) group.add(uStair(floorById(D.stairs.u.to).level - f.level));
     if (D.stairs.flight?.from === f.id) group.add(flight(floorById(D.stairs.flight.to).level - f.level));
     const cellar = D.cellar && roomBySlug.get(D.cellar.room.replace('/', '-'));
     if (cellar && cellar.floor === f.id) group.add(cellarStairs(cellar.level - f.level));
   });
 
-  /** One wall from a to b: brick outside if it's an outside wall, white inside, a cream top. */
-  function wall(group: THREE.Group, floor: string, a: Pt, b: Pt, nx: number, nz: number, exterior: boolean, rel: number) {
+  /**
+   * One wall from a to b: brick outside if it's an outside wall, white inside, a cream top.
+   * It runs on by half its thickness at an end that meets no other wall on the same line (to fill the corner).
+   */
+  function wall(group: THREE.Group, floor: string, a: Pt, b: Pt, nx: number, nz: number, exterior: boolean, rel: number, extra: number, extA: boolean, extB: boolean) {
     const dx = b[0] - a[0], dz = b[1] - a[1];
-    const len = Math.hypot(dx, dz);
+    const len0 = Math.hypot(dx, dz);
+    const ux = dx / len0, uz = dz / len0;
+    const ea = extA ? THICK / 2 : 0, eb = extB ? THICK / 2 : 0;
+    const len = len0 + ea + eb;
+    const cx = (a[0] + b[0]) / 2 + (ux * (eb - ea)) / 2, cz = (a[1] + b[1]) / 2 + (uz * (eb - ea)) / 2;
     const plusZOut = -dz * nx + dx * nz > 0;
-    const brick = exterior ? brickFor(len + THICK, LOW) : null;
+    const brick = exterior ? brickFor(len, LOW) : null;
     const outsideFace = brick ?? M.wall;
     // Box faces: +x, -x (the ends), +y (the top), -y, +z, -z (the two sides).
     const ends = brick ?? M.wall;
     const mats = [ends, ends, M.cream, M.wall, plusZOut ? outsideFace : M.wall, plusZOut ? M.wall : outsideFace];
     const mesh = new THREE.Mesh(wallBox, mats);
     mesh.rotation.y = Math.atan2(-dz, dx);
-    mesh.position.set((a[0] + b[0]) / 2, rel, (a[1] + b[1]) / 2);
-    mesh.scale.set(len + THICK, LOW, 1);
+    mesh.position.set(cx, rel, cz);
+    mesh.scale.set(len, LOW + extra, 1);
     mesh.add(new THREE.LineSegments(wallEdges, M.edge));
     group.add(mesh);
-    walls.push({ mesh, floor, map: brick?.map ?? undefined });
+    walls.push({ mesh, floor, map: brick?.map ?? undefined, extra });
   }
 
-  /** Floor-to-ceiling glass in an opening: a window with mullions, a glass door, or sliding doors. */
-  function glazed(at: Pt, w: number, alongX: boolean, rel: number, kind: 'window' | 'door' | 'sliding') {
+  /**
+   * What fills an opening in a wall, as on the drawings: a lintel over it; a door's frame and its
+   * leaf standing open (two for a double door), with the swing marked on the floor as on the plan;
+   * glass for a glass door, sliding doors or a window; a closed panel door for the garage.
+   */
+  function doorway(f: FloorM, at: Seg, kind: string, height: number, hinge: 'start' | 'end' | null, normal: Pt) {
+    const { group, tall } = parts.get(f.id)!;
+    const [x0, z0, x1, z1] = at;
+    const alongX = Math.abs(z1 - z0) < 1e-6;
+    const w = Math.hypot(x1 - x0, z1 - z0);
+    const mid: Pt = [(x0 + x1) / 2, (z0 + z1) / 2];
+    const [nx, nz] = alongX ? [0, 1] : [1, 0];
+    const { base, high, exterior } = sidesOf(f, mid, nx, nz);
+    // The opening is measured from the higher floor (you step down into the lower room).
+    const head = high + height, top = high + fullFor(f);
+    if (top > head + 0.02) {
+      const lintel = new THREE.Mesh(wallBox, exterior ? brickFor(w, top - head) : M.wall);
+      lintel.rotation.y = alongX ? 0 : Math.PI / 2;
+      lintel.scale.set(w, top - head, 1);
+      lintel.position.set(mid[0], head, mid[1]);
+      tall.add(lintel);
+    }
+    if (kind === 'window' || kind === 'glass' || kind === 'sliding') {
+      tall.add(glazed(mid, w, alongX, high, kind === 'glass' ? 'door' : kind, height));
+      return;
+    }
+    if (kind === 'opening') return;
+    const g = new THREE.Group();
+    g.position.set(mid[0], 0, mid[1]);
+    g.rotation.y = alongX ? 0 : Math.PI / 2;
+    if (kind === 'garage') {
+      // A closed up-and-over door, its panels picked out by ribs.
+      const panel = new THREE.Mesh(unitBox, M.cream);
+      panel.scale.set(w, height, 0.06);
+      panel.position.y = base;
+      g.add(panel);
+      for (let y = 0.3; y < height - 0.1; y += 0.4) {
+        const rib = new THREE.Mesh(unitBox, M.stone);
+        rib.scale.set(w - 0.1, 0.04, 0.1);
+        rib.position.y = base + y;
+        g.add(rib);
+      }
+      tall.add(g);
+      return;
+    }
+    // The frame: two jambs and a head, standing a little proud of the wall on both faces.
+    const d = THICK + 0.04;
+    for (const s of [-1, 1]) {
+      const jamb = new THREE.Mesh(unitBox, M.white);
+      jamb.scale.set(0.07, head - base, d);
+      jamb.position.set(s * (w / 2 - 0.035), base, 0);
+      g.add(jamb);
+    }
+    const cap = new THREE.Mesh(unitBox, M.white);
+    cap.scale.set(w, 0.07, d);
+    cap.position.set(0, head - 0.07, 0);
+    g.add(cap);
+    tall.add(g);
+    // The leaves, open about 70°, hung at the wall's face on the side they swing into.
+    const leaves: [Pt, Pt][] = kind === 'double'
+      ? [[[x0, z0], mid], [[x1, z1], mid]]
+      : [hinge === 'end' ? [[x1, z1], [x0, z0]] : [[x0, z0], [x1, z1]]];
+    const [sx, sz] = normal;
+    for (const [h, e] of leaves) {
+      const L = Math.hypot(e[0] - h[0], e[1] - h[1]);
+      const ux = (e[0] - h[0]) / L, uz = (e[1] - h[1]) / L;
+      const open = (deg: number): Pt => {
+        const t = (deg * Math.PI) / 180;
+        return [ux * Math.cos(t) + sx * Math.sin(t), uz * Math.cos(t) + sz * Math.sin(t)];
+      };
+      const [ox, oz] = open(70);
+      const hx = h[0] + sx * (THICK / 2) + ux * 0.07, hz = h[1] + sz * (THICK / 2) + uz * 0.07;
+      const leafLen = L - 0.09;
+      const leaf = edged(M.door, leafLen, height - 0.08, 0.04, hx + (ox * leafLen) / 2, high + 0.01, hz + (oz * leafLen) / 2);
+      leaf.rotation.y = Math.atan2(-oz, ox);
+      tall.add(leaf);
+      const knob = new THREE.Mesh(unitBox, M.cream);
+      knob.scale.set(0.04, 0.04, 0.12);
+      knob.rotation.y = leaf.rotation.y;
+      knob.position.set(hx + ox * (leafLen - 0.08), high + 1.0, hz + oz * (leafLen - 0.08));
+      tall.add(knob);
+      // The swing, drawn on the floor like the plan, so it reads with the walls cut down too.
+      const arc: THREE.Vector3[] = [];
+      for (let k = 0; k <= 12; k++) {
+        const [px, pz] = open((90 * k) / 12);
+        arc.push(new THREE.Vector3(h[0] + px * L, high + 0.012, h[1] + pz * L));
+      }
+      arc.push(new THREE.Vector3(h[0], high + 0.012, h[1]));
+      group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(arc), M.swing));
+    }
+  }
+
+  /** Glass in an opening: a window with mullions, a glass door, or sliding doors. */
+  function glazed(at: Pt, w: number, alongX: boolean, rel: number, kind: string, h: number) {
     const g = new THREE.Group();
     g.position.set(at[0], rel, at[1]);
     g.rotation.y = alongX ? 0 : Math.PI / 2;
     const d = THICK + 0.04;
-    const bar = (mat: THREE.Material, cx: number, y0: number, bw: number, h: number, bd: number) => {
+    const bar = (mat: THREE.Material, cx: number, y0: number, bw: number, bh: number, bd: number, cz = 0) => {
       const m = new THREE.Mesh(unitBox, mat);
-      m.scale.set(bw, h, bd);
-      m.position.set(cx, y0, 0);
+      m.scale.set(bw, bh, bd);
+      m.position.set(cx, y0, cz);
       g.add(m);
     };
-    bar(M.pane, 0, 0, w, GLAZED, 0.03);
-    bar(M.white, -w / 2 + 0.05, 0, 0.1, GLAZED, d);
-    bar(M.white, w / 2 - 0.05, 0, 0.1, GLAZED, d);
-    bar(M.white, 0, GLAZED - 0.1, w, 0.1, d);
+    bar(M.white, -w / 2 + 0.05, 0, 0.1, h, d);
+    bar(M.white, w / 2 - 0.05, 0, 0.1, h, d);
+    bar(M.white, 0, h - 0.1, w, 0.1, d);
     bar(M.white, 0, 0, w, 0.06, d);
+    if (kind === 'sliding') {
+      // Two panes in two tracks, each a little over half the width.
+      const pw = w * 0.52 - 0.05;
+      for (const s of [-1, 1]) {
+        const cx = s * (w / 2 - 0.05 - pw / 2), cz = s * 0.035;
+        bar(M.pane, cx, 0.06, pw, h - 0.16, 0.02, cz);
+        bar(M.white, cx - pw / 2 + 0.03, 0.06, 0.06, h - 0.16, 0.05, cz);
+        bar(M.white, cx + pw / 2 - 0.03, 0.06, 0.06, h - 0.16, 0.05, cz);
+      }
+      return g;
+    }
+    bar(M.pane, 0, 0, w, h, 0.03);
     if (kind === 'window') {
       const panes = Math.max(2, Math.round(w / 1.1));
-      for (let k = 1; k < panes; k++) bar(M.white, -w / 2 + (w * k) / panes, 0, 0.06, GLAZED, d);
-      bar(M.white, 0, 2.0, w, 0.06, d);
+      for (let k = 1; k < panes; k++) bar(M.white, -w / 2 + (w * k) / panes, 0, 0.06, h, d);
+      bar(M.white, 0, Math.min(2.0, h - 0.5), w, 0.06, d);
     } else {
-      bar(M.white, 0, 0, 0.08, GLAZED, d); // two leaves
+      bar(M.white, 0, 0, 0.08, h, d); // two leaves
       for (const s of [-1, 1]) bar(M.cream, s * 0.12, 1.0, 0.04, 0.35, d + 0.08);
     }
     return g;
@@ -472,11 +641,11 @@ function init() {
   }
 
   /** Corner stones (quoins) at the outside corners, alternating long and short. */
-  function addQuoins(floor: string, r: RoomM, indoor: RoomM[], rel: number, height: number) {
+  function addQuoins(floor: string, r: RoomM, indoor: Pt[][], rel: number, height: number) {
     if (r.points.length !== 4) return;
     const [x, z, w, d] = r.rect;
     for (const [vx, vz, sx, sz] of [[x, z, -1, -1], [x + w, z, 1, -1], [x + w, z + d, 1, 1], [x, z + d, -1, 1]]) {
-      const free = (p: Pt) => !indoor.some((o) => inside(p, o.points));
+      const free = (p: Pt) => !indoor.some((o) => inside(p, o));
       if (!free([vx + sx * 0.4, vz + sz * 0.4]) || !free([vx + sx * 0.4, vz - sz * 0.4]) || !free([vx - sx * 0.4, vz + sz * 0.4])) continue;
       const n = Math.floor(height / 0.3);
       const inst = new THREE.InstancedMesh(unitBox, M.stone, n);
@@ -740,6 +909,7 @@ function init() {
       let h = fullFor(f);
       if (whole && f === topRoomFloor) h = EAVE - f.level; // under the roof
       else if (!whole && i === si) h = LOW;
+      h += w.extra;
       const from = w.mesh.scale.y;
       if (Math.abs(from - h) < 0.01) continue;
       tween(ms, (e) => {

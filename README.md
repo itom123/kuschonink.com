@@ -28,8 +28,12 @@ You can also walk through the house:
 - **Stairs.** The stairs are drawn on every floor: click *▲ Up* at the top of the
   stairs or *▼ Down* at the bottom to arrive on the stairs of the next floor. The
   roof has a hatch down to the attic.
-- **Next door.** Every room's panel lists the rooms beside it, by direction
-  (north is the top of the plan), plus the way up or down if you're on the stairs.
+- **Doors.** The plan draws every door as the drawings do: a gap in the wall, the
+  leaf and the quarter circle it swings through (sliding and glass doors as panes,
+  openings as a plain gap). The same doors show in a room's furniture plan and in 3D.
+- **Next door.** Every room's panel lists the rooms its doors lead to, by the wall the
+  door is in (north is the top of the plan), plus the way up or down if you're on the
+  stairs. A door onto a corridor or a lobby leads to every room off it.
 - **How the floors stack.** All floors share one camera, so changing floors keeps
   the same spot in view. Going up, the old floor sinks away; going down, it rises.
   The floor below shows as dashed lines, and through open-air rooms (terraces,
@@ -47,14 +51,15 @@ of the same rooms, in the house's own colours (`src/scripts/house3d.ts`), as a g
 Drag to turn it, scroll or pinch to zoom, use **R / A / 2 / 1** to cut the house away
 down to a floor, tick **Lift floors** to pull the storeys apart, and tick
 **Blueprint** to lay the original drawing on each floor and check the model against
-it. Click a room for its chapter. Rooms and levels come from `house.json`; the rest is
-traced from the drawings into `src/content/house3d.json`: doors and openings, glazing
-(the living room's picture window and glass door onto the porch, the attic's sliding
-doors), walls the rooms don't draw (the stair core), floor they leave out (the attic
-corridor), the stairs (a wooden U round the core from the ground floor to the first
-floor, then a straight flight to the attic; none to the roof), the stairwells, and the
-garage as a cellar a few steps down from the hall with a small stair up to a narrow
-loft. Edit that file to correct a door or a stair. The roof, columns, balustrades and
+it. Click a room for its chapter. Rooms, levels, doors, passages and the stair core's
+walls come from `house.json`, shared with the plan. Doors have frames and leaves standing
+open the way they swing, with the swing marked on the floor; the garage has its car door;
+glass and sliding doors are glazed. Each wall is built once, brick outside and white
+inside. The rest is traced from the drawings into `src/content/house3d.json`: the living
+room's picture window, the stairs (a wooden U round the core from the ground floor to the
+first floor, then a straight flight to the attic; none to the roof), the stairwells, and
+the garage as a cellar a few steps down from the hall with a small stair up to a narrow
+loft. Edit that file to correct a stair. The roof, columns, balustrades and
 corner stones are approximations from the south elevation and photos of the house.
 Both 3D views (this page and the small turning house on the floorplan) redraw when
 Chrome drops and restores their graphics context (a GPU process restart, a driver reset,
@@ -93,8 +98,17 @@ It's the missing chapter.
   `{ "page": "about" | "contact" | "writings" | "colophon" }`. To move a project,
   move its `contents` to another room. Rooms without `contents` are only described.
 - `stairs: "<floor id>"` marks the stairs room and where it leads up to. It draws
-  the *Up* link there and the *Down* link on that floor. "Next door" comes from
-  rooms that share a wall (locked rooms are left out).
+  the *Up* link there and the *Down* link on that floor.
+- `doors` on each floor, traced from the drawings: `at` is `[x0, y0, x1, y1]` along a
+  wall; `kind` is `door`, `double`, `opening`, `glass`, `sliding` or `garage`; `code` is
+  the label on the drawing (M0922 is 900 mm wide and 2200 mm high, which sets the height
+  in 3D); a `door` has a `hinge` (`start` or `end` of `at`) and says which room or passage
+  it swings `into`. Door codes and counts in the inventory, "Next door", the plan and the
+  3D model all come from this list. The build stops if a door isn't on a wall, opens
+  into a locked room, or if a room on a floor can't be reached from its stairs.
+- `passages` are floor that is no room (the first floor's lobby, the attic corridor),
+  as polygons; `walls` are walls the rooms don't draw (the stair core).
+  "Echoing" constraints still count rooms that share a wall.
 - `locked: true` makes a room impossible to enter.
 - `scan` places the original drawing under the traced rooms (the Blueprint layer).
 - `elevation.hotspots` are the clickable door and windows on the façade.

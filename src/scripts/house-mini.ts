@@ -19,8 +19,8 @@ type V3 = [number, number, number];
 export interface MiniData {
   floors: { id: string; level: number }[];
   rooms: { slug: string; floor: string; points: Pt[]; level: number; outdoor: boolean; locked: boolean; stairs: boolean }[];
-  /** Floor the rooms leave out (a lobby, a corridor), [x, z, w, d]. */
-  fills: Record<string, number[][]>;
+  /** Floor the rooms leave out (a lobby, a corridor), as polygons. */
+  fills: Record<string, Pt[][]>;
   doors: Record<string, Seg[]>;
   glazing: Record<string, Seg[]>;
 }
@@ -52,7 +52,6 @@ function inside([x, z]: Pt, poly: Pt[]) {
   }
   return hit;
 }
-const rectPoly = ([x, z, w, d]: number[]): Pt[] => [[x, z], [x + w, z], [x + w, z + d], [x, z + d]];
 
 interface Wall {
   a: Pt; b: Pt; n: Pt; y0: number; y1: number;
@@ -96,7 +95,7 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
   floors.forEach((f, i) => {
     if (f === roofFloor) return;
     const here = roomsOf(f.id);
-    const indoor = [...here.filter((r) => !r.outdoor).map((r) => r.points), ...(data.fills[f.id] ?? []).map(rectPoly)];
+    const indoor = [...here.filter((r) => !r.outdoor).map((r) => r.points), ...(data.fills[f.id] ?? [])];
     const doors = (data.doors[f.id] ?? []);
     const glass = (data.glazing[f.id] ?? []);
     const list: Wall[] = [];
@@ -322,7 +321,7 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
   }
 
   function drawSlabs(id: string, here: boolean, level: number) {
-    const fills = (data.fills[id] ?? []).map((r) => rectPoly(r));
+    const fills = data.fills[id] ?? [];
     for (const poly of fills) {
       path(poly.map(([x, z]): V3 => [x, level, z]));
       ctx!.fillStyle = '#fff';
