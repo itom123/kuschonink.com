@@ -2,7 +2,7 @@
 // A plan of the room's furniture. Drawers can be opened; objects inside open
 // on a sheet of paper. The pieces' text is NOT in this page: it is fetched
 // from its own unlisted page (/house/drawer/<id>) only when opened.
-import { furnitureOf, placementsIn, type Room } from '../../lib/house';
+import { furnitureOf, placementsIn, doorsOfRoom, doorPlan, type Room } from '../../lib/house';
 import Bi from '../Bi.astro';
 import { t, attr, text, drawerN } from '../../lib/i18n';
 
@@ -10,7 +10,9 @@ interface Props { room: Room }
 const { room } = Astro.props;
 const furniture = furnitureOf(room);
 const placed = placementsIn(room);
-const [, , W, H] = room.rect;
+const [X, Y, W, H] = room.rect;
+// The room's doors, in the room's own coordinates; leaves are drawn only where they swing into this room.
+const doors = doorsOfRoom(room.floor, room).map((d) => ({ d, p: doorPlan(d), inside: !d.into || d.into === room.id }));
 const pad = 120;
 const inDrawer = (fid: string, n: number) => placed.find((p) => p.furniture.id === fid && p.drawer === n);
 const years = (d: string) => d.slice(0, 4);
@@ -19,6 +21,15 @@ const years = (d: string) => d.slice(0, 4);
   <section class="interior" {...attr('aria-label', t.furnitureHere)}>
     <svg class="interior-plan" viewBox={`${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}`} role="group" {...attr('aria-label', { en: `Plan of the ${room.en.toLowerCase()} with furniture`, zh: `${room.zh}家具平面图` })}>
       <rect class="interior-walls" x="0" y="0" width={W} height={H} />
+      <g class="doors" transform={`translate(${-X} ${-Y})`} aria-hidden="true">
+        {doors.map(({ d, p, inside }) => (
+          <g class:list={['door', d.kind]}>
+            <line class="door-gap" x1={p.gap[0]} y1={p.gap[1]} x2={p.gap[2]} y2={p.gap[3]} />
+            {inside && p.swing && <path class="door-swing" d={p.swing} />}
+            {(inside || !p.swing) && <path class="door-leaf" d={p.marks} />}
+          </g>
+        ))}
+      </g>
       {furniture.map((f) => {
         const [x, y, w, h] = f.rect;
         const horizontal = w >= h;

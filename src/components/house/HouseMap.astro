@@ -1,7 +1,7 @@
 ---
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import { floors, rooms, house, floorBounds, roomPoints, stairsByFloor, type Room } from '../../lib/house';
+import { floors, rooms, house, floorBounds, roomPoints, stairsByFloor, doorsByFloor, doorPlan, type Room } from '../../lib/house';
 import { projects, imagesOf } from '../../lib/content';
 import { img } from '../../lib/images';
 import { t as tr, attr, text, chapter, floorZh, stairsTo } from '../../lib/i18n';
@@ -150,6 +150,20 @@ const roofIsPitch = (f: (typeof floors)[number]) => f.rooms.every((r) => r.outdo
               <a class:list={['room', { 'has-contents': !!r.contents, outdoor: r.outdoor, current: current?.slug === r.slug }]} href={`/house/${r.slug}`} data-slug={r.slug} {...attr('aria-label', { en: name('en'), zh: name('zh') })}>{inner}</a>
             );
           })}
+          {/* Doors as on the drawings: a gap in the wall, the leaf and its swing. */}
+          <g class="doors" aria-hidden="true">
+            {(f.walls ?? []).map(([x0, y0, x1, y1]) => <line class="wall" x1={x0} y1={y0} x2={x1} y2={y1} />)}
+            {(doorsByFloor.get(f.id) ?? []).map((d) => {
+              const p = doorPlan(d);
+              return (
+                <g class:list={['door', d.kind]}>
+                  <line class="door-gap" x1={p.gap[0]} y1={p.gap[1]} x2={p.gap[2]} y2={p.gap[3]} />
+                  {p.swing && <path class="door-swing" d={p.swing} />}
+                  <path class="door-leaf" d={p.marks} />
+                </g>
+              );
+            })}
+          </g>
           {stairBands(f).map((sb) => {
             const to = floorOf(sb.to.floor.id);
             const label = stairsTo(sb.dir, to);
