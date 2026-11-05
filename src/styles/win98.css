@@ -121,5 +121,17 @@ body.wm-loading, body.wm-loading * { cursor: progress !important; }
   .explorer { grid-template-columns: repeat(2, 1fr); }
   .explorer .thumb { width: 100%; height: auto; aspect-ratio: 4 / 3; }
 }
-.menu-lang { margin-left: auto; padding: 2px 6px; }
-.menu-lang button { padding: 0 3px; }
+
+/* The language switch in the tray: two small buttons, the current one pressed in. */
+.tray { display: flex; align-items: center; gap: 8px; padding: 0 6px 0 3px; }
+.tray-lang { gap: 0; }
+.tray .tray-lang button {
+  min-width: 0; min-height: 0; height: 22px; padding: 0 7px; font-size: 12px; text-decoration: none; cursor: pointer; color: #000; background: #c0c0c0;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+}
+.tray .tray-lang button[aria-pressed='true'] {
+  font-weight: bold; cursor: default;
+  box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080;
+  background: repeating-conic-gradient(#c0c0c0 0 25%, #fff 0 50%) 0 0 / 2px 2px;
+}
+.tray .tray-lang button:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }

@@ -37,8 +37,14 @@ You can also walk through the house:
 - **How the floors stack.** All floors share one camera, so changing floors keeps
   the same spot in view. Going up, the old floor sinks away; going down, it rises.
   The floor below shows as dashed lines, and through open-air rooms (terraces,
-  balconies, the roof). The little section beside the floor buttons shows which
-  storey you're on.
+  balconies, the roof).
+- **Where you are.** A small model of the whole house turns slowly beside the floor
+  buttons (`src/scripts/house-mini.ts`, plain canvas, no three.js): the floors below
+  yours stand whole with their doors, glass and windows, yours is cut open at waist
+  height, the floors above are faint. The room you're in is yellow, the part of the
+  plan on screen is outlined in blue, and the dot is where you are. Drag it to turn
+  it, double-click to face the front; it stands still with reduced motion. Its roof
+  and eaves come from `src/lib/house-shell.ts`, shared with the 3D house.
 
 **The house in 3D (test)** (`/house/3d`, `/house/3d?room=<room>`): a rough model
 of the same rooms, in the house's own colours (`src/scripts/house3d.ts`), as a guide.
@@ -55,6 +61,12 @@ first floor, then a straight flight to the attic; none to the roof), the stairwe
 the garage as a cellar a few steps down from the hall with a small stair up to a narrow
 loft. Edit that file to correct a stair. The roof, columns, balustrades and
 corner stones are approximations from the south elevation and photos of the house.
+Both 3D views (this page and the small turning house on the floorplan) redraw when
+Chrome drops and restores their graphics context (a GPU process restart, a driver reset,
+sleep, GPU memory running short) and when the device pixel ratio changes (another monitor,
+browser zoom). If WebGL doesn't come back, the page says so and offers to draw it again.
+To see what a browser reports about its graphics (WebGL / WebGL2, the GPU and ANGLE
+backend, limits, canvas sizes, context losses), add `?debug=3d` to `/house/3d` or `/house`.
 three.js is loaded only on this page. The page is `noindex` and is not in the sitemap.
 
 **The simple view** (`/`, `/image`, `/image/<slug>`, `/image/all`, `/about`, `/contact`):
@@ -147,10 +159,13 @@ objectLabel, html, references). The rules find it a drawer.
 
 ### Two languages: the 中/EN toggle
 
-Every page can be read in English or Chinese, one at a time. The **中 / EN**
-switch sits top right (in the house header, and in the simple view's menu bar).
-The choice is remembered in the browser; first-time visitors get Chinese if
-their browser is set to Chinese, English otherwise.
+Every page can be read in English or Chinese, one at a time. The language is
+picked automatically: first-time visitors get the first of their browser's
+preferred languages that the site has (so a browser set to French, then Chinese,
+gets Chinese), and English if neither is listed. The **中 / EN** switch changes it
+at any time: top right in the house header, and in the simple view as two
+buttons in the taskbar tray next to the clock (always visible, on phones too).
+Once someone uses the switch, their choice is remembered in the browser.
 
 How it works: each page carries both languages. Elements marked `data-l="en"` /
 `data-l="zh"` show only when that language is on (`src/styles/lang.css`), and

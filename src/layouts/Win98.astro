@@ -58,7 +58,6 @@ const underline = (text: string, key: string) => {
           {menuItems.map((m) => (
             <a href={m.href}><span data-l="en" set:html={underline(m.en, m.key)} /><span data-l="zh" lang="zh-Hans">{m.zh}(<u>{m.key.toUpperCase()}</u>)</span></a>
           ))}
-          <span class="menu-lang"><LangToggle /></span>
         </div>
         <div class="field-row address-row">
           <label for="address"><Bi t={t.address} /></label>
@@ -89,7 +88,7 @@ const underline = (text: string, key: string) => {
       </ul>
     </details>
     <span class="task-current"><Bi t={title} /></span>
-    <span class="tray"><time class="clock"></time></span>
+    <span class="tray"><LangToggle variant="tray" /><time class="clock"></time></span>
   </footer>
   <script>
     import { startWindowManager } from '../scripts/win98-wm';
