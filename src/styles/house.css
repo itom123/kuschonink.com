@@ -73,6 +73,7 @@ svg.floor[hidden] { display: none; }
 .grid line { stroke: #999; stroke-width: 1px; vector-effect: non-scaling-stroke; stroke-dasharray: 2 4; }
 .blueprint .grid { display: none; }
 .dim { font-size: calc(var(--px) * 11px); fill: #666; text-anchor: middle; dominant-baseline: middle; font-family: 'Times New Roman', serif; }
+.grid.dims-off .dim { display: none; }
 
 /* The floor below, seen faintly through open-air rooms and around the edges. */
 .ghost polygon { fill: none; stroke: #9a9a9a; stroke-width: 1px; vector-effect: non-scaling-stroke; stroke-dasharray: 3 3; pointer-events: none; }
@@ -102,25 +103,25 @@ a.room:focus-visible polygon { stroke: var(--link); stroke-width: 3px; }
 .door.garage .door-leaf { stroke-dasharray: 6 3; stroke-width: 1px; }
 .blueprint .doors { display: none; }
 
+/* Labels keep one size on screen (--label, --label-sub). Each time the floor is drawn, map.ts
+   fits every label to its room: on one line, on two, or not at all (fit-none) until you zoom in;
+   the full name is in the room's tooltip. */
+.house-map { --label: 15px; --label-sub: 13px; }
+@container house (max-width: 600px) { .house-map { --label: 12px; } }
 .room text { font-family: 'Times New Roman', Times, serif; pointer-events: none; }
 .label { text-anchor: middle; dominant-baseline: middle; }
-.label-main { font-size: calc(var(--px) * 15px); fill: var(--ink); }
+.label-main { font-size: calc(var(--px) * var(--label)); fill: var(--ink); }
 .room.has-contents .label-main { fill: var(--link); text-decoration: underline; }
 a.room.has-contents:visited .label-main { fill: var(--visited); }
-.label-en { font-size: calc(var(--px) * 12px); fill: #333; display: none; }
-.label-sub { font-size: calc(var(--px) * 13px); font-style: italic; fill: var(--ink); display: none; }
+.label-sub { font-size: calc(var(--px) * var(--label-sub)); font-style: italic; fill: var(--ink); display: none; }
+.label-sub.label-line { display: inline; }
+.label.fit-none, .stair-label.fit-none { display: none; }
 .chapter { font-size: calc(var(--px) * 12px); fill: #555; display: none; }
 .thumbs { display: none; }
 .thumbs image { opacity: 0.9; }
-.house-map[data-zoom-level='2'] .label-sub, .house-map[data-zoom-level='3'] .label-sub,
 .house-map[data-zoom-level='2'] .chapter, .house-map[data-zoom-level='3'] .chapter { display: inline; }
+.house-map .room .chapter.fit-none { display: none; }
 .house-map[data-zoom-level='2'] .thumbs, .house-map[data-zoom-level='3'] .thumbs { display: inline; }
-.house-map[data-zoom-level='2'] .label-en, .house-map[data-zoom-level='3'] .label-en { display: inline; }
-@container house (max-width: 600px) {
-  .label-main { font-size: calc(var(--px) * 12px); }
-  /* Zoomed out on a narrow window, only rooms with something in them are named. */
-  .house-map[data-zoom-level='1'] .room:not(.has-contents) .label { display: none; }
-}
 .blueprint .label, .blueprint .chapter { opacity: 0; }
 .blueprint a.room:hover .label, .blueprint a.room:focus .label, .blueprint .room.current .label { opacity: 1; paint-order: stroke; stroke: #fff; stroke-width: calc(var(--px) * 4px); }
 .house-map[data-zoom-level='2'] .room.has-contents .label { paint-order: stroke; stroke: var(--paper); stroke-width: calc(var(--px) * 4px); }

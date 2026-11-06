@@ -147,6 +147,7 @@ function initMap() {
     for (const svg of shown()) {
       if (svg.getAttribute('viewBox') !== box) svg.setAttribute('viewBox', box);
       if (svg.style.getPropertyValue('--px') !== px) svg.style.setProperty('--px', px);
+      fitLabels(svg, s);
     }
     pan.style.transform = '';
     drawn = { cx: view.cx, cy: view.cy, s, w: vw, h: vh, ox, oy };
@@ -161,6 +162,130 @@ function initMap() {
   /** Move the picture drawn for view d to where the current view puts it. */
   function shift(d: Drawn, s: number) {
     pan.style.transform = `translate(${(d.cx - view.cx) * s}px, ${(d.cy - view.cy) * s}px) scale(${s / d.s})`;
+  }
+
+  // ---- Labels that fit their rooms ----
+  // Labels keep one size on screen, so zoomed out a room's name can be wider than the room and
+  // run into its neighbours. Each time the floor is drawn, every label is fitted to its room:
+  // the name (and, from zoom level 2, the project's title) on one line each if they fit; the
+  // title, or the name, on two lines if that fits; otherwise no label (the room's tooltip still
+  // names it). Chapter numbers, stair captions and the grid's measurements give way the same way.
+  const ruler = document.createElement('canvas').getContext('2d');
+  const widths = new Map<string, number>();
+  /** A text's width at a font size of 1px, in the plan's typeface. */
+  function em(text: string, italic = false) {
+    const k = `${italic ? 'i' : 'n'}${text}`;
+    let w = widths.get(k);
+    if (w === undefined) {
+      if (ruler) {
+        ruler.font = `${italic ? 'italic ' : ''}100px "Times New Roman", Times, serif`;
+        w = ruler.measureText(text).width / 100;
+      } else w = [...text].length * 0.6;
+      widths.set(k, w);
+    }
+    return w;
+  }
+  /** Two lines from one, broken where it reads best: "Room / (south-west)", "Dining / room", "西南 / 房间". */
+  function twoLines(text: string): [string, string] | null {
+    const paren = text.search(/ [(（]/);
+    if (paren > 0) return [text.slice(0, paren), text.slice(paren + 1)];
+    const spaces = [...text.matchAll(/ /g)].map((m) => m.index!);
+    if (spaces.length) {
+      const uneven = (i: number) => Math.abs(em(text.slice(0, i)) - em(text.slice(i + 1)));
+      const i = spaces.reduce((a, b) => (uneven(b) < uneven(a) ? b : a));
+      return [text.slice(0, i), text.slice(i + 1)];
+    }
+    const chars = [...text];
+    if (chars.length < 4 || !/[\u3400-\u9fff]/.test(text)) return null;
+    const half = Math.ceil(chars.length / 2);
+    return [chars.slice(0, half).join(''), chars.slice(half).join('')];
+  }
+
+  type Line = { text: string; sub: boolean };
+  interface Label { el: SVGTextElement; x: string; main: string; sub: string; subClass: string; key: string }
+  interface Spot { w: number; h: number; stairs: boolean; labels: Label[]; chapter: SVGTextElement | null }
+  const spots = new Map<SVGSVGElement, { list: Spot[]; grid: SVGGElement | null; gap: number }>();
+  /** The rooms and stairs of a floor, with their sizes (mm) and labels, read once. */
+  function spotsOf(svg: SVGSVGElement) {
+    let f = spots.get(svg);
+    if (!f) {
+      const list = [...svg.querySelectorAll<SVGElement>('.room[data-w], .stair-link[data-w]')].map((el): Spot => ({
+        w: Number(el.dataset.w),
+        h: Number(el.dataset.h),
+        stairs: el.classList.contains('stair-link'),
+        chapter: el.querySelector<SVGTextElement>(':scope > .chapter'),
+        labels: [...el.querySelectorAll<SVGTextElement>(':scope > text.label, :scope > text.stair-label')].map((t) => {
+          const sub = t.querySelector('.label-sub');
+          return {
+            el: t,
+            x: t.getAttribute('x') ?? '0',
+            main: (t.querySelector('.label-main') ?? t).textContent!.trim(),
+            sub: sub?.textContent?.trim() ?? '',
+            subClass: sub?.getAttribute('class') ?? 'label-sub',
+            key: '',
+          };
+        }),
+      }));
+      const grid = svg.querySelector<SVGGElement>('.grid');
+      f = { list, grid, gap: Number(grid?.dataset.gap) || 0 };
+      spots.set(svg, f);
+    }
+    return f;
+  }
+
+  function fitLabels(svg: SVGSVGElement, s: number) {
+    const css = getComputedStyle(root!);
+    const fm = parseFloat(css.getPropertyValue('--label')) || 15;
+    const fs = parseFloat(css.getPropertyValue('--label-sub')) || 13;
+    const size = (l: Line) => (l.sub ? fs : fm);
+    const wide = (l: Line) => em(l.text, l.sub) * size(l);
+    const tall = (lines: Line[]) => lines.reduce((a, l) => a + 1.2 * size(l), 0);
+    const titles = view.z >= 1.8; // projects' titles join the names from zoom level 2
+    const f = spotsOf(svg);
+    f.grid?.classList.toggle('dims-off', f.gap * s < em('3600') * 11 + 14);
+    for (const spot of f.list) {
+      const W = spot.w * s - 10, H = spot.h * s - 6;
+      if (spot.stairs) {
+        for (const l of spot.labels) l.el.classList.toggle('fit-none', em(l.main) * 13 > W || 16 > H);
+        continue;
+      }
+      let chapter = spot.w * s >= 60 && spot.h * s >= 44;
+      for (const l of spot.labels) {
+        const name: Line = { text: l.main, sub: false };
+        const options: Line[][] = [];
+        if (titles && l.sub) {
+          options.push([name, { text: l.sub, sub: true }]);
+          const t2 = twoLines(l.sub);
+          if (t2) options.push([name, { text: t2[0], sub: true }, { text: t2[1], sub: true }]);
+        }
+        options.push([name]);
+        const n2 = twoLines(l.main);
+        if (n2) options.push([{ text: n2[0], sub: false }, { text: n2[1], sub: false }]);
+        const lines = options.find((o) => o.every((ln) => wide(ln) <= W) && tall(o) <= H);
+        const key = lines ? `${fm}/${fs}:${lines.map((ln) => `${+ln.sub}${ln.text}`).join('|')}` : 'none';
+        if (key !== l.key) {
+          l.key = key;
+          if (lines) setLines(l, lines, size);
+          l.el.classList.toggle('fit-none', !lines);
+        }
+        // The chapter number sits in the room's top left corner: only where it clears the label.
+        if (lines && (H - tall(lines)) / 2 < 18 && (W - Math.max(...lines.map(wide))) / 2 < 28) chapter = false;
+      }
+      spot.chapter?.classList.toggle('fit-none', !chapter);
+    }
+  }
+
+  /** Write a label's lines, as a block centred on the room. */
+  function setLines(l: Label, lines: Line[], size: (l: Line) => number) {
+    const drop = lines.slice(1).reduce((a, ln) => a + 1.2 * size(ln), 0);
+    l.el.replaceChildren(...lines.map((ln, i) => {
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      t.setAttribute('class', `${ln.sub ? l.subClass : 'label-main'} label-line`);
+      t.setAttribute('x', l.x);
+      t.setAttribute('dy', i ? '1.2em' : drop ? `${(-drop / 2 / size(ln)).toFixed(3)}em` : '0');
+      t.textContent = ln.text;
+      return t;
+    }));
   }
 
   /** Does the picture drawn for view d still fill the window (and look sharp enough)? */
