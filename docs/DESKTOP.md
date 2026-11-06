@@ -127,12 +127,35 @@ which one shows (`src/styles/lang.css`, `src/scripts/lang.ts`, words in
   takes `title` and `status` as `{ en, zh }`; toolbar buttons and Links (`Tool`,
   `QuickLink`), Start menu items (`MenuItem.zh`, e.g. `'程序(&P)'`) and desktop
   icons (`DeskIcon.zh`, `tipZh`) have a `zh` field.
-- **In the shell**, `tr({ en, zh })` picks a text now, and `shownText(el)` reads
-  an element in the language showing. Tooltips read `data-tip-zh`. Window
-  titles keep both languages (the taskbar copies them), and the browser tab's
-  title comes from each page's `title-en` / `title-zh` metas.
-- Not yet translated: menus built in the browser (right-click menus, menu
-  bars), most dialog boxes, the Control Panel, Run, Find and Help.
+- **In the shell**, text is a `Text`: a string, or `{ en, zh }` (`util.ts`).
+  `h()` takes it anywhere a string goes and keeps both languages, so whatever
+  is open changes the moment the switch is pressed:
+  - as a child, it becomes two `data-l` spans (inside `<option>` and
+    `<textarea>`, the language showing plus `data-text-en` / `-zh`);
+  - as `title`, `aria-label`, `placeholder`, `alt` or `value`, the language
+    showing plus `data-<attr>-en` / `-zh`, swapped by `lang.ts` (and by
+    `util.ts` for `value`);
+  - as `data-tip`, `data-help` or `data-type`, English plus `data-tip-zh` etc.,
+    read when the tooltip, What's This? note or Properties sheet opens.
+  `setText(el, text)` replaces what an element says. `tr(text)` picks one
+  language now (for things that are gone in a moment, like a tooltip), and
+  `shownText(el)` reads an element in the language showing.
+- Shared words (OK 确定, Cancel 取消, Yes 是…) and counts (`objects(n)`,
+  `images(n)`, `filesFound(n)`…) are in `words.ts`. Menus built in the browser
+  take `zh` beside `label`, with the English access key: `{ label: 'P&roperties',
+  zh: '属性(&R)' }`. `msgbox()` shows its buttons translated but still answers
+  with the English name (`'Yes'`, `'Retry'`…), and buttons carry `data-btn`.
+- `/desktop.json` has the Chinese names the programs need (`titleZh`,
+  `floorZh`, `typeZh`, `keywordsZh`…). Run and Find match names in either
+  language; Find shows its results in the language showing.
+- Window titles keep both languages (the taskbar and Start ▸ Documents copy
+  them), and the browser tab's title comes from each page's `title-en` /
+  `title-zh` metas.
+- Help topics (`src/content/help.json`) have `titleZh`, `keywordsZh` and
+  `htmlZh`; the Index is listed once per language, and Search finds words in
+  either.
+- What stays English: the BIOS lines at start-up (as on a real machine), the
+  name Guest, and content that has no Chinese yet.
 
 ## State
 

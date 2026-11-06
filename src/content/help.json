@@ -1,89 +1,125 @@
 {
-  "_comment": "Xiangyin 98 Help (/help). Each topic has an id (its #anchor), a title, an icon, index keywords and HTML. {email} and {instagram} are filled in from site.json.",
+  "_comment": "Xiangyin 98 Help (/help). Each topic has an id (its #anchor), a title, an icon, index keywords and HTML, in English and Chinese (titleZh, keywordsZh, htmlZh). {email} and {instagram} are filled in from site.json.",
   "topics": [
     {
       "id": "welcome",
       "title": "Welcome to Xiangyin 98",
+      "titleZh": "欢迎使用 Xiangyin 98",
       "icon": "welcome",
       "keywords": ["introduction", "getting started", "what is this"],
-      "html": "<p>This is the website of Xiangyin Gu, an artist based in London. It works like a computer from 1998: the work is kept in folders and programs on a desktop. You don’t need to know Windows to use it. Everything opens with the mouse, a finger or the keyboard.</p><p>The quickest ways in:</p><ul><li><a href=\"/image\">Projects</a>: every project, as a folder.</li><li><a href=\"/house/facade\">The House</a>: the same work, kept in the rooms of a house.</li><li><a href=\"/about\">About.doc</a> and <a href=\"/contact\">Contact</a>.</li></ul>"
+      "keywordsZh": ["简介", "入门", "这是什么网站"],
+      "html": "<p>This is the website of Xiangyin Gu, an artist based in London. It works like a computer from 1998: the work is kept in folders and programs on a desktop. You don’t need to know Windows to use it. Everything opens with the mouse, a finger or the keyboard.</p><p>The quickest ways in:</p><ul><li><a href=\"/image\">Projects</a>: every project, as a folder.</li><li><a href=\"/house/facade\">The House</a>: the same work, kept in the rooms of a house.</li><li><a href=\"/about\">About.doc</a> and <a href=\"/contact\">Contact</a>.</li></ul>",
+      "htmlZh": "<p>这是常驻伦敦的艺术家 Xiangyin Gu 的网站。它像一台1998年的电脑：作品存放在桌面上的文件夹和程序里。你不需要懂 Windows 也能使用它。一切都可以用鼠标、手指或键盘打开。</p><p>最快的入口：</p><ul><li><a href=\"/image\">作品</a>：每件作品都是一个文件夹。</li><li><a href=\"/house/facade\">房子</a>：同样的作品，存放在一座房子的房间里。</li><li><a href=\"/about\">关于.doc</a> 和 <a href=\"/contact\">联系</a>。</li></ul>"
     },
     {
       "id": "desktop",
       "title": "The desktop, Start menu and taskbar",
+      "titleZh": "桌面、“开始”菜单和任务栏",
       "icon": "desktop",
       "keywords": ["desktop", "icons", "Start menu", "taskbar", "clock", "Programs", "Documents", "Find", "Run", "Recycle Bin", "delete", "arrange"],
-      "html": "<p>The icons on the left of the screen are the <b>desktop</b>. Double-click an icon to open it. On a phone or tablet, tap it once.</p><p>The grey bar along the bottom is the <b>taskbar</b>. Click <b>Start</b> for a menu of everything on the site: Programs (each project, the House, About, Contact), recently opened Documents, Settings, Find, Help, Run and Shut Down.</p><p>Each open window has a button on the taskbar. Click a button to bring its window to the front; click it again to hide (minimise) the window. Rest the pointer on the clock to see the date. The speaker next to it turns sounds on and off.</p><p><b>Start → Find</b> looks for a project, a room, a page or a Help topic by name. <b>Start → Run</b> opens something when you know its name: type <code>hanabi</code>, <code>house</code> or <code>about</code> and press Enter.</p><p>To tidy the desktop, drag icons where you like, or right-click it and choose <b>Arrange Icons</b>. Icons you delete go to the <b>Recycle Bin</b>; open it to put them back.</p>"
+      "keywordsZh": ["桌面", "图标", "开始菜单", "任务栏", "时钟", "程序", "文档", "查找", "运行", "回收站", "删除", "排列图标"],
+      "html": "<p>The icons on the left of the screen are the <b>desktop</b>. Double-click an icon to open it. On a phone or tablet, tap it once.</p><p>The grey bar along the bottom is the <b>taskbar</b>. Click <b>Start</b> for a menu of everything on the site: Programs (each project, the House, About, Contact), recently opened Documents, Settings, Find, Help, Run and Shut Down.</p><p>Each open window has a button on the taskbar. Click a button to bring its window to the front; click it again to hide (minimise) the window. Rest the pointer on the clock to see the date. The speaker next to it turns sounds on and off.</p><p><b>Start → Find</b> looks for a project, a room, a page or a Help topic by name. <b>Start → Run</b> opens something when you know its name: type <code>hanabi</code>, <code>house</code> or <code>about</code> and press Enter.</p><p>To tidy the desktop, drag icons where you like, or right-click it and choose <b>Arrange Icons</b>. Icons you delete go to the <b>Recycle Bin</b>; open it to put them back.</p>",
+      "htmlZh": "<p>屏幕左边的图标就是<b>桌面</b>。双击一个图标即可打开它。在手机或平板电脑上，轻点一下就行。</p><p>屏幕底部的灰色长条是<b>任务栏</b>。单击<b>开始</b>会弹出一个菜单，里面有网站上的一切：程序（每件作品、房子、关于、联系）、最近打开的文档、设置、查找、帮助、运行和关闭系统。</p><p>每个打开的窗口在任务栏上都有一个按钮。单击按钮可以把它的窗口放到最前面；再单击一次就把窗口隐藏起来（最小化）。把指针停在时钟上可以看到日期。时钟旁边的喇叭可以打开或关闭声音。</p><p><b>开始 → 查找</b>按名称查找作品、房间、网页或帮助主题。<b>开始 → 运行</b>在你知道名称时直接打开它：键入 <code>花火</code>、<code>房子</code> 或 <code>关于</code>，然后按 Enter 键。</p><p>要整理桌面，可以把图标拖到你喜欢的地方，或者右击桌面并选择<b>排列图标</b>。删除的图标会进入<b>回收站</b>；打开回收站就能把它们放回去。</p>"
     },
     {
       "id": "mouse",
       "title": "Using the mouse",
+      "titleZh": "使用鼠标",
       "icon": "mouse",
       "keywords": ["click", "double-click", "right-click", "drag", "pointer", "pointer trails", "touch", "long-press", "select"],
-      "html": "<ul><li><b>Click</b> an icon to select it. <b>Double-click</b> to open it.</li><li><b>Right-click</b> almost anything (the desktop, an icon, a window’s title bar, a photograph, a link) for a menu of what you can do with it. On a touch screen, press and hold instead.</li><li><b>Drag</b> a window by its title bar to move it, or drag its edges to resize it. Drag icons to arrange the desktop.</li><li>Drag across an empty part of the desktop to select several icons at once.</li></ul><p>The pointer changes as it did in 1998: an hourglass while something opens, a hand over links. The ghost pointers that follow the mouse are <i>pointer trails</i>; you can switch them off in Control Panel → Mouse.</p>"
+      "keywordsZh": ["单击", "双击", "右击", "拖动", "指针", "指针轨迹", "触摸屏", "长按", "选定"],
+      "html": "<ul><li><b>Click</b> an icon to select it. <b>Double-click</b> to open it.</li><li><b>Right-click</b> almost anything (the desktop, an icon, a window’s title bar, a photograph, a link) for a menu of what you can do with it. On a touch screen, press and hold instead.</li><li><b>Drag</b> a window by its title bar to move it, or drag its edges to resize it. Drag icons to arrange the desktop.</li><li>Drag across an empty part of the desktop to select several icons at once.</li></ul><p>The pointer changes as it did in 1998: an hourglass while something opens, a hand over links. The ghost pointers that follow the mouse are <i>pointer trails</i>; you can switch them off in Control Panel → Mouse.</p>",
+      "htmlZh": "<ul><li><b>单击</b>图标可以选定它。<b>双击</b>可以打开它。</li><li>几乎所有东西（桌面、图标、窗口的标题栏、照片、链接）都可以<b>右击</b>，会弹出一个菜单，列出你可以对它做的事。在触摸屏上，改为按住不放。</li><li>按住窗口的标题栏<b>拖动</b>可以移动窗口，拖动它的边框可以调整大小。拖动图标可以整理桌面。</li><li>在桌面的空白处拖出一个方框，可以一次选定多个图标。</li></ul><p>指针会像1998年那样变化：打开东西时变成沙漏，移到链接上时变成一只手。跟着鼠标的那串淡淡的指针叫作<i>指针轨迹</i>；你可以在“控制面板 → 鼠标”中关掉它。</p>"
     },
     {
       "id": "keyboard",
       "title": "Using the keyboard",
+      "titleZh": "使用键盘",
       "icon": "keys",
       "keywords": ["keyboard", "shortcuts", "Tab", "Enter", "Esc", "Shift+F10", "F1", "Alt+F4", "F3", "Backspace", "Delete", "Ctrl+Esc"],
-      "html": "<table><tbody><tr><th><kbd>Tab</kbd>, <kbd>Shift</kbd>+<kbd>Tab</kbd></th><td>Move between icons, buttons and links</td></tr><tr><th><kbd>Enter</kbd></th><td>Open the selected icon or link</td></tr><tr><th>Arrow keys</th><td>Move between desktop icons and menu items; move around the house map</td></tr><tr><th><kbd>Esc</kbd></th><td>Close a menu or a dialog box</td></tr><tr><th><kbd>Shift</kbd>+<kbd>F10</kbd> or the Menu key</th><td>The right-click menu for the selected thing</td></tr><tr><th><kbd>F1</kbd></th><td>This Help (if your browser allows it). In a dialog box, it explains the setting you are on.</td></tr><tr><th><kbd>F3</kbd></th><td>Find, on the desktop and in folders</td></tr><tr><th><kbd>Backspace</kbd></th><td>Up one level, in folders and the House</td></tr><tr><th><kbd>Delete</kbd></th><td>Send the selected desktop icon to the Recycle Bin</td></tr><tr><th><kbd>Ctrl</kbd>+<kbd>Esc</kbd></th><td>Open the Start menu (if your computer allows it)</td></tr><tr><th><kbd>Alt</kbd>+<kbd>F4</kbd></th><td>Close the active window (if your browser allows it)</td></tr></tbody></table><p>Some shortcuts belong to your own computer or browser (for example <kbd>Alt</kbd>+<kbd>Tab</kbd> or <kbd>Ctrl</kbd>+<kbd>W</kbd>); those still do what they normally do.</p>"
+      "keywordsZh": ["键盘", "快捷键", "Tab", "Enter", "Esc", "Shift+F10", "F1", "Alt+F4", "F3", "Backspace", "Delete", "Ctrl+Esc"],
+      "html": "<table><tbody><tr><th><kbd>Tab</kbd>, <kbd>Shift</kbd>+<kbd>Tab</kbd></th><td>Move between icons, buttons and links</td></tr><tr><th><kbd>Enter</kbd></th><td>Open the selected icon or link</td></tr><tr><th>Arrow keys</th><td>Move between desktop icons and menu items; move around the house map</td></tr><tr><th><kbd>Esc</kbd></th><td>Close a menu or a dialog box</td></tr><tr><th><kbd>Shift</kbd>+<kbd>F10</kbd> or the Menu key</th><td>The right-click menu for the selected thing</td></tr><tr><th><kbd>F1</kbd></th><td>This Help (if your browser allows it). In a dialog box, it explains the setting you are on.</td></tr><tr><th><kbd>F3</kbd></th><td>Find, on the desktop and in folders</td></tr><tr><th><kbd>Backspace</kbd></th><td>Up one level, in folders and the House</td></tr><tr><th><kbd>Delete</kbd></th><td>Send the selected desktop icon to the Recycle Bin</td></tr><tr><th><kbd>Ctrl</kbd>+<kbd>Esc</kbd></th><td>Open the Start menu (if your computer allows it)</td></tr><tr><th><kbd>Alt</kbd>+<kbd>F4</kbd></th><td>Close the active window (if your browser allows it)</td></tr></tbody></table><p>Some shortcuts belong to your own computer or browser (for example <kbd>Alt</kbd>+<kbd>Tab</kbd> or <kbd>Ctrl</kbd>+<kbd>W</kbd>); those still do what they normally do.</p>",
+      "htmlZh": "<table><tbody><tr><th><kbd>Tab</kbd>、<kbd>Shift</kbd>+<kbd>Tab</kbd></th><td>在图标、按钮和链接之间移动</td></tr><tr><th><kbd>Enter</kbd></th><td>打开选定的图标或链接</td></tr><tr><th>方向键</th><td>在桌面图标和菜单项之间移动；在房子的地图上移动</td></tr><tr><th><kbd>Esc</kbd></th><td>关闭菜单或对话框</td></tr><tr><th><kbd>Shift</kbd>+<kbd>F10</kbd> 或菜单键</th><td>选定项目的右键菜单</td></tr><tr><th><kbd>F1</kbd></th><td>打开这个帮助（如果你的浏览器允许）。在对话框中，它会解释你所在的设置。</td></tr><tr><th><kbd>F3</kbd></th><td>查找，在桌面上和文件夹中都可以用</td></tr><tr><th><kbd>Backspace</kbd></th><td>在文件夹和房子中向上一级</td></tr><tr><th><kbd>Delete</kbd></th><td>把选定的桌面图标放入回收站</td></tr><tr><th><kbd>Ctrl</kbd>+<kbd>Esc</kbd></th><td>打开“开始”菜单（如果你的电脑允许）</td></tr><tr><th><kbd>Alt</kbd>+<kbd>F4</kbd></th><td>关闭当前窗口（如果你的浏览器允许）</td></tr></tbody></table><p>有些快捷键属于你自己的电脑或浏览器（例如 <kbd>Alt</kbd>+<kbd>Tab</kbd> 或 <kbd>Ctrl</kbd>+<kbd>W</kbd>）；它们仍然照常工作。</p>"
     },
     {
       "id": "windows",
       "title": "Windows",
+      "titleZh": "窗口",
       "icon": "run",
       "keywords": ["window", "minimise", "maximise", "close", "move", "resize", "Back", "Forward", "Up", "address bar", "Always maximize"],
-      "html": "<p>Every page opens in a window. The three buttons at the top right minimise, maximise (fill the screen) and close it. Double-click the title bar to maximise it or put it back. Windows can overlap: click one to bring it to the front.</p><p>Folders and the House have <b>Back</b>, <b>Forward</b> and <b>Up</b> buttons, and an Address bar you can type into, for example <code>C:\\xiangyin\\image</code> or <code>/house</code>. Your browser’s own Back button works too, and the browser’s address always shows the window in front, so you can share it or bookmark it.</p><p>If overlapping windows get in the way, choose <b>Always maximize windows</b> in Control Panel → Display: every window then fills the screen, like an ordinary website.</p>"
+      "keywordsZh": ["窗口", "最小化", "最大化", "关闭", "移动", "调整大小", "后退", "前进", "向上", "地址栏", "总是最大化窗口"],
+      "html": "<p>Every page opens in a window. The three buttons at the top right minimise, maximise (fill the screen) and close it. Double-click the title bar to maximise it or put it back. Windows can overlap: click one to bring it to the front.</p><p>Folders and the House have <b>Back</b>, <b>Forward</b> and <b>Up</b> buttons, and an Address bar you can type into, for example <code>C:\\xiangyin\\image</code> or <code>/house</code>. Your browser’s own Back button works too, and the browser’s address always shows the window in front, so you can share it or bookmark it.</p><p>If overlapping windows get in the way, choose <b>Always maximize windows</b> in Control Panel → Display: every window then fills the screen, like an ordinary website.</p>",
+      "htmlZh": "<p>每个网页都在一个窗口中打开。右上角的三个按钮分别用来最小化、最大化（铺满屏幕）和关闭窗口。双击标题栏可以最大化窗口，或者把它还原。窗口可以互相重叠：单击一个窗口就能把它放到最前面。</p><p>文件夹和房子有<b>后退</b>、<b>前进</b>和<b>向上</b>按钮，还有一个可以键入的地址栏，例如 <code>C:\\xiangyin\\image</code> 或 <code>/house</code>。浏览器自己的“后退”按钮也能用；浏览器的地址栏总是显示最前面的窗口，所以你可以分享它，或者把它加入书签。</p><p>如果重叠的窗口碍事，可以在“控制面板 → 显示”中选择<b>总是最大化窗口</b>：这样每个窗口都会铺满屏幕，就像普通的网站一样。</p>"
     },
     {
       "id": "projects",
       "title": "Looking at the work",
+      "titleZh": "浏览作品",
       "icon": "folder",
       "keywords": ["projects", "folder", "views", "thumbnails", "details", "sort", "Image Viewer", "photographs", "all on one page"],
-      "html": "<p>The <a href=\"/image\">Projects</a> folder holds every project. Choose a view: <b>Thumbnails</b>, <b>List</b> or <b>Details</b>. In Details, click a column heading to sort. Select a project to read about it on the left of the window; double-click to open it.</p><p>In a project, click a photograph to see it in the <b>Image Viewer</b>, where you can zoom in and step through the photographs. <a href=\"/image/all\">All projects on one page</a> shows everything in one long page.</p>"
+      "keywordsZh": ["作品", "文件夹", "查看", "缩略图", "详细资料", "排序", "图像查看器", "照片", "全部作品在一页"],
+      "html": "<p>The <a href=\"/image\">Projects</a> folder holds every project. Choose a view: <b>Thumbnails</b>, <b>List</b> or <b>Details</b>. In Details, click a column heading to sort. Select a project to read about it on the left of the window; double-click to open it.</p><p>In a project, click a photograph to see it in the <b>Image Viewer</b>, where you can zoom in and step through the photographs. <a href=\"/image/all\">All projects on one page</a> shows everything in one long page.</p>",
+      "htmlZh": "<p><a href=\"/image\">作品</a>文件夹里存放着每一件作品。选择一种查看方式：<b>缩略图</b>、<b>列表</b>或<b>详细资料</b>。在“详细资料”中，单击列标题可以排序。选定一件作品，窗口左边会显示关于它的介绍；双击即可打开它。</p><p>在作品中，单击一张照片就会在<b>图像查看器</b>中看到它，在那里你可以放大，也可以一张一张地浏览照片。<a href=\"/image/all\">全部作品在一页</a>把所有作品放在一个长长的页面里。</p>"
     },
     {
       "id": "house",
       "title": "Exploring the House",
+      "titleZh": "探索房子",
       "icon": "house",
       "keywords": ["house", "façade", "front door", "floorplan", "floors", "zoom", "search", "Blueprint", "rooms", "chapters", "constraints", "drawers", "room without a door"],
-      "html": "<p>The site is also a house, drawn from the plans of the 2008 renovation of the family house. Its front, the <a href=\"/house/facade\">south façade</a>, has a door and windows you can click.</p><p>Inside, the <a href=\"/house\">floorplan</a> works like a map: drag to move, scroll (or pinch) to zoom, and change floors with the buttons <b>R</b>, <b>A</b>, <b>2</b> and <b>1</b> (roof, attic, first floor, ground floor). Type in <b>Search this house</b> to find a room or a project. Tick <b>Blueprint</b> to see the original drawings.</p><p>Click a room to open it beside the plan. Every room has a chapter number, an inventory and a table of constraints. Some rooms have furniture with drawers: click a drawer to open it, then an object inside to read it.</p><p>One room has no door. It can’t be entered.</p>"
+      "keywordsZh": ["房子", "立面", "正门", "平面图", "楼层", "缩放", "搜索", "蓝图", "房间", "章节", "约束", "抽屉", "没有门的房间"],
+      "html": "<p>The site is also a house, drawn from the plans of the 2008 renovation of the family house. Its front, the <a href=\"/house/facade\">south façade</a>, has a door and windows you can click.</p><p>Inside, the <a href=\"/house\">floorplan</a> works like a map: drag to move, scroll (or pinch) to zoom, and change floors with the buttons <b>R</b>, <b>A</b>, <b>2</b> and <b>1</b> (roof, attic, first floor, ground floor). Type in <b>Search this house</b> to find a room or a project. Tick <b>Blueprint</b> to see the original drawings.</p><p>Click a room to open it beside the plan. Every room has a chapter number, an inventory and a table of constraints. Some rooms have furniture with drawers: click a drawer to open it, then an object inside to read it.</p><p>One room has no door. It can’t be entered.</p>",
+      "htmlZh": "<p>这个网站也是一座房子，取自家宅2008年翻修时的图纸。它的正面，也就是<a href=\"/house/facade\">南立面</a>，有一扇门和几扇窗户，都可以单击。</p><p>走进去，<a href=\"/house\">平面图</a>就像一张地图：拖动以移动，滚动（或双指缩放）以放大缩小，用 <b>R</b>、<b>A</b>、<b>2</b> 和 <b>1</b> 按钮切换楼层（屋顶、阁楼层、二层、一层）。在<b>搜索这座房子</b>中键入文字，可以找到一个房间或一件作品。勾选<b>蓝图</b>可以看到原始图纸。</p><p>单击一个房间，它会在平面图旁边打开。每个房间都有一个章节号、一份清单和一张约束表。有些房间里有带抽屉的家具：单击抽屉打开它，再单击里面的物件来阅读。</p><p>有一个房间没有门。它无法进入。</p>"
     },
     {
       "id": "rules",
       "title": "The rules of the house",
+      "titleZh": "房子的规则",
       "icon": "topic",
       "keywords": ["Perec", "knight’s tour", "Latin squares", "constraints", "Index", "Chronology", "Checklist"],
-      "html": "<p>The order of the rooms is set by a rule, after Georges Perec’s <i>Life A User’s Manual</i>: a knight moves across the house’s 5 × 5 structural grid, and the rooms are numbered in the order it first lands in them. Lists of sources, times and hidden things are dealt over the grid by Latin squares, and each room shows which of them it fulfils.</p><p>Read the <a href=\"/house/appendix/rules\">Rules of the house</a>, the <a href=\"/house/appendix/index\">Index</a>, the <a href=\"/house/appendix/chronology\">Chronology</a> and the <a href=\"/house/appendix/checklist\">Checklist of the chapters</a>.</p>"
+      "keywordsZh": ["佩雷克", "骑士巡游", "拉丁方", "约束", "索引", "年表", "章节清单"],
+      "html": "<p>The order of the rooms is set by a rule, after Georges Perec’s <i>Life A User’s Manual</i>: a knight moves across the house’s 5 × 5 structural grid, and the rooms are numbered in the order it first lands in them. Lists of sources, times and hidden things are dealt over the grid by Latin squares, and each room shows which of them it fulfils.</p><p>Read the <a href=\"/house/appendix/rules\">Rules of the house</a>, the <a href=\"/house/appendix/index\">Index</a>, the <a href=\"/house/appendix/chronology\">Chronology</a> and the <a href=\"/house/appendix/checklist\">Checklist of the chapters</a>.</p>",
+      "htmlZh": "<p>房间的顺序由一条规则决定，仿照乔治·佩雷克的《人生拼图版》：一个骑士（国际象棋里的马）在房子 5 × 5 的结构网格上移动，房间按它第一次落入的先后编号。来源、时间和隐藏之物的清单用拉丁方分配到网格上，每个房间都标明它满足了其中哪些。</p><p>请阅读<a href=\"/house/appendix/rules\">房子的规则</a>、<a href=\"/house/appendix/index\">索引</a>、<a href=\"/house/appendix/chronology\">年表</a>和<a href=\"/house/appendix/checklist\">章节清单</a>。</p>"
     },
     {
       "id": "contact",
       "title": "Getting in touch",
+      "titleZh": "取得联系",
       "icon": "mail",
       "keywords": ["contact", "message", "email", "Send", "Instagram"],
-      "html": "<p>Open <a href=\"/contact\">Contact</a> to write a message: fill in your name, your email address, a subject and the message, then click <b>Send</b>. You can also follow the work on <a href=\"{instagram}\" target=\"_blank\" rel=\"noopener\">Instagram</a>.</p>"
+      "keywordsZh": ["联系", "消息", "电子邮件", "发送", "Instagram"],
+      "html": "<p>Open <a href=\"/contact\">Contact</a> to write a message: fill in your name, your email address, a subject and the message, then click <b>Send</b>. You can also follow the work on <a href=\"{instagram}\" target=\"_blank\" rel=\"noopener\">Instagram</a>.</p>",
+      "htmlZh": "<p>打开<a href=\"/contact\">联系</a>来写一条消息：填写你的名字、电子邮箱地址、主题和内容，然后单击<b>发送</b>。你也可以在 <a href=\"{instagram}\" target=\"_blank\" rel=\"noopener\">Instagram</a> 上关注这些作品。</p>"
     },
     {
       "id": "settings",
       "title": "Changing the settings",
+      "titleZh": "更改设置",
       "icon": "control",
       "keywords": ["Control Panel", "settings", "wallpaper", "screen saver", "colour scheme", "High Contrast", "sounds", "Folder Options", "single-click", "What's This?", "Display", "Appearance", "Effects", "Restore Default Desktop"],
-      "html": "<p>Open <b>Start → Settings → Control Panel</b>.</p><ul><li><b>Display</b>: wallpaper (including some of the artist’s photographs), screen saver, colour scheme (<i>High Contrast</i> is easier to read), and effects such as dragging whole windows.</li><li><b>Mouse</b>: pointer trails, double-click speed and larger pointers.</li><li><b>Sounds</b>: turn sounds on or off and set the volume.</li><li><b>Folder Options</b>: open icons with a single click instead of a double-click.</li></ul><p>Not sure what a setting does? Click the <b>?</b> at the top right of the dialog box, then click the setting: a yellow note explains it. (Or press <kbd>F1</kbd> while it has the focus.)</p><p>Settings are kept in this browser only.</p>"
+      "keywordsZh": ["控制面板", "设置", "墙纸", "屏幕保护程序", "配色方案", "高对比", "声音", "文件夹选项", "单击打开", "这是什么？", "显示", "外观", "效果", "还原默认桌面"],
+      "html": "<p>Open <b>Start → Settings → Control Panel</b>.</p><ul><li><b>Display</b>: wallpaper (including some of the artist’s photographs), screen saver, colour scheme (<i>High Contrast</i> is easier to read), and effects such as dragging whole windows.</li><li><b>Mouse</b>: pointer trails, double-click speed and larger pointers.</li><li><b>Sounds</b>: turn sounds on or off and set the volume.</li><li><b>Folder Options</b>: open icons with a single click instead of a double-click.</li></ul><p>Not sure what a setting does? Click the <b>?</b> at the top right of the dialog box, then click the setting: a yellow note explains it. (Or press <kbd>F1</kbd> while it has the focus.)</p><p>Settings are kept in this browser only.</p>",
+      "htmlZh": "<p>打开<b>开始 → 设置 → 控制面板</b>。</p><ul><li><b>显示</b>：墙纸（包括艺术家的一些照片）、屏幕保护程序、配色方案（<i>高对比白色</i>更容易阅读），以及拖动时显示整个窗口之类的效果。</li><li><b>鼠标</b>：指针轨迹、双击速度和更大的指针。</li><li><b>声音</b>：打开或关闭声音，设置音量。</li><li><b>文件夹选项</b>：单击打开图标，而不是双击。</li></ul><p>不确定某个设置是做什么的？单击对话框右上角的 <b>?</b>，再单击那个设置：一张黄色的便笺会解释它。（或者在它获得焦点时按 <kbd>F1</kbd>。）</p><p>设置只保存在这个浏览器里。</p>"
     },
     {
       "id": "startup",
       "title": "Starting, logging off and shutting down",
+      "titleZh": "启动、注销和关闭系统",
       "icon": "shutdown",
       "keywords": ["start-up", "log on", "password", "Log Off", "Shut Down", "Restart", "Stand by"],
-      "html": "<p>The first time you visit in a browser session, Xiangyin 98 starts up and asks you to log on. There’s no account: type any name, or none, and press <b>OK</b> (<b>Cancel</b> works too). Click or press any key to skip the start-up screen.</p><p><b>Start → Log Off</b> shows the log-on box again. <b>Start → Shut Down</b> lets you shut the computer down (click to start again), restart it, or put it on stand-by.</p>"
+      "keywordsZh": ["启动", "登录", "密码", "注销", "关闭系统", "重新启动", "待机"],
+      "html": "<p>The first time you visit in a browser session, Xiangyin 98 starts up and asks you to log on. There’s no account: type any name, or none, and press <b>OK</b> (<b>Cancel</b> works too). Click or press any key to skip the start-up screen.</p><p><b>Start → Log Off</b> shows the log-on box again. <b>Start → Shut Down</b> lets you shut the computer down (click to start again), restart it, or put it on stand-by.</p>",
+      "htmlZh": "<p>在一次浏览器会话中第一次访问时，Xiangyin 98 会启动并请你登录。这里没有帐户：键入任意名称，或者不填，然后按<b>确定</b>（按<b>取消</b>也可以）。单击或按任意键可以跳过启动画面。</p><p><b>开始 → 注销</b>会再次显示登录框。<b>开始 → 关闭系统</b>可以关闭计算机（单击即可重新开始）、重新启动，或者让它待机。</p>"
     },
     {
       "id": "trouble",
       "title": "Troubleshooting",
+      "titleZh": "疑难解答",
       "icon": "question",
       "keywords": ["problems", "sound", "mute", "animations", "reduce motion", "too small", "browser menu", "Recycle Bin", "missing icon", "screen saver", "High Contrast", "colours"],
-      "html": "<dl><dt>I can’t hear anything.</dt><dd>Click the speaker next to the clock and untick <b>Mute</b>. On an iPhone, also check the silent switch.</dd><dt>I don’t like the pointer trails or the animations.</dt><dd>Control Panel → Mouse → untick <b>Show pointer trails</b>. If your device is set to reduce motion, they’re off already.</dd><dt>The windows are too small, or overlap.</dt><dd>Maximise the window (the middle button at the top right), or choose <b>Always maximize windows</b> in Control Panel → Display.</dd><dt>A page looks wrong.</dt><dd>Click <b>Refresh</b> in the window, or reload the page in your browser.</dd><dt>I’d like the browser’s own right-click menu.</dt><dd>Hold <b>Shift</b> while you right-click.</dd><dt>An icon has gone from the desktop.</dt><dd>Open the <b>Recycle Bin</b>, select the icon and click <b>Restore</b>. If the bin was emptied, open Control Panel → Display → Effects and click <b>Restore Default Desktop</b>.</dd><dt>The screen went dark, or photographs filled it.</dt><dd>That’s the screen saver. Move the mouse or press a key. To change or switch it off: Control Panel → Display → Screen Saver.</dd><dt>The colours are hard to read.</dt><dd>Control Panel → Display → Appearance → <b>High Contrast White</b>. Larger pointers are in Control Panel → Mouse.</dd></dl>"
+      "keywordsZh": ["问题", "声音", "静音", "动画", "减少动态效果", "太小", "浏览器菜单", "回收站", "图标不见了", "屏幕保护程序", "高对比", "颜色"],
+      "html": "<dl><dt>I can’t hear anything.</dt><dd>Click the speaker next to the clock and untick <b>Mute</b>. On an iPhone, also check the silent switch.</dd><dt>I don’t like the pointer trails or the animations.</dt><dd>Control Panel → Mouse → untick <b>Show pointer trails</b>. If your device is set to reduce motion, they’re off already.</dd><dt>The windows are too small, or overlap.</dt><dd>Maximise the window (the middle button at the top right), or choose <b>Always maximize windows</b> in Control Panel → Display.</dd><dt>A page looks wrong.</dt><dd>Click <b>Refresh</b> in the window, or reload the page in your browser.</dd><dt>I’d like the browser’s own right-click menu.</dt><dd>Hold <b>Shift</b> while you right-click.</dd><dt>An icon has gone from the desktop.</dt><dd>Open the <b>Recycle Bin</b>, select the icon and click <b>Restore</b>. If the bin was emptied, open Control Panel → Display → Effects and click <b>Restore Default Desktop</b>.</dd><dt>The screen went dark, or photographs filled it.</dt><dd>That’s the screen saver. Move the mouse or press a key. To change or switch it off: Control Panel → Display → Screen Saver.</dd><dt>The colours are hard to read.</dt><dd>Control Panel → Display → Appearance → <b>High Contrast White</b>. Larger pointers are in Control Panel → Mouse.</dd></dl>",
+      "htmlZh": "<dl><dt>我听不到任何声音。</dt><dd>单击时钟旁边的喇叭，取消勾选<b>静音</b>。在 iPhone 上，还要检查静音开关。</dd><dt>我不喜欢指针轨迹或动画。</dt><dd>控制面板 → 鼠标 → 取消勾选<b>显示指针轨迹</b>。如果你的设备设置了减少动态效果，它们已经是关闭的。</dd><dt>窗口太小，或者互相重叠。</dt><dd>最大化窗口（右上角中间的按钮），或者在“控制面板 → 显示”中选择<b>总是最大化窗口</b>。</dd><dt>网页显示不正常。</dt><dd>单击窗口中的<b>刷新</b>，或者在浏览器中重新加载网页。</dd><dt>我想用浏览器自己的右键菜单。</dt><dd>右击时按住 <b>Shift</b> 键。</dd><dt>桌面上的一个图标不见了。</dt><dd>打开<b>回收站</b>，选定那个图标，然后单击<b>还原</b>。如果回收站已经清空，请打开“控制面板 → 显示 → 效果”，然后单击<b>还原默认桌面</b>。</dd><dt>屏幕变黑了，或者满屏都是照片。</dt><dd>那是屏幕保护程序。移动鼠标或按一个键即可。要更改或关闭它：控制面板 → 显示 → 屏幕保护程序。</dd><dt>颜色看不清楚。</dt><dd>控制面板 → 显示 → 外观 → <b>高对比白色</b>。更大的指针在“控制面板 → 鼠标”中。</dd></dl>"
     }
   ]
 }

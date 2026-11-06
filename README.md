@@ -205,9 +205,12 @@ Where the words live:
     artist writes them).
 - Anything without a Chinese version shows its English in both modes, so a new
   project still works before it's translated. Fill in both when you can.
-- **The computer's own words** (window titles, toolbars, the Start menu, desktop
-  icons, the log-on screen, Welcome) are bilingual. Menus, dialog boxes, the
-  Control Panel and Help are in English for now.
+- **The computer's own words** are bilingual, in the terms of the Chinese
+  edition of Windows 98: window titles, toolbars, the Start menu, desktop icons,
+  the log-on screen, Welcome, right-click menus and menu bars, message boxes,
+  Properties, the Control Panel, Run, Find, the Image Viewer and Help. Whatever
+  is open changes as soon as the switch is pressed. How to add words:
+  `docs/DESKTOP.md`, "Two languages".
 
 ### Contact form
 
