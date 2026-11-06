@@ -6,47 +6,61 @@ import '../styles/vendor/98css/98.css';
 import '../styles/blocks.css';
 import '../styles/win98.css';
 import { site } from '../lib/content';
+import { t, attr, type Bi as BiText } from '../lib/i18n';
+import Bi from '../components/Bi.astro';
+import LangToggle from '../components/LangToggle.astro';
 import type { Seo } from '../lib/types';
 
 interface Props {
   seo: Seo;
   image?: string;
   /** Window title */
-  title: string;
-  /** Fake address, e.g. C:\kuschonink\image */
+  title: BiText;
+  /** Fake address, e.g. C:\xiangyin\image */
   address: string;
   houseHref?: string;
-  status?: string;
+  status?: BiText;
 }
-const { seo, image, title, address, houseHref = '/house', status } = Astro.props;
+const { seo, image, title, address, houseHref = '/house/facade', status } = Astro.props;
+// Menu items with their keyboard letter underlined, Windows style: "Projects" / "作品(P)".
+const menu = (en: string, key: string, zh: string) => ({ en, key, zh });
+const menuItems = [
+  { href: '/image', ...menu('Projects', 'P', t.projects.zh) },
+  { href: '/image/all', ...menu('All on one page', 'A', t.allOnOnePage.zh) },
+  { href: '/about', ...menu('About', 'b', t.about.zh) },
+  { href: '/contact', ...menu('Contact', 'C', t.contact.zh) },
+  { href: houseHref, ...menu('The House', 'T', t.theHouse.zh) },
+];
+const underline = (text: string, key: string) => {
+  const i = text.indexOf(key);
+  return i < 0 ? text : `${text.slice(0, i)}<u>${key}</u>${text.slice(i + 1)}`;
+};
 ---
 <Base seo={seo} image={image} bodyClass="win98">
   <div class="desktop">
-    <nav class="desktop-icons" aria-label="Desktop">
-      <a href="/image" class="desk-icon"><span class="ico ico-folder" aria-hidden="true"></span>Projects</a>
-      <a href={houseHref} class="desk-icon"><span class="ico ico-house" aria-hidden="true"></span>The House</a>
-      <a href="/about" class="desk-icon"><span class="ico ico-doc" aria-hidden="true"></span>About.txt</a>
-      <a href="/contact" class="desk-icon"><span class="ico ico-mail" aria-hidden="true"></span>Contact</a>
+    <nav class="desktop-icons" {...attr('aria-label', t.desktop)}>
+      <a href="/image" class="desk-icon"><span class="ico ico-folder" aria-hidden="true"></span><span class="label"><Bi t={t.projects} /></span></a>
+      <a href={houseHref} class="desk-icon"><span class="ico ico-house" aria-hidden="true"></span><span class="label"><Bi t={t.theHouse} /></span></a>
+      <a href="/about" class="desk-icon"><span class="ico ico-doc" aria-hidden="true"></span><span class="label"><Bi t={{ en: 'About.txt', zh: '关于.txt' }} /></span></a>
+      <a href="/contact" class="desk-icon"><span class="ico ico-mail" aria-hidden="true"></span><span class="label"><Bi t={t.contact} /></span></a>
     </nav>
     <main class="window main-window">
       <div class="title-bar">
-        <div class="title-bar-text">{title} — {site.name}</div>
+        <div class="title-bar-text"><Bi t={title} /> — {site.name}</div>
         <div class="title-bar-controls">
-          <button aria-label="Minimize" disabled></button>
-          <button aria-label="Maximize" disabled></button>
-          <a href={houseHref} class="close-link" aria-label="Close and go to the house"><button aria-label="Close" tabindex="-1"></button></a>
+          <button {...attr('aria-label', { en: 'Minimize', zh: '最小化' })} disabled></button>
+          <button {...attr('aria-label', { en: 'Maximize', zh: '最大化' })} disabled></button>
+          <a href={houseHref} class="close-link" {...attr('aria-label', { en: 'Close and go to the house', zh: '关闭并前往房子' })}><button {...attr('aria-label', { en: 'Close', zh: '关闭' })} tabindex="-1"></button></a>
         </div>
       </div>
       <div class="window-body">
-        <div class="menu-bar" role="navigation" aria-label="Menu">
-          <a href="/image"><u>P</u>rojects</a>
-          <a href="/image/all"><u>A</u>ll on one page</a>
-          <a href="/about">A<u>b</u>out</a>
-          <a href="/contact"><u>C</u>ontact</a>
-          <a href={houseHref}><u>T</u>he House</a>
+        <div class="menu-bar" role="navigation" {...attr('aria-label', t.menu)}>
+          {menuItems.map((m) => (
+            <a href={m.href}><span data-l="en" set:html={underline(m.en, m.key)} /><span data-l="zh" lang="zh-Hans">{m.zh}(<u>{m.key.toUpperCase()}</u>)</span></a>
+          ))}
         </div>
         <div class="field-row address-row">
-          <label for="address">Address</label>
+          <label for="address"><Bi t={t.address} /></label>
           <input id="address" type="text" value={address} readonly />
         </div>
         <div class="page sunken-panel">
@@ -54,31 +68,34 @@ const { seo, image, title, address, houseHref = '/house', status } = Astro.props
         </div>
         {status && (
           <div class="status-bar">
-            <p class="status-bar-field">{status}</p>
+            <p class="status-bar-field"><Bi t={status} /></p>
             <p class="status-bar-field">{site.name}</p>
           </div>
         )}
       </div>
     </main>
   </div>
-  <footer class="taskbar">
+<footer class="taskbar">
     <details class="start">
-      <summary><span class="start-flag" aria-hidden="true"></span><b>Start</b></summary>
+      <summary><span class="start-flag" aria-hidden="true"></span><b><Bi t={t.start} /></b></summary>
       <ul class="start-menu window">
-        <li><a href={houseHref}>The House</a></li>
-        <li><a href="/image">Projects</a></li>
-        <li><a href="/image/all">All projects on one page</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/contact">Contact</a></li>
+        <li><a href={houseHref}><Bi t={t.theHouse} /></a></li>
+        <li><a href="/image"><Bi t={t.projects} /></a></li>
+        <li><a href="/image/all"><Bi t={t.allProjectsOnOnePage} /></a></li>
+        <li><a href="/about"><Bi t={t.about} /></a></li>
+        <li><a href="/contact"><Bi t={t.contact} /></a></li>
         <li><a href={site.social[0].href} target="_blank" rel="noopener">Instagram</a></li>
       </ul>
     </details>
-    <span class="task-current">{title}</span>
-    <span class="tray"><time class="clock"></time></span>
+    <span class="task-current"><Bi t={title} /></span>
+    <span class="tray"><LangToggle variant="tray" /><time class="clock"></time></span>
   </footer>
   <script>
+    import { startWindowManager } from '../scripts/win98-wm';
+    startWindowManager();
     const c = document.querySelector('.clock');
-    const tick = () => { if (c) c.textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); };
+    const tick = () => { if (c) c.textContent = new Date().toLocaleTimeString(document.documentElement.lang || [], { hour: 'numeric', minute: '2-digit' }); };
     tick(); setInterval(tick, 15000);
+    document.addEventListener('langchange', tick);
   </script>
 </Base>

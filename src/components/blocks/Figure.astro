@@ -1,6 +1,7 @@
 ---
 import type { ImageRef } from '../../lib/types';
 import ResponsiveImage from '../ResponsiveImage.astro';
+import Caption from '../Caption.astro';
 interface Props { image: ImageRef; eager?: boolean }
 const { image, eager } = Astro.props;
 ---
@@ -10,5 +11,5 @@ const { image, eager } = Astro.props;
   ) : (
     <ResponsiveImage image={image} sizes="(max-width: 800px) 100vw, 1200px" eager={eager} />
   )}
-  {image.caption && <figcaption set:html={image.caption} />}
+  <Caption text={image.caption} zh={image.captionZh} />
 </figure>

@@ -1,0 +1,16 @@
+---
+// The 中/EN switch. The choice is remembered in the browser (src/scripts/lang.ts).
+// "text": underlined words, for the house header. "tray": two Windows 98 buttons
+// for the simple view's taskbar, the current language pressed in.
+interface Props { variant?: 'text' | 'tray' }
+const { variant = 'text' } = Astro.props;
+---
+{variant === 'tray' ? (
+  <span class="lang-toggle tray-lang" role="group" aria-label="Language · 语言" title="Language · 语言">
+    <button type="button" data-lang-toggle="zh" lang="zh-Hans" aria-pressed="false">中文</button><button type="button" data-lang-toggle="en" lang="en" aria-pressed="true">EN</button>
+  </span>
+) : (
+  <span class="lang-toggle" role="group" aria-label="Language · 语言">
+    <button type="button" data-lang-toggle="zh" lang="zh-Hans" aria-pressed="false">中</button><span aria-hidden="true">/</span><button type="button" data-lang-toggle="en" lang="en" aria-pressed="true">EN</button>
+  </span>
+)}

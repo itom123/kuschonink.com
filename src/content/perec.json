@@ -10,20 +10,23 @@
           "label": "the municipal governmental archive",
           "match": [
             "municipal"
-          ]
+          ],
+          "zh": "市政府档案馆"
         },
         {
           "label": "British declassified documents on China (National Archives)",
           "match": [
             "declassified",
             "National Archives"
-          ]
+          ],
+          "zh": "英国解密的涉华档案（英国国家档案馆）"
         },
         {
           "label": "textual writings from artist research; novelistic writing",
           "match": [
             "writing"
-          ]
+          ],
+          "zh": "艺术研究中的文字写作；小说式写作"
         },
         {
           "label": "maternal family photographs",
@@ -31,15 +34,18 @@
             "family photograph",
             "family history",
             "maternal"
-          ]
+          ],
+          "zh": "母系家族照片"
         },
         {
           "label": "diary entries from my maternal grandfather",
           "match": [
             "diary"
-          ]
+          ],
+          "zh": "外祖父的日记"
         }
-      ]
+      ],
+      "zh": "来源"
     },
     {
       "id": "time",
@@ -50,7 +56,8 @@
           "label": "early 1990s: the land is bought",
           "match": [
             "1990"
-          ]
+          ],
+          "zh": "1990年代初：买下土地"
         },
         {
           "label": "late 1990s: the house is built",
@@ -58,27 +65,32 @@
             "1998",
             "1999",
             "construction"
-          ]
+          ],
+          "zh": "1990年代末：房子建成"
         },
         {
           "label": "the years of my birth",
           "match": [
             "born"
-          ]
+          ],
+          "zh": "我出生的那些年"
         },
         {
           "label": "2008: the last renovation",
           "match": [
             "2008"
-          ]
+          ],
+          "zh": "2008年：最后一次翻修"
         },
         {
           "label": "2025: the floorplan is found again",
           "match": [
             "2025"
-          ]
+          ],
+          "zh": "2025年：平面图重新被找到"
         }
-      ]
+      ],
+      "zh": "时间"
     },
     {
       "id": "object",
@@ -91,19 +103,22 @@
           "match": [
             "Surgical Clinics",
             "1989"
-          ]
+          ],
+          "zh": "《北美外科临床》第69卷第3期，1989年6月"
         },
         {
           "label": "a Hasselblad 500C",
           "match": [
             "Hasselblad"
-          ]
+          ],
+          "zh": "一台哈苏 500C"
         },
         {
           "label": "the red bin chutes of the building site",
           "match": [
             "chute"
-          ]
+          ],
+          "zh": "工地上的红色垃圾滑槽"
         },
         {
           "label": "the floor/house plan",
@@ -112,7 +127,8 @@
             "floor plan",
             "house plan",
             "blueprint"
-          ]
+          ],
+          "zh": "平面图／房屋图纸"
         },
         {
           "label": "a slide projector",
@@ -120,9 +136,11 @@
             "projector",
             "projection",
             "slide"
-          ]
+          ],
+          "zh": "一台幻灯机"
         }
-      ]
+      ],
+      "zh": "物件"
     },
     {
       "id": "quote",
@@ -134,35 +152,41 @@
           "label": "Milan Kundera",
           "match": [
             "Kundera"
-          ]
+          ],
+          "zh": "米兰·昆德拉"
         },
         {
           "label": "Louise Glück",
           "match": [
             "Glück",
             "Gluck"
-          ]
+          ],
+          "zh": "露易丝·格丽克"
         },
         {
           "label": "Nakahira Takuma, Degree Zero",
           "match": [
             "Nakahira",
             "中平"
-          ]
+          ],
+          "zh": "中平卓马，《零度》"
         },
         {
           "label": "William Blake",
           "match": [
             "Blake"
-          ]
+          ],
+          "zh": "威廉·布莱克"
         },
         {
           "label": "“Like a Spoon of Sugar” (my poem)",
           "match": [
             "Spoon of Sugar"
-          ]
+          ],
+          "zh": "《像一勺糖》（我的诗）"
         }
-      ]
+      ],
+      "zh": "引用文献"
     },
     {
       "id": "sign",
@@ -175,99 +199,132 @@
           "match": [
             "Suzhou",
             "苏州"
-          ]
+          ],
+          "zh": "苏州"
         },
         {
           "label": "London",
           "match": [
             "London"
-          ]
+          ],
+          "zh": "伦敦"
         },
         {
           "label": "the Royal College of Art",
           "match": [
             "Royal College of Art",
             "RCA"
-          ]
+          ],
+          "zh": "英国皇家艺术学院"
         },
         {
           "label": "my paternal grandparents",
           "match": [
             "paternal"
-          ]
+          ],
+          "zh": "我的爷爷奶奶"
         },
         {
           "label": "my grandfather",
           "match": [
             "grandfather"
-          ]
+          ],
+          "zh": "我的祖父"
         }
-      ]
+      ],
+      "zh": "自传符号"
     }
   ],
   "clinamen": "On each floor, the last room the knight reaches breaks its quoted-document constraint on purpose.",
   "chronology": [
     {
       "when": "early 1990s",
-      "what": "My grandparents buy the land, with two other plots of similar size; they sell the others and keep this one."
+      "what": "My grandparents buy the land, with two other plots of similar size; they sell the others and keep this one.",
+      "whenZh": "1990年代初",
+      "whatZh": "我的祖父母买下这块地，连同另外两块大小相近的地；他们卖掉了另外两块，留下了这一块。"
     },
     {
       "when": "late 1990s",
-      "what": "My grandfather begins the first major construction. My father, just married, helps with the planning and errands."
+      "what": "My grandfather begins the first major construction. My father, just married, helps with the planning and errands.",
+      "whenZh": "1990年代末",
+      "whatZh": "我的祖父开始第一次大规模的建造。我的父亲刚刚结婚，帮忙做规划、跑腿。"
     },
     {
       "when": "the same years",
-      "what": "The house is built and furnished, and I am born. My birth is tied to the fate of the house."
+      "what": "The house is built and furnished, and I am born. My birth is tied to the fate of the house.",
+      "whenZh": "同一时期",
+      "whatZh": "房子建成、布置妥当，我也出生了。我的出生与这座房子的命运联系在一起。"
     },
     {
       "when": "2008",
       "what": "The last major renovation. The digital floor/house plans are the only remaining trace of the original design.",
-      "room": "attic/blind-room"
+      "room": "attic/blind-room",
+      "whenZh": "2008年",
+      "whatZh": "最后一次大规模翻修。电子版的平面图／房屋图纸是原始设计仅存的痕迹。"
     },
     {
       "when": "15–19 Aug 2022",
       "what": "After the Waiting Room, Copeland Gallery, London.",
-      "room": "f1/garage"
+      "room": "f1/garage",
+      "whenZh": "2022年8月15–19日",
+      "whatZh": "《After the Waiting Room》，Copeland Gallery，伦敦。"
     },
     {
       "when": "19–25 Nov 2022",
       "what": "What a Waste, The Koppel Project Hive, London.",
-      "room": "f2/sitting-room"
+      "room": "f2/sitting-room",
+      "whenZh": "2022年11月19–25日",
+      "whatZh": "《What a Waste》，The Koppel Project Hive，伦敦。"
     },
     {
       "when": "2023",
       "what": "Fresh Eyes International Talents, 2023 edition, GUP.",
-      "room": "f2/sitting-room"
+      "room": "f2/sitting-room",
+      "whenZh": "2023年",
+      "whatZh": "Fresh Eyes International Talents，2023年度，GUP。"
     },
     {
       "when": "14–15 Apr 2023",
       "what": "Hot Sheet 2023, Downstairs at The Department Store, London.",
-      "room": "f2/sitting-room"
+      "room": "f2/sitting-room",
+      "whenZh": "2023年4月14–15日",
+      "whatZh": "Hot Sheet 2023，Downstairs at The Department Store，伦敦。"
     },
     {
       "when": "2–10 Feb 2024",
       "what": "It Says Forget at CHASMA, Beaconsfield, London.",
-      "room": "f1/east-bathroom"
+      "room": "f1/east-bathroom",
+      "whenZh": "2024年2月2–10日",
+      "whatZh": "《It Says Forget》，CHASMA，Beaconsfield，伦敦。"
     },
     {
       "when": "30 Apr 2024",
       "what": "William Blake and Conflict Beyond Borders and Forms, Fitzwilliam Museum, Cambridge.",
-      "room": "f2/terrace"
+      "room": "f2/terrace",
+      "whenZh": "2024年4月30日",
+      "whatZh": "《William Blake and Conflict Beyond Borders and Forms》，菲茨威廉博物馆，剑桥。"
     },
     {
       "when": "26 Aug – 28 Sep 2024",
       "what": "AFMP Exhibition, FotoFilmic, Bowen Island, BC.",
-      "room": "f1/kitchen"
+      "room": "f1/kitchen",
+      "whenZh": "2024年8月26日–9月28日",
+      "whatZh": "AFMP 展览，FotoFilmic，鲍恩岛，不列颠哥伦比亚省。"
     },
     {
       "when": "2025",
       "what": "After much effort, the floor/house plan is fetched from a family elder friend. The original blueprint is supposedly lost.",
-      "room": "roof/roof"
+      "room": "roof/roof",
+      "whenZh": "2025年",
+      "whatZh": "几经周折，平面图／房屋图纸从一位家中长辈的朋友那里取回。原始蓝图据说已经遗失。"
     },
     {
       "when": "16 Jul – 16 Aug 2025",
       "what": "Room We Didn't Build, with Lujane Pagganwala and Maya Silverberg, Norito Gallery, London.",
-      "room": "f2/study"
+      "room": "f2/study",
+      "whenZh": "2025年7月16日–8月16日",
+      "whatZh": "《Room We Didn’t Build》，与 Lujane Pagganwala、Maya Silverberg 合作，Norito Gallery，伦敦。"
     }
-  ]
+  ],
+  "clinamenZh": "每一层上，骑士最后到达的房间会故意打破它的“引用文献”约束。"
 }
