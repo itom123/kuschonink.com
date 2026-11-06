@@ -21,7 +21,9 @@ Ground rules:
   "reduce motion".** On a touch screen a double-tap is two taps, never a zoom
   (`touch-action: manipulation` on every element, in `desktop.css`; whatever
   handles touches itself sets its own), and on an iPhone or iPad typing in a
-  text box doesn't zoom the page (`textzoom.ts`). Pinching still zooms.
+  text box doesn't zoom the page (`textzoom.ts`). Pinching still zooms. A tap
+  opens an icon, and a double-tap opens it once: its second tap is dropped,
+  even if the window has already opened under the finger (`icons.ts`).
 
 ## The pieces
 
@@ -47,7 +49,7 @@ Ground rules:
 | --- | --- |
 | `index.ts` | Starts everything; registers commands; loads the larger programs on first use |
 | `wm.ts` | Window manager: focus, stacking, move (outline or full), resize, minimise, maximise, modal dialogs |
-| `router.ts` | Opens pages in windows: fetches the page, swaps the window, keeps the browser's address and history in step |
+| `router.ts` | Opens pages in windows: fetches the page, swaps the window, keeps the browser's address and history in step. A page asked for twice is fetched once; a navigation that's overtaken stops waiting but doesn't cancel the request the newer one waits for |
 | `taskbar.ts`, `startmenu.ts`, `tray.ts` | Taskbar buttons, clock, Start menu (Documents ▸ remembers recent pages), volume |
 | `menu.ts`, `menubar.ts`, `winmenus.ts`, `contextmenu.ts` | One menu engine for the Start menu, menu bars and right-click menus (press and hold on touch, Shift+F10) |
 | `icons.ts` | Icons on the desktop and in folders: select, double-click, drag, rubber band, arrow keys |

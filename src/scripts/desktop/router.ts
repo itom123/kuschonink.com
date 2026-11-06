@@ -47,6 +47,17 @@ function isPageUrl(url: URL) {
   return !/\.[a-z0-9]+$/i.test(p) || p.endsWith('.html');
 }
 
+/** Wait for a page unless `signal` gives up first. The request itself goes on, for whoever else is waiting for it. */
+function until<T>(p: Promise<T>, signal?: AbortSignal): Promise<T> {
+  if (!signal) return p;
+  if (signal.aborted) return Promise.reject(new DOMException('Aborted', 'AbortError'));
+  return new Promise<T>((resolve, reject) => {
+    const stop = () => reject(new DOMException('Aborted', 'AbortError'));
+    signal.addEventListener('abort', stop, { once: true });
+    p.then(resolve, reject).finally(() => signal.removeEventListener('abort', stop));
+  });
+}
+
 async function fetchPage(url: URL, reload = false, signal?: AbortSignal): Promise<Page> {
   const key = cleanPath(url.pathname);
   if (!reload) {
@@ -57,14 +68,16 @@ async function fetchPage(url: URL, reload = false, signal?: AbortSignal): Promis
       return hit;
     }
     const pending = inflight.get(key);
-    if (pending) return pending;
+    if (pending) return until(pending, signal);
   }
   const p = (async () => {
     const res = await fetch(url.pathname, {
       headers: { Accept: 'text/html' },
       cache: reload ? 'no-cache' : 'default',
       credentials: 'same-origin',
-      signal,
+      // A shared request isn't stopped by one of those waiting for it (a double-tap's
+      // second navigation stops the first, and then waits for the same page).
+      signal: reload ? signal : undefined,
     });
     if (new URL(res.url).origin !== location.origin) throw new Error('cross-origin');
     if (!(res.headers.get('content-type') ?? '').includes('text/html')) throw new Error('not-html');
@@ -78,6 +91,7 @@ async function fetchPage(url: URL, reload = false, signal?: AbortSignal): Promis
   if (!reload) {
     inflight.set(key, p);
     p.finally(() => inflight.delete(key)).catch(() => {});
+    return until(p, signal);
   }
   return p;
 }
