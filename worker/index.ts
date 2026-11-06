@@ -4,7 +4,7 @@
 import { EmailMessage } from 'cloudflare:email';
 import { CONTACT_PATH, handleContact, type Deps, type EmailOut, type TurnstileResult } from './contact';
 import { DRAWING_PATH, handleDrawing } from './drawing';
-import { buildMime } from './mime';
+import { buildMime, forBinding } from './mime';
 
 interface Env {
   ASSETS: Fetcher;
@@ -32,10 +32,10 @@ async function siteverify(secret: string, token: string, ip: string | null): Pro
 
 // Send with the structured Email Service API; if the binding only supports the
 // classic Email Routing form (an error with no code), resend as a raw message.
-// Pictures go along either way: as `attachments`, or as MIME parts.
+// Pictures go along either way: as `attachments` (bytes), or as MIME parts.
 async function sendMail(env: Env, mail: EmailOut): Promise<unknown> {
   try {
-    return await env.EMAIL.send({ ...mail, to: env.CONTACT_TO });
+    return await env.EMAIL.send(forBinding(mail, env.CONTACT_TO));
   } catch (e) {
     if ((e as { code?: string }).code) throw e;
     console.error('contact: structured send failed, trying raw message:', (e as Error).message);

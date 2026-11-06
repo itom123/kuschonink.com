@@ -254,9 +254,12 @@ contact form (origin, a per-visitor rate limit kept apart from messages, and
 Turnstile with its own action, `kuschonink-drawing`), plus the picture itself,
 which must be a complete PNG of at most 2 MB and 2400 pixels a side (Paint
 shrinks busier pictures to fit). The email goes to the same inbox through the
-`EMAIL` binding, with the drawing shown in the message (an inline attachment,
-`drawing-<date>-<time>-<name>.png`); replying goes to the visitor when they gave
-an address. Nothing is stored on the server.
+`EMAIL` binding, with the drawing shown in the message and attached as a file
+(`drawing-<date>-<time>-<name>.png`); replying goes to the visitor when they gave
+an address. Nothing is stored on the server. The binding takes the picture as
+bytes: given a string it sends text, so a base64 string would arrive as text
+instead of a picture (`forBinding()` in `worker/mime.ts`). Local `wrangler dev`
+can't simulate binary attachments, so try sending on the live site.
 
 **In the visitor's browser.** The picture being drawn is kept in IndexedDB
 (`kus98-paint`), so closing Paint doesn't lose it; File ▸ New clears it. Tool
