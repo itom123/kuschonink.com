@@ -1,0 +1,226 @@
+---
+// The sequence (Rules of the house): how the knight's tour numbers the rooms.
+// Drawn at build time from house.json and the tour, so it follows any change to the rooms.
+import { floors, rooms, house, tour, coordinate, roomPoints, floorBounds, type Room } from '../../lib/house';
+import { t as tr, attr, floorZh } from '../../lib/i18n';
+import Bi from '../Bi.astro';
+
+type Pt = [number, number];
+const { columns, rows } = house.grid;
+const N = tour.length;
+const centre = ([c, r]: Pt): Pt => [(columns[c] + columns[c + 1]) / 2, (rows[r] + rows[r + 1]) / 2];
+const square = ([c, r]: Pt) => [columns[c], rows[r], columns[c + 1], rows[r + 1]] as const;
+const pts = (p: Pt[]) => p.map(([x, y]) => `${Math.round(x)},${Math.round(y)}`).join(' ');
+const gx0 = columns[0], gx1 = columns[columns.length - 1], gy0 = rows[0], gy1 = rows[rows.length - 1];
+
+/** A segment from a to b, pulled in by `inset` at both ends (to stop at the edge of a circle). */
+function inset(a: Pt, b: Pt, by: number) {
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  if (len <= by * 2) return null;
+  const ux = (b[0] - a[0]) / len, uy = (b[1] - a[1]) / len;
+  return { x1: a[0] + ux * by, y1: a[1] + uy * by, x2: b[0] - ux * by, y2: b[1] - uy * by };
+}
+
+/** The part of a room inside a square (Sutherland–Hodgman: a polygon clipped by a rectangle). */
+function clip(poly: Pt[], [x0, y0, x1, y1]: readonly number[]): Pt[] {
+  const at = (a: Pt, b: Pt, k: 0 | 1, v: number): Pt => {
+    const s = (v - a[k]) / (b[k] - a[k]);
+    return [a[0] + (b[0] - a[0]) * s, a[1] + (b[1] - a[1]) * s];
+  };
+  const sides: [(p: Pt) => boolean, 0 | 1, number][] = [
+    [(p) => p[0] >= x0, 0, x0], [(p) => p[0] <= x1, 0, x1],
+    [(p) => p[1] >= y0, 1, y0], [(p) => p[1] <= y1, 1, y1],
+  ];
+  let out = poly;
+  for (const [inside, k, v] of sides) {
+    const input = out;
+    out = [];
+    input.forEach((p, i) => {
+      const prev = input[(i + input.length - 1) % input.length];
+      if (inside(p)) {
+        if (!inside(prev)) out.push(at(prev, p, k, v));
+        out.push(p);
+      } else if (inside(prev)) out.push(at(prev, p, k, v));
+    });
+    if (!out.length) break;
+  }
+  return out;
+}
+
+// ---- Figure 1: the tour on the bare grid, bays to scale ----
+const R1 = 470; // circle radius, mm
+const tourSegs = tour.slice(1).map((s, i) => inset(centre(tour[i]), centre(s), R1 + 60));
+
+// ---- Figure 2: each floor, its chapters, and where the knight entered each room ----
+// One frame for all four floors, so they line up like the floorplan's floors.
+const bounds = floors.map(floorBounds);
+const fx0 = Math.min(gx0, ...bounds.map((b) => b.x)), fy0 = Math.min(gy0, ...bounds.map((b) => b.y));
+const fx1 = Math.max(gx1, ...bounds.map((b) => b.x + b.w)), fy1 = Math.max(gy1, ...bounds.map((b) => b.y + b.h));
+const M = 1300; // room for the column letters and row numbers
+const frame = `${fx0 - M} ${fy0 - M} ${fx1 - fx0 + M + 400} ${fy1 - fy0 + M + 400}`;
+const R2 = 560;
+const labelAt = (r: Room): Pt => [r.rect[0] + r.rect[2] / 2, r.rect[1] + r.rect[3] / 2];
+const area = (p: Pt[]) => Math.abs(p.reduce((s, [x, y], i) => s + x * p[(i + 1) % p.length][1] - p[(i + 1) % p.length][0] * y, 0)) / 2;
+/** Where the knight first stood in the room: its entry square, cut to the room's walls. */
+function entryPatch(r: Room): Pt[] {
+  if (!r.move) return [];
+  const cut = clip(roomPoints(r), square(r.cell));
+  // Entry is decided by the room's bounding box; draw that if the walls leave nothing.
+  if (area(cut) > 0) return cut;
+  const [x, y, w, h] = r.rect;
+  return clip([[x, y], [x + w, y], [x + w, y + h], [x, y + h]], square(r.cell));
+}
+const perFloor = floors.map((f) => {
+  const list = rooms.filter((r) => r.floor === f);
+  const order = list.slice(1).map((r, i) => inset(labelAt(list[i]), labelAt(r), R2 + 80));
+  return { f, list, order, first: list[0]?.chapter, last: list[list.length - 1]?.chapter };
+});
+
+// ---- The table: move by move, what each move opens on each floor ----
+const moves = tour.map((s, i) => ({
+  n: i + 1,
+  square: coordinate(s),
+  cells: floors.map((f) => rooms.filter((r) => r.floor === f && r.move === i + 1)),
+}));
+const unreached = rooms.filter((r) => !r.move);
+
+const roomName = (r: Room) => ({ en: `Chapter ${r.chapter}: ${r.en}${r.locked ? ' (no door)' : ''}`, zh: `第${r.chapter}章：${r.zh}${r.locked ? '（没有门）' : ''}` });
+const letters = Array.from({ length: columns.length - 1 }, (_, c) => String.fromCharCode(65 + c));
+---
+<section class="sequence" aria-labelledby="sequence-title">
+  <h2 id="sequence-title"><Bi t={tr.theSequence} /></h2>
+  <p data-l="en">On every floor the knight sets out from {coordinate(tour[0])} and makes the same {N} moves. Each time it lands in a room that has no number yet, that room becomes the next chapter; when one move lands in several new rooms at once, they are numbered one after another. A move that lands only in rooms already numbered, or outside the floor, adds nothing. When a floor is done, the count goes on upstairs, and the knight starts again at {coordinate(tour[0])}.</p>
+  <p data-l="zh" lang="zh-Hans">每一层，骑士都从{coordinate(tour[0])}出发，走同样的{N}步。每当它落进一个还没有编号的房间，这个房间就成为下一章；如果一步同时落进几个新房间，它们就依次编号。只落进已编号的房间、或落在楼层之外的那几步，不增加章节。一层走完，编号在楼上接着数下去，骑士又从{coordinate(tour[0])}重新开始。</p>
+
+  <figure class="tour-figure">
+    <svg viewBox={`${gx0 - 1100} ${gy0 - 1100} ${gx1 - gx0 + 1500} ${gy1 - gy0 + 1500}`} role="img" {...attr('aria-label', { en: `The knight’s tour: ${tour.map(coordinate).join(', ')}`, zh: `骑士巡游：${tour.map(coordinate).join('、')}` })}>
+      <defs>
+        <marker id="tour-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" />
+        </marker>
+      </defs>
+      <g class="seq-grid" aria-hidden="true">
+        {columns.map((x) => <line x1={x} x2={x} y1={gy0} y2={gy1} />)}
+        {rows.map((y) => <line y1={y} y2={y} x1={gx0} x2={gx1} />)}
+        {letters.map((l, c) => <text class="seq-axis" x={(columns[c] + columns[c + 1]) / 2} y={gy0 - 500}>{l}</text>)}
+        {rows.slice(1).map((_, r) => <text class="seq-axis" x={gx0 - 550} y={(rows[r] + rows[r + 1]) / 2}>{r + 1}</text>)}
+      </g>
+      <g class="tour-path" aria-hidden="true">
+        {tourSegs.map((s) => s && <line {...s} marker-end="url(#tour-arrow)" />)}
+      </g>
+      <g class="tour-stops" aria-hidden="true">
+        {tour.map((s, i) => {
+          const [x, y] = centre(s);
+          return (
+            <g class:list={{ ends: i === 0 || i === N - 1 }}>
+              <circle cx={x} cy={y} r={R1} />
+              <text x={x} y={y}>{i + 1}</text>
+            </g>
+          );
+        })}
+      </g>
+    </svg>
+    <figcaption>
+      <span data-l="en">The knight’s tour: {N} moves from {coordinate(tour[0])} to {coordinate(tour[N - 1])}, each square visited once, by Warnsdorff’s rule. The bays are drawn to scale.</span>
+      <span data-l="zh" lang="zh-Hans">骑士巡游：从{coordinate(tour[0])}到{coordinate(tour[N - 1])}共{N}步，按沃恩斯多夫规则，每格只经过一次。网格按实际尺寸绘制。</span>
+    </figcaption>
+  </figure>
+
+  <figure class="floors-figure">
+    <div class="seq-floors">
+      {perFloor.map(({ f, list, order, first, last }) => (
+        <div class="seq-floor">
+          <p class="seq-floor-name">
+            <Bi t={{ en: f.name, zh: floorZh(f.zh) }} />{' · '}
+            <Bi t={first === last ? { en: `chapter ${first}`, zh: `第${first}章` } : { en: `chapters ${first}–${last}`, zh: `第${first}–${last}章` }} />
+          </p>
+          <svg viewBox={frame} role="group" {...attr('aria-label', { en: `${f.name}: ${list.map((r) => `${r.chapter} ${r.en}`).join(', ')}`, zh: `${floorZh(f.zh)}：${list.map((r) => `${r.chapter} ${r.zh}`).join('、')}` })}>
+            <defs>
+              <marker id={`seq-arrow-${f.id}`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" />
+              </marker>
+              <pattern id={`seq-hatch-${f.id}`} width="400" height="400" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="400" />
+              </pattern>
+            </defs>
+            <g class="seq-grid" aria-hidden="true">
+              {columns.map((x) => <line x1={x} x2={x} y1={gy0 - 600} y2={gy1 + 300} />)}
+              {rows.map((y) => <line y1={y} y2={y} x1={gx0 - 600} x2={gx1 + 300} />)}
+              {letters.map((l, c) => <text class="seq-axis" x={(columns[c] + columns[c + 1]) / 2} y={fy0 - 650}>{l}</text>)}
+              {rows.slice(1).map((_, r) => <text class="seq-axis" x={fx0 - 700} y={(rows[r] + rows[r + 1]) / 2}>{r + 1}</text>)}
+            </g>
+            <g class="seq-entries" aria-hidden="true">
+              {list.map((r) => <polygon points={pts(entryPatch(r))} />)}
+            </g>
+            <g class="seq-rooms">
+              {(f.passages ?? []).map((p) => <polygon class="seq-passage" points={pts(p.poly)} aria-hidden="true" />)}
+              {list.map((r) => (
+                <polygon class:list={['seq-room', { outdoor: r.outdoor, locked: r.locked }]} points={pts(roomPoints(r))} fill={r.locked ? `url(#seq-hatch-${f.id})` : undefined} aria-hidden="true" />
+              ))}
+            </g>
+            <g class="seq-order" aria-hidden="true">
+              {order.map((s) => s && <line {...s} marker-end={`url(#seq-arrow-${f.id})`} />)}
+            </g>
+            <g class="seq-chapters">
+              {list.map((r) => {
+                const [x, y] = labelAt(r);
+                const mark = (
+                  <>
+                    <circle cx={x} cy={y} r={R2} />
+                    <text x={x} y={y}>{r.chapter}</text>
+                  </>
+                );
+                return r.locked ? (
+                  <g class="seq-chapter locked" role="img" {...attr('aria-label', roomName(r))}>{mark}</g>
+                ) : (
+                  <a class="seq-chapter" href={`/house/${r.slug}`} {...attr('aria-label', roomName(r))}>{mark}</a>
+                );
+              })}
+            </g>
+          </svg>
+        </div>
+      ))}
+    </div>
+    <figcaption>
+      <span data-l="en">Floor by floor. The numbers are the chapters, read along the blue line. Yellow: the part of each room where the knight first lands.</span>
+      <span data-l="zh" lang="zh-Hans">逐层来看。数字是章节，沿蓝线依次读下去。黄色：骑士第一次落进每个房间的位置。</span>
+    </figcaption>
+  </figure>
+
+  <h3><Bi t={{ en: 'Move by move', zh: '逐步' }} /></h3>
+  <p data-l="en">What each of the knight’s moves opens on each floor. Grey moves open nothing anywhere: every square they land on is already counted.</p>
+  <p data-l="zh" lang="zh-Hans">骑士的每一步在各层开启了哪些章节。灰色的步数在哪一层都没有开启新章节：它们落进的格子都已数过。</p>
+  <div class="seq-table-wrap">
+    <table class="seq-table">
+      <thead>
+        <tr>
+          <th scope="col"><Bi t={{ en: 'Move', zh: '步' }} /></th>
+          {floors.map((f) => <th scope="col"><Bi t={{ en: f.name, zh: floorZh(f.zh) }} /></th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {moves.map((m) => (
+          <tr class:list={{ idle: m.cells.every((c) => !c.length) }}>
+            <th scope="row"><span class="seq-move">♞{m.n}</span> {m.square}</th>
+            {m.cells.map((list) => (
+              <td>
+                {list.map((r) => (
+                  <span class="seq-entry">
+                    <b>{r.chapter}</b>{' '}
+                    {r.locked ? <i><Bi t={{ en: r.en, zh: r.zh }} /></i> : <a href={`/house/${r.slug}`}><Bi t={{ en: r.en, zh: r.zh }} /></a>}
+                  </span>
+                ))}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  {unreached.length > 0 && (
+    <p>
+      <span data-l="en">Never reached by the knight, so numbered last on their floor: {unreached.map((r) => `${r.chapter} ${r.en}`).join(', ')}.</span>
+      <span data-l="zh" lang="zh-Hans">骑士从未落进、因而排在本层最后的房间：{unreached.map((r) => `${r.chapter} ${r.zh}`).join('、')}。</span>
+    </p>
+  )}
+</section>

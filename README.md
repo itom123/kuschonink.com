@@ -112,6 +112,19 @@ inventory built only from facts: name, size, floor level, window and door codes,
 and what's inside. One room, drawn in the attic with no door, can't be entered.
 It's the missing chapter.
 
+**The sequence.** On every floor the knight starts again at A1 and makes the same
+25 moves, ending at A3. A move numbers each room it lands in that has no number yet;
+when one move lands in several new rooms, they're numbered in the order `house.json`
+lists them. Moves that land only in numbered rooms (or outside the floor) add nothing,
+and a room the knight never reaches would go last on its floor. As the house is drawn,
+the same squares open rooms on each floor: B3 (move 2) the middle of the house, D3
+(move 6) the east side, C2 (move 8) the stairs, A3 (move 25) the west bathroom. The *Rules
+of the house* page draws this (`src/components/house/KnightSequence.astro`): the tour
+on the grid, each floor with its chapter numbers, the reading path and the squares
+where the knight first lands, and a table of what every move opens. It's drawn from
+`house.json` and the tour at build time, so it follows any change to the rooms. Each
+room also keeps the move that entered it (`move` in `src/lib/house.ts`).
+
 ### Editing the house: `src/content/house.json`
 
 - Each floor has `rooms`. A room is a rectangle in millimetres `[x, y, width, height]`
