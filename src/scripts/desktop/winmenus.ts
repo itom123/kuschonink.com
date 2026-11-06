@@ -79,8 +79,13 @@ export function systemMenu(win: wm.Win): MenuSpec[] {
   ];
 }
 
+/** Menu bars a program draws itself (kus98.menus), by window. */
+export const ownMenus = new WeakMap<HTMLElement, (name: string) => MenuSpec[] | null>();
+
 /** A window's menu bar menus. */
 export function barMenu(win: wm.Win, name: string): MenuSpec[] {
+  const own = ownMenus.get(win.el)?.(name);
+  if (own) return own;
   const url = wm.urlOf(win);
   const title = wm.titleOf(win);
   const icon = win.el.dataset.icon ?? 'document';
@@ -138,6 +143,7 @@ export function barMenu(win: wm.Win, name: string): MenuSpec[] {
         { label: 'The &House', zh: '房子(&H)', icon: 'house', action: open('/house/facade') },
         { label: '&About.doc', zh: '关于.doc(&A)', icon: 'document', action: open('/about') },
         { label: '&Contact', zh: '联系(&C)', icon: 'mail', action: open('/contact') },
+        { label: 'Pai&nt', zh: '画图(&N)', icon: 'paint', action: open('/paint') },
       ];
     case 'favorites':
       return [

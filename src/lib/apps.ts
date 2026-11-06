@@ -1,7 +1,7 @@
 // The programs of Xiangyin 98 and which URLs open in which program.
 // No Astro imports: this file is also bundled into the browser (the shell).
 
-export type AppId = 'welcome' | 'explorer' | 'about' | 'contact' | 'house' | 'help' | 'error';
+export type AppId = 'welcome' | 'explorer' | 'about' | 'contact' | 'paint' | 'house' | 'help' | 'error';
 
 export interface AppInfo {
   /** Program name, shown in tooltips and Properties. */
@@ -20,6 +20,7 @@ export const APPS: Record<AppId, AppInfo> = {
   explorer: { name: 'Explorer', icon: 'folder-open', w: 880, h: 600 },
   about: { name: 'Document', icon: 'document', w: 720, h: 640 },
   contact: { name: 'New Message', icon: 'mail', w: 660, h: 620 },
+  paint: { name: 'Paint', icon: 'paint', w: 900, h: 660 },
   house: { name: 'The House', icon: 'house', w: 1100, h: 760, max: true },
   help: { name: 'Help', icon: 'help', w: 800, h: 580 },
   error: { name: 'Error', icon: 'error', w: 460, h: 300 },
@@ -38,6 +39,7 @@ export function appFor(path: string): AppId {
   if (p === '/image' || p.startsWith('/image/')) return 'explorer';
   if (p === '/about') return 'about';
   if (p === '/contact') return 'contact';
+  if (p === '/paint') return 'paint';
   if (p === '/house' || p.startsWith('/house/')) return 'house';
   if (p === '/help') return 'help';
   return 'error';
@@ -49,6 +51,7 @@ export function addressFor(path: string): string {
   if (p === '/') return 'C:\\xiangyin\\Desktop';
   if (p === '/about') return 'C:\\xiangyin\\About.doc';
   if (p === '/contact') return 'C:\\xiangyin\\Contact';
+  if (p === '/paint') return 'C:\\xiangyin\\Paint';
   if (p === '/help') return 'C:\\xiangyin\\Help';
   return 'C:\\xiangyin' + p.replace(/\//g, '\\');
 }

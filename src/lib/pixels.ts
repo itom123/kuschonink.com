@@ -25,6 +25,7 @@ export const PALETTE: Record<string, string> = {
   f: '#ff00ff', // fuchsia
   x: '#c08040', // tan (wood)
   z: '#fffbf0', // cream
+  q: '#8a5a2b', // dark wood
 };
 
 export class Canvas {
