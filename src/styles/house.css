@@ -258,6 +258,46 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 .deal .digits { font-family: 'Courier New', monospace; }
 .appendix h3.hidden { color: #c00; }
 
+/* The sequence (Rules of the house): the knight's tour, and the chapters it numbers on each floor.
+   Sizes in the SVGs are in millimetres, like the plan. */
+.sequence figure { margin: 12px 0 20px; }
+.sequence figcaption { font-size: 0.9em; font-style: italic; margin-top: 6px; }
+.sequence svg { display: block; width: 100%; height: auto; font-family: 'Times New Roman', Times, serif; }
+.tour-figure svg { max-width: 420px; }
+.seq-grid line { stroke: #999; stroke-width: 1px; vector-effect: non-scaling-stroke; stroke-dasharray: 2 3; }
+.seq-axis { font-size: 480px; fill: #666; text-anchor: middle; dominant-baseline: central; }
+.tour-path line { stroke: var(--ink); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.tour-figure marker path { fill: var(--ink); }
+.tour-stops circle { fill: var(--paper); stroke: var(--ink); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.tour-stops text { font-size: 520px; text-anchor: middle; dominant-baseline: central; }
+.tour-stops .ends circle { fill: var(--ink); }
+.tour-stops .ends text { fill: var(--paper); font-weight: bold; }
+.seq-floors { display: grid; gap: 14px; }
+.seq-floor svg { max-width: 520px; }
+.seq-floor-name { margin: 0 0 2px; font-size: 0.95em; }
+.seq-entries polygon { fill: var(--here); }
+.seq-room { fill: none; stroke: var(--ink); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.seq-room.outdoor { stroke-dasharray: 4 2; stroke-width: 1px; }
+.seq-room.locked { stroke-dasharray: 2 2; }
+.seq-floor pattern line { stroke: #aaa; stroke-width: 70px; }
+.seq-passage { fill: #f0f0f0; stroke: none; }
+.seq-order line { stroke: var(--link); stroke-width: 1.25px; vector-effect: non-scaling-stroke; }
+.seq-floor marker path { fill: var(--link); }
+.seq-chapter circle { fill: var(--paper); stroke: var(--ink); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.seq-chapter text { font-size: 620px; text-anchor: middle; dominant-baseline: central; fill: var(--link); }
+a.seq-chapter:hover circle, a.seq-chapter:focus-visible circle { fill: var(--hover); stroke: var(--link); }
+a.seq-chapter:focus { outline: none; }
+.seq-chapter.locked circle { stroke-dasharray: 2 2; }
+.seq-chapter.locked text { fill: #666; font-style: italic; }
+.seq-table-wrap { overflow-x: auto; }
+.seq-table { border-collapse: collapse; width: 100%; font-size: 0.9em; white-space: normal; margin: 6px 0 12px; }
+.seq-table th, .seq-table td { border: 1px solid #808080; padding: 2px 5px; text-align: left; vertical-align: top; height: auto; }
+.seq-table thead th { background: var(--grey); box-shadow: none; position: static; }
+.seq-table tbody th { white-space: nowrap; font-weight: normal; }
+.seq-move { color: #555; }
+.seq-entry { display: block; }
+.seq-table tr.idle th, .seq-table tr.idle td, .seq-table tr.idle .seq-move { color: #999; background: #f6f6f6; }
+
 /* Room interiors: furniture plan, drawers, objects */
 .interior { margin: 0.6em 0 1em; }
 .interior-plan { width: 100%; max-height: 46cqh; display: block; background: #fff; }

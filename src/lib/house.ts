@@ -65,6 +65,8 @@ export interface Room extends RoomData {
   chapter: number;
   /** Grid square [column, row] where the knight first enters the room. */
   cell: [number, number];
+  /** The knight's move (1–25) that first enters the room; none if the tour never reaches it. */
+  move?: number;
   title: string;
   titleZh: string;
   inventory: string[];
@@ -375,14 +377,18 @@ function buildRooms(): Room[] {
   for (const floor of floors) {
     const order: RoomData[] = [];
     const entry = new Map<RoomData, [number, number]>();
-    for (const [c, row] of tour) {
+    const move = new Map<RoomData, number>();
+    // The knight starts again at A1 on every floor. A move into several new rooms at once
+    // numbers them in the order house.json lists them.
+    tour.forEach(([c, row], i) => {
       for (const r of floor.rooms) {
         if (!order.includes(r) && overlaps(r, c, row)) {
           order.push(r);
           entry.set(r, [c, row]);
+          move.set(r, i + 1);
         }
       }
-    }
+    });
     for (const r of floor.rooms) {
       if (!order.includes(r)) {
         order.push(r);
@@ -400,6 +406,7 @@ function buildRooms(): Room[] {
         floor,
         chapter,
         cell: entry.get(r)!,
+        move: move.get(r),
         title: title?.en ?? r.en,
         titleZh: title?.zh || r.zh,
         inventory: inv.en,

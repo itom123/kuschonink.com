@@ -119,6 +119,7 @@ export const t = {
     zh: '数字是章节。粗体：东西真的在那里。常规：只是分配给了这个房间。',
   },
   theGrid: { en: 'The grid', zh: '网格' },
+  theSequence: { en: 'The sequence', zh: '顺序' },
   anInventory: { en: 'an inventory', zh: '一份清单' },
   roomWithoutDoor: { en: 'the room without a door. This chapter is missing.', zh: '没有门的房间。这一章缺失了。' },
 
