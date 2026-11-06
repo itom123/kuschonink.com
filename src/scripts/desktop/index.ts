@@ -11,6 +11,12 @@ import { initSettings } from './settings';
 import { initStartMenu, remember } from './startmenu';
 import { initTaskbar } from './taskbar';
 import { initTooltips } from './tooltips';
+import { initControlPanel } from './apps/controlpanel';
+import { session } from './session';
+import { initSound } from './sound';
+import { initTrails } from './trails';
+import { initTray } from './tray';
+import { escapeHtml, html } from './util';
 import * as wm from './wm';
 
 declare global {
@@ -34,6 +40,28 @@ initMenubars();
 initContextMenus();
 initDesktopIcons();
 initTooltips();
+initSound();
+initTrails();
+initTray();
+initControlPanel();
+
+// Start-up, log-on, log-off and shut-down live in their own file, loaded when needed.
+const boot = () => import('./boot');
+commands.register('logoff', () => boot().then((m) => m.logOff()));
+commands.register('shutdown', () => boot().then((m) => m.shutDownDialog()));
+if (html.dataset.boot) {
+  boot()
+    .then((m) => m.startUp())
+    .catch(() => delete html.dataset.boot);
+}
+
+// Start ▸ "Log Off <name>..."
+function logOffLabel() {
+  const name = escapeHtml(session.user() || 'Guest');
+  document.querySelectorAll('[data-logoff] .mi-label').forEach((el) => (el.innerHTML = `<u>L</u>og Off ${name}...`));
+}
+logOffLabel();
+document.addEventListener('desktop:login', logOffLabel);
 
 commands.register('about-k98', () => aboutBox());
 commands.register('help', () => navigate('/help'));

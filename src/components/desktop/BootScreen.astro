@@ -1,0 +1,62 @@
+---
+// Start-up, log-on and shut-down screens. Hidden unless <html data-boot> is
+// set (by the script in <head>, only with JavaScript and never for search
+// engines), so the page underneath is always complete.
+---
+<div class="boot" id="k98-boot" data-step="bios" data-js-only>
+  <div class="boot-bios" aria-hidden="true">
+    <div class="bios-head">
+      <span class="ico ico-start"></span>
+      <div><b>kuschonink BIOS</b> v4.10, An Archive Ally<br />Copyright (C) 1998–2026, Xiangyin Gu</div>
+    </div>
+    <pre class="bios-text"></pre>
+  </div>
+
+  <div class="boot-splash" role="img" aria-label="kuschonink 98 is starting">
+    <div class="splash-clouds" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="splash-logo">
+      <span class="ico ico-start" aria-hidden="true"></span>
+      <div class="splash-word"><small>Xiangyin Gu</small><b>kuschonink</b><span>98</span></div>
+    </div>
+    <p class="splash-msg" data-splash-msg></p>
+    <div class="splash-bar" aria-hidden="true"></div>
+  </div>
+
+  <p class="boot-skip">Click or press any key to skip</p>
+
+  <div class="boot-login">
+    <section class="window login-window" role="dialog" aria-modal="true" aria-labelledby="login-title" aria-describedby="login-intro">
+      <div class="title-bar">
+        <div class="title-bar-text" id="login-title">Welcome to kuschonink 98</div>
+        <div class="title-bar-controls">
+          <button type="button" class="tb-btn tb-help" aria-label="Help" title="There is no account: any name will do." data-login-help></button>
+          <button type="button" class="tb-btn tb-close" aria-label="Close" title="Close" data-login="cancel"></button>
+        </div>
+      </div>
+      <form class="login-body" data-login-form autocomplete="off">
+        <span class="ico ico-keys login-keys" aria-hidden="true"></span>
+        <div class="login-fields">
+          <p id="login-intro">Type a user name and password to log on to kuschonink 98.</p>
+          <div class="login-row">
+            <label for="login-name"><u>U</u>ser name:</label>
+            <input id="login-name" name="user" type="text" maxlength="32" spellcheck="false" autocapitalize="off" autocomplete="off" />
+          </div>
+          <div class="login-row">
+            <label for="login-pass"><u>P</u>assword:</label>
+            <input id="login-pass" type="text" spellcheck="false" autocapitalize="off" autocomplete="off" data-1p-ignore data-lpignore="true" aria-describedby="login-hint" />
+          </div>
+          <p class="login-hint" id="login-hint">No password needed: just press <b>OK</b>.</p>
+        </div>
+        <div class="login-buttons">
+          <button type="submit" class="default">OK</button>
+          <button type="button" data-login="cancel">Cancel</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="boot-safe" role="status">
+    <p>It’s now safe to turn off<br />your computer.</p>
+    <small>Click or press any key to start kuschonink 98 again.</small>
+  </div>
+</div>

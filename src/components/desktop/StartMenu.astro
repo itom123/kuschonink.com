@@ -37,7 +37,14 @@ const items: MenuItem[] = [
     label: '&Documents', icon: 'documents', big: true, jsOnly: true, attrs: { 'data-recent': '' },
     sub: [{ label: '(Empty)', disabled: true }],
   },
+  {
+    label: '&Settings', icon: 'control', big: true, jsOnly: true,
+    sub: [{ label: '&Control Panel', cmd: 'control-panel', icon: 'control' }],
+  },
   { label: '&Help', href: '/help', icon: 'help', big: true },
+  { sep: true, jsOnly: true },
+  { label: '&Log Off Guest...', cmd: 'logoff', icon: 'keys', big: true, jsOnly: true, attrs: { 'data-logoff': '' } },
+  { label: 'Sh&ut Down...', cmd: 'shutdown', icon: 'shutdown', big: true, jsOnly: true },
 ];
 ---
 <details class="start" id="k98-start">

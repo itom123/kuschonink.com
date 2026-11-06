@@ -136,16 +136,35 @@ export function lineUpIcons(group: HTMLElement) {
   savePositions(group);
 }
 
+const cellKey = ([x, y]: [number, number]) => `${Math.round((x - PAD_X) / CELL_W)},${Math.round((y - PAD_Y) / CELL_H)}`;
+
+/** Put icons where the visitor left them; icons without a saved place take the first free cell. */
 function applySaved(group: HTMLElement) {
   const saved = positions.get();
   if (!Object.keys(saved).length) return;
-  makeFree(group);
+  group.classList.add('free');
   const a = { w: group.clientWidth, h: group.clientHeight };
-  group.querySelectorAll<HTMLElement>(':scope > .desk-item').forEach((item) => {
+  const taken = new Set<string>();
+  const unsaved: HTMLElement[] = [];
+  for (const item of group.querySelectorAll<HTMLElement>(':scope > .desk-item')) {
+    if (!item.getClientRects().length) continue;
     const id = item.querySelector<HTMLElement>('.icon')?.dataset.iconId;
     const p = id ? saved[id] : undefined;
-    if (p) setPos(item, [clamp(p[0], 0, Math.max(0, a.w - CELL_W)), clamp(p[1], 0, Math.max(0, a.h - CELL_H))]);
-  });
+    if (!p) {
+      unsaved.push(item);
+      continue;
+    }
+    const at: [number, number] = [clamp(p[0], 0, Math.max(0, a.w - CELL_W)), clamp(p[1], 0, Math.max(0, a.h - CELL_H))];
+    setPos(item, at);
+    taken.add(cellKey(at));
+  }
+  let n = 0;
+  for (const item of unsaved) {
+    let at = gridPos(group, n++);
+    while (taken.has(cellKey(at)) && n < 400) at = gridPos(group, n++);
+    setPos(item, at);
+    taken.add(cellKey(at));
+  }
 }
 
 // ---------------------------------------------------------------------------

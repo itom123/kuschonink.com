@@ -9,6 +9,8 @@ import '../styles/blocks.css';
 import '../styles/house.css';
 import '../styles/explorer.css';
 import '../styles/apps.css';
+import '../styles/system.css';
+import BootScreen from '../components/desktop/BootScreen.astro';
 import DesktopIcons from '../components/desktop/DesktopIcons.astro';
 import Taskbar from '../components/desktop/Taskbar.astro';
 import { BUILD_ID } from '../lib/build';
@@ -18,10 +20,42 @@ interface Props { seo: Seo; image?: string; noindex?: boolean }
 const { seo, image, noindex } = Astro.props;
 ---
 <Base seo={seo} image={image} noindex={noindex} bodyClass="kus98">
-  <script is:inline slot="head-start">document.documentElement.classList.add('js');</script>
+  {/* Before first paint: settings, saved icon places, and whether to start up
+      (once per browser session; never for search engines and link previews). */}
+  <script is:inline slot="head-start">
+    (function () {
+      var d = document.documentElement, s = {}, ic = {};
+      d.classList.add('js');
+      try {
+        s = JSON.parse(localStorage.getItem('kus98:settings') || '{}') || {};
+        ic = JSON.parse(localStorage.getItem('kus98:icons') || '{}') || {};
+      } catch (e) {}
+      if (s.scheme) d.setAttribute('data-scheme', s.scheme);
+      if (s.pointers) d.setAttribute('data-pointers', s.pointers);
+      if (s.alwaysMax) d.setAttribute('data-maxall', '');
+      if (s.wallpaper) {
+        d.style.setProperty('--wallpaper', 'url("' + String(s.wallpaper).replace(/["\\]/g, '') + '")');
+        d.style.setProperty('--wallpaper-repeat', s.wallpaperMode === 'tile' ? 'repeat' : 'no-repeat');
+        d.style.setProperty('--wallpaper-size', s.wallpaperMode === 'stretch' ? 'cover' : 'auto');
+        d.classList.add('has-wallpaper');
+      }
+      var css = '';
+      for (var k in ic) if (/^[a-z0-9-]+$/.test(k) && ic[k] && ic[k].length === 2) css += '.desk-item:has(>#icon-' + k + '){--ix:' + (+ic[k][0]) + 'px;--iy:' + (+ic[k][1]) + 'px}';
+      if (css) {
+        d.setAttribute('data-icons-free', '');
+        var st = document.createElement('style');
+        st.textContent = css;
+        document.head.appendChild(st);
+      }
+      var bot = navigator.webdriver || /bot|crawl|spider|slurp|lighthouse|pagespeed|headless|preview|facebookexternalhit|embedly|whatsapp|telegram|discord|slack/i.test(navigator.userAgent);
+      if (!bot && !/(?:^|;\s*)kus98_session=/.test(document.cookie)) d.setAttribute('data-boot', 'boot');
+      setTimeout(function () { if (!window.__kus98) d.removeAttribute('data-boot'); }, 10000);
+    })();
+  </script>
   <Fragment slot="head">
     <meta name="kus98-build" content={BUILD_ID} />
     <link rel="stylesheet" href={`/system/icons.css?v=${BUILD_ID}`} />
+    <link rel="stylesheet" href={`/system/cursors.css?v=${BUILD_ID}`} />
     <script>import '../scripts/desktop/index';</script>
   </Fragment>
   <a class="skip-link" href="#k98-windows">Skip to the open window</a>
@@ -30,5 +64,6 @@ const { seo, image, noindex } = Astro.props;
   </div>
   <main id="k98-windows" class="windows"><slot /></main>
   <Taskbar />
+  <BootScreen />
   <div id="k98-announcer" class="sr-only" aria-live="polite"></div>
 </Base>
