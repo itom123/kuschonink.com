@@ -339,7 +339,7 @@ html[data-dragging] { -webkit-user-select: none; user-select: none; }
 .menu-item > .ico { margin-right: 6px; }
 .menu-item.big { height: 34px; padding-left: 2px; }
 .menu-item.big > .ico { width: 32px; height: 32px; margin-right: 8px; }
-.menu-item .mi-label { flex: 1; }
+.menu-item .mi-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .menu-item .mi-key { margin-left: 24px; }
 .menu-item:focus { outline: none; }
 .menu-item:hover, .menu-item:focus, .menu > li.open > .menu-item { background: var(--sel); color: var(--sel-text); }
@@ -354,8 +354,9 @@ html[data-dragging] { -webkit-user-select: none; user-select: none; }
   border: 4px solid transparent; border-left-color: currentColor; border-right: 0;
 }
 .menu-default > .menu-item .mi-label, .menu-item.default .mi-label { font-weight: bold; }
+/* Never wider than the screen: a long name ends in "…" (menu.ts keeps it on screen). */
 .menu.sub, .menu.popup {
-  position: absolute; z-index: 2; min-width: 150px; padding: 2px; box-sizing: border-box;
+  position: absolute; z-index: 2; min-width: 150px; max-width: calc(100vw - 4px); padding: 2px; box-sizing: border-box;
   background: var(--face); box-shadow: var(--raised-window);
 }
 .menu.sub { left: calc(100% - 3px); top: -3px; display: none; }
