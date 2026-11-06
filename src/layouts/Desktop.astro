@@ -1,0 +1,32 @@
+---
+// kuschonink 98: every page is the desktop with that page's window open.
+// The page passes its window (src/components/desktop/Window.astro) as the slot.
+import Base from './Base.astro';
+import '../styles/vendor/98css/98.css';
+import '../styles/desktop.css';
+import '../styles/doc.css';
+import '../styles/blocks.css';
+import '../styles/explorer.css';
+import DesktopIcons from '../components/desktop/DesktopIcons.astro';
+import Taskbar from '../components/desktop/Taskbar.astro';
+import { BUILD_ID } from '../lib/build';
+import type { Seo } from '../lib/types';
+
+interface Props { seo: Seo; image?: string; noindex?: boolean }
+const { seo, image, noindex } = Astro.props;
+---
+<Base seo={seo} image={image} noindex={noindex} bodyClass="kus98">
+  <script is:inline slot="head-start">document.documentElement.classList.add('js');</script>
+  <Fragment slot="head">
+    <meta name="kus98-build" content={BUILD_ID} />
+    <link rel="stylesheet" href={`/system/icons.css?v=${BUILD_ID}`} />
+    <script>import '../scripts/desktop/index';</script>
+  </Fragment>
+  <a class="skip-link" href="#windows">Skip to the open window</a>
+  <div id="desktop" class="desktop">
+    <DesktopIcons />
+  </div>
+  <main id="windows" class="windows"><slot /></main>
+  <Taskbar />
+  <div id="desktop-announcer" class="sr-only" aria-live="polite"></div>
+</Base>

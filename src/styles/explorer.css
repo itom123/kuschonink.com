@@ -1,0 +1,28 @@
+/* ===== The Projects folder (Explorer) ===== */
+
+.explorer { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px 12px; }
+.explorer a { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; text-decoration: none; color: #000 !important; padding: 4px; }
+.explorer a:hover .name, .explorer a:focus .name { background: #000080; color: #fff; }
+.explorer .thumb { width: 140px; height: 105px; object-fit: cover; border: 2px inset #808080; background: #c0c0c0; }
+.explorer .name { padding: 0 2px; }
+.explorer .meta { font-size: 12px; color: #444; }
+
+/* Views: Large icons / Details */
+.view-switch { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0; font-family: var(--ui-font); font-size: 11px; }
+.view-switch > label { margin-right: 12px; }
+.view-switch > .explorer, .view-switch > .view-details { flex: 1 1 100%; margin-top: 10px; font-family: "Times New Roman", Times, serif; font-size: 16px; }
+.view-details { display: none; height: auto; overflow-x: auto; }
+#view-details:checked ~ .view-details { display: block; }
+#view-details:checked ~ .view-icons { display: none; }
+table.details { width: 100%; white-space: nowrap; }
+table.details th { cursor: pointer; white-space: nowrap; font-family: var(--ui-font); font-size: 11px; }
+table.details th[data-dir="asc"]::after { content: " ▲"; }
+table.details th[data-dir="desc"]::after { content: " ▼"; }
+table.details td { font-family: "Times New Roman", Times, serif; font-size: 14px; }
+.classify-note { margin-top: 2em; color: #555; }
+
+@media (max-width: 700px) {
+  .doc-page { padding: 12px; }
+  .explorer { grid-template-columns: repeat(2, 1fr); }
+  .explorer .thumb { width: 100%; height: auto; aspect-ratio: 4 / 3; }
+}

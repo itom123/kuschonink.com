@@ -1,0 +1,20 @@
+---
+// The taskbar: Start, Quick Launch, a button per open window, the tray.
+import StartMenu from './StartMenu.astro';
+---
+<footer class="taskbar" id="taskbar" aria-label="Taskbar">
+  <StartMenu />
+  <span class="tb-etch ql" aria-hidden="true"></span>
+  <span class="tb-handle ql" aria-hidden="true"></span>
+  <div class="tb-group quick-launch" role="toolbar" aria-label="Quick Launch">
+    <button type="button" class="ql-btn" data-cmd="show-desktop" data-js-only title="Show Desktop" aria-label="Show Desktop"><span class="ico ico16 ico-desktop" aria-hidden="true"></span></button>
+    <a class="ql-btn" href="/house" title="The House" aria-label="The House"><span class="ico ico16 ico-house" aria-hidden="true"></span></a>
+    <a class="ql-btn" href="/image" title="Projects" aria-label="Projects"><span class="ico ico16 ico-folder" aria-hidden="true"></span></a>
+  </div>
+  <span class="tb-etch" aria-hidden="true"></span>
+  <span class="tb-handle" aria-hidden="true"></span>
+  <div class="tasks" id="tasks" role="toolbar" aria-label="Open windows"></div>
+  <div class="tray" id="tray" data-js-only>
+    <time class="clock" id="clock"></time>
+  </div>
+</footer>

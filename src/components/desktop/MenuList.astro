@@ -1,0 +1,55 @@
+---
+// Renders a menu (and its cascading submenus) as nested lists of real links,
+// so menus work as plain navigation without JavaScript.
+import { accelHtml, accelKey, plainLabel, type MenuItem } from '../../lib/menus';
+
+interface Props { items: MenuItem[]; class?: string; label?: string }
+const { items, class: className, label } = Astro.props;
+---
+<ul class:list={['menu', className]} role="menu" aria-label={label}>
+  {items.map((it) =>
+    it.sep ? (
+      <li class="menu-sep" role="separator" data-js-only={it.jsOnly ? '' : undefined}></li>
+    ) : (
+      <li class:list={{ 'has-sub': !!it.sub }} role="none" data-js-only={it.jsOnly ? '' : undefined}>
+        {it.href ? (
+          <a
+            class:list={['menu-item', { big: it.big }]}
+            role="menuitem"
+            href={it.href}
+            target={it.external ? '_blank' : undefined}
+            rel={it.external ? 'noopener' : undefined}
+            data-key={accelKey(it.label)}
+            aria-haspopup={it.sub ? 'menu' : undefined}
+            aria-expanded={it.sub ? 'false' : undefined}
+            aria-disabled={it.disabled ? 'true' : undefined}
+            aria-label={plainLabel(it.label)}
+            {...it.attrs}
+          >
+            {it.icon && <span class:list={['ico', it.big ? '' : 'ico16', `ico-${it.icon}`]} aria-hidden="true"></span>}
+            <span class="mi-label" set:html={accelHtml(it.label ?? '')} />
+            {it.key && <span class="mi-key">{it.key}</span>}
+          </a>
+        ) : (
+          <button
+            type="button"
+            class:list={['menu-item', { big: it.big }]}
+            role="menuitem"
+            data-cmd={it.cmd}
+            data-key={accelKey(it.label)}
+            aria-haspopup={it.sub ? 'menu' : undefined}
+            aria-expanded={it.sub ? 'false' : undefined}
+            aria-disabled={it.disabled ? 'true' : undefined}
+            aria-label={plainLabel(it.label)}
+            {...it.attrs}
+          >
+            {it.icon && <span class:list={['ico', it.big ? '' : 'ico16', `ico-${it.icon}`]} aria-hidden="true"></span>}
+            <span class="mi-label" set:html={accelHtml(it.label ?? '')} />
+            {it.key && <span class="mi-key">{it.key}</span>}
+          </button>
+        )}
+        {it.sub && <Astro.self items={it.sub} class="sub" label={plainLabel(it.label)} />}
+      </li>
+    ),
+  )}
+</ul>

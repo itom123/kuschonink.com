@@ -1,8 +1,10 @@
 ---
-import Win98 from '../../layouts/Win98.astro';
+import Desktop from '../../layouts/Desktop.astro';
+import Window from '../../components/desktop/Window.astro';
 import ProjectBody from '../../components/ProjectBody.astro';
 import { projects, imagesOf } from '../../lib/content';
 import { roomForProject } from '../../lib/house';
+import { EXPLORER_LINKS, EXPLORER_TOOLS } from '../../lib/chrome';
 import type { Project } from '../../lib/types';
 
 export function getStaticPaths() {
@@ -12,20 +14,27 @@ const { project, prev, next } = Astro.props as { project: Project & { slug: stri
 const room = roomForProject(project.slug);
 const n = imagesOf(project.sections).length;
 ---
-<Win98
-  seo={project.seo}
-  image={imagesOf(project.sections)[0]}
-  title={project.title}
-  address={`C:\\kuschonink\\image\\${project.slug}`}
-  houseHref={room ? `/house/${room.slug}` : '/house'}
-  status={`${n} image${n === 1 ? '' : 's'}${room ? ` · in the house: ${room.en}, ${room.floor.name.toLowerCase()}` : ''}`}
->
-  <p><a href="/image">↑ Up to Projects</a></p>
-  <ProjectBody project={project} eager />
-  <hr />
-  <nav class="project-nav" aria-label="More projects">
-    {prev ? <a href={`/image/${prev.slug}`}>← {prev.title}</a> : <span />}
-    {room && <a href={`/house/${room.slug}`}>Find it in the house</a>}
-    {next ? <a href={`/image/${next.slug}`}>{next.title} →</a> : <span />}
-  </nav>
-</Win98>
+<Desktop seo={project.seo} image={imagesOf(project.sections)[0]}>
+  <Window
+    app="explorer"
+    title={project.title}
+    icon="folder-open"
+    home="/image"
+    tools={EXPLORER_TOOLS}
+    links={EXPLORER_LINKS}
+    bodyClass="doc"
+    alt={room ? `/house/${room.slug}` : undefined}
+    status={[`${n} image${n === 1 ? '' : 's'}`, room ? `In the house: ${room.en}, ${room.floor.name.toLowerCase()}` : 'Projects']}
+  >
+    <div class="doc-page">
+      <p class="up-link"><a href="/image">↑ Up to Projects</a></p>
+      <ProjectBody project={project} eager />
+      <hr />
+      <nav class="project-nav" aria-label="More projects">
+        {prev ? <a href={`/image/${prev.slug}`}>← {prev.title}</a> : <span />}
+        {room && <a href={`/house/${room.slug}`}>Find it in the house</a>}
+        {next ? <a href={`/image/${next.slug}`}>{next.title} →</a> : <span />}
+      </nav>
+    </div>
+  </Window>
+</Desktop>

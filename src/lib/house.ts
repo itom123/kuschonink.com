@@ -281,7 +281,7 @@ export interface Placement {
   fulfils: { name: string; value: string }[];
 }
 
-const furnitureByRoom = (drawersJson as { rooms: Record<string, Furniture[]> }).rooms;
+const furnitureByRoom = (drawersJson as unknown as { rooms: Record<string, Furniture[]> }).rooms;
 const pieceFiles = import.meta.glob<Omit<Piece, 'id'>>('../content/writings/*.json', { eager: true, import: 'default' });
 export const pieces: Piece[] = Object.entries(pieceFiles)
   .map(([path, data]) => ({ ...data, id: path.split('/').pop()!.replace(/\.json$/, '') }))

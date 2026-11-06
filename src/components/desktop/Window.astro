@@ -1,0 +1,115 @@
+---
+// One program window. The server renders it so every URL is a real page;
+// the shell (src/scripts/desktop) makes it movable, resizable and stackable.
+// Contract the shell relies on (see docs/DESKTOP.md):
+//   [data-window][data-app][data-url][data-state]  the window
+//   [data-window-inner]  everything below the title bar; swapped when the window navigates
+//   [data-window-body]   the scrolling content area
+//   [data-keep="…"]      a node carried over when the window navigates (the house map)
+//   [data-cmd="…"]       minimize, maximize, close, back, forward, up, home, refresh, stop
+import { APPS, addressFor, cleanPath, type AppId } from '../../lib/apps';
+import type { QuickLink, Tool } from '../../lib/chrome';
+
+interface Props {
+  /** Toolbar buttons (commands need JavaScript and are hidden without it). */
+  tools?: Tool[];
+  /** The Links bar under the address bar. */
+  links?: QuickLink[];
+  app: AppId;
+  /** Title bar and taskbar text. */
+  title: string;
+  icon?: string;
+  /** This page's path; defaults to the current URL. */
+  url?: string;
+  /** Address bar text; false hides the address bar. */
+  address?: string | false;
+  /** Status bar fields. */
+  status?: string | string[];
+  variant?: 'folder' | 'browser' | 'document' | 'mail' | 'help' | 'welcome' | 'dialog' | 'error';
+  maximized?: boolean;
+  w?: number;
+  h?: number;
+  bodyClass?: string;
+  /** Where "the same thing in another program" lives (house room ↔ project). */
+  alt?: string;
+  /** The program's home page (toolbar Home). */
+  home?: string;
+}
+const { app, title, icon, url, address, status, variant = 'folder', maximized, w, h, bodyClass, alt, home, tools = [], links = [] } = Astro.props;
+const info = APPS[app];
+const path = cleanPath(url ?? Astro.url.pathname);
+const ico = icon ?? info.icon;
+const addr = address === false ? null : (address ?? addressFor(path));
+const fields = status == null ? [] : Array.isArray(status) ? status : [status];
+const titleId = `${app}-title`;
+---
+<section
+  class:list={['window', 'app-window', `v-${variant}`]}
+  data-window
+  data-app={app}
+  data-url={path}
+  data-state={maximized ?? info.max ? 'max' : 'normal'}
+  data-icon={ico}
+  data-alt-href={alt}
+  data-home={home}
+  aria-labelledby={titleId}
+  style={`--w:${w ?? info.w}px;--h:${h ?? info.h}px`}
+>
+  <div class="title-bar" data-drag>
+    <div class="title-bar-text">
+      <span class={`ico ico16 ico-${ico} title-ico`} data-cmd="sysmenu" aria-hidden="true"></span>
+      <span class="title-text" id={titleId} data-title>{title}</span>
+    </div>
+    <div class="title-bar-controls">
+      <button type="button" class="tb-btn tb-min" data-cmd="minimize" aria-label="Minimize" title="Minimize"></button>
+      <button type="button" class="tb-btn tb-max" data-cmd="maximize" aria-label="Maximize" title="Maximize"></button>
+      <a class="tb-btn tb-close" href="/" data-cmd="close" aria-label="Close" title="Close"></a>
+    </div>
+  </div>
+  <div class="window-inner" data-window-inner>
+    {Astro.slots.has('menu') && <nav class="menubar" aria-label="Menu bar"><slot name="menu" /></nav>}
+    {(tools.length > 0 || Astro.slots.has('toolbar')) && (
+      <div class="toolbar" role="toolbar" aria-label="Standard buttons" data-js-only={tools.every((t) => !t.href) && !Astro.slots.has('toolbar') ? '' : undefined}>
+        {tools.map((t) =>
+          t.sep ? (
+            <span class="tool-sep" aria-hidden="true"></span>
+          ) : t.href ? (
+            <a class="tool" href={t.href} title={t.title ?? t.label}><span class={`ico ico20 ico-${t.icon}`} aria-hidden="true"></span>{t.label}</a>
+          ) : (
+            <button type="button" class="tool" data-cmd={t.cmd} title={t.title ?? t.label} data-js-only><span class={`ico ico20 ico-${t.icon}`} aria-hidden="true"></span>{t.label}</button>
+          ),
+        )}
+        <slot name="toolbar" />
+      </div>
+    )}
+    {addr && (
+      <div class="addressbar">
+        <label for={`${app}-address`}>A<u>d</u>dress</label>
+        <div class="address-field">
+          <span class={`ico ico16 ico-${ico}`} aria-hidden="true"></span>
+          <input id={`${app}-address`} type="text" value={addr} data-address readonly spellcheck="false" autocomplete="off" />
+        </div>
+      </div>
+    )}
+    {links.length > 0 && (
+      <nav class="linksbar" aria-label="Links">
+        <span class="links-label" aria-hidden="true">Links</span>
+        {links.map((l) => (
+          <a class="link-btn" href={l.href} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener' : undefined}>
+            <span class={`ico ico16 ico-${l.icon ?? 'topic'}`} aria-hidden="true"></span>{l.label}
+          </a>
+        ))}
+      </nav>
+    )}
+    <div class="window-main">
+      {Astro.slots.has('side') && <aside class="window-side"><slot name="side" /></aside>}
+      <div class:list={['wbody', bodyClass]} data-window-body tabindex="-1"><slot /></div>
+    </div>
+    {fields.length > 0 && (
+      <div class="status-bar">
+        {fields.map((f) => <p class="status-bar-field">{f}</p>)}
+        <span class="grip ico ico-grip" data-resize="se" aria-hidden="true"></span>
+      </div>
+    )}
+  </div>
+</section>

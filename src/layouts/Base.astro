@@ -1,12 +1,12 @@
 ---
-// Shared <head>: SEO, social cards, favicon. Each view (house / Win98) wraps this.
+// Shared <head>: SEO, social cards, favicon. Desktop.astro wraps this.
 import { getImage } from 'astro:assets';
 import { site } from '../lib/content';
 import { img } from '../lib/images';
 import type { Seo } from '../lib/types';
 
-interface Props { seo: Seo; image?: string; bodyClass?: string }
-const { seo, image = site.defaultImage, bodyClass } = Astro.props;
+interface Props { seo: Seo; image?: string; bodyClass?: string; noindex?: boolean }
+const { seo, image = site.defaultImage, bodyClass, noindex = false } = Astro.props;
 const description = seo.description ?? site.description;
 const canonical = new URL(Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '/'), site.url).href;
 const og = await getImage({ src: img(image), width: 1200, format: 'jpg' });
@@ -16,11 +16,14 @@ const ogUrl = new URL(og.src, site.url).href;
 <html lang="en-GB">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <slot name="head-start" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{seo.title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow, noarchive" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#008080" />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={seo.title} />
     <meta property="og:description" content={description} />
