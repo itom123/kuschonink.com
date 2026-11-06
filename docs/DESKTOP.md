@@ -18,7 +18,10 @@ Ground rules:
   [98.css](https://github.com/jdan/98.css) (MIT, vendored in `src/styles/vendor/`)
   draws the basic controls.
 - **Everything works with a keyboard, a screen reader, a touch screen and
-  "reduce motion".**
+  "reduce motion".** On a touch screen a double-tap is two taps, never a zoom
+  (`touch-action: manipulation` on every element, in `desktop.css`; whatever
+  handles touches itself sets its own), and on an iPhone or iPad typing in a
+  text box doesn't zoom the page (`textzoom.ts`). Pinching still zooms.
 
 ## The pieces
 
@@ -51,6 +54,7 @@ Ground rules:
 | `dialogs.ts`, `properties.ts`, `aboutbox.ts` | Message boxes, dialog windows, Properties sheets |
 | `boot.ts`, `session.ts` | Start-up, log-on, log off, shut down, stand by |
 | `sound.ts`, `trails.ts`, `tooltips.ts` | Sounds, pointer trails, yellow tooltips |
+| `textzoom.ts` | iPhone and iPad: a text box in use doesn't zoom the page (the desktop's text is under the 16px that sets iOS zooming) |
 | `screensaver.ts`, `whatsthis.ts` | Idle timer for the screen saver; What's This? notes |
 | `settings.ts` | Visitor settings (Control Panel) |
 | `api.ts` | `window.kus98`, what page content may ask of the desktop |

@@ -28,6 +28,11 @@
 }
 
 html { height: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+/* Touch screens: a double-tap is two taps (the desktop's double-click), never a zoom;
+   pinching still zooms. On every element, since iPhones look no further up than the
+   nearest scrolling box. With no specificity, so whatever handles touches itself (title
+   bars, the house map, Paint's picture) keeps its own touch-action. */
+* { touch-action: manipulation; }
 body.kus98 {
   margin: 0;
   min-height: 100%;
