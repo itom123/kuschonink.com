@@ -163,7 +163,6 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
 }
 .map-mini.turning { cursor: grabbing; }
 @container house (max-width: 600px) { .map-mini { width: 108px; height: 108px; } }
-@container house (max-width: 480px) { .map-mini { width: 76px; height: 76px; } }
 .map-zoom { right: 12px; bottom: 20px; display: flex; flex-direction: column; }
 .map-search { z-index: 6; left: 12px; top: 12px; width: min(320px, calc(100cqw - 24px)); }
 .map-search input[type='search'] { font: inherit; width: 100%; height: auto; padding: 4px 6px; line-height: normal; box-sizing: border-box; border: 2px inset #808080; box-shadow: none; background: #fff; }
@@ -209,12 +208,25 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
   .has-panel .map-floors { bottom: calc(55cqh + 92px); }
   .has-panel .map-blueprint { display: none; }
 }
-/* Phones, with a room open: the plan above the sheet is short, so the floor and zoom
-   buttons sit in one row just above the sheet, and the small turning house steps aside. */
+/* Phones. Held upright the plan is narrow, on their side it is short: either way the small
+   turning house would cover too much of it, so it goes (tablets and computers keep it).
+   Where the plan is short, the floor and zoom buttons sit in one row at the bottom. */
 @container house (max-width: 480px) {
-  .has-panel .map-mini { display: none; }
+  .map-mini { display: none; }
+  /* With a room open, the plan above the sheet is short too. */
   .has-panel .map-floors, .has-panel .map-zoom { flex-direction: row; bottom: calc(55cqh + 8px); }
   .has-panel .map-zoom { right: calc(12px + 4 * 34px + 8px); }
+}
+@container house (max-height: 320px) {
+  .map-mini { display: none; }
+  .map-floors, .map-zoom { flex-direction: row; bottom: 12px; }
+  .map-zoom { right: calc(12px + 4 * 34px + 8px); }
+  .has-panel .map-floors { right: calc(min(560px, 45cqw) + 12px); bottom: 12px; }
+  .has-panel .map-zoom { right: calc(min(560px, 45cqw) + 12px + 4 * 34px + 8px); bottom: 12px; }
+}
+@container house (max-height: 320px) and (max-width: 800px) {
+  .has-panel .map-floors { right: 12px; bottom: calc(55cqh + 8px); }
+  .has-panel .map-zoom { right: calc(12px + 4 * 34px + 8px); bottom: calc(55cqh + 8px); }
 }
 
 .noscript-index { position: relative; z-index: 10; background: #fff; padding: 12px 16px; }
