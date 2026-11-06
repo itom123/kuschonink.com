@@ -1,5 +1,7 @@
-// A small RFC 5322 / MIME builder for the classic Email Routing send path,
-// which only accepts a raw message (cloudflare:email EmailMessage).
+// The email, shaped for each of the two ways the EMAIL binding sends:
+// forBinding() for the structured Email Service API, and buildMime(), a small
+// RFC 5322 / MIME builder, for the classic Email Routing path, which only
+// accepts a raw message (cloudflare:email EmailMessage).
 import type { Attachment, EmailOut } from './contact';
 
 const encoder = new TextEncoder();
@@ -86,4 +88,33 @@ export function buildMime(mail: EmailOut, to: string, id: string, date = new Dat
     root = multipart('mixed', `kuschonink-${id}-mix`, [part([`Content-Type: ${root.type}`], root.body), ...files.map(attachmentPart)]);
   }
   return [...top, `Content-Type: ${root.type}`, '', root.body].join('\r\n');
+}
+
+/** Base64 → bytes. */
+export function bytesFromBase64(b64: string): Uint8Array {
+  const bin = atob(b64.replace(/\s+/g, ''));
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+/**
+ * The message for the structured API: env.EMAIL.send({ ...mail, to }), with
+ * attachments as bytes. Given a string, the binding sends it as text (a
+ * base64 string arrived as base64 text, not as the picture), so the
+ * base64 `content` of each attachment is decoded first.
+ */
+export function forBinding(mail: EmailOut, to: string) {
+  const { attachments, ...rest } = mail;
+  if (!attachments?.length) return { ...rest, to };
+  // An ArrayBuffer, as in Cloudflare's own examples (await file.arrayBuffer()).
+  const bytes = new Map<string, ArrayBuffer>();
+  return {
+    ...rest,
+    to,
+    attachments: attachments.map((a) => {
+      if (!bytes.has(a.content)) bytes.set(a.content, bytesFromBase64(a.content).buffer as ArrayBuffer);
+      return { ...a, content: bytes.get(a.content)! };
+    }),
+  };
 }

@@ -2,7 +2,7 @@
 import { deflateSync, crc32 } from 'node:zlib';
 import { handleDrawing, parsePicture, pictureName, MAX_SIDE, type DrawingSubmission } from './drawing.ts';
 import type { Deps, EmailOut } from './contact.ts';
-import { buildMime } from './mime.ts';
+import { buildMime, forBinding } from './mime.ts';
 
 /** A real PNG: w × h, RGB, a diagonal stripe so it compresses like a drawing. */
 function png(w: number, h: number, { truncate = false } = {}): Buffer {
@@ -73,7 +73,10 @@ const check = async (name: string, r: Promise<Response>, status: number, error?:
 const b = await check('valid drawing is sent', handleDrawing(req(good), deps()), 202);
 const m = sent[0];
 const a = m?.attachments?.[0];
-ok(!!a && a.disposition === 'inline' && a.type === 'image/png' && a.contentId === 'drawing@kuschonink.com' && a.content === picture.toString('base64'), '  the picture travels inline, unchanged');
+const file = m?.attachments?.[1];
+ok(m?.attachments?.length === 2, '  the picture goes twice: shown in the message, and as a file');
+ok(!!a && a.disposition === 'inline' && a.type === 'image/png' && a.contentId === 'drawing@kuschonink.com' && a.content === picture.toString('base64'), '  shown inline (cid:), unchanged');
+ok(!!file && file.disposition === 'attachment' && file.type === 'image/png' && !file.contentId && file.content === a?.content && file.filename === a?.filename, '  attached as a file, the same PNG under the same name');
 ok(/^drawing-\d{8}-\d{4}-ann\.png$/.test(a?.filename ?? '') && b.filename === a?.filename && b.width === 320 && b.height === 240, '  named by date and drawer, size reported', a?.filename);
 ok(m?.replyTo === 'ann@example.com' && m.subject === 'kuschonink.com: a drawing from Ann', '  reply goes to the visitor; subject names them');
 ok(!!m && m.html.includes('src="cid:drawing@kuschonink.com"') && m.html.includes('&lt;b&gt;') && !m.html.includes('<b>'), '  HTML shows the picture and escapes the note');
@@ -120,18 +123,29 @@ ok(pictureName('小明', at) === 'drawing-20261106-1432.png', 'file name: Chines
 ok(pictureName('Zoë "the" <Painter>', at) === 'drawing-20261106-1432-zoe-the-painter.png', 'file name: accents and symbols', pictureName('Zoë "the" <Painter>', at));
 ok(pictureName('a'.repeat(40), at).length === 'drawing-20261106-1432-'.length + 24 + 4, 'file name: long names are cut');
 
-// The raw message (the classic Email Routing path) with the picture inside.
+// The structured API (the binding): pictures as bytes. Given a string, the
+// binding sends it as text: the first live drawing arrived as base64 text.
+const bound = forBinding(sent[0] ?? m, 'to@example.com') as { to: string; attachments: { content: unknown; disposition: string }[] };
+ok(bound.to === 'to@example.com' && bound.attachments.length === 2, 'binding: addressed, both attachments there');
+ok(bound.attachments.every((x) => x.content instanceof ArrayBuffer && Buffer.from(x.content as ArrayBuffer).equals(picture)), 'binding: each attachment is the PNG\'s bytes (an ArrayBuffer), not a base64 string');
+ok(bound.attachments[0].content === bound.attachments[1].content, 'binding: the picture is decoded once for both');
+const contactMail = { from: { email: 'noreply@kuschonink.com', name: 'kuschonink.com' }, replyTo: 'ann@example.com', subject: 's', text: 't', html: 'h' };
+ok(!('attachments' in forBinding(contactMail, 'to@example.com')), 'binding: a contact-form message is sent as before (no attachments key)');
+
+// The raw message (the classic Email Routing path) with the picture inside and attached.
 const mime = buildMime(sent[0] ?? m, 'to@example.com', 'abc', new Date(0));
+const mixIdx = mime.indexOf('Content-Type: multipart/mixed; boundary="kuschonink-abc-mix"');
 const relIdx = mime.indexOf('Content-Type: multipart/related; boundary="kuschonink-abc-rel"; type="multipart/alternative"');
 const altIdx = mime.indexOf('Content-Type: multipart/alternative; boundary="kuschonink-abc-alt"');
 const imgIdx = mime.indexOf('Content-Type: image/png; name="');
-ok(relIdx > 0 && altIdx > relIdx && imgIdx > altIdx, 'raw MIME: related ⊃ alternative, then the picture');
-ok(mime.includes('Content-ID: <drawing@kuschonink.com>') && mime.includes('Content-Disposition: inline; filename="drawing-'), 'raw MIME: the picture has its Content-ID and file name');
+const fileIdx = mime.indexOf('Content-Disposition: attachment; filename="drawing-');
+ok(mixIdx > 0 && relIdx > mixIdx && altIdx > relIdx && imgIdx > altIdx && fileIdx > imgIdx, 'raw MIME: mixed ⊃ (related ⊃ alternative + the picture) + the file');
+ok(mime.includes('Content-ID: <drawing@kuschonink.com>') && mime.includes('Content-Disposition: inline; filename="drawing-'), 'raw MIME: the shown picture has its Content-ID and file name');
 ok(!mime.includes('Reply-To:'), 'raw MIME: no Reply-To when no email was given');
-ok(mime.endsWith('--kuschonink-abc-rel--\r\n') && mime.includes('--kuschonink-abc-alt--'), 'raw MIME: both multiparts are closed');
+ok(mime.endsWith('--kuschonink-abc-mix--\r\n') && mime.includes('--kuschonink-abc-rel--') && mime.includes('--kuschonink-abc-alt--'), 'raw MIME: every multipart is closed');
 ok(mime.split('\r\n').every((l) => l.length <= 998), 'raw MIME: no line over 998 characters');
-const imgBody = mime.slice(imgIdx).split('\r\n\r\n')[1].split('\r\n--')[0].replace(/\r\n/g, '');
-ok(Buffer.from(imgBody, 'base64').equals(sent[0]?.attachments?.[0].content ? Buffer.from(sent[0].attachments[0].content, 'base64') : picture), 'raw MIME: the picture decodes back to the same bytes');
+const partBody = (at: number) => Buffer.from(mime.slice(at).split('\r\n\r\n')[1].split('\r\n--')[0].replace(/\r\n/g, ''), 'base64');
+ok(partBody(imgIdx).equals(picture) && partBody(fileIdx).equals(picture), 'raw MIME: both parts decode back to the same PNG');
 const withReply = buildMime(m, 'to@example.com', 'abc', new Date(0));
 ok(withReply.includes('Reply-To: <ann@example.com>'), 'raw MIME: Reply-To when an email was given');
 

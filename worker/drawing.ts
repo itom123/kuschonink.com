@@ -1,5 +1,6 @@
 // Paint's "Send to Xiangyin": a drawing (a PNG), with an optional name, email
-// and note, emailed to the artist's inbox with the picture in the message.
+// and note, emailed to the artist's inbox: the picture is shown in the
+// message and attached as a file.
 // The same checks as the contact form: origin → size → validation → rate
 // limit → Turnstile. Only a complete PNG within the size limits is accepted.
 // Nothing is stored: the picture goes into the email and nowhere else.
@@ -109,7 +110,7 @@ export function buildDrawingEmail(p: DrawingSubmission, pic: Picture, date = new
   // Shown at most 640 px wide in the message; the file itself is full size.
   const showW = Math.min(pic.width, 640);
   const showH = Math.round((pic.height * showW) / pic.width);
-  const lines = [`From: ${who}`, `Email: ${reply}`, `Picture: ${filename} (${size}), shown in this email`, ''];
+  const lines = [`From: ${who}`, `Email: ${reply}`, `Picture: ${filename} (${size}), attached`, ''];
   if (p.message) lines.push('Note:', p.message);
   else lines.push('(No note.)');
   return {
@@ -124,9 +125,13 @@ export function buildDrawingEmail(p: DrawingSubmission, pic: Picture, date = new
       `<dt>From</dt><dd>${escapeHtml(who)}</dd>` +
       `<dt>Email</dt><dd>${escapeHtml(reply)}</dd>` +
       `<dt>Note</dt><dd style="white-space:pre-wrap">${p.message ? escapeHtml(p.message) : '<i>No note.</i>'}</dd>` +
-      `<dt>Picture</dt><dd>${escapeHtml(filename)}, ${escapeHtml(size)}</dd>` +
+      `<dt>Picture</dt><dd>${escapeHtml(filename)}, ${escapeHtml(size)} (attached)</dd>` +
       '</dl>',
-    attachments: [{ content: pic.base64, filename, type: 'image/png', disposition: 'inline', contentId: CID }],
+    // The same PNG twice: shown in the message (cid:), and as a file to save.
+    attachments: [
+      { content: pic.base64, filename, type: 'image/png', disposition: 'inline', contentId: CID },
+      { content: pic.base64, filename, type: 'image/png', disposition: 'attachment' },
+    ],
   };
 }
 
