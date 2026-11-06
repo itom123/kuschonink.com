@@ -18,7 +18,12 @@ Ground rules:
   [98.css](https://github.com/jdan/98.css) (MIT, vendored in `src/styles/vendor/`)
   draws the basic controls.
 - **Everything works with a keyboard, a screen reader, a touch screen and
-  "reduce motion".**
+  "reduce motion".** On a touch screen a double-tap is two taps, never a zoom
+  (`touch-action: manipulation` on every element, in `desktop.css`; whatever
+  handles touches itself sets its own), and on an iPhone or iPad typing in a
+  text box doesn't zoom the page (`textzoom.ts`). Pinching still zooms. A tap
+  opens an icon, and a double-tap opens it once: its second tap is dropped,
+  even if the window has already opened under the finger (`icons.ts`).
 
 ## The pieces
 
@@ -44,13 +49,14 @@ Ground rules:
 | --- | --- |
 | `index.ts` | Starts everything; registers commands; loads the larger programs on first use |
 | `wm.ts` | Window manager: focus, stacking, move (outline or full), resize, minimise, maximise, modal dialogs |
-| `router.ts` | Opens pages in windows: fetches the page, swaps the window, keeps the browser's address and history in step |
+| `router.ts` | Opens pages in windows: fetches the page, swaps the window, keeps the browser's address and history in step. A page asked for twice is fetched once; a navigation that's overtaken stops waiting but doesn't cancel the request the newer one waits for |
 | `taskbar.ts`, `startmenu.ts`, `tray.ts` | Taskbar buttons, clock, Start menu (Documents ▸ remembers recent pages), volume |
 | `menu.ts`, `menubar.ts`, `winmenus.ts`, `contextmenu.ts` | One menu engine for the Start menu, menu bars and right-click menus (press and hold on touch, Shift+F10) |
 | `icons.ts` | Icons on the desktop and in folders: select, double-click, drag, rubber band, arrow keys |
 | `dialogs.ts`, `properties.ts`, `aboutbox.ts` | Message boxes, dialog windows, Properties sheets |
 | `boot.ts`, `session.ts` | Start-up, log-on, log off, shut down, stand by |
 | `sound.ts`, `trails.ts`, `tooltips.ts` | Sounds, pointer trails, yellow tooltips |
+| `textzoom.ts` | iPhone and iPad: a text box in use doesn't zoom the page (the desktop's text is under the 16px that sets iOS zooming) |
 | `screensaver.ts`, `whatsthis.ts` | Idle timer for the screen saver; What's This? notes |
 | `settings.ts` | Visitor settings (Control Panel) |
 | `memory.ts` | What the desktop remembers between page loads: each program's window as it was left, the whole desktop for a refresh, and whether the home page opens Welcome |

@@ -17,6 +17,29 @@ let lastClick: { el: HTMLElement | null; t: number } = { el: null, t: 0 };
 let suppressClick = false;
 let hintsShown = 0;
 let hintTimer = 0;
+/** Where and when a tap opened an icon (on a touch screen a tap opens), and when its second tap was dropped. */
+let tapOpened = { t: -Infinity, x: 0, y: 0 };
+let droppedAt = -Infinity;
+
+/**
+ * A double-tap opens once, as a double-click does: its second tap is dropped, whether it
+ * lands on the same icon or in the window that has just opened under the finger.
+ */
+function dropSecondTap(e: MouseEvent) {
+  const now = performance.now();
+  if (e.type === 'dblclick') {
+    if (now - droppedAt < 300) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+    return;
+  }
+  if (now - tapOpened.t > settings.get().dblClickMs || Math.hypot(e.clientX - tapOpened.x, e.clientY - tapOpened.y) > 40) return;
+  tapOpened.t = -Infinity;
+  droppedAt = now;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+}
 
 const iconsIn = (group: Element) => [...group.querySelectorAll<HTMLElement>('.icon')].filter((i) => i.getClientRects().length > 0);
 
@@ -187,6 +210,7 @@ function onClick(e: MouseEvent) {
   if (single) {
     select(icon);
     openIcon(icon);
+    if (lastPointer !== 'mouse' && e.detail !== 0) tapOpened = { t: now, x: e.clientX, y: e.clientY };
     return;
   }
   if (lastClick.el === icon && now - lastClick.t < s.dblClickMs) {
@@ -374,6 +398,9 @@ export function resetIconPlaces() {
 }
 
 export function initDesktopIcons() {
+  // Before anything else sees the click (it may land in a window that has just opened).
+  addEventListener('click', dropSecondTap, true);
+  addEventListener('dblclick', dropSecondTap, true);
   const group = document.getElementById('k98-icons');
   const area = document.getElementById('k98-desktop');
   if (!group || !area) return;
