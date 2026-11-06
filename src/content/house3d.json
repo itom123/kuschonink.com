@@ -1,0 +1,30 @@
+{
+  "_comment": "Details for the 3D house (/house/3d), traced from the floor plans and from notes on how the house really is. Millimetres in plan coordinates, like house.json, which holds the doors, the passages and the extra walls (the 2D map draws them too). glazing: floor-to-ceiling windows in a wall (glass doors are doors, in house.json). stairs: the staircases as they are (u: up the east side, across the north, down the west side, round the core; flight: one straight run). wells: holes in a floor where stairs come up, as polygons. cellar: the garage's steps down from the hall, the stair up to the loft, and the loft.",
+  "glazing": {
+    "f1": [
+      { "_": "living room onto the porch: a floor-to-ceiling window, left of the glass door M-1", "line": [4000, 13400, 8300, 13400], "kind": "window" }
+    ]
+  },
+  "stairs": {
+    "u": {
+      "_": "wooden, ground floor to first floor: north up the east side, west along the north, south down the west side",
+      "from": "f1", "to": "f2",
+      "east": [6900, 7750], "north": [2950, 3780], "west": [3750, 4620], "start": 5500, "end": 5450
+    },
+    "flight": {
+      "_": "straight, first floor to attic, north up the east strip of the stairwell",
+      "from": "f2", "to": "attic",
+      "x": [6900, 7700], "y": [5500, 2950]
+    }
+  },
+  "wells": {
+    "f2": [[3700, 2900], [6880, 2900], [6880, 3800], [4650, 3800], [4650, 5500], [3700, 5500]],
+    "attic": [[6880, 2900], [7720, 2900], [7720, 4700], [6880, 4700]]
+  },
+  "cellar": {
+    "room": "f1/garage",
+    "steps": { "x": [8100, 8800], "y": 5600 },
+    "stair": { "x": [9000, 11200], "y": [5000, 5500] },
+    "loft": { "x": [11200, 14600], "y": [4300, 5500], "height": 1600 }
+  }
+}

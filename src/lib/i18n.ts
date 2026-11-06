@@ -27,6 +27,12 @@ export const floorZh = (zh: string) => zh.replace(/平面图$/, '');
 export const chapter = (n: number | undefined): Bi =>
   n === undefined ? { en: 'Chapter —', zh: '第—章' } : { en: `Chapter ${n}`, zh: `第${n}章` };
 
+/** "Up to the first floor" / "上楼到二层". */
+export const stairsTo = (dir: 'up' | 'down', floor: { name: string; zh: string }): Bi => ({
+  en: `${dir === 'up' ? 'Up' : 'Down'} to the ${floor.name.toLowerCase()}`,
+  zh: `${dir === 'up' ? '上楼' : '下楼'}到${floorZh(floor.zh)}`,
+});
+
 export const drawerN = (n: number): Bi => ({ en: `drawer ${n}`, zh: `第${n}格抽屉` });
 
 export const t = {
@@ -41,7 +47,30 @@ export const t = {
   zoom: { en: 'Zoom', zh: '缩放' },
   zoomIn: { en: 'Zoom in', zh: '放大' },
   zoomOut: { en: 'Zoom out', zh: '缩小' },
-  mapHelp: { en: 'Floorplan. Drag to move, scroll to zoom, PageUp and PageDown change floors.', zh: '平面图。拖动以移动，滚动以缩放，PageUp 和 PageDown 切换楼层。' },
+  mapHelp: { en: 'Floorplan. Drag to move, scroll to zoom. PageUp and PageDown, or R, A, 2 and 1, change floors.', zh: '平面图。拖动以移动，滚动以缩放。PageUp 和 PageDown，或 R、A、2、1 键切换楼层。' },
+  up: { en: 'Up', zh: '上楼' },
+  down: { en: 'Down', zh: '下楼' },
+  nextDoor: { en: 'Next door', zh: '隔壁' },
+  stairs: { en: 'Stairs', zh: '楼梯' },
+  north: { en: 'North', zh: '北' },
+  east: { en: 'East', zh: '东' },
+  south: { en: 'South', zh: '南' },
+  west: { en: 'West', zh: '西' },
+  section: { en: 'Section through the house', zh: '房子剖面' },
+  in3d: { en: '3D', zh: '3D' },
+  seeIn3d: { en: 'See this room in 3D', zh: '在3D模型中查看这个房间' },
+  model3d: { en: 'The house in 3D', zh: '3D房子' },
+  miniHouse: { en: 'Where you are in the house. Drag to turn it; double-click to face the front.', zh: '你在房子里的位置。拖动以旋转；双击回到正面。' },
+  model3dHelp: { en: 'A rough model of the house, after the drawings. Drag to turn it, scroll or pinch to zoom, click a room. Blueprint lays the drawing on each floor.', zh: '按图纸做的房子粗略模型。拖动以旋转，滚动或双指缩放，点击一个房间。“蓝图”把图纸铺在每层楼面上。' },
+  liftFloors: { en: 'Lift floors', zh: '分开楼层' },
+  openChapter: { en: 'Open this chapter', zh: '打开这一章' },
+  backToPlan: { en: 'Floorplan', zh: '平面图' },
+  wholeHouse: { en: 'Whole house, with the roof', zh: '整座房子（含屋顶）' },
+  noWebgl: { en: 'This browser can’t draw the 3D house. The floorplan works everywhere.', zh: '这个浏览器无法绘制3D房子。平面图在任何地方都能用。' },
+  noWebglWhy: { en: 'Its graphics (WebGL) are off or blocked. In Chrome, check Settings → System → “Use graphics acceleration when available”, or open chrome://gpu.', zh: '它的图形功能（WebGL）被关闭或被阻止。在 Chrome 中，请检查“设置 → 系统 → 使用图形加速功能（如果可用）”，或打开 chrome://gpu。' },
+  glLost: { en: 'The graphics card stopped drawing the house.', zh: '显卡停止绘制这座房子了。' },
+  glRetry: { en: 'Draw it again', zh: '重新绘制' },
+
   locked: { en: 'locked', zh: '上锁' },
   noDoorToast: { en: 'This room has no door.', zh: '这个房间没有门。' },
   close: { en: 'Close and return to the floorplan', zh: '关闭并回到平面图' },

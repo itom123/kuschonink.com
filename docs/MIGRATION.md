@@ -1,7 +1,11 @@
 # Migration from Squarespace
 
-> The site has since been redesigned as *the house* (see the README). The old
-> URLs `/image/<slug>`, `/about` and `/contact` still work, in the simple view.
+> The site has since been redesigned twice: first as *the house*, then as
+> *Xiangyin 98*, a Windows 98-style desktop in which every page opens in a
+> window (see the README and [`DESKTOP.md`](DESKTOP.md)). The old URLs
+> `/image/<slug>`, `/about` and `/contact` still work and are still ordinary
+> pages; `/` is now the Welcome window and the house façade moved to
+> `/house/facade`.
 
 Migrated on 29 October 2026 by crawling the live site (https://kuschonink.com).
 
@@ -9,7 +13,7 @@ Migrated on 29 October 2026 by crawling the live site (https://kuschonink.com).
 
 **Pages (17 routes, same URLs as before)**
 
-- `/` and `/image`: project index over the archive background image (now: `/` is the house façade, `/image` the simple view)
+- `/` and `/image`: project index over the archive background image (now: `/` is the Welcome window, `/image` the Projects folder)
 - `/about`: biography and *Selected Conferences, Exhibitions & Programs*
 - `/contact`: email, phone, contact form, closing banner
 - 13 projects under `/image/…`: Failure of Memory, Dissecting Memories,

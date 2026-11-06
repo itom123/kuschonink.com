@@ -1,0 +1,135 @@
+---
+// One program window. The server renders it so every URL is a real page;
+// the shell (src/scripts/desktop) makes it movable, resizable and stackable.
+// Contract the shell relies on (see docs/DESKTOP.md):
+//   [data-window][data-app][data-url][data-state]  the window
+//   [data-window-inner]  everything below the title bar; swapped when the window navigates
+//   [data-window-body]   the scrolling content area
+//   [data-keep="…"]      a node carried over when the window navigates (the house map)
+//   [data-cmd="…"]       minimize, maximize, close, back, forward, up, home, refresh, stop
+import { APPS, addressFor, cleanPath, type AppId } from '../../lib/apps';
+import type { QuickLink, Tool } from '../../lib/chrome';
+import { accelKey, biAccelHtml, MENU_ZH, plainLabel } from '../../lib/menus';
+import { attr, type Bi as BiText } from '../../lib/i18n';
+import Bi from '../Bi.astro';
+
+interface Props {
+  /** Toolbar buttons (commands need JavaScript and are hidden without it). */
+  tools?: Tool[];
+  /** The Links bar under the address bar. */
+  links?: QuickLink[];
+  app: AppId;
+  /** Title bar and taskbar text, in English and (optionally) Chinese. */
+  title: string | BiText;
+  icon?: string;
+  /** This page's path; defaults to the current URL. */
+  url?: string;
+  /** Address bar text; false hides the address bar. */
+  address?: string | false;
+  /** Status bar fields. */
+  status?: string | BiText | (string | BiText)[];
+  variant?: 'folder' | 'browser' | 'document' | 'mail' | 'help' | 'welcome' | 'dialog' | 'error';
+  maximized?: boolean;
+  w?: number;
+  h?: number;
+  bodyClass?: string;
+  /** Where "the same thing in another program" lives (house room ↔ project). */
+  alt?: string;
+  /** The program's home page (toolbar Home). */
+  home?: string;
+  /** Menu bar menus ("&File"…); defaults by variant. */
+  menus?: string[];
+}
+const MENUS: Record<string, string[]> = {
+  folder: ['&File', '&Edit', '&View', '&Go', 'F&avorites', '&Help'],
+  browser: ['&File', '&Edit', '&View', '&Go', 'F&avorites', '&Help'],
+  document: ['&File', '&Edit', '&View', '&Help'],
+  mail: ['&File', '&Edit', '&View', '&Help'],
+};
+const { app, title, icon, url, address, status, variant = 'folder', maximized, w, h, bodyClass, alt, home, tools = [], links = [], menus } = Astro.props;
+const menuNames = menus ?? MENUS[variant] ?? [];
+const info = APPS[app];
+const path = cleanPath(url ?? Astro.url.pathname);
+const ico = icon ?? info.icon;
+const addr = address === false ? null : (address ?? addressFor(path));
+const fields = status == null ? [] : Array.isArray(status) ? status : [status];
+const bi = (x: string | BiText): BiText => (typeof x === 'string' ? { en: x, zh: '' } : x);
+const titleId = `${app}-title`;
+---
+<section
+  class:list={['window', 'app-window', `v-${variant}`]}
+  data-window
+  data-app={app}
+  data-url={path}
+  data-state={maximized ?? info.max ? 'max' : 'normal'}
+  data-icon={ico}
+  data-alt-href={alt}
+  data-home={home}
+  aria-labelledby={titleId}
+  style={`--w:${w ?? info.w}px;--h:${h ?? info.h}px`}
+>
+  <div class="title-bar" data-drag>
+    <div class="title-bar-text">
+      <span class={`ico ico16 ico-${ico} title-ico`} data-cmd="sysmenu" aria-hidden="true"></span>
+      <span class="title-text" id={titleId} data-title><Bi t={bi(title)} /></span>
+    </div>
+    <div class="title-bar-controls">
+      <button type="button" class="tb-btn tb-min" data-cmd="minimize" {...attr('aria-label', { en: 'Minimize', zh: '最小化' })} {...attr('title', { en: 'Minimize', zh: '最小化' })}></button>
+      <button type="button" class="tb-btn tb-max" data-cmd="maximize" {...attr('aria-label', { en: 'Maximize', zh: '最大化' })} {...attr('title', { en: 'Maximize', zh: '最大化' })}></button>
+      <a class="tb-btn tb-close" href="/" data-cmd="close" {...attr('aria-label', { en: 'Close', zh: '关闭' })} {...attr('title', { en: 'Close', zh: '关闭' })}></a>
+    </div>
+  </div>
+  <div class="window-inner" data-window-inner>
+    {menuNames.length > 0 && (
+      <div class="menubar" role="menubar" {...attr('aria-label', { en: 'Menu bar', zh: '菜单栏' })} data-js-only>
+        {menuNames.map((m) => (
+          <button type="button" class="mb-item" role="menuitem" aria-haspopup="menu" aria-expanded="false" data-menu={plainLabel(m).toLowerCase()} data-key={accelKey(m)} set:html={biAccelHtml(m, MENU_ZH[m])} />
+        ))}
+      </div>
+    )}
+    {(tools.length > 0 || Astro.slots.has('toolbar')) && (
+      <div class="toolbar" role="toolbar" {...attr('aria-label', { en: 'Standard buttons', zh: '标准按钮' })} data-js-only={tools.every((t) => !t.href) && !Astro.slots.has('toolbar') ? '' : undefined}>
+        {tools.map((t) => {
+          const tip = attr('title', { en: t.title ?? t.label, zh: t.titleZh ?? t.zh ?? '' });
+          return t.sep ? (
+            <span class="tool-sep" aria-hidden="true"></span>
+          ) : t.href ? (
+            <a class="tool" href={t.href} {...tip}><span class={`ico ico20 ico-${t.icon}`} aria-hidden="true"></span><Bi t={{ en: t.label, zh: t.zh ?? '' }} /></a>
+          ) : (
+            <button type="button" class="tool" data-cmd={t.cmd} {...tip} data-js-only><span class={`ico ico20 ico-${t.icon}`} aria-hidden="true"></span><Bi t={{ en: t.label, zh: t.zh ?? '' }} /></button>
+          );
+        })}
+        <slot name="toolbar" />
+      </div>
+    )}
+    {addr && (
+      <div class="addressbar">
+        <label for={`${app}-address`}><span data-l="en">A<u>d</u>dress</span><span data-l="zh" lang="zh-Hans">地址(<u>D</u>)</span></label>
+        <div class="address-field">
+          <span class={`ico ico16 ico-${ico}`} aria-hidden="true"></span>
+          <input id={`${app}-address`} type="text" value={addr} data-address readonly spellcheck="false" autocomplete="off" />
+        </div>
+      </div>
+    )}
+    {links.length > 0 && (
+      <nav class="linksbar" {...attr('aria-label', { en: 'Links', zh: '链接' })}>
+        <span class="links-label" aria-hidden="true"><Bi t={{ en: 'Links', zh: '链接' }} /></span>
+        {links.map((l) => (
+          <a class="link-btn" href={l.href} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener' : undefined}>
+            <span class={`ico ico16 ico-${l.icon ?? 'topic'}`} aria-hidden="true"></span><Bi t={{ en: l.label, zh: l.zh ?? '' }} />
+          </a>
+        ))}
+      </nav>
+    )}
+    <div class="window-main">
+      {Astro.slots.has('side') && <aside class="window-side"><slot name="side" /></aside>}
+      <div class:list={['wbody', bodyClass]} data-window-body tabindex="-1"><slot /></div>
+    </div>
+    {fields.length > 0 && (
+      <div class="status-bar">
+        {fields.map((f) => <p class="status-bar-field"><Bi t={bi(f)} /></p>)}
+        <span class="grip ico ico-grip" data-resize="se" aria-hidden="true"></span>
+      </div>
+    )}
+  </div>
+</section>

@@ -2,9 +2,9 @@
 import Section from '../Section.astro';
 import RoomInterior from './RoomInterior.astro';
 import { projects, about, contact, site } from '../../lib/content';
-import { neighbours, house, rooms, type Room } from '../../lib/house';
+import { neighbours, exitsOf, house, rooms, type Room } from '../../lib/house';
 import Bi from '../Bi.astro';
-import { t, attr, chapter, statusZh } from '../../lib/i18n';
+import { t, attr, chapter, statusZh, stairsTo } from '../../lib/i18n';
 
 interface Props { room: Room }
 const { room } = Astro.props;
@@ -16,6 +16,9 @@ const sections = project?.sections ?? (page === 'about' ? about.sections : page 
 const chapterOf = (r: Room) => chapter(r.locked ? undefined : r.chapter);
 const titleOf = (r: Room) => ({ en: r.title, zh: r.titleZh });
 const chapterLink = (r: Room) => ({ en: `${chapterOf(r).en}: ${r.title}`, zh: `${chapterOf(r).zh}：${r.titleZh}` });
+// The ways out of this room: up or down the stairs, and the rooms next door.
+const exits = exitsOf(room);
+const nameOf = (r: Room) => (r.contents ? { en: `${r.en}: ${r.title}`, zh: `${r.zh}：${r.titleZh}` } : { en: r.en, zh: r.zh || r.en });
 ---
 <aside class="room-panel" data-room-page={room.slug} aria-labelledby="room-title">
   <div class="panel-bar">
@@ -65,18 +68,18 @@ const chapterLink = (r: Room) => ({ en: `${chapterOf(r).en}: ${r.title}`, zh: `$
     {page === 'colophon' && (
       <div class="prose">
         <div data-l="en">
-          <p>{site.name}. <a href="/">kuschonink.com</a></p>
+          <p><a href="/">{site.name}</a>.</p>
           <p>The house is drawn from the plans of the 2008 renovation of the family house: ground floor, first floor, attic and roof, and the south elevation. {house.lockedNote}</p>
           <p>Its {rooms.length} chapters follow a knight’s tour of the house’s 5 × 5 structural grid, floor by floor, after Georges Perec’s <i>Life A User’s Manual</i> (1978). One room has no door.</p>
-          <p>The house collects: every room keeps one thing. The <a href="/image">simple view</a> classifies the same things into an array.</p>
+          <p>The house collects: every room keeps one thing. The <a href="/image">Projects folder</a> classifies the same things into an array.</p>
           <p>Appendices: <a href="/house/appendix/index">Index</a> · <a href="/house/appendix/chronology">Chronology</a> · <a href="/house/appendix/checklist">Checklist</a> · <a href="/house/appendix/rules">Rules</a>.</p>
           <p>Set in Times New Roman.</p>
         </div>
         <div data-l="zh" lang="zh-Hans">
-          <p>{site.name}。<a href="/">kuschonink.com</a></p>
+          <p><a href="/">{site.name}</a>。</p>
           <p>这座房子取自家宅2008年翻修时的图纸：一层、二层、阁楼层和屋顶，以及南立面。{house.lockedNoteZh}</p>
           <p>它的{rooms.length}个章节沿着骑士在房子5 × 5结构网格上的巡游，一层接一层排列，仿照乔治·佩雷克的《人生拼图版》（1978）。有一个房间没有门。</p>
-          <p>房子收藏：每个房间保存一样东西。<a href="/image">简易视图</a>把同样的东西分类成一个数组。</p>
+          <p>房子收藏：每个房间保存一样东西。<a href="/image">作品文件夹</a>把同样的东西分类成一个数组。</p>
           <p>附录：<a href="/house/appendix/index">索引</a> · <a href="/house/appendix/chronology">年表</a> · <a href="/house/appendix/checklist">章节清单</a> · <a href="/house/appendix/rules">规则</a>。</p>
           <p>以 Times New Roman 排印。</p>
         </div>
@@ -84,12 +87,38 @@ const chapterLink = (r: Room) => ({ en: `${chapterOf(r).en}: ${r.title}`, zh: `$
     )}
 
     {project && (
-      <p class="simple-link"><a href={`/image/${project.slug}`}><Bi t={{ en: `See “${project.title}” in the simple view`, zh: `在简易视图中查看《${project.titleZh ?? project.title}》` }} /></a></p>
+      <p class="simple-link"><a href={`/image/${project.slug}`}><Bi t={{ en: `Show “${project.title}” in the Projects folder`, zh: `在“作品”文件夹中显示《${project.titleZh ?? project.title}》` }} /></a></p>
     )}
-    {page === 'about' && <p class="simple-link"><a href="/about"><Bi t={{ en: 'About, in the simple view', zh: '在简易视图中查看“关于”' }} /></a></p>}
-    {page === 'contact' && <p class="simple-link"><a href="/contact"><Bi t={{ en: 'Contact, in the simple view', zh: '在简易视图中查看“联系”' }} /></a></p>}
+    {!room.locked && <p class="simple-link"><a href={`/house/3d?room=${room.slug}`}><Bi t={t.seeIn3d} /></a></p>}
+    {page === 'about' && <p class="simple-link"><a href="/about"><Bi t={{ en: 'Open About.doc', zh: '打开“关于.doc”' }} /></a></p>}
+    {page === 'contact' && <p class="simple-link"><a href="/contact"><Bi t={{ en: 'Open Contact (New Message)', zh: '打开“联系”（新邮件）' }} /></a></p>}
 
     <hr />
+    {(exits.up || exits.down || exits.byDir.length > 0) && (
+      <nav class="exits" {...attr('aria-label', t.nextDoor)}>
+        {(exits.up || exits.down) && (
+          <p class="exits-stairs">
+            {exits.up && <a href={`/house/${exits.up.to.slug}`} data-stairs="up">↑ <Bi t={stairsTo('up', exits.up.floor)} /></a>}
+            {exits.up && exits.down && ' · '}
+            {exits.down && <a href={`/house/${exits.down.to.slug}`} data-stairs="down">↓ <Bi t={stairsTo('down', exits.down.floor)} /></a>}
+          </p>
+        )}
+        {exits.byDir.length > 0 && (
+          <p class="exits-doors">
+            <b><Bi t={t.nextDoor} /><span data-l="en">:</span><span data-l="zh">：</span></b>
+            {exits.byDir.map((g, i) => (
+              <>
+                {i > 0 && ' · '}
+                <span class="exit-dir"><Bi t={t[g.dir]} /></span>{' '}
+                {g.rooms.map((r, j) => (
+                  <>{j > 0 && ', '}<a href={`/house/${r.slug}`}><Bi t={nameOf(r)} /></a></>
+                ))}
+              </>
+            ))}
+          </p>
+        )}
+      </nav>
+    )}
     <nav class="chapter-nav" {...attr('aria-label', t.chapters)}>
       {prev ? <a href={`/house/${prev.slug}`} rel="prev">← <Bi t={chapterLink(prev)} /></a> : <span />}
       {next ? <a href={`/house/${next.slug}`} rel="next"><Bi t={chapterLink(next)} /> →</a> : <a href="/house/appendix/index" rel="next"><Bi t={t.appendicesIndex} /> →</a>}

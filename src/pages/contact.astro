@@ -1,20 +1,53 @@
 ---
-import Win98 from '../layouts/Win98.astro';
+// Contact: a New Message window. The form, its fields and the backend are
+// the same as before (src/components/blocks/ContactForm.astro).
+import Desktop from '../layouts/Desktop.astro';
+import Window from '../components/desktop/Window.astro';
+import Blocks from '../components/Blocks.astro';
 import Section from '../components/Section.astro';
 import Bi from '../components/Bi.astro';
+import ContactForm from '../components/blocks/ContactForm.astro';
 import { contact as page, site } from '../lib/content';
 import { roomForPage } from '../lib/house';
-import { t, floorZh } from '../lib/i18n';
+import { t, attr, floorZh } from '../lib/i18n';
+import { SEP, type Tool } from '../lib/chrome';
 const room = roomForPage('contact');
 const title = { en: page.title, zh: page.titleZh ?? t.contact.zh };
+// The first section's text (the phone number) goes beside the message; later sections below it.
+const [first, ...rest] = page.sections;
+const details = first?.blocks.filter((b) => b.type !== 'contactForm') ?? [];
+const tools: Tool[] = [
+  { cmd: 'mail-send', label: 'Send', zh: '发送', icon: 'tb-send', title: 'Send the message', titleZh: '发送这条消息' },
+  SEP,
+  { cmd: 'help', label: 'Help', zh: '帮助', icon: 'help', title: 'Help', titleZh: '帮助' },
+];
 ---
-<Win98
-  seo={page.seo}
-  title={title}
-  address={`C:\\kuschonink\\contact.txt`}
-  houseHref={room ? `/house/${room.slug}` : '/house'}
-  status={room ? { en: `In the house: ${room.en}, ${room.floor.name.toLowerCase()}`, zh: `在房子里：${floorZh(room.floor.zh)}${room.zh}` } : { en: site.name, zh: site.name }}
->
-  <h1><Bi t={title} /></h1>
-  {page.sections.map((s, i) => <Section section={s} first={i === 0} />)}
-</Win98>
+<Desktop seo={page.seo}>
+  <Window
+    app="contact"
+    title={{ en: 'New Message', zh: '新邮件' }}
+    variant="mail"
+    icon="mail"
+    address={false}
+    tools={tools}
+    bodyClass="mail-desk"
+    alt={room ? `/house/${room.slug}` : undefined}
+    status={[
+      { en: `Write to ${site.name}. Every field is needed.`, zh: `写信给${site.name}。每一栏都要填写。` },
+      room ? { en: `In the house: ${room.en}, ${room.floor.name.toLowerCase()}`, zh: `在房子里：${floorZh(room.floor.zh)}${room.zh}` } : site.name,
+    ]}
+  >
+    <div class="mail-window">
+      <h1 class="sr-only"><Bi t={title} /></h1>
+      <ContactForm variant="mail" />
+      <aside class="mail-card doc" {...attr('aria-label', { en: 'Contact details', zh: '联系方式' })}>
+        <h2 class="mail-card-title"><Bi t={{ en: 'Contact details', zh: '联系方式' }} /></h2>
+        <Blocks blocks={details} />
+        <p><strong>Instagram</strong><br /><a href={site.social[0].href} target="_blank" rel="noopener"><Bi t={{ en: 'Follow on Instagram', zh: '在 Instagram 上关注' }} /></a></p>
+      </aside>
+      <div class="mail-stationery doc">
+        {rest.map((s) => <Section section={s} />)}
+      </div>
+    </div>
+  </Window>
+</Desktop>

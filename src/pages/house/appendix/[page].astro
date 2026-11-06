@@ -1,6 +1,8 @@
 ---
 // Perec's appendices: Index, Chronology, Checklist — plus the Rules of the house.
-import House from '../../../layouts/House.astro';
+import Desktop from '../../../layouts/Desktop.astro';
+import Window from '../../../components/desktop/Window.astro';
+import { HOUSE_LINKS, houseTools } from '../../../lib/chrome';
 import HouseMap from '../../../components/house/HouseMap.astro';
 import { rooms, roomByKey, perec, tour, latin, coordinate, roomsMentioning, house, type Room } from '../../../lib/house';
 import { projects, site } from '../../../lib/content';
@@ -55,9 +57,23 @@ const chapters = (e: Entry) =>
 const N = 5;
 const visit = new Map(tour.map(([c, r], i) => [`${c},${r}`, i + 1]));
 ---
-<House seo={{ title: `${title} — ${site.name}`, titleZh: `${titleBi.zh} — ${site.name}`, description: `${title} of the house, after Georges Perec’s Life A User’s Manual.` }} bodyClass="house-map-page">
+<Desktop seo={{ title: `${title} — ${site.name}`, titleZh: `${titleBi.zh} — ${site.name}`, description: `${title} of the house, after Georges Perec’s Life A User’s Manual.` }}>
+  <Window
+    app="house"
+    variant="browser"
+    title={{ en: `${title} - The House`, zh: `${titleBi.zh} - 房子` }}
+    home="/house/facade"
+    tools={houseTools()}
+    links={HOUSE_LINKS}
+    bodyClass="doc house-body"
+    status={[
+      { en: `Appendix · ${title}`, zh: `附录 · ${titleBi.zh}` },
+      { en: 'After Georges Perec, Life A User’s Manual', zh: '仿照乔治·佩雷克《人生拼图版》' },
+    ]}
+  >
+  <div class="house-view">
   <HouseMap />
-  <aside class="room-panel" data-panel="appendix" aria-labelledby="room-title" transition:animate="fade">
+  <aside class="room-panel" data-panel="appendix" aria-labelledby="room-title">
     <div class="panel-bar">
       <span><Bi t={tr.appendix} /> · <Bi t={titleBi} /></span>
       <a class="panel-close" href="/house" {...attr('aria-label', tr.close)}>[×]</a>
@@ -165,4 +181,6 @@ const visit = new Map(tour.map(([c, r], i) => [`${c},${r}`, i + 1]));
       </nav>
     </div>
   </aside>
-</House>
+  </div>
+  </Window>
+</Desktop>

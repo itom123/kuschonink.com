@@ -2,7 +2,7 @@
 // A plan of the room's furniture. Drawers can be opened; objects inside open
 // on a sheet of paper. The pieces' text is NOT in this page: it is fetched
 // from its own unlisted page (/house/drawer/<id>) only when opened.
-import { furnitureOf, placementsIn, type Room } from '../../lib/house';
+import { furnitureOf, placementsIn, doorsOfRoom, doorPlan, type Room } from '../../lib/house';
 import Bi from '../Bi.astro';
 import { t, attr, text, drawerN } from '../../lib/i18n';
 
@@ -10,7 +10,9 @@ interface Props { room: Room }
 const { room } = Astro.props;
 const furniture = furnitureOf(room);
 const placed = placementsIn(room);
-const [, , W, H] = room.rect;
+const [X, Y, W, H] = room.rect;
+// The room's doors, in the room's own coordinates; leaves are drawn only where they swing into this room.
+const doors = doorsOfRoom(room.floor, room).map((d) => ({ d, p: doorPlan(d), inside: !d.into || d.into === room.id }));
 const pad = 120;
 const inDrawer = (fid: string, n: number) => placed.find((p) => p.furniture.id === fid && p.drawer === n);
 const years = (d: string) => d.slice(0, 4);
@@ -19,6 +21,15 @@ const years = (d: string) => d.slice(0, 4);
   <section class="interior" {...attr('aria-label', t.furnitureHere)}>
     <svg class="interior-plan" viewBox={`${-pad} ${-pad} ${W + pad * 2} ${H + pad * 2}`} role="group" {...attr('aria-label', { en: `Plan of the ${room.en.toLowerCase()} with furniture`, zh: `${room.zh}家具平面图` })}>
       <rect class="interior-walls" x="0" y="0" width={W} height={H} />
+      <g class="doors" transform={`translate(${-X} ${-Y})`} aria-hidden="true">
+        {doors.map(({ d, p, inside }) => (
+          <g class:list={['door', d.kind]}>
+            <line class="door-gap" x1={p.gap[0]} y1={p.gap[1]} x2={p.gap[2]} y2={p.gap[3]} />
+            {inside && p.swing && <path class="door-swing" d={p.swing} />}
+            {(inside || !p.swing) && <path class="door-leaf" d={p.marks} />}
+          </g>
+        ))}
+      </g>
       {furniture.map((f) => {
         const [x, y, w, h] = f.rect;
         const horizontal = w >= h;
@@ -78,7 +89,7 @@ const years = (d: string) => d.slice(0, 4);
           <div class="drawer-contents" data-for={`${f.id}-${n}`} hidden>
             <p class="drawer-title"><Bi t={{ en: `${f.en}, drawer ${n}:`, zh: `${f.zh}${drawerN(n).zh}：` }} /></p>
             {p ? (
-              <a class={`object object-${p.piece.object}`} href={`/house/drawer/${p.piece.id}`} rel="nofollow" data-astro-reload data-piece={p.piece.id}>
+              <a class={`object object-${p.piece.object}`} href={`/house/drawer/${p.piece.id}`} rel="nofollow" data-native data-piece={p.piece.id} data-icon={p.piece.object === 'letter' ? 'mail' : 'document'}>
                 <svg class="object-icon" viewBox="0 0 40 40" aria-hidden="true">
                   {p.piece.object === 'letter' && <><rect x="5" y="10" width="30" height="20" /><path d="M5 10 L20 22 L35 10" /></>}
                   {p.piece.object === 'page' && <><rect x="10" y="4" width="20" height="32" /><path d="M14 12h12M14 17h12M14 22h12M14 27h8" /></>}
@@ -103,6 +114,8 @@ const years = (d: string) => d.slice(0, 4);
   const UNFOLDING = () => pick({ en: 'Unfolding…', zh: '正在展开……' });
   const UNREADABLE = () => pick({ en: 'This sheet could not be read.', zh: '这张纸无法读取。' });
   const cache = new Map<string, string>();
+
+  /** Without the desktop (e.g. a saved page), a plain dialog. */
   function sheetDialog() {
     let d = document.getElementById('sheet-dialog') as HTMLDialogElement | null;
     if (!d) {
@@ -115,14 +128,37 @@ const years = (d: string) => d.slice(0, 4);
     }
     return d;
   }
-  async function openPiece(id: string, href: string) {
-    const d = sheetDialog();
-    const close = d.querySelector('.sheet-close button')!;
-    close.textContent = PUT_BACK();
-    close.setAttribute('aria-label', PUT_BACK());
-    const holder = d.querySelector('.sheet-holder')!;
-    holder.innerHTML = `<p><i>${UNFOLDING()}</i></p>`;
-    d.showModal();
+  /** On the desktop, the sheet opens in its own window, held over the House. */
+  function sheetWindow(a: HTMLElement): HTMLElement | null {
+    const k = window.kus98;
+    if (!k) return null;
+    const body = document.createElement('div');
+    body.className = 'sheet-window-body';
+    body.innerHTML = '<div class="sheet-holder"></div><div class="sheet-actions"><button type="button" class="default"></button></div>';
+    const btn = body.querySelector<HTMLButtonElement>('.sheet-actions button')!;
+    btn.textContent = PUT_BACK();
+    const shown = a.querySelector<HTMLElement>(`span [data-l="${document.documentElement.dataset.lang === 'zh' ? 'zh' : 'en'}"]`) ?? a.querySelector('span');
+    const label = shown?.textContent?.trim() || 'A sheet';
+    const d = k.dialog({ title: label, icon: a.dataset.icon ?? 'document', body, owner: a, className: 'sheet-window', w: 720, h: 620, resizable: true });
+    btn.addEventListener('click', () => d.close());
+    btn.focus();
+    return body;
+  }
+
+  async function openPiece(id: string, a: HTMLAnchorElement) {
+    const href = a.href;
+    const win = sheetWindow(a);
+    let holder: HTMLElement;
+    if (win) holder = win.querySelector<HTMLElement>('.sheet-holder')!;
+    else {
+      const d = sheetDialog();
+      const close = d.querySelector('.sheet-close button')!;
+      close.textContent = PUT_BACK();
+      close.setAttribute('aria-label', PUT_BACK());
+      holder = d.querySelector<HTMLElement>('.sheet-holder')!;
+      d.showModal();
+    }
+    holder.innerHTML = `<p class="sheet-loading"><i>${UNFOLDING()}</i></p>`;
     try {
       if (!cache.has(id)) {
         const html = await (await fetch(href)).text();
@@ -132,7 +168,7 @@ const years = (d: string) => d.slice(0, 4);
       holder.innerHTML = cache.get(id)!;
       holder.scrollTop = 0;
     } catch {
-      holder.innerHTML = `<p>${UNREADABLE()} <a href="${href}">${pick({ en: 'Open it on its own', zh: '单独打开' })}</a>.</p>`;
+      holder.innerHTML = `<p>${UNREADABLE()} <a href="${href}" data-native>${pick({ en: 'Open it on its own', zh: '单独打开' })}</a>.</p>`;
     }
   }
   function initDrawers() {
@@ -149,7 +185,7 @@ const years = (d: string) => d.slice(0, 4);
         g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(g); } });
       });
       section.querySelectorAll<HTMLAnchorElement>('a[data-piece]').forEach((a) =>
-        a.addEventListener('click', (e) => { e.preventDefault(); openPiece(a.dataset.piece!, a.href); }),
+        a.addEventListener('click', (e) => { e.preventDefault(); openPiece(a.dataset.piece!, a); }),
       );
     }
   }

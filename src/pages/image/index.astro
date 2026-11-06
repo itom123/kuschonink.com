@@ -1,111 +1,138 @@
 ---
+// The Projects folder: an Explorer window with Web View, in Thumbnails,
+// List or Details view (View menu or the Views button).
 import { getImage } from 'astro:assets';
-import Win98 from '../../layouts/Win98.astro';
+import Desktop from '../../layouts/Desktop.astro';
+import Window from '../../components/desktop/Window.astro';
+import Bi from '../../components/Bi.astro';
 import { home, projects, imagesOf, site } from '../../lib/content';
 import { img } from '../../lib/images';
 import { roomForProject } from '../../lib/house';
-import Bi from '../../components/Bi.astro';
+import { EXPLORER_LINKS, EXPLORER_TOOLS, SEP, type Tool } from '../../lib/chrome';
 import { t, attr, floorZh, seoTitle } from '../../lib/i18n';
 
+const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`;
 const items = await Promise.all(
   projects.map(async (p) => {
     const all = imagesOf(p.sections);
-    const t = await getImage({ src: img(all[0]), width: 320, height: 240, fit: 'cover', format: 'webp', quality: 72 });
+    const thumb = await getImage({ src: img(all[0]), width: 320, height: 240, fit: 'cover', format: 'webp', quality: 72 });
     const blocks = p.sections.flatMap((s) => s.blocks);
     const room = roomForProject(p.slug);
+    const texts = blocks.filter((b) => b.type === 'text' || b.type === 'marquee').length;
+    const videos = blocks.filter((b) => b.type === 'video').length;
+    const dealt = room?.constraints.find((c) => c.list === 'source');
     return {
       p,
-      thumb: t.src,
+      thumb: thumb.src,
       images: all.length,
-      texts: blocks.filter((b) => b.type === 'text' || b.type === 'marquee').length,
-      videos: blocks.filter((b) => b.type === 'video').length,
+      texts,
+      videos,
       room,
-      source: room?.constraints.find((c) => c.list === 'source')?.value ?? '',
-      sourceZh: room?.constraints.find((c) => c.list === 'source')?.valueZh ?? '',
+      facts: [plural(all.length, 'image'), texts ? plural(texts, 'text') : '', videos ? plural(videos, 'video') : ''].filter(Boolean).join(' · '),
+      factsZh: [`${all.length} 张图片`, texts ? `${texts} 段文字` : '', videos ? `${videos} 段视频` : ''].filter(Boolean).join(' · '),
+      where: room ? `In the house: ${room.en}${room.zh ? ' ' + room.zh : ''}, ${room.floor.name.toLowerCase()} (chapter ${room.chapter})` : '',
+      whereZh: room ? `在房子里：${floorZh(room.floor.zh)}${room.zh || room.en}（第${room.chapter}章）` : '',
+      source: dealt?.value ?? '',
+      sourceZh: dealt?.valueZh ?? '',
     };
   }),
 );
+const total = items.reduce((n, i) => n + i.images, 0);
+const tools: Tool[] = [...EXPLORER_TOOLS, SEP, { cmd: 'views', label: 'Views', zh: '查看', icon: 'tb-views', title: 'Thumbnails, List or Details', titleZh: '缩略图、列表或详细资料' }];
 ---
-<Win98 seo={{ ...seoTitle(t.projects, site.name), description: home.seo.description }} title={t.projects} address="C:\kuschonink\image" status={{ en: `${projects.length} object(s)`, zh: `${projects.length} 个对象` }}>
-  <h1><Bi t={t.projects} /></h1>
-  <p data-l="en">All work by {site.name}. <a href="/image/all">See every project on one page</a>, or <a href="/house">walk through the house</a>.</p>
-  <p data-l="zh" lang="zh-Hans">{site.name}的全部作品。<a href="/image/all">在一页上查看所有作品</a>，或者<a href="/house">走进这座房子</a>。</p>
+<Desktop seo={{ ...seoTitle(t.projects, site.name), description: home.seo.description }}>
+  <Window
+    app="explorer"
+    title={t.projects}
+    icon="folder-open"
+    home="/image"
+    tools={tools}
+    links={EXPLORER_LINKS}
+    bodyClass="folder-body"
+    status={[{ en: `${projects.length} object(s)`, zh: `${projects.length} 个对象` }, { en: 'Double-click a project to open it.', zh: '双击一件作品即可打开。' }]}
+  >
+    <aside class="webview" slot="side" data-webview>
+      <div class="wv-head"><span class="ico ico-folder-open" aria-hidden="true"></span><h2><Bi t={t.projects} /></h2></div>
+      <div class="wv-rule" aria-hidden="true"></div>
+      <div class="wv-default">
+        <p><Bi t={{ en: `${projects.length} projects by ${site.name}, with ${total} images.`, zh: `${site.name}的 ${projects.length} 件作品，共 ${total} 张图片。` }} /></p>
+        <p><Bi t={{ en: 'Select a project to see its description. Double-click to open it.', zh: '选中一件作品可查看介绍，双击即可打开。' }} /></p>
+        <p data-l="en"><a href="/image/all">See every project on one page</a>, or <a href="/house/facade">walk through the house</a>.</p>
+        <p data-l="zh" lang="zh-Hans"><a href="/image/all">在一页上查看所有作品</a>，或者<a href="/house/facade">走进这座房子</a>。</p>
+      </div>
+      <div class="wv-item" hidden>
+        <img class="wv-thumb" alt="" width="320" height="240" />
+        <b class="wv-name"></b>
+        <span class="wv-type"><Bi t={{ en: 'Project folder', zh: '作品文件夹' }} /></span>
+        <p class="wv-desc"></p>
+        <p class="wv-facts"></p>
+        <p class="wv-room"></p>
+      </div>
+    </aside>
+    <div class="folder-page" data-folder-page data-view="thumbs">
+      <h1 class="sr-only"><Bi t={t.projects} /></h1>
+      <ul class="projects-view" {...attr('aria-label', t.projects)}>
+        {items.map(({ p, thumb, facts, factsZh, where, whereZh }) => (
+          <li>
+            <a
+              class="icon"
+              href={`/image/${p.slug}`}
+              data-icon-id={p.slug}
+              data-type="Project folder"
+              data-thumb={thumb}
+              data-desc={p.seo.description ?? ''}
+              data-desc-zh={p.seo.descriptionZh ?? ''}
+              data-facts={facts}
+              data-facts-zh={factsZh}
+              data-room={where}
+              data-room-zh={whereZh}
+              draggable="false"
+            >
+              <img class="thumb" src={thumb} alt="" width="140" height="105" loading="lazy" />
+              <span class="ico ico16 ico-folder list-ico" aria-hidden="true"></span>
+              <span class="icon-label"><Bi t={{ en: p.title, zh: p.titleZh ?? '' }} /></span>
+            </a>
+          </li>
+        ))}
+      </ul>
 
-  <div class="view-switch" role="radiogroup" {...attr('aria-label', t.view)}>
-    <input type="radio" name="view" id="view-icons" checked />
-    <label for="view-icons"><Bi t={t.largeIcons} /></label>
-    <input type="radio" name="view" id="view-details" />
-    <label for="view-details"><Bi t={t.details} /></label>
-
-    <ul class="explorer view-icons">
-      {items.map(({ p, thumb, images }) => (
-        <li>
-          <a href={`/image/${p.slug}`}>
-            <img class="thumb" src={thumb} alt="" width="140" height="105" loading="lazy" />
-            <span class="name"><Bi t={{ en: p.title, zh: p.titleZh ?? '' }} /></span>
-            <span class="meta"><Bi t={{ en: `${images} image${images === 1 ? '' : 's'}`, zh: `${images} 张图片` }} /></span>
-          </a>
-        </li>
-      ))}
-    </ul>
-
-    <div class="view-details sunken-panel">
-      <table class="interactive details" data-sortable>
-        <thead>
-          <tr>
-            <th data-sort="text"><Bi t={t.name} /></th>
-            <th data-sort="text"><Bi t={t.room} /></th>
-            <th data-sort="text"><Bi t={t.floor} /></th>
-            <th data-sort="num"><Bi t={t.chapterCol} /></th>
-            <th data-sort="num"><Bi t={t.images} /></th>
-            <th data-sort="num"><Bi t={t.texts} /></th>
-            <th data-sort="num"><Bi t={t.videos} /></th>
-            <th data-sort="text"><Bi t={t.sourceDealt} /></th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map(({ p, images, texts, videos, room, source, sourceZh }) => (
+      <div class="details-view">
+        <table class="interactive details" data-sortable>
+          <thead>
             <tr>
-              <td><a href={`/image/${p.slug}`}><Bi t={{ en: p.title, zh: p.titleZh ?? '' }} /></a></td>
-              <td>{room ? <a href={`/house/${room.slug}`}><Bi t={{ en: room.en, zh: room.zh }} /></a> : ''}</td>
-              <td>{room ? <Bi t={{ en: room.floor.name, zh: floorZh(room.floor.zh) }} /> : ''}</td>
-              <td>{room?.chapter ?? ''}</td>
-              <td>{images}</td>
-              <td>{texts}</td>
-              <td>{videos}</td>
-              <td><Bi t={{ en: source, zh: sourceZh }} /></td>
+              <th data-sort="text"><Bi t={t.name} /></th>
+              <th data-sort="text"><Bi t={t.room} /></th>
+              <th data-sort="text"><Bi t={t.floor} /></th>
+              <th data-sort="num"><Bi t={t.chapterCol} /></th>
+              <th data-sort="num"><Bi t={t.images} /></th>
+              <th data-sort="num"><Bi t={t.texts} /></th>
+              <th data-sort="num"><Bi t={t.videos} /></th>
+              <th data-sort="text"><Bi t={t.sourceDealt} /></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {items.map(({ p, images, texts, videos, room, source, sourceZh }) => (
+              <tr data-href={`/image/${p.slug}`} tabindex="-1">
+                <td><span class="ico ico16 ico-folder" aria-hidden="true"></span> <a href={`/image/${p.slug}`}><Bi t={{ en: p.title, zh: p.titleZh ?? '' }} /></a></td>
+                <td>{room ? <a href={`/house/${room.slug}`}><Bi t={{ en: room.en, zh: room.zh }} /></a> : ''}</td>
+                <td>{room ? <Bi t={{ en: room.floor.name, zh: floorZh(room.floor.zh) }} /> : ''}</td>
+                <td>{room?.chapter ?? ''}</td>
+                <td>{images}</td>
+                <td>{texts}</td>
+                <td>{videos}</td>
+                <td><Bi t={{ en: source, zh: sourceZh }} /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="classify-note"><small><Bi t={t.classify} /></small></p>
     </div>
-  </div>
-  <p class="classify-note"><small><Bi t={t.classify} /></small></p>
-</Win98>>
-</Win98>
+  </Window>
+</Desktop>
 
 <script>
-  // Click a column heading to sort, like Explorer's Details view.
-  for (const table of document.querySelectorAll<HTMLTableElement>('table[data-sortable]')) {
-    const heads = [...table.tHead!.rows[0].cells];
-    heads.forEach((th, i) => {
-      th.tabIndex = 0;
-      const sort = () => {
-        const asc = th.dataset.dir !== 'asc';
-        heads.forEach((h) => delete h.dataset.dir);
-        th.dataset.dir = asc ? 'asc' : 'desc';
-        const num = th.dataset.sort === 'num';
-        const rows = [...table.tBodies[0].rows];
-        rows.sort((a, b) => {
-          const text = (c: HTMLTableCellElement) => (c.querySelector(`[data-l="${document.documentElement.dataset.lang === 'zh' ? 'zh' : 'en'}"]`) ?? c).textContent!.trim();
-          const x = text(a.cells[i]), y = text(b.cells[i]);
-          const d = num ? Number(x) - Number(y) : x.localeCompare(y);
-          return asc ? d : -d;
-        });
-        table.tBodies[0].append(...rows);
-      };
-      th.addEventListener('click', sort);
-      th.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sort(); } });
-    });
-  }
+  import { initExplorerFolder } from '../../scripts/explorer';
+  initExplorerFolder();
+  document.addEventListener('astro:page-load', initExplorerFolder);
 </script>

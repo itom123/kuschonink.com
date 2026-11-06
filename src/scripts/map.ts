@@ -1,31 +1,66 @@
 // The house map: pan, zoom, floors, search, URL state. Plain DOM, no framework.
 // Works like an indoor map: the viewport shows one floor at a time, rooms are links.
+// It lives inside The House's window, so it measures the window, never the screen.
 import { getLang, pick } from './lang';
+import { searchRooms, type SearchRoom } from './search';
+import { startMini, type MiniData } from './house-mini';
+import { showDiag } from './gl-diag';
 
 type View = { cx: number; cy: number; z: number };
 type Bounds = { x: number; y: number; w: number; h: number };
-interface IndexRoom { slug: string; floor: string; title: string; titleZh: string; zh: string; en: string; chapter: number; locked: boolean }
+type IndexRoom = SearchRoom;
 
 const MIN_Z = 0.6;
 const MAX_Z = 12;
 
-export function initMap() {
+// The map currently on the page. The House window keeps its map while it
+// changes page; closing the window drops it, and opening the House again
+// brings a fresh copy, so set up whichever map is present after every page.
+let active: { root: HTMLElement; off: AbortController } | null = null;
+
+export function startMap() {
+  initMap();
+  document.addEventListener('astro:page-load', () => initMap());
+}
+
+function initMap() {
   const root = document.getElementById('house-map');
-  if (!root || root.dataset.ready) return;
+  if (root && root === active?.root) return;
+  active?.off.abort();
+  active = null;
+  if (!root) return;
   root.dataset.ready = '1';
+  const off = new AbortController();
+  const { signal } = off;
+  const win = root.closest<HTMLElement>('[data-window]');
+  win?.addEventListener('desktop:close', () => off.abort(), { once: true });
+  /** This page's URL: the window's (on the desktop) or the browser's. */
+  const pageUrl = () => new URL(win?.dataset.url ?? location.pathname + location.search, location.origin);
+  /** Side panel on the right when the window is wide; a sheet at the bottom when narrow. */
+  const wide = () => root.clientWidth > 800;
 
   const viewport = root.querySelector<HTMLElement>('.map-viewport')!;
+  // The small turning house beside the floor buttons.
+  const mini = startMini(
+    root.querySelector<HTMLCanvasElement>('.map-mini')!,
+    JSON.parse(root.querySelector('#house-mini')!.textContent!) as MiniData,
+    signal,
+  );
+  showDiag(root, () => [...root.querySelectorAll<HTMLCanvasElement>('canvas')], signal);
   const svgs = [...root.querySelectorAll<SVGSVGElement>('svg.floor')];
-  const index = JSON.parse(document.getElementById('house-index')!.textContent!) as {
+  const index = JSON.parse(root.querySelector('#house-index')!.textContent!) as {
     rooms: IndexRoom[];
     floors: { id: string; name: string; zh: string; zhShort: string; level: string }[];
     text: { none: { en: string; zh: string }; noDoor: { en: string; zh: string } };
   };
   const floorName = root.querySelector<HTMLElement>('.map-floorname')!;
+  // The arrow shows which way the last change of floor went, until the next one.
+  let arrow = '';
   const showFloorName = () => {
     const info = index.floors.find((x) => x.id === floor)!;
-    floorName.textContent = `${getLang() === 'zh' ? info.zh : info.name} · ${info.level}`;
+    floorName.textContent = `${arrow}${getLang() === 'zh' ? info.zh : info.name} · ${info.level}`;
   };
+  const order = index.floors.map((f) => f.id);
 
   const bounds = new Map<string, Bounds>(
     svgs.map((s) => {
@@ -34,38 +69,56 @@ export function initMap() {
     }),
   );
 
+  // Every floor is drawn on the same grid, so one camera serves them all:
+  // zoom 1 fits the whole house, and changing floors keeps the same spot in view.
+  const all: Bounds = (() => {
+    const bs = [...bounds.values()];
+    const x = Math.min(...bs.map((b) => b.x)), y = Math.min(...bs.map((b) => b.y));
+    return { x, y, w: Math.max(...bs.map((b) => b.x + b.w)) - x, h: Math.max(...bs.map((b) => b.y + b.h)) - y };
+  })();
+
   let floor = root.dataset.floor || 'f1';
-  const views = new Map<string, View>();
-  const home = (f: string): View => {
-    const b = bounds.get(f)!;
-    return { cx: b.x + b.w / 2, cy: b.y + b.h / 2, z: 1 };
-  };
-  let view: View = home(floor);
+  const home = (): View => ({ cx: all.x + all.w / 2, cy: all.y + all.h / 2, z: 1 });
+  let view: View = home();
 
   const svgOf = (f: string) => svgs.find((s) => s.dataset.floor === f)!;
+  // The floor fading out after a change of floor, kept in step with the camera.
+  let leaving: SVGSVGElement | null = null;
+  let leaveTimer = 0;
 
-  // Pixels per millimetre at zoom 1 (floor fits the viewport).
-  const baseScale = () => {
-    const b = bounds.get(floor)!;
-    return Math.min(viewport.clientWidth / b.w, viewport.clientHeight / b.h);
-  };
+  // Pixels per millimetre at zoom 1 (the house fits the viewport).
+  const baseScale = () => Math.min(viewport.clientWidth / all.w, viewport.clientHeight / all.h);
   const scale = () => baseScale() * view.z;
 
   function render() {
+    if (!viewport.clientWidth || !viewport.clientHeight) return;
     const s = scale();
     const w = viewport.clientWidth / s;
     const h = viewport.clientHeight / s;
+    for (const svg of leaving ? [svgOf(floor), leaving] : [svgOf(floor)]) {
+      svg.setAttribute('viewBox', `${view.cx - w / 2} ${view.cy - h / 2} ${w} ${h}`);
+      svg.setAttribute('preserveAspectRatio', 'none');
+      // Keep labels a constant size on screen: 1 screen px in mm.
+      svg.style.setProperty('--px', String(1 / s));
+    }
+    mini.set({ view: visibleArea(s, w, h) });
     const svg = svgOf(floor);
-    svg.setAttribute('viewBox', `${view.cx - w / 2} ${view.cy - h / 2} ${w} ${h}`);
-    svg.setAttribute('preserveAspectRatio', 'none');
-    // Keep labels a constant size on screen: 1 screen px in mm.
-    svg.style.setProperty('--px', String(1 / s));
     const level = view.z < 1.8 ? 1 : view.z < 3.5 ? 2 : 3;
     if (root!.dataset.zoomLevel !== String(level)) {
       root!.dataset.zoomLevel = String(level);
       if (level >= 2) loadThumbs(svg);
     }
     scheduleUrl();
+  }
+
+  /** The part of the plan that isn't under the room panel, in mm: [x, y, w, h]. */
+  function visibleArea(s: number, w: number, h: number): [number, number, number, number] {
+    let vw = w, vh = h;
+    if (root!.classList.contains('has-panel')) {
+      if (wide()) vw -= Math.min(560, root!.clientWidth * 0.45) / s;
+      else vh -= (root!.clientHeight * 0.55) / s;
+    }
+    return [view.cx - w / 2, view.cy - h / 2, Math.max(0, vw), Math.max(0, vh)];
   }
 
   function loadThumbs(svg: SVGSVGElement) {
@@ -129,22 +182,41 @@ export function initMap() {
     render();
   }
 
+  function endLeave() {
+    clearTimeout(leaveTimer);
+    if (!leaving) return;
+    leaving.classList.remove('floor-leave');
+    if (leaving.dataset.floor !== floor) leaving.setAttribute('hidden', '');
+    leaving = null;
+  }
+
   function setFloor(f: string, v?: View) {
     if (!bounds.has(f)) return;
-    views.set(floor, view);
+    endLeave();
     const prev = svgOf(floor);
+    const dir = order.indexOf(f) > order.indexOf(floor) ? 'up' : 'down';
     floor = f;
     root!.dataset.floor = f;
-    svgs.forEach((s) => s.toggleAttribute('hidden', s.dataset.floor !== f));
     const next = svgOf(f);
+    svgs.forEach((s) => s.toggleAttribute('hidden', s !== next));
     if (prev !== next) {
+      arrow = dir === 'up' ? '↑ ' : '↓ ';
+      root!.dataset.dir = dir;
       next.classList.remove('floor-enter');
       void next.getBoundingClientRect();
       next.classList.add('floor-enter');
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        // Let the old floor fade away under the new one, on the same grid.
+        leaving = prev;
+        prev.removeAttribute('hidden');
+        prev.classList.add('floor-leave');
+        leaveTimer = window.setTimeout(endLeave, 400);
+      }
     }
     root!.querySelectorAll<HTMLButtonElement>('[data-floor-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.floorBtn === f)));
+    mini.set({ floor: f });
     showFloorName();
-    view = clampView(v ?? views.get(f) ?? { ...view, ...{ cx: home(f).cx, cy: home(f).cy } });
+    view = clampView(v ?? view);
     root!.dataset.zoomLevel = '';
     render();
   }
@@ -155,46 +227,63 @@ export function initMap() {
     if (!el) return null;
     const f = (el.closest('svg') as SVGSVGElement).dataset.floor!;
     const box = el.getBBox();
-    const b = bounds.get(f)!;
-    const panel = window.innerWidth > 800 ? Math.min(560, window.innerWidth * 0.45) : 0;
+    const b = all;
+    const panel = wide() ? Math.min(560, root!.clientWidth * 0.45) : 0;
     const availW = viewport.clientWidth - panel;
-    const availH = window.innerWidth > 800 ? viewport.clientHeight : viewport.clientHeight * 0.45;
+    const availH = wide() ? viewport.clientHeight : viewport.clientHeight * 0.45;
     const base = Math.min(viewport.clientWidth / b.w, viewport.clientHeight / b.h);
     // Close enough to see the room, far enough to keep its neighbours in view.
     const z = Math.min(3, Math.max(1, Math.min(availW / (box.width * 2.2), availH / (box.height * 2.2)) / base));
     const s = base * z;
     // Shift the centre so the room sits in the free area (left of the panel / above the sheet).
     const dx = panel / 2 / s;
-    const dy = window.innerWidth > 800 ? 0 : (viewport.clientHeight * 0.275) / s;
+    const dy = wide() ? 0 : (viewport.clientHeight * 0.275) / s;
     return { floor: f, view: { z, cx: box.x + box.width / 2 + dx, cy: box.y + box.height / 2 + dy } };
   }
 
   function focusRoom(slug: string, animate = true) {
     root!.querySelectorAll('.room.current').forEach((r) => r.classList.remove('current'));
+    mini.set({ room: slug });
     root!.querySelector(`.room[data-slug="${slug}"]`)?.classList.add('current');
+    const el = root!.querySelector(`.room[data-slug="${slug}"]`);
+    if (!el) return;
+    // Show the room's floor before measuring it: a hidden SVG has no geometry.
+    const f = (el.closest('svg') as SVGSVGElement).dataset.floor!;
+    if (f !== floor) setFloor(f, { ...view, z: Math.max(1, view.z * 0.8) });
     const target = roomView(slug);
     if (!target) return;
-    if (target.floor !== floor) setFloor(target.floor, { ...view, z: Math.max(1, view.z * 0.8) });
     flyTo(target.view, animate ? 550 : 0);
   }
 
   // ---- URL state (only on /house itself) ----
   let urlTimer = 0;
   function scheduleUrl() {
-    if (!/^\/house\/?$/.test(location.pathname)) return;
+    if (!/^\/house\/?$/.test(pageUrl().pathname)) return;
     clearTimeout(urlTimer);
     urlTimer = window.setTimeout(() => {
+      if (!root!.isConnected || !/^\/house\/?$/.test(pageUrl().pathname)) return;
       const q = new URLSearchParams({ floor, x: String(Math.round(view.cx)), y: String(Math.round(view.cy)), z: view.z.toFixed(2) });
-      history.replaceState(history.state, '', `/house?${q}`);
-    }, 250);
+      const url = `/house?${q}`;
+      if (window.kus98 && win) window.kus98.replaceUrl(root!, url);
+      else {
+        try { history.replaceState(history.state, '', url); } catch { /* Safari limits replaceState */ }
+      }
+    }, 400);
   }
 
   // ---- Pointer: drag to pan, pinch to zoom ----
   const pointers = new Map<number, { x: number; y: number }>();
   let moved = 0;
   let pinchDist = 0;
+  const forget = (id: number) => {
+    pointers.delete(id);
+    if (pointers.size < 2) pinchDist = 0;
+    if (!pointers.size) viewport.classList.remove('dragging');
+  };
   viewport.addEventListener('pointerdown', (e) => {
     if ((e.target as Element).closest('.map-ui')) return;
+    // Only the main button pans (a right-click opens a menu instead).
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     moved = 0;
     cancelAnimationFrame(anim);
@@ -202,10 +291,11 @@ export function initMap() {
       const [a, b] = [...pointers.values()];
       pinchDist = Math.hypot(a.x - b.x, a.y - b.y);
     }
-  });
+  }, { signal });
   viewport.addEventListener('pointermove', (e) => {
     const p = pointers.get(e.pointerId);
     if (!p) return;
+    if (e.pointerType === 'mouse' && !(e.buttons & 1)) return forget(e.pointerId);
     const dx = e.clientX - p.x, dy = e.clientY - p.y;
     if (pointers.size === 1) {
       moved += Math.abs(dx) + Math.abs(dy);
@@ -225,14 +315,12 @@ export function initMap() {
       pinchDist = d;
       moved = 99;
     }
-  });
-  const end = (e: PointerEvent) => {
-    pointers.delete(e.pointerId);
-    if (pointers.size < 2) pinchDist = 0;
-    if (!pointers.size) viewport.classList.remove('dragging');
-  };
-  viewport.addEventListener('pointerup', end);
-  viewport.addEventListener('pointercancel', end);
+  }, { signal });
+  const end = (e: PointerEvent) => forget(e.pointerId);
+  viewport.addEventListener('pointerup', end, { signal });
+  viewport.addEventListener('pointercancel', end, { signal });
+  viewport.addEventListener('lostpointercapture', end, { signal });
+  viewport.addEventListener('pointerleave', (e) => { if (!e.buttons) forget(e.pointerId); }, { signal });
   // A drag is not a click.
   viewport.addEventListener('click', (e) => {
     if (moved > 4) {
@@ -242,15 +330,19 @@ export function initMap() {
       return;
     }
     const locked = (e.target as Element).closest('.room.locked');
-    if (locked) toast(pick(index.text.noDoor));
-  }, true);
+    if (locked) noDoor();
+  }, { capture: true, signal });
 
   viewport.addEventListener('wheel', (e) => {
     e.preventDefault();
     const factor = Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.001));
     zoomAt(factor, e.clientX, e.clientY);
-  }, { passive: false });
+  }, { passive: false, signal });
 
+  // R / A / 2 / 1: the labels on the floor buttons.
+  const floorKeys = new Map(
+    [...root.querySelectorAll<HTMLButtonElement>('[data-floor-btn]')].map((b) => [b.textContent!.trim().toUpperCase(), b.dataset.floorBtn!]),
+  );
   viewport.addEventListener('keydown', (e) => {
     const step = 120 / scale();
     const k = e.key;
@@ -261,37 +353,34 @@ export function initMap() {
     else if (k === '+' || k === '=') return zoomAt(1.4);
     else if (k === '-') return zoomAt(1 / 1.4);
     else if (k === 'PageUp' || k === 'PageDown') {
-      const order = index.floors.map((f) => f.id);
       const i = order.indexOf(floor) + (k === 'PageUp' ? 1 : -1);
       if (order[i]) setFloor(order[i]);
+    } else if (!e.ctrlKey && !e.metaKey && !e.altKey && floorKeys.has(k.toUpperCase())) {
+      setFloor(floorKeys.get(k.toUpperCase())!);
     } else return;
     e.preventDefault();
     view = clampView(view);
     render();
-  });
+  }, { signal });
 
   root.querySelectorAll<HTMLButtonElement>('[data-zoom]').forEach((b) =>
     b.addEventListener('click', () => {
-      const r = viewport.getBoundingClientRect();
       const f = b.dataset.zoom === 'in' ? 1.6 : 1 / 1.6;
       flyTo({ ...view, z: view.z * f }, 250);
-      void r;
-    }),
+    }, { signal }),
   );
-  root.querySelectorAll<HTMLButtonElement>('[data-floor-btn]').forEach((b) => b.addEventListener('click', () => setFloor(b.dataset.floorBtn!)));
+  root.querySelectorAll<HTMLButtonElement>('[data-floor-btn]').forEach((b) => b.addEventListener('click', () => setFloor(b.dataset.floorBtn!), { signal }));
   root.querySelector<HTMLInputElement>('[data-blueprint]')!.addEventListener('change', (e) => {
     root!.classList.toggle('blueprint', (e.target as HTMLInputElement).checked);
-  });
+  }, { signal });
 
   // ---- Search ----
   const input = root.querySelector<HTMLInputElement>('.map-search input')!;
   const results = root.querySelector<HTMLUListElement>('.search-results')!;
-  const norm = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
   const floorLabel = (id: string) => { const f = index.floors.find((f) => f.id === id)!; return getLang() === 'zh' ? f.zhShort : f.name; };
   function showResults() {
-    const q = norm(input.value.trim());
-    if (!q) { results.hidden = true; results.innerHTML = ''; return; }
-    const hits = index.rooms.filter((r) => [r.title, r.titleZh, r.en, r.zh, String(r.chapter)].some((t) => norm(t).includes(q))).slice(0, 8);
+    if (!input.value.trim()) { results.hidden = true; results.innerHTML = ''; return; }
+    const hits = searchRooms(index.rooms, input.value);
     results.innerHTML = hits.length
       ? hits.map((r) => {
           const zh = getLang() === 'zh';
@@ -304,24 +393,36 @@ export function initMap() {
       : `<li class="none">${escape(pick(index.text.none))}</li>`;
     results.hidden = false;
   }
-  input.addEventListener('input', showResults);
-  document.addEventListener('langchange', () => { showFloorName(); showResults(); });
+  input.addEventListener('input', showResults, { signal });
+  document.addEventListener('langchange', () => { showFloorName(); showResults(); }, { signal });
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const a = results.querySelector<HTMLAnchorElement>('a');
       if (a) { e.preventDefault(); a.click(); }
     }
     if (e.key === 'Escape') { input.value = ''; showResults(); }
-  });
+  }, { signal });
   results.addEventListener('click', (e) => {
     const a = (e.target as Element).closest<HTMLAnchorElement>('a');
     if (!a) return;
-    if (a.hasAttribute('data-locked')) { e.preventDefault(); focusRoom(a.dataset.slug!); toast(pick(index.text.noDoor)); }
+    if (a.hasAttribute('data-locked')) { e.preventDefault(); focusRoom(a.dataset.slug!); noDoor(); }
     input.value = '';
     showResults();
-  });
+  }, { signal });
 
-  // ---- Toast ----
+  // ---- The room without a door: "Access is denied" on the desktop ----
+  function noDoor() {
+    if (window.kus98) {
+      window.kus98.alert({
+        title: pick({ en: 'Room without a door', zh: '没有门的房间' }),
+        icon: 'error',
+        text: pick({ en: 'This room has no door. Access is denied.', zh: '这个房间没有门。拒绝访问。' }),
+        owner: root,
+      });
+    } else toast(pick(index.text.noDoor));
+  }
+
+  // ---- Toast (when the map runs outside the desktop) ----
   let toastEl: HTMLElement | null = null;
   function toast(msg: string) {
     toastEl ??= Object.assign(document.createElement('div'), { className: 'map-toast', role: 'status' });
@@ -332,27 +433,46 @@ export function initMap() {
   }
 
   // ---- Start ----
-  const params = new URLSearchParams(location.search);
+  const params = pageUrl().searchParams;
   const startFloor = params.get('floor');
   if (startFloor && bounds.has(startFloor)) floor = startFloor;
   const start: View = {
-    cx: Number(params.get('x')) || home(floor).cx,
-    cy: Number(params.get('y')) || home(floor).cy,
+    cx: Number(params.get('x')) || home().cx,
+    cy: Number(params.get('y')) || home().cy,
     z: Number(params.get('z')) || 1,
   };
   setFloor(floor, start);
-  window.addEventListener('resize', () => render());
+  arrow = '';
+  showFloorName();
+  // The window can be any size: follow the map's own box, not the screen.
+  const ro = new ResizeObserver(() => render());
+  ro.observe(viewport);
+  signal.addEventListener('abort', () => { endLeave(); cancelAnimationFrame(anim); ro.disconnect(); clearTimeout(urlTimer); });
 
-  // After every page (initial and ClientRouter navigations), follow the current room.
+  // After every page shown in the window, follow the current room (or the floor in the URL).
   const sync = () => {
-    const page = document.querySelector<HTMLElement>('[data-room-page]');
-    root!.classList.toggle('has-panel', !!page || !!document.querySelector('[data-panel]'));
+    if (!root!.isConnected) return;
+    const scope: ParentNode = win ?? document;
+    const page = scope.querySelector<HTMLElement>('[data-room-page]');
+    root!.classList.toggle('has-panel', !!page || !!scope.querySelector('[data-panel]'));
+    // The 3D link opens the model at the room you're in.
+    const link3d = root!.querySelector<HTMLAnchorElement>('.map-3d');
+    if (link3d) link3d.href = page ? `/house/3d?room=${encodeURIComponent(page.dataset.roomPage!)}` : '/house/3d';
     if (page) focusRoom(page.dataset.roomPage!, !!root!.dataset.synced);
-    else root!.querySelectorAll('.room.current').forEach((r) => r.classList.remove('current'));
+    else {
+      root!.querySelectorAll('.room.current').forEach((r) => r.classList.remove('current'));
+      mini.set({ room: null });
+      const f = pageUrl().searchParams.get('floor');
+      if (root!.dataset.synced && f && f !== floor && bounds.has(f)) setFloor(f);
+    }
+    render();
     root!.dataset.synced = '1';
   };
-  document.addEventListener('astro:page-load', sync);
-  if (document.readyState === 'complete') sync();
+  // On the desktop the window says when it shows a new page; on its own, the document does.
+  if (win) win.addEventListener('desktop:content', sync, { signal });
+  else document.addEventListener('astro:page-load', sync, { signal });
+  sync();
+  active = { root, off };
 }
 
 function escape(s: string) {

@@ -1,19 +1,35 @@
 ---
-import Win98 from '../../layouts/Win98.astro';
+import Desktop from '../../layouts/Desktop.astro';
+import Window from '../../components/desktop/Window.astro';
 import ProjectBody from '../../components/ProjectBody.astro';
 import Bi from '../../components/Bi.astro';
 import { projects, site, home } from '../../lib/content';
+import { EXPLORER_LINKS, EXPLORER_TOOLS } from '../../lib/chrome';
 import { t, seoTitle } from '../../lib/i18n';
 ---
-<Win98 seo={{ ...seoTitle(t.allProjects, site.name), description: home.seo.description }} title={t.allProjects} address="C:\kuschonink\image\*.*" status={{ en: `${projects.length} projects`, zh: `${projects.length} 件作品` }}>
-  <h1><Bi t={t.allProjects} /></h1>
-  <ol>
-    {projects.map((p) => <li><a href={`#${p.slug}`}><Bi t={{ en: p.title, zh: p.titleZh ?? '' }} /></a></li>)}
-  </ol>
-  {projects.map((p, i) => (
-    <section class="project-block" id={p.slug}>
-      <ProjectBody project={p} headingLevel="h2" eager={i === 0} />
-      <p><a href="#top"><Bi t={t.top} /></a> · <a href={`/image/${p.slug}`}><Bi t={t.openOnItsOwn} /></a></p>
-    </section>
-  ))}
-</Win98>
+<Desktop seo={{ ...seoTitle(t.allProjects, site.name), description: home.seo.description }}>
+  <Window
+    app="explorer"
+    title={t.allProjects}
+    icon="documents"
+    home="/image"
+    address="C:\xiangyin\image\*.*"
+    tools={EXPLORER_TOOLS}
+    links={EXPLORER_LINKS}
+    bodyClass="doc"
+    status={[{ en: `${projects.length} projects`, zh: `${projects.length} 件作品` }, { en: 'Every project on one page.', zh: '所有作品都在这一页。' }]}
+  >
+    <div class="doc-page" id="top">
+      <h1><Bi t={t.allProjects} /></h1>
+      <ol>
+        {projects.map((p) => <li><a href={`#${p.slug}`}><Bi t={{ en: p.title, zh: p.titleZh ?? '' }} /></a></li>)}
+      </ol>
+      {projects.map((p, i) => (
+        <section class="project-block" id={p.slug}>
+          <ProjectBody project={p} headingLevel="h2" eager={i === 0} />
+          <p><a href="#top"><Bi t={t.top} /></a> · <a href={`/image/${p.slug}`}><Bi t={t.openOnItsOwn} /></a></p>
+        </section>
+      ))}
+    </div>
+  </Window>
+</Desktop>
