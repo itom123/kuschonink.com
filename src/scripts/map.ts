@@ -90,25 +90,86 @@ function initMap() {
   const baseScale = () => Math.min(viewport.clientWidth / all.w, viewport.clientHeight / all.h);
   const scale = () => baseScale() * view.z;
 
+  // ---- Drawing ----
+  // A new viewBox makes the browser lay out and paint the whole floor again (Safari, and
+  // so every browser on an iPhone, measures each label anew): far too slow for every move
+  // of a finger. So while the map is dragged, pinched, flown or zoomed with the wheel, the
+  // floor already drawn slides and scales as a picture (a transform on .map-pan, done by
+  // the graphics chip), and it is drawn afresh when that ends, or sooner when the picture
+  // no longer fills the window. It is drawn a quarter larger than the window on every
+  // side, so a drag has something to show at the edges.
+  const pan = root.querySelector<HTMLElement>('.map-pan')!;
+  const OVER = 0.25;
+  type Drawn = { cx: number; cy: number; s: number; w: number; h: number; ox: number; oy: number };
+  let drawn: Drawn | null = null;
+  let drawnAt = 0;
+  let frame = 0;
+  let flying = false;
+  let wheeling = false;
+  const pointers = new Map<number, { x: number; y: number }>();
+  const live = () => pointers.size > 0 || flying || wheeling;
+  const shown = () => (leaving ? [svgOf(floor), leaving] : [svgOf(floor)]);
+  svgs.forEach((svg) => svg.setAttribute('preserveAspectRatio', 'none'));
+
+  /** Show the view on the next frame (many moves in one frame make one picture). */
   function render() {
-    if (!viewport.clientWidth || !viewport.clientHeight) return;
+    if (!frame) frame = requestAnimationFrame(paint);
+  }
+
+  /** Show the view now: slide the picture during a gesture, draw it afresh otherwise. */
+  function paint() {
+    cancelAnimationFrame(frame);
+    frame = 0;
+    const vw = viewport.clientWidth, vh = viewport.clientHeight;
+    if (!vw || !vh) return;
     const s = scale();
-    const w = viewport.clientWidth / s;
-    const h = viewport.clientHeight / s;
-    for (const svg of leaving ? [svgOf(floor), leaving] : [svgOf(floor)]) {
-      svg.setAttribute('viewBox', `${view.cx - w / 2} ${view.cy - h / 2} ${w} ${h}`);
-      svg.setAttribute('preserveAspectRatio', 'none');
-      // Keep labels a constant size on screen: 1 screen px in mm.
-      svg.style.setProperty('--px', String(1 / s));
+    if (!live() || !drawn || drawn.w !== vw || drawn.h !== vh) draw(s, vw, vh);
+    else if (covers(drawn, s, vw, vh)) shift(drawn, s);
+    else if (performance.now() - drawnAt > 120) draw(s, vw, vh);
+    else {
+      shift(drawn, s);
+      render(); // and draw it afresh in a moment
     }
-    mini.set({ view: visibleArea(s, w, h) });
-    const svg = svgOf(floor);
+    mini.set({ view: visibleArea(s, vw / s, vh / s) });
+    scheduleUrl();
+  }
+
+  function draw(s: number, vw: number, vh: number) {
+    const ox = Math.round(vw * OVER), oy = Math.round(vh * OVER);
+    if (drawn?.ox !== ox || drawn?.oy !== oy) {
+      pan.style.setProperty('--ox', `${ox}px`);
+      pan.style.setProperty('--oy', `${oy}px`);
+    }
+    const w = (vw + 2 * ox) / s, h = (vh + 2 * oy) / s;
+    const box = `${view.cx - w / 2} ${view.cy - h / 2} ${w} ${h}`;
+    // Keep labels a constant size on screen: 1 screen px in mm.
+    const px = String(1 / s);
+    for (const svg of shown()) {
+      if (svg.getAttribute('viewBox') !== box) svg.setAttribute('viewBox', box);
+      if (svg.style.getPropertyValue('--px') !== px) svg.style.setProperty('--px', px);
+    }
+    pan.style.transform = '';
+    drawn = { cx: view.cx, cy: view.cy, s, w: vw, h: vh, ox, oy };
+    drawnAt = performance.now();
     const level = view.z < 1.8 ? 1 : view.z < 3.5 ? 2 : 3;
     if (root!.dataset.zoomLevel !== String(level)) {
       root!.dataset.zoomLevel = String(level);
-      if (level >= 2) loadThumbs(svg);
+      if (level >= 2) loadThumbs(svgOf(floor));
     }
-    scheduleUrl();
+  }
+
+  /** Move the picture drawn for view d to where the current view puts it. */
+  function shift(d: Drawn, s: number) {
+    pan.style.transform = `translate(${(d.cx - view.cx) * s}px, ${(d.cy - view.cy) * s}px) scale(${s / d.s})`;
+  }
+
+  /** Does the picture drawn for view d still fill the window (and look sharp enough)? */
+  function covers(d: Drawn, s: number, vw: number, vh: number) {
+    const k = s / d.s;
+    // Flights zoom a long way for a moment: let them blur, and draw sharp at the end.
+    if (!flying && (k > 1.75 || k < 0.6)) return false;
+    const tx = Math.abs((d.cx - view.cx) * s), ty = Math.abs((d.cy - view.cy) * s);
+    return tx + vw / 2 <= k * (vw / 2 + d.ox) && ty + vh / 2 <= k * (vh / 2 + d.oy);
   }
 
   /** The part of the plan that isn't under the room panel, in mm: [x, y, w, h]. */
@@ -140,10 +201,12 @@ function initMap() {
     const from = { ...view };
     const to = clampView(target);
     if (ms === 0 || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      flying = false;
       view = to;
-      render();
+      paint();
       return;
     }
+    flying = true;
     const t0 = performance.now();
     const step = (t: number) => {
       const k = Math.min(1, (t - t0) / ms);
@@ -154,8 +217,9 @@ function initMap() {
         cy: from.cy + (to.cy - from.cy) * e,
         z: from.z * Math.pow(to.z / from.z, e),
       };
-      render();
       if (k < 1) anim = requestAnimationFrame(step);
+      else flying = false;
+      paint();
     };
     anim = requestAnimationFrame(step);
   }
@@ -218,7 +282,8 @@ function initMap() {
     showFloorName();
     view = clampView(v ?? view);
     root!.dataset.zoomLevel = '';
-    render();
+    drawn = null;
+    paint();
   }
 
   // Fit a room in view, leaving room for the side panel on wide screens.
@@ -272,13 +337,15 @@ function initMap() {
   }
 
   // ---- Pointer: drag to pan, pinch to zoom ----
-  const pointers = new Map<number, { x: number; y: number }>();
   let moved = 0;
   let pinchDist = 0;
   const forget = (id: number) => {
-    pointers.delete(id);
+    if (!pointers.delete(id)) return;
     if (pointers.size < 2) pinchDist = 0;
-    if (!pointers.size) viewport.classList.remove('dragging');
+    if (!pointers.size) {
+      viewport.classList.remove('dragging');
+      render(); // draw the floor afresh where the gesture left it
+    }
   };
   viewport.addEventListener('pointerdown', (e) => {
     if ((e.target as Element).closest('.map-ui')) return;
@@ -287,6 +354,7 @@ function initMap() {
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     moved = 0;
     cancelAnimationFrame(anim);
+    flying = false;
     if (pointers.size === 2) {
       const [a, b] = [...pointers.values()];
       pinchDist = Math.hypot(a.x - b.x, a.y - b.y);
@@ -319,7 +387,10 @@ function initMap() {
   const end = (e: PointerEvent) => forget(e.pointerId);
   viewport.addEventListener('pointerup', end, { signal });
   viewport.addEventListener('pointercancel', end, { signal });
-  viewport.addEventListener('lostpointercapture', end, { signal });
+  // On a touch screen the finger starts out captured by whatever it touched (a room, a line);
+  // that element's lostpointercapture bubbles up here when the map takes the finger over,
+  // and must not end the drag. Only the map's own loss counts.
+  viewport.addEventListener('lostpointercapture', (e) => { if (e.target === viewport) end(e); }, { signal });
   viewport.addEventListener('pointerleave', (e) => { if (!e.buttons) forget(e.pointerId); }, { signal });
   // A drag is not a click.
   viewport.addEventListener('click', (e) => {
@@ -333,8 +404,15 @@ function initMap() {
     if (locked) noDoor();
   }, { capture: true, signal });
 
+  let wheelTimer = 0;
   viewport.addEventListener('wheel', (e) => {
     e.preventDefault();
+    wheeling = true;
+    clearTimeout(wheelTimer);
+    wheelTimer = window.setTimeout(() => {
+      wheeling = false;
+      render();
+    }, 150);
     const factor = Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.001));
     zoomAt(factor, e.clientX, e.clientY);
   }, { passive: false, signal });
@@ -371,7 +449,13 @@ function initMap() {
   );
   root.querySelectorAll<HTMLButtonElement>('[data-floor-btn]').forEach((b) => b.addEventListener('click', () => setFloor(b.dataset.floorBtn!), { signal }));
   root.querySelector<HTMLInputElement>('[data-blueprint]')!.addEventListener('change', (e) => {
-    root!.classList.toggle('blueprint', (e.target as HTMLInputElement).checked);
+    const on = (e.target as HTMLInputElement).checked;
+    // The scans are large pictures: fetch them only when someone wants to see them.
+    if (on) root!.querySelectorAll<SVGImageElement>('image.scan[data-href]').forEach((im) => {
+      im.setAttribute('href', im.dataset.href!);
+      im.removeAttribute('data-href');
+    });
+    root!.classList.toggle('blueprint', on);
   }, { signal });
 
   // ---- Search ----
@@ -445,9 +529,16 @@ function initMap() {
   arrow = '';
   showFloorName();
   // The window can be any size: follow the map's own box, not the screen.
-  const ro = new ResizeObserver(() => render());
+  const ro = new ResizeObserver(() => paint());
   ro.observe(viewport);
-  signal.addEventListener('abort', () => { endLeave(); cancelAnimationFrame(anim); ro.disconnect(); clearTimeout(urlTimer); });
+  signal.addEventListener('abort', () => {
+    endLeave();
+    cancelAnimationFrame(anim);
+    cancelAnimationFrame(frame);
+    ro.disconnect();
+    clearTimeout(urlTimer);
+    clearTimeout(wheelTimer);
+  });
 
   // After every page shown in the window, follow the current room (or the floor in the URL).
   const sync = () => {

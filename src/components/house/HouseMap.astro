@@ -103,6 +103,7 @@ const mini = {
 ---
 <div class="house-map" id="house-map" data-floor={initialFloor} data-current={current?.slug ?? ''} data-zoom-level="1" data-keep="house-map">
   <div class="map-viewport" tabindex="0" {...attr('aria-label', tr.mapHelp)}>
+    <div class="map-pan">
     {floors.map((f, fi) => {
       const b = floorBounds(f);
       const m = 2400;
@@ -118,7 +119,7 @@ const mini = {
           role="group"
           {...attr('aria-label', { en: f.name, zh: f.zh })}
         >
-          <image class="scan" href={scans[f.id]} x={f.scan.x} y={f.scan.y} width={f.scan.width} height={f.scan.height} preserveAspectRatio="none" />
+          <image class="scan" data-href={scans[f.id]} x={f.scan.x} y={f.scan.y} width={f.scan.width} height={f.scan.height} preserveAspectRatio="none" />
           <g class="grid" aria-hidden="true">
             {columns.map((cx) => <line x1={cx} x2={cx} y1={rows[0] - 1500} y2={rows[rows.length - 1] + 1500} />)}
             {rows.map((cy) => <line y1={cy} y2={cy} x1={columns[0] - 1500} x2={columns[columns.length - 1] + 1500} />)}
@@ -206,6 +207,7 @@ const mini = {
         </svg>
       );
     })}
+    </div>
   </div>
 
   <div class="map-ui map-floors" role="toolbar" {...attr('aria-label', tr.floors)}>
