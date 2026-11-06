@@ -1,3 +1,5 @@
+import { tr, type Text } from './util';
+
 // Yellow Windows 98 tooltips. Anything with a title or data-tip gets one
 // after a short rest of the mouse (the browser's own tooltip is suppressed).
 
@@ -34,9 +36,9 @@ export function hideTip() {
 }
 
 /** A tooltip pointing at an element (hints such as "Double-click to open"). */
-export function tipFor(target: Element, text: string, ms = 3500) {
+export function tipFor(target: Element, text: Text, ms = 3500) {
   const r = target.getBoundingClientRect();
-  showTip(text, r.left + 8, r.bottom + 2, ms);
+  showTip(tr(text), r.left + 8, r.bottom + 2, ms);
 }
 
 function textOf(node: HTMLElement) {

@@ -3,9 +3,10 @@
 import { commands } from './commands';
 import { settings } from './settings';
 import { play, unlockAudio } from './sound';
-import { h } from './util';
+import { h, tr } from './util';
 
 let pop: HTMLElement | null = null;
+const VOLUME = { en: 'Volume', zh: '音量' };
 
 function closePop() {
   pop?.remove();
@@ -21,7 +22,7 @@ function outside(e: PointerEvent) {
 
 function openPop() {
   const s = settings.get();
-  const range = h('input', { type: 'range', class: 'has-box-indicator', min: '0', max: '100', step: '5', value: String(Math.round(s.volume * 100)), 'aria-label': 'Volume' });
+  const range = h('input', { type: 'range', class: 'has-box-indicator', min: '0', max: '100', step: '5', value: String(Math.round(s.volume * 100)), 'aria-label': VOLUME });
   const mute = h('input', { type: 'checkbox', id: 'k98-mute', checked: s.sound ? undefined : '' });
   range.addEventListener('input', () => settings.set({ volume: Number(range.value) / 100 }));
   range.addEventListener('change', () => play('ding'));
@@ -30,10 +31,10 @@ function openPop() {
     settings.set({ sound: !mute.checked });
     if (!mute.checked) play('ding');
   });
-  pop = h('div', { class: 'window volume-popup', role: 'dialog', 'aria-label': 'Volume' }, [
-    h('p', {}, 'Volume'),
+  pop = h('div', { class: 'window volume-popup', role: 'dialog', 'aria-label': VOLUME }, [
+    h('p', {}, VOLUME),
     h('div', { class: 'volume-track' }, [h('div', { class: 'is-vertical' }, [range])]),
-    h('div', { class: 'field-row' }, [mute, h('label', { for: 'k98-mute' }, 'Mute')]),
+    h('div', { class: 'field-row' }, [mute, h('label', { for: 'k98-mute' }, { en: 'Mute', zh: '静音' })]),
   ]);
   document.body.appendChild(pop);
   range.focus();
@@ -48,9 +49,13 @@ export function initTray() {
     const s = settings.get();
     const on = s.sound && s.volume > 0;
     ico.className = `ico ico16 ico-${on ? 'speaker' : 'speaker-mute'}`;
-    btn.dataset.tip = on ? `Volume (${Math.round(s.volume * 100)}%)` : 'Volume (muted)';
-    btn.dataset.tipZh = on ? `音量（${Math.round(s.volume * 100)}%）` : '音量（已静音）';
-    btn.setAttribute('aria-label', btn.dataset.tip);
+    const pct = Math.round(s.volume * 100);
+    const tip = on ? { en: `Volume (${pct}%)`, zh: `音量（${pct}%）` } : { en: 'Volume (muted)', zh: '音量（已静音）' };
+    btn.dataset.tip = tip.en;
+    btn.dataset.tipZh = tip.zh;
+    btn.dataset.ariaLabelEn = tip.en;
+    btn.dataset.ariaLabelZh = tip.zh;
+    btn.setAttribute('aria-label', tr(tip));
   };
   sync();
   settings.on(sync);

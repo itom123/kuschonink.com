@@ -1,17 +1,18 @@
 // Windows for programs that live only in the browser (Control Panel, My
 // Computer, the Recycle Bin…): the same chrome as Window.astro, one each.
-import { h } from './util';
+import { h, type Text } from './util';
+import { W } from './words';
 import * as wm from './wm';
 
 export interface AppWindowOpts {
   app: string;
-  title: string;
+  title: Text;
   icon: string;
   w: number;
   h: number;
   body: Node;
-  status?: string[];
-  address?: string;
+  status?: Text[];
+  address?: Text;
   toolbar?: Node;
   className?: string;
   bodyClass?: string;
@@ -44,17 +45,17 @@ export function appWindow(o: AppWindowOpts): wm.Win {
           h('span', { class: 'title-text', id: titleId, 'data-title': '' }, o.title),
         ]),
         h('div', { class: 'title-bar-controls' }, [
-          h('button', { type: 'button', class: 'tb-btn tb-min', 'data-cmd': 'minimize', 'aria-label': 'Minimize', title: 'Minimize' }),
-          h('button', { type: 'button', class: 'tb-btn tb-max', 'data-cmd': 'maximize', 'aria-label': 'Maximize', title: 'Maximize' }),
-          h('button', { type: 'button', class: 'tb-btn tb-close', 'data-cmd': 'close', 'aria-label': 'Close', title: 'Close' }),
+          h('button', { type: 'button', class: 'tb-btn tb-min', 'data-cmd': 'minimize', 'aria-label': W.minimize, title: W.minimize }),
+          h('button', { type: 'button', class: 'tb-btn tb-max', 'data-cmd': 'maximize', 'aria-label': W.maximize, title: W.maximize }),
+          h('button', { type: 'button', class: 'tb-btn tb-close', 'data-cmd': 'close', 'aria-label': W.close, title: W.close }),
         ]),
       ]),
       h('div', { class: 'window-inner', 'data-window-inner': '' }, [
         o.toolbar ?? null,
         o.address
           ? h('div', { class: 'addressbar' }, [
-              h('label', {}, 'Address'),
-              h('div', { class: 'address-field' }, [h('span', { class: `ico ico16 ico-${o.icon}`, 'aria-hidden': 'true' }), h('input', { type: 'text', value: o.address, readonly: '', 'aria-label': 'Address' })]),
+              h('label', {}, [h('span', { 'data-l': 'en' }, ['A', h('u', {}, 'd'), 'dress']), h('span', { 'data-l': 'zh', lang: 'zh-Hans' }, ['地址(', h('u', {}, 'D'), ')'])]),
+              h('div', { class: 'address-field' }, [h('span', { class: `ico ico16 ico-${o.icon}`, 'aria-hidden': 'true' }), h('input', { type: 'text', value: o.address, readonly: '', 'aria-label': W.address })]),
             ])
           : null,
         h('div', { class: 'window-main' }, [
@@ -71,11 +72,11 @@ export function appWindow(o: AppWindowOpts): wm.Win {
 }
 
 /** A row of tabs over panels, as in Windows property sheets. */
-export function tabs(names: string[], panels: HTMLElement[], o: { start?: number; onShow?: (i: number) => void } = {}) {
+export function tabs(names: Text[], panels: HTMLElement[], o: { start?: number; onShow?: (i: number) => void } = {}) {
   const list = h(
     'menu',
     { role: 'tablist', class: 'prop-tabs' },
-    names.map((n, i) => h('li', { role: 'tab', 'aria-selected': String(i === 0), 'data-help': 'Click a tab to see another page of settings.' }, h('a', { href: '#' }, n))),
+    names.map((n, i) => h('li', { role: 'tab', 'aria-selected': String(i === 0), 'data-help': { en: 'Click a tab to see another page of settings.', zh: '单击选项卡可以查看另一页设置。' } }, h('a', { href: '#' }, n))),
   );
   const holder = h('div', { class: 'window prop-panel', role: 'tabpanel' }, panels);
   const show = (i: number) => {

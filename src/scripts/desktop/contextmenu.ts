@@ -6,7 +6,7 @@ import { arrangeIcons, lineUpIcons, openIcon, select } from './icons';
 import * as menu from './menu';
 import { showIconProperties } from './properties';
 import { navigate } from './router';
-import { isCompact, shownText } from './util';
+import { isCompact, shownText, tr } from './util';
 import { linkMenu, mailAbout, pageMenu, photoMenu, systemMenu, toolbarsMenu } from './winmenus';
 import { binItemMenu, recycleIconMenu } from './apps/recycle';
 import * as wm from './wm';
@@ -19,23 +19,23 @@ function iconMenu(icon: HTMLElement): menu.MenuSpec[] {
   const href = icon.getAttribute('href');
   const outside = !!href && new URL(href, location.href).origin !== location.origin;
   return [
-    { label: '&Open', bold: true, action: () => openIcon(icon) },
-    ...(href && !outside ? [{ label: 'Open in &New Window', action: () => window.open(new URL(href, location.href).href, '_blank', 'noopener') } as menu.MenuSpec] : []),
+    { label: '&Open', zh: '打开(&O)', bold: true, action: () => openIcon(icon) },
+    ...(href && !outside ? [{ label: 'Open in &New Window', zh: '在新窗口中打开(&N)', action: () => window.open(new URL(href, location.href).href, '_blank', 'noopener') } as menu.MenuSpec] : []),
     { sep: true },
-    { label: 'Se&nd To', sub: [{ label: '&Mail Recipient', icon: 'mail', action: () => mailAbout(label) }] },
+    { label: 'Se&nd To', zh: '发送到(&N)', sub: [{ label: '&Mail Recipient', zh: '邮件收件人(&M)', icon: 'mail', action: () => mailAbout(label) }] },
     { sep: true },
-    { label: 'Cu&t', disabled: true },
-    { label: '&Copy', disabled: true },
+    { label: 'Cu&t', zh: '剪切(&T)', disabled: true },
+    { label: '&Copy', zh: '复制(&C)', disabled: true },
     { sep: true },
-    { label: 'Create &Shortcut', disabled: true },
+    { label: 'Create &Shortcut', zh: '创建快捷方式(&S)', disabled: true },
     {
-      label: '&Delete',
+      label: '&Delete', zh: '删除(&D)',
       disabled: icon.hasAttribute('data-fixed') || !group?.hasAttribute('data-free') || !commands.has('recycle-icon'),
       action: () => commands.run('recycle-icon', { el: icon }),
     },
-    { label: 'Rena&me', disabled: true },
+    { label: 'Rena&me', zh: '重命名(&M)', disabled: true },
     { sep: true },
-    { label: 'P&roperties', action: () => showIconProperties(icon) },
+    { label: 'P&roperties', zh: '属性(&R)', action: () => showIconProperties(icon) },
   ];
 }
 
@@ -43,57 +43,57 @@ function desktopMenu(): menu.MenuSpec[] {
   const group = document.getElementById('k98-icons')!;
   return [
     {
-      label: 'Arrange &Icons',
+      label: 'Arrange &Icons', zh: '排列图标(&I)',
       sub: [
-        { label: 'by &Name', action: () => arrangeIcons(group, 'name') },
-        { label: 'by &Type', action: () => arrangeIcons(group, 'type') },
+        { label: 'by &Name', zh: '按名称(&N)', action: () => arrangeIcons(group, 'name') },
+        { label: 'by &Type', zh: '按类型(&T)', action: () => arrangeIcons(group, 'type') },
       ],
     },
-    { label: 'Line &Up Icons', action: () => lineUpIcons(group) },
+    { label: 'Line &Up Icons', zh: '对齐图标(&U)', action: () => lineUpIcons(group) },
     { sep: true },
     {
-      label: 'R&efresh',
+      label: 'R&efresh', zh: '刷新(&E)',
       action: () => {
         group.style.visibility = 'hidden';
         setTimeout(() => (group.style.visibility = ''), 150);
       },
     },
     { sep: true },
-    { label: '&Paste', disabled: true },
-    { label: 'Paste &Shortcut', disabled: true },
+    { label: '&Paste', zh: '粘贴(&P)', disabled: true },
+    { label: 'Paste &Shortcut', zh: '粘贴快捷方式(&S)', disabled: true },
     { sep: true },
     {
-      label: 'Ne&w',
+      label: 'Ne&w', zh: '新建(&W)',
       sub: [
-        { label: '&Folder', icon: 'folder', disabled: true },
-        { label: '&Shortcut', disabled: true },
+        { label: '&Folder', zh: '文件夹(&F)', icon: 'folder', disabled: true },
+        { label: '&Shortcut', zh: '快捷方式(&S)', disabled: true },
         { sep: true },
-        { label: 'Text Document', icon: 'document', disabled: true },
+        { label: 'Text Document', zh: '文本文档', icon: 'document', disabled: true },
       ],
     },
     { sep: true },
-    { label: 'P&roperties', disabled: !commands.has('display-properties'), action: () => commands.run('display-properties') },
+    { label: 'P&roperties', zh: '属性(&R)', disabled: !commands.has('display-properties'), action: () => commands.run('display-properties') },
   ];
 }
 
 function taskbarMenu(): menu.MenuSpec[] {
   const many = wm.list().filter((w) => !w.dialog && w.state !== 'min').length;
   return [
-    { label: '&Cascade Windows', disabled: !many || isCompact(), action: () => wm.arrange('cascade') },
-    { label: 'Tile Windows &Horizontally', disabled: !many || isCompact(), action: () => wm.arrange('tile-h') },
-    { label: 'Tile Windows V&ertically', disabled: !many || isCompact(), action: () => wm.arrange('tile-v') },
+    { label: '&Cascade Windows', zh: '层叠窗口(&C)', disabled: !many || isCompact(), action: () => wm.arrange('cascade') },
+    { label: 'Tile Windows &Horizontally', zh: '横向平铺窗口(&H)', disabled: !many || isCompact(), action: () => wm.arrange('tile-h') },
+    { label: 'Tile Windows V&ertically', zh: '纵向平铺窗口(&E)', disabled: !many || isCompact(), action: () => wm.arrange('tile-v') },
     { sep: true },
-    { label: '&Minimize All Windows', action: () => wm.minimizeAll() },
+    { label: '&Minimize All Windows', zh: '最小化所有窗口(&M)', action: () => wm.minimizeAll() },
     { sep: true },
-    { label: 'P&roperties', disabled: !commands.has('taskbar-properties'), action: () => commands.run('taskbar-properties') },
+    { label: 'P&roperties', zh: '属性(&R)', disabled: !commands.has('taskbar-properties'), action: () => commands.run('taskbar-properties') },
   ];
 }
 
 function startButtonMenu(): menu.MenuSpec[] {
   return [
-    { label: '&Open', bold: true, action: () => document.querySelector<HTMLElement>('#k98-start summary')?.click() },
-    { label: '&Explore', action: () => navigate('/image') },
-    { label: '&Find...', disabled: !commands.has('find'), action: () => commands.run('find') },
+    { label: '&Open', zh: '打开(&O)', bold: true, action: () => document.querySelector<HTMLElement>('#k98-start summary')?.click() },
+    { label: '&Explore', zh: '资源管理器(&E)', action: () => navigate('/image') },
+    { label: '&Find...', zh: '查找(&F)...', disabled: !commands.has('find'), action: () => commands.run('find') },
   ];
 }
 
@@ -125,13 +125,13 @@ function targetFor(t: Element): Target {
       const img = t.closest('img');
       if (img instanceof HTMLImageElement && img.naturalWidth > 64) {
         const view: menu.MenuSpec[] = commands.has('view-image')
-          ? [{ label: '&Open in Image Viewer', bold: true, action: () => commands.run('view-image', { el: img }) }, { sep: true }]
+          ? [{ label: '&Open in Image Viewer', zh: '在图像查看器中打开(&O)', bold: true, action: () => commands.run('view-image', { el: img }) }, { sep: true }]
           : [];
         return { specs: photoMenu(img, view) };
       }
       const link = t.closest('a[href]');
       if (link) {
-        const name = (link.textContent ?? '').trim() || link.getAttribute('aria-label') || 'Link';
+        const name = shownText(link).trim() || link.getAttribute('aria-label') || tr({ en: 'Link', zh: '链接' });
         return { specs: linkMenu(link, name) };
       }
       return win.dialog ? { specs: [] } : { specs: pageMenu(win) };

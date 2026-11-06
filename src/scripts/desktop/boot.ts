@@ -6,7 +6,8 @@ import { session } from './session';
 import { settings } from './settings';
 import { play, unlockAudio } from './sound';
 import { tipFor } from './tooltips';
-import { coarseQuery, emit, h, html, reducedMotion, tr } from './util';
+import { coarseQuery, emit, h, html, reducedMotion, tr, type Text } from './util';
+import { W } from './words';
 import * as wm from './wm';
 
 const box = () => document.getElementById('k98-boot')!;
@@ -161,15 +162,14 @@ function closeAll() {
 }
 
 export async function logOff() {
-  const yes = tr({ en: 'Yes', zh: '是' });
   const r = await msgbox({
-    title: tr({ en: 'Log Off Xiangyin 98', zh: '注销 Xiangyin 98' }),
+    title: { en: 'Log Off Xiangyin 98', zh: '注销 Xiangyin 98' },
     icon: 'question',
-    text: tr({ en: 'Are you sure you want to log off?', zh: '确实要注销吗？' }),
-    buttons: [yes, tr({ en: 'No', zh: '否' })],
+    text: { en: 'Are you sure you want to log off?', zh: '确实要注销吗？' },
+    buttons: ['Yes', 'No'],
     sound: false,
   });
-  if (r !== yes) return;
+  if (r !== 'Yes') return;
   play('logoff');
   closeAll();
   session.logOff();
@@ -222,19 +222,19 @@ export function shutDownDialog() {
   const dim = h('div', { class: 'shutdown-dim', 'aria-hidden': 'true' });
   layer.classList.add('over-taskbar');
   layer.appendChild(dim);
-  const choices: [string, string][] = [
-    ['standby', tr({ en: 'Stand by', zh: '待机' })],
-    ['shutdown', tr({ en: 'Shut down', zh: '关闭计算机' })],
-    ['restart', tr({ en: 'Restart', zh: '重新启动' })],
+  const choices: [string, Text][] = [
+    ['standby', { en: 'Stand by', zh: '待机' }],
+    ['shutdown', { en: 'Shut down', zh: '关闭计算机' }],
+    ['restart', { en: 'Restart', zh: '重新启动' }],
   ];
-  const ok = h('button', { type: 'button', class: 'default' }, tr({ en: 'OK', zh: '确定' }));
-  const cancel = h('button', { type: 'button' }, tr({ en: 'Cancel', zh: '取消' }));
-  const help = h('button', { type: 'button' }, tr({ en: 'Help', zh: '帮助' }));
+  const ok = h('button', { type: 'button', class: 'default', 'data-btn': 'OK' }, W.ok);
+  const cancel = h('button', { type: 'button', 'data-btn': 'Cancel' }, W.cancel);
+  const help = h('button', { type: 'button', 'data-btn': 'Help' }, W.help);
   const body = h('div', { class: 'msgbox shutdown-box' }, [
     h('div', { class: 'msg-row' }, [
       h('span', { class: 'ico ico-shutdown', 'aria-hidden': 'true' }),
       h('div', { class: 'shutdown-choices' }, [
-        h('p', { class: 'msg-text' }, tr({ en: 'What do you want the computer to do?', zh: '你希望计算机做什么？' })),
+        h('p', { class: 'msg-text' }, { en: 'What do you want the computer to do?', zh: '你希望计算机做什么？' }),
         ...choices.map(([v, l]) =>
           h('div', { class: 'field-row' }, [
             h('input', { type: 'radio', name: 'k98-shutdown', id: `k98-sd-${v}`, value: v, checked: v === 'shutdown' ? '' : undefined }),
@@ -246,7 +246,7 @@ export function shutDownDialog() {
     h('div', { class: 'msg-buttons' }, [ok, cancel, help]),
   ]);
   const win = openDialog({
-    title: tr({ en: 'Shut Down Xiangyin 98', zh: '关闭 Xiangyin 98' }),
+    title: { en: 'Shut Down Xiangyin 98', zh: '关闭 Xiangyin 98' },
     icon: 'shutdown',
     body,
     modal: true,

@@ -4,9 +4,10 @@ import { appWindow } from '../appwindow';
 import { commands } from '../commands';
 import { msgbox } from '../dialogs';
 import { bindIconGroup } from '../icons';
-import { h } from '../util';
+import { h, type Text } from '../util';
+import { W, objects } from '../words';
 
-function icon(label: string, ico: string, o: { open?: string; href?: string; type: string; tip?: string }) {
+function icon(label: Text, ico: string, o: { open?: string; href?: string; type: Text; tip?: Text }) {
   const inner = [h('span', { class: `ico ico-${ico}`, 'aria-hidden': 'true' }), h('span', { class: 'icon-label' }, label)];
   return h('li', {}, [
     o.href
@@ -17,32 +18,40 @@ function icon(label: string, ico: string, o: { open?: string; href?: string; typ
 
 async function notReady(drive: string) {
   for (;;) {
-    const r = await msgbox({ title: drive, icon: 'error', text: `${drive}\\ is not accessible.\n\nThe device is not ready.`, buttons: ['Retry', 'Cancel'] });
+    const r = await msgbox({
+      title: drive,
+      icon: 'error',
+      text: { en: `${drive}\\ is not accessible.\n\nThe device is not ready.`, zh: `无法访问 ${drive}\\。\n\n设备未就绪。` },
+      buttons: ['Retry', 'Cancel'],
+    });
     if (r !== 'Retry') return;
   }
 }
 
 export function myComputer() {
-  const list = h('ul', { class: 'folder-view', 'aria-label': 'My Computer' }, [
-    icon('3½ Floppy (A:)', 'floppy', { open: 'drive-a', type: '3½ Inch Floppy Disk' }),
-    icon('xiangyin (C:)', 'drive', { open: 'drive-c', type: 'Local Disk', tip: 'Everything on this computer.' }),
-    icon('Compact Disc (D:)', 'cd', { open: 'drive-d', type: 'CD-ROM Disc' }),
-    icon('Control Panel', 'control', { open: 'control-panel', type: 'System Folder', tip: 'Mouse, sounds, display and more.' }),
+  const list = h('ul', { class: 'folder-view', 'aria-label': W.myComputer }, [
+    icon({ en: '3½ Floppy (A:)', zh: '3.5 英寸软盘 (A:)' }, 'floppy', { open: 'drive-a', type: { en: '3½ Inch Floppy Disk', zh: '3.5 英寸软盘' } }),
+    icon('xiangyin (C:)', 'drive', { open: 'drive-c', type: { en: 'Local Disk', zh: '本地磁盘' }, tip: { en: 'Everything on this computer.', zh: '这台电脑上的一切。' } }),
+    icon({ en: 'Compact Disc (D:)', zh: '光盘 (D:)' }, 'cd', { open: 'drive-d', type: { en: 'CD-ROM Disc', zh: 'CD-ROM 光盘' } }),
+    icon(W.controlPanel, 'control', { open: 'control-panel', type: { en: 'System Folder', zh: '系统文件夹' }, tip: { en: 'Mouse, sounds, display and more.', zh: '鼠标、声音、显示等。' } }),
   ]);
-  appWindow({ app: 'mycomputer', title: 'My Computer', icon: 'computer', w: 540, h: 340, body: list, address: 'My Computer', status: ['4 object(s)', 'Double-click a drive to open it.'] });
+  appWindow({ app: 'mycomputer', title: W.myComputer, icon: 'computer', w: 540, h: 340, body: list, address: W.myComputer, status: [objects(4), { en: 'Double-click a drive to open it.', zh: '双击驱动器即可打开。' }] });
   bindIconGroup(list);
 }
 
+const FOLDER = { en: 'File Folder', zh: '文件夹' };
+const PROGRAM = { en: 'Program', zh: '程序' };
+
 export function driveC() {
   const list = h('ul', { class: 'folder-view', 'aria-label': 'xiangyin (C:)' }, [
-    icon('Projects', 'folder', { href: '/image', type: 'File Folder' }),
-    icon('The House', 'house', { href: '/house/facade', type: 'Program' }),
-    icon('About.doc', 'document', { href: '/about', type: 'Document' }),
-    icon('Contact', 'mail', { href: '/contact', type: 'Program' }),
-    icon('Help', 'help', { href: '/help', type: 'Help file' }),
-    icon('Welcome', 'welcome', { href: '/', type: 'Program' }),
+    icon(W.projects, 'folder', { href: '/image', type: FOLDER }),
+    icon(W.theHouse, 'house', { href: '/house/facade', type: PROGRAM }),
+    icon({ en: 'About.doc', zh: '关于.doc' }, 'document', { href: '/about', type: { en: 'Document', zh: '文档' } }),
+    icon({ en: 'Contact', zh: '联系' }, 'mail', { href: '/contact', type: PROGRAM }),
+    icon(W.help, 'help', { href: '/help', type: { en: 'Help file', zh: '帮助文件' } }),
+    icon({ en: 'Welcome', zh: '欢迎' }, 'welcome', { href: '/', type: PROGRAM }),
   ]);
-  appWindow({ app: 'drive-c', title: 'xiangyin (C:)', icon: 'drive', w: 560, h: 340, body: list, address: 'C:\\', status: ['6 object(s)', 'Double-click an item to open it.'] });
+  appWindow({ app: 'drive-c', title: 'xiangyin (C:)', icon: 'drive', w: 560, h: 340, body: list, address: 'C:\\', status: [objects(6), { en: 'Double-click an item to open it.', zh: '双击项目即可打开。' }] });
   bindIconGroup(list);
 }
 

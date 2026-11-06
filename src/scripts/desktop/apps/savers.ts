@@ -7,11 +7,11 @@ import { h, html, reducedMotion } from '../util';
 
 type Stop = () => void;
 
-export const SAVERS: [string, string][] = [
-  ['', '(None)'],
-  ['blank', 'Blank Screen'],
-  ['lines', 'Lines'],
-  ['slideshow', 'Photographs'],
+export const SAVERS: [string, { en: string; zh: string }][] = [
+  ['', { en: '(None)', zh: '(无)' }],
+  ['blank', { en: 'Blank Screen', zh: '空白屏幕' }],
+  ['lines', { en: 'Lines', zh: '线条' }],
+  ['slideshow', { en: 'Photographs', zh: '照片' }],
 ];
 
 function shuffle<T>(a: T[]) {
@@ -34,7 +34,7 @@ function slides(box: HTMLElement, mini: boolean): Stop {
   desktopData()
     .then((d) => {
       if (stopped) return;
-      const list = shuffle(mini ? d.projects.map((p) => ({ title: p.title, src: p.thumb })) : d.slideshow);
+      const list = shuffle(mini ? d.projects.map((p) => ({ title: p.title, titleZh: p.titleZh, src: p.thumb })) : d.slideshow);
       if (!list.length) throw new Error('no pictures');
       let i = 0;
       const show = () => {
@@ -49,7 +49,7 @@ function slides(box: HTMLElement, mini: boolean): Stop {
           .then(() => {
             if (stopped) return;
             const back = layers[1 - front];
-            back.replaceChildren(img, mini ? '' : h('figcaption', {}, item.title));
+            back.replaceChildren(img, mini ? '' : h('figcaption', {}, { en: item.title, zh: item.titleZh }));
             back.classList.remove('drift-a', 'drift-b');
             void back.offsetWidth;
             if (!reducedMotion.matches && !mini) back.classList.add(i % 2 ? 'drift-a' : 'drift-b');

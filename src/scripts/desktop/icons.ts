@@ -210,7 +210,7 @@ function onClick(e: MouseEvent) {
     hintTimer = window.setTimeout(() => {
       if (lastClick.el === icon && icon.classList.contains('selected')) {
         hintsShown++;
-        tipFor(icon, 'Double-click to open. (Or press Enter.)');
+        tipFor(icon, { en: 'Double-click to open. (Or press Enter.)', zh: '双击即可打开。（或按 Enter 键。）' });
       }
     }, s.dblClickMs + 700);
   }

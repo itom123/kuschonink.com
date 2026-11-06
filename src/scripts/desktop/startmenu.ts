@@ -3,7 +3,7 @@
 import * as menu from './menu';
 import { emit, escapeHtml, stored } from './util';
 
-export interface Recent { url: string; title: string; icon: string }
+export interface Recent { url: string; title: string; titleZh?: string; icon: string }
 const MAX_RECENT = 15;
 export const recent = stored<Recent[]>('kus98:recent', []);
 
@@ -16,6 +16,12 @@ export function remember(r: Recent) {
   recent.set(list.slice(0, MAX_RECENT));
 }
 
+/** A document's name in both languages (pages remembered before there was Chinese have one). */
+const label = (r: Recent) =>
+  r.titleZh && r.titleZh !== r.title
+    ? `<span data-l="en">${escapeHtml(r.title)}</span><span data-l="zh" lang="zh-Hans">${escapeHtml(r.titleZh)}</span>`
+    : escapeHtml(r.title);
+
 function fillDocuments(start: HTMLElement) {
   const sub = start.querySelector<HTMLElement>('[data-recent] + ul.menu.sub, li[data-recent-list] > ul.menu.sub');
   if (!sub) return;
@@ -24,7 +30,7 @@ function fillDocuments(start: HTMLElement) {
     ? list
         .map(
           (r) =>
-            `<li role="none"><a class="menu-item" role="menuitem" tabindex="-1" href="${escapeHtml(r.url)}"><span class="ico ico16 ico-${escapeHtml(r.icon)}" aria-hidden="true"></span><span class="mi-label">${escapeHtml(r.title)}</span></a></li>`,
+            `<li role="none"><a class="menu-item" role="menuitem" tabindex="-1" href="${escapeHtml(r.url)}"><span class="ico ico16 ico-${escapeHtml(r.icon)}" aria-hidden="true"></span><span class="mi-label">${label(r)}</span></a></li>`,
         )
         .join('')
     : '<li role="none"><span class="menu-item" role="menuitem" aria-disabled="true" tabindex="-1"><span class="mi-label"><span data-l="en">(Empty)</span><span data-l="zh" lang="zh-Hans">(空)</span></span></span></li>';
@@ -73,7 +79,7 @@ export function initStartMenu() {
     }
   });
   document.addEventListener('desktop:navigate', (e) => {
-    const d = (e as CustomEvent<{ url: string; title: string; icon: string }>).detail;
-    remember({ url: d.url, title: d.title, icon: d.icon });
+    const d = (e as CustomEvent<Recent>).detail;
+    remember({ url: d.url, title: d.title, titleZh: d.titleZh, icon: d.icon });
   });
 }

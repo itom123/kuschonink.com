@@ -3,7 +3,7 @@
 import { appWindow } from '../appwindow';
 import { commands } from '../commands';
 import { settings } from '../settings';
-import { h } from '../util';
+import { h, setText, type Text } from '../util';
 import { largestSrc } from '../winmenus';
 import * as wm from '../wm';
 
@@ -24,7 +24,7 @@ function picsFrom(scope: Element): HTMLImageElement[] {
   return [...scope.querySelectorAll<HTMLImageElement>('img')].filter((i) => i.matches(VIEWABLE) && !i.closest('a[href]') && i.naturalWidth > 64);
 }
 
-function tool(cmd: string, label: string, icon: string, title = label) {
+function tool(cmd: string, label: Text, icon: string, title: Text = label) {
   return h('button', { type: 'button', class: 'tool', 'data-viewer': cmd, title }, [h('span', { class: `ico ico20 ico-${icon}`, 'aria-hidden': 'true' }), label]);
 }
 
@@ -33,10 +33,10 @@ function show() {
   if (!p || !win) return;
   img.src = p.src;
   img.alt = p.alt;
-  win.el.querySelector('[data-title]')!.textContent = `${p.name} - Image Viewer`;
+  setText(win.el.querySelector('[data-title]')!, { en: `${p.name} - Image Viewer`, zh: `${p.name} - 图像查看器` });
   const fields = win.el.querySelectorAll('.status-bar-field');
-  fields[0].textContent = `Image ${index + 1} of ${pics.length}`;
-  fields[1].textContent = p.w ? `${p.w} × ${p.h} pixels` : '';
+  setText(fields[0], { en: `Image ${index + 1} of ${pics.length}`, zh: `第 ${index + 1} 张，共 ${pics.length} 张` });
+  setText(fields[1], p.w ? { en: `${p.w} × ${p.h} pixels`, zh: `${p.w} × ${p.h} 像素` } : '');
   applyZoom();
   win.el.querySelectorAll<HTMLButtonElement>('[data-viewer="prev"], [data-viewer="next"]').forEach((b) => (b.disabled = pics.length < 2));
   document.dispatchEvent(new CustomEvent('wm:change'));
@@ -47,7 +47,7 @@ function applyZoom() {
   if (zoom === 'fit') img.style.width = '';
   else img.style.width = `${Math.round((pics[index]?.w || img.naturalWidth) * zoom)}px`;
   const z = win?.el.querySelectorAll('.status-bar-field')[2];
-  if (z) z.textContent = zoom === 'fit' ? 'Best fit' : `${Math.round(zoom * 100)}%`;
+  if (z) setText(z, zoom === 'fit' ? { en: 'Best fit', zh: '最适合' } : `${Math.round(zoom * 100)}%`);
 }
 
 function go(d: number) {
@@ -66,18 +66,19 @@ function zoomBy(f: number) {
 function build() {
   img = h('img', { class: 'viewer-img', alt: '', draggable: 'false' });
   stage = h('div', { class: 'viewer-stage fit' }, img);
-  const toolbar = h('div', { class: 'toolbar', role: 'toolbar', 'aria-label': 'Image Viewer' }, [
-    tool('prev', 'Previous', 'tb-back'),
-    tool('next', 'Next', 'tb-forward'),
+  const VIEWER = { en: 'Image Viewer', zh: '图像查看器' };
+  const toolbar = h('div', { class: 'toolbar', role: 'toolbar', 'aria-label': VIEWER }, [
+    tool('prev', { en: 'Previous', zh: '上一张' }, 'tb-back'),
+    tool('next', { en: 'Next', zh: '下一张' }, 'tb-forward'),
     h('span', { class: 'tool-sep', 'aria-hidden': 'true' }),
-    tool('in', 'Zoom In', 'tb-zoomin'),
-    tool('out', 'Zoom Out', 'tb-zoomout'),
-    tool('fit', 'Best Fit', 'tb-fit'),
+    tool('in', { en: 'Zoom In', zh: '放大' }, 'tb-zoomin'),
+    tool('out', { en: 'Zoom Out', zh: '缩小' }, 'tb-zoomout'),
+    tool('fit', { en: 'Best Fit', zh: '最适合' }, 'tb-fit'),
     h('span', { class: 'tool-sep', 'aria-hidden': 'true' }),
-    tool('wallpaper', 'Wallpaper', 'desktop', 'Set as wallpaper'),
-    tool('save', 'Save', 'tb-print', 'Save the picture'),
+    tool('wallpaper', { en: 'Wallpaper', zh: '墙纸' }, 'desktop', { en: 'Set as wallpaper', zh: '设为墙纸' }),
+    tool('save', { en: 'Save', zh: '保存' }, 'tb-print', { en: 'Save the picture', zh: '保存图片' }),
   ]);
-  win = appWindow({ app: 'viewer', title: 'Image Viewer', icon: 'image', w: 820, h: 620, body: stage, toolbar, status: ['', '', ''], className: 'viewer-window', bodyClass: 'viewer-body' });
+  win = appWindow({ app: 'viewer', title: VIEWER, icon: 'image', w: 820, h: 620, body: stage, toolbar, status: ['', '', ''], className: 'viewer-window', bodyClass: 'viewer-body' });
   win.el.addEventListener('desktop:close', () => (win = null), { once: true });
   toolbar.addEventListener('click', (e) => {
     const b = (e.target as Element).closest<HTMLElement>('[data-viewer]');

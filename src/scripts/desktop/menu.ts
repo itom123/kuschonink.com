@@ -1,11 +1,13 @@
 // Windows 98 menus. The Start menu, window menu bars and right-click menus all
 // use this engine: hover delays, cascading submenus, arrow keys, access keys.
-import { accelHtml, accelKey } from '../../lib/menus';
+import { accelKey, biAccelHtml } from '../../lib/menus';
 import { h, html } from './util';
 
 export interface MenuSpec {
   /** "&Open": the letter after & is the access key. */
   label?: string;
+  /** The Chinese label, with the same access key: "打开(&O)" (the 中/EN switch). */
+  zh?: string;
   icon?: string;
   sep?: boolean;
   disabled?: boolean;
@@ -251,7 +253,7 @@ function build(specs: MenuSpec[], map: WeakMap<HTMLElement, MenuSpec>, sub = fal
     });
     if (s.icon) b.append(h('span', { class: `ico ico16 ico-${s.icon}`, 'aria-hidden': 'true' }));
     const label = h('span', { class: 'mi-label' });
-    label.innerHTML = accelHtml(s.label ?? '');
+    label.innerHTML = biAccelHtml(s.label ?? '', s.zh);
     b.append(label);
     if (s.key) b.append(h('span', { class: 'mi-key' }, s.key));
     map.set(b, s);

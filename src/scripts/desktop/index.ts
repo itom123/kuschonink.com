@@ -92,9 +92,9 @@ commands.register('views', (ctx) => {
   const r = el.getBoundingClientRect();
   menu.popup(
     [
-      { label: 'Thu&mbnails', radio: true, checked: v === 'thumbs', action: () => settings.set({ explorerView: 'thumbs' }) },
-      { label: '&List', radio: true, checked: v === 'list', action: () => settings.set({ explorerView: 'list' }) },
-      { label: '&Details', radio: true, checked: v === 'details', action: () => settings.set({ explorerView: 'details' }) },
+      { label: 'Thu&mbnails', zh: '缩略图(&M)', radio: true, checked: v === 'thumbs', action: () => settings.set({ explorerView: 'thumbs' }) },
+      { label: '&List', zh: '列表(&L)', radio: true, checked: v === 'list', action: () => settings.set({ explorerView: 'list' }) },
+      { label: '&Details', zh: '详细资料(&D)', radio: true, checked: v === 'details', action: () => settings.set({ explorerView: 'details' }) },
     ],
     r.left,
     r.bottom,
@@ -154,7 +154,10 @@ function ready() {
   for (const el of document.querySelectorAll<HTMLElement>('#k98-windows > [data-window]')) {
     el.dispatchEvent(new CustomEvent('desktop:content', { bubbles: true, detail: { url: el.dataset.url, initial: true } }));
     const w = wm.byEl(el);
-    if (w && wm.isPage(w)) remember({ url: wm.urlOf(w), title: wm.titleOf(w), icon: el.dataset.icon ?? 'document' });
+    if (w && wm.isPage(w)) {
+      const t = wm.titlesOf(w);
+      remember({ url: wm.urlOf(w), title: t.en, titleZh: t.zh, icon: el.dataset.icon ?? 'document' });
+    }
   }
   document.dispatchEvent(new Event('astro:page-load'));
 }

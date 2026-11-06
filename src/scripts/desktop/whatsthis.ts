@@ -3,24 +3,26 @@
 // the same note. Esc cancels. Notes come from data-help attributes.
 import { commands } from './commands';
 import { hideTip } from './tooltips';
-import { h, html } from './util';
+import { h, html, lang, tr } from './util';
 
-const NONE = 'No Help topic is associated with this item.';
+/** Said when a control has no note of its own. */
+const NONE = { en: 'No Help topic is associated with this item.', zh: '此项没有相关的帮助主题。' };
 
-/** What a control does, in a sentence or two. */
+/** What a control does, in a sentence or two, in the language showing. */
 export function explain(el: Element): string {
-  const own = el.closest<HTMLElement>('[data-help]')?.dataset.help;
-  if (own) return own;
-  const btn = el.closest('button');
-  if (btn?.classList.contains('tb-close')) return 'Closes this window.';
-  if (btn?.classList.contains('tb-help')) return 'Click this, then click any part of the dialog box to find out what it does.';
-  const label = (btn?.textContent ?? '').trim();
-  if (label === 'OK') return 'Closes this dialog box and keeps any changes you have made.';
-  if (label === 'Cancel') return 'Closes this dialog box without keeping any changes.';
-  if (label === 'Yes' || label === 'No') return `Answers the question with “${label}”.`;
-  if (el.closest('.title-bar')) return 'The title bar shows the name of the window. Drag it to move the window.';
-  if (el.closest('.status-bar')) return 'The status bar tells you what you are looking at and what you can do next.';
-  return NONE;
+  const own = el.closest<HTMLElement>('[data-help]');
+  if (own) return (lang() === 'zh' && own.dataset.helpZh) || own.dataset.help || '';
+  const btn = el.closest<HTMLElement>('button');
+  if (btn?.classList.contains('tb-close')) return tr({ en: 'Closes this window.', zh: '关闭这个窗口。' });
+  if (btn?.classList.contains('tb-help')) return tr({ en: 'Click this, then click any part of the dialog box to find out what it does.', zh: '单击这里，然后单击对话框的任何部分，就能知道它是做什么的。' });
+  // Message box buttons carry their English name in data-btn.
+  const id = btn?.dataset.btn ?? (btn?.textContent ?? '').trim();
+  if (id === 'OK') return tr({ en: 'Closes this dialog box and keeps any changes you have made.', zh: '关闭这个对话框，并保留你所做的更改。' });
+  if (id === 'Cancel') return tr({ en: 'Closes this dialog box without keeping any changes.', zh: '关闭这个对话框，不保留任何更改。' });
+  if (id === 'Yes' || id === 'No') return tr({ en: `Answers the question with “${id}”.`, zh: `用“${id === 'Yes' ? '是' : '否'}”回答这个问题。` });
+  if (el.closest('.title-bar')) return tr({ en: 'The title bar shows the name of the window. Drag it to move the window.', zh: '标题栏显示窗口的名称。拖动它可以移动窗口。' });
+  if (el.closest('.status-bar')) return tr({ en: 'The status bar tells you what you are looking at and what you can do next.', zh: '状态栏告诉你正在看什么，以及接下来可以做什么。' });
+  return tr(NONE);
 }
 
 let note: HTMLElement | null = null;
@@ -69,7 +71,7 @@ export function showNote(text: string, x: number, y: number) {
 /** F1 on a control inside a dialog: explain it. Returns false when there's nothing to say. */
 export function explainFocused(el: Element) {
   const text = explain(el);
-  if (text === NONE) return false;
+  if (text === tr(NONE)) return false;
   const r = el.getBoundingClientRect();
   showNote(text, r.left + 8, r.bottom + 4);
   return true;

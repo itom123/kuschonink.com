@@ -19,13 +19,14 @@ import Bi from '../Bi.astro';
           data-tip={i.tip}
           data-tip-zh={i.tipZh}
           data-type={i.type}
+          data-type-zh={i.typeZh}
           draggable="false"
         >
           <span class={`ico ico-${i.icon}`} aria-hidden="true">{i.shortcut && <span class="ico ico-shortcut"></span>}</span>
           <span class="icon-label"><Bi t={{ en: i.label, zh: i.zh ?? '' }} /></span>
         </a>
       ) : (
-        <button type="button" class="icon" id={`icon-${i.id}`} data-open={i.open} data-icon-id={i.id} data-tip={i.tip} data-tip-zh={i.tipZh} data-type={i.type} data-fixed={i.fixed ? '' : undefined}>
+        <button type="button" class="icon" id={`icon-${i.id}`} data-open={i.open} data-icon-id={i.id} data-tip={i.tip} data-tip-zh={i.tipZh} data-type={i.type} data-type-zh={i.typeZh} data-fixed={i.fixed ? '' : undefined}>
           <span class={`ico ico-${i.icon}`} aria-hidden="true"></span>
           <span class="icon-label"><Bi t={{ en: i.label, zh: i.zh ?? '' }} /></span>
         </button>

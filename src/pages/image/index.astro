@@ -38,7 +38,7 @@ const items = await Promise.all(
   }),
 );
 const total = items.reduce((n, i) => n + i.images, 0);
-const tools: Tool[] = [...EXPLORER_TOOLS, SEP, { cmd: 'views', label: 'Views', zh: '查看', icon: 'tb-views', title: 'Thumbnails, List or Details', titleZh: '缩略图、列表或详细信息' }];
+const tools: Tool[] = [...EXPLORER_TOOLS, SEP, { cmd: 'views', label: 'Views', zh: '查看', icon: 'tb-views', title: 'Thumbnails, List or Details', titleZh: '缩略图、列表或详细资料' }];
 ---
 <Desktop seo={{ ...seoTitle(t.projects, site.name), description: home.seo.description }}>
   <Window

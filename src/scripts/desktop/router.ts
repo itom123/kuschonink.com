@@ -205,7 +205,7 @@ export function notFound(what: string, owner?: Element | null) {
   return msgbox({
     title: 'Xiangyin 98',
     icon: 'error',
-    text: `Cannot find '${what}'. Make sure the path or Internet address is correct.`,
+    text: { en: `Cannot find '${what}'. Make sure the path or Internet address is correct.`, zh: `找不到“${what}”。请确定路径或 Internet 地址是否正确。` },
     owner,
   });
 }
@@ -264,7 +264,10 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
       msgbox({
         title: 'Xiangyin 98',
         icon: 'error',
-        text: `Xiangyin 98 cannot open ${addressFor(path)}.\n\nCheck your Internet connection, then try again.`,
+        text: {
+          en: `Xiangyin 98 cannot open ${addressFor(path)}.\n\nCheck your Internet connection, then try again.`,
+          zh: `Xiangyin 98 无法打开 ${addressFor(path)}。\n\n请检查你的 Internet 连接，然后再试一次。`,
+        },
         owner: win?.el,
       });
       return;
@@ -317,7 +320,8 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
   await runScripts(scripts);
   emit(win.el, 'desktop:content', { url: target });
   document.dispatchEvent(new Event('astro:page-load'));
-  emit(document, 'desktop:navigate', { url: target, app, title: wm.titleOf(win), icon: win.el.dataset.icon ?? 'document', docTitle });
+  const titles = wm.titlesOf(win);
+  emit(document, 'desktop:navigate', { url: target, app, title: titles.en, titleZh: titles.zh, icon: win.el.dataset.icon ?? 'document', docTitle });
   wm.focus(win, { history: false });
   if (o.source === 'keyboard') {
     const h1 = win.el.querySelector<HTMLElement>('[data-window-body] h1');

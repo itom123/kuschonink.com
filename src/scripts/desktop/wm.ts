@@ -6,7 +6,7 @@
 import { APPS, addressFor, cleanPath, upOf, type AppId } from '../../lib/apps';
 import { settings } from './settings';
 import { play } from './sound';
-import { clamp, emit, html, isCompact, reducedMotion, siteTitle, lang, shownText } from './util';
+import { clamp, emit, html, isCompact, reducedMotion, siteTitle, lang, shownText, tr } from './util';
 
 export type WinState = 'normal' | 'max' | 'min';
 
@@ -83,6 +83,11 @@ export const find = (app: string) => wins.find((w) => w.app === app && !w.dialog
 export const urlOf = (win: Win) => win.el.dataset.url ?? '';
 /** The window's title, in the language showing. */
 export const titleOf = (win: Win) => shownText(win.el.querySelector(':scope > .title-bar [data-title]'));
+/** A window's title in both languages (Start ▸ Documents keeps both). */
+export function titlesOf(win: Win) {
+  const el = win.el.querySelector(':scope > .title-bar [data-title]');
+  return { en: shownText(el, 'en').trim(), zh: shownText(el, 'zh').trim() };
+}
 /** The browser tab's title for a window's page, in the language showing. */
 export const pageTitle = (win: Win) => (lang() === 'zh' && win.docTitleZh) || win.docTitle;
 export const isPage = (win: Win) => !!win.el.dataset.url && !win.dialog;
@@ -214,9 +219,13 @@ function centerRect(win: Win) {
 function updateMaxButton(win: Win) {
   const b = win.el.querySelector<HTMLElement>(':scope > .title-bar [data-cmd="maximize"]');
   if (!b) return;
-  const label = win.state === 'max' ? 'Restore' : 'Maximize';
-  b.setAttribute('aria-label', label);
-  b.title = label;
+  // Both languages, so the 中/EN switch (lang.ts) swaps in the right word.
+  const label = win.state === 'max' ? { en: 'Restore', zh: '还原' } : { en: 'Maximize', zh: '最大化' };
+  for (const a of ['aria-label', 'title']) {
+    b.setAttribute(a, tr(label));
+    b.setAttribute(`data-${a}-en`, label.en);
+    b.setAttribute(`data-${a}-zh`, label.zh);
+  }
 }
 
 export function updateNav(win: Win) {
