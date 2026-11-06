@@ -382,6 +382,10 @@ html[data-busy="wait"], html[data-busy="wait"] * { cursor: wait !important; }
   html.js .app-window:not(.v-dialog) .tb-max, .rz, .grip { display: none !important; }
   .window-side { display: none; }
   .tasks .task { flex-basis: 110px; }
+  /* Toolbars keep to one row (swipe sideways for the rest), leaving the room to the page. */
+  .toolbar, .linksbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .toolbar::-webkit-scrollbar, .linksbar::-webkit-scrollbar { display: none; }
+  .toolbar > *, .linksbar > * { flex: none; }
 }
 @media (pointer: coarse) {
   .tb-btn { width: 26px; height: 22px; background-position: center !important; }

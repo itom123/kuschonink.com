@@ -1,7 +1,7 @@
-// Pointer trails, the Windows 98 way: ghost pointers follow the mouse and
-// disappear when it stops. Control Panel ▸ Mouse turns them off or sets their
-// length. Never on touch screens, with "reduce motion", or with the
-// computer's own pointers.
+// Pointer trails, the Windows 98 way but faint: ghost pointers follow the
+// mouse and disappear when it stops. Off to begin with; Control Panel ▸ Mouse
+// turns them on and sets their length. Never on touch screens, with "reduce
+// motion", or with the computer's own pointers.
 import { settings } from './settings';
 import { coarseQuery, html, reducedMotion } from './util';
 
@@ -49,7 +49,8 @@ function frame() {
     if (show) {
       g.style.transform = `translate(${p.x}px, ${p.y}px)`;
       g.dataset.kind = p.kind;
-      g.style.opacity = String(0.85 - i * (0.5 / n));
+      // Faint, and fainter further back: 0.3 for the nearest ghost.
+      g.style.opacity = String((0.3 * (n - i)) / n);
     }
     g.hidden = !show;
   });

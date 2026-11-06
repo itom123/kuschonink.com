@@ -32,9 +32,9 @@ appears with the page they asked for open in a window.
   Contact (`/contact`, a New Message window), The House (`/house/…`, a browser
   window) and Help (`/help`).
 - **The Control Panel**: Display (wallpaper, screen saver, colour schemes
-  including High Contrast, window effects), Mouse (pointer trails, larger
-  pointers, double-click speed), Sounds, and Folder Options (single or double
-  click). Settings stay in the visitor's browser.
+  including High Contrast, window effects), Mouse (faint pointer trails, off to
+  begin with; larger pointers; double-click speed), Sounds, and Folder Options
+  (single or double click). Settings stay in the visitor's browser.
 - Sounds, pointers, icons and screens are made for the site: nothing is taken
   from Windows. No visible text says "kuschonink"; addresses read `C:\xiangyin\…`.
 

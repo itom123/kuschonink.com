@@ -42,6 +42,13 @@ html:not(.js) .house-view { position: relative; inset: auto; height: 75vh; }
 .map-viewport { position: absolute; inset: 0; touch-action: none; cursor: grab; outline: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .map-viewport.dragging { cursor: grabbing; }
 .map-viewport:focus-visible { outline: 2px dotted var(--ink); outline-offset: -4px; }
+/* The floors, drawn a little larger than the window (--ox, --oy, set by map.ts), so that
+   while a finger drags the map the drawing can slide as a picture and still fill the window. */
+.map-pan {
+  position: absolute; left: calc(-1 * var(--ox, 0px)); top: calc(-1 * var(--oy, 0px));
+  width: calc(100% + 2 * var(--ox, 0px)); height: calc(100% + 2 * var(--oy, 0px));
+  transform-origin: 50% 50%; will-change: transform;
+}
 svg.floor { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; display: block; user-select: none; }
 svg.floor[hidden] { display: none; }
 /* Changing floors: going up, the floor you leave sinks away and the new one comes up to meet you;
@@ -59,12 +66,14 @@ svg.floor[hidden] { display: none; }
   .floor-leave { display: none; }
 }
 
-.scan { opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-.blueprint .scan { opacity: 1; }
+/* Hidden scans aren't painted at all (an invisible one would still cost a phone every frame). */
+.scan { opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0s 0.3s; pointer-events: none; }
+.blueprint .scan { opacity: 1; visibility: visible; transition: opacity 0.3s; }
 
 .grid line { stroke: #999; stroke-width: 1px; vector-effect: non-scaling-stroke; stroke-dasharray: 2 4; }
 .blueprint .grid { display: none; }
 .dim { font-size: calc(var(--px) * 11px); fill: #666; text-anchor: middle; dominant-baseline: middle; font-family: 'Times New Roman', serif; }
+.grid.dims-off .dim { display: none; }
 
 /* The floor below, seen faintly through open-air rooms and around the edges. */
 .ghost polygon { fill: none; stroke: #9a9a9a; stroke-width: 1px; vector-effect: non-scaling-stroke; stroke-dasharray: 3 3; pointer-events: none; }
@@ -94,25 +103,25 @@ a.room:focus-visible polygon { stroke: var(--link); stroke-width: 3px; }
 .door.garage .door-leaf { stroke-dasharray: 6 3; stroke-width: 1px; }
 .blueprint .doors { display: none; }
 
+/* Labels keep one size on screen (--label, --label-sub). Each time the floor is drawn, map.ts
+   fits every label to its room: on one line, on two, or not at all (fit-none) until you zoom in;
+   the full name is in the room's tooltip. */
+.house-map { --label: 15px; --label-sub: 13px; }
+@container house (max-width: 600px) { .house-map { --label: 12px; } }
 .room text { font-family: 'Times New Roman', Times, serif; pointer-events: none; }
 .label { text-anchor: middle; dominant-baseline: middle; }
-.label-main { font-size: calc(var(--px) * 15px); fill: var(--ink); }
+.label-main { font-size: calc(var(--px) * var(--label)); fill: var(--ink); }
 .room.has-contents .label-main { fill: var(--link); text-decoration: underline; }
 a.room.has-contents:visited .label-main { fill: var(--visited); }
-.label-en { font-size: calc(var(--px) * 12px); fill: #333; display: none; }
-.label-sub { font-size: calc(var(--px) * 13px); font-style: italic; fill: var(--ink); display: none; }
+.label-sub { font-size: calc(var(--px) * var(--label-sub)); font-style: italic; fill: var(--ink); display: none; }
+.label-sub.label-line { display: inline; }
+.label.fit-none, .stair-label.fit-none { display: none; }
 .chapter { font-size: calc(var(--px) * 12px); fill: #555; display: none; }
 .thumbs { display: none; }
 .thumbs image { opacity: 0.9; }
-.house-map[data-zoom-level='2'] .label-sub, .house-map[data-zoom-level='3'] .label-sub,
 .house-map[data-zoom-level='2'] .chapter, .house-map[data-zoom-level='3'] .chapter { display: inline; }
+.house-map .room .chapter.fit-none { display: none; }
 .house-map[data-zoom-level='2'] .thumbs, .house-map[data-zoom-level='3'] .thumbs { display: inline; }
-.house-map[data-zoom-level='2'] .label-en, .house-map[data-zoom-level='3'] .label-en { display: inline; }
-@container house (max-width: 600px) {
-  .label-main { font-size: calc(var(--px) * 12px); }
-  /* Zoomed out on a narrow window, only rooms with something in them are named. */
-  .house-map[data-zoom-level='1'] .room:not(.has-contents) .label { display: none; }
-}
 .blueprint .label, .blueprint .chapter { opacity: 0; }
 .blueprint a.room:hover .label, .blueprint a.room:focus .label, .blueprint .room.current .label { opacity: 1; paint-order: stroke; stroke: #fff; stroke-width: calc(var(--px) * 4px); }
 .house-map[data-zoom-level='2'] .room.has-contents .label { paint-order: stroke; stroke: var(--paper); stroke-width: calc(var(--px) * 4px); }
@@ -199,6 +208,26 @@ a.room.has-contents:visited .label-main { fill: var(--visited); }
   .has-panel .map-zoom { bottom: calc(55cqh + 12px); }
   .has-panel .map-floors { bottom: calc(55cqh + 92px); }
   .has-panel .map-blueprint { display: none; }
+}
+/* Phones. Held upright the plan is narrow, on their side it is short: either way the small
+   turning house would cover too much of it, so it goes (tablets and computers keep it).
+   Where the plan is short, the floor and zoom buttons sit in one row at the bottom. */
+@container house (max-width: 480px) {
+  .map-mini { display: none; }
+  /* With a room open, the plan above the sheet is short too. */
+  .has-panel .map-floors, .has-panel .map-zoom { flex-direction: row; bottom: calc(55cqh + 8px); }
+  .has-panel .map-zoom { right: calc(12px + 4 * 34px + 8px); }
+}
+@container house (max-height: 320px) {
+  .map-mini { display: none; }
+  .map-floors, .map-zoom { flex-direction: row; bottom: 12px; }
+  .map-zoom { right: calc(12px + 4 * 34px + 8px); }
+  .has-panel .map-floors { right: calc(min(560px, 45cqw) + 12px); bottom: 12px; }
+  .has-panel .map-zoom { right: calc(min(560px, 45cqw) + 12px + 4 * 34px + 8px); bottom: 12px; }
+}
+@container house (max-height: 320px) and (max-width: 800px) {
+  .has-panel .map-floors { right: 12px; bottom: calc(55cqh + 8px); }
+  .has-panel .map-zoom { right: calc(12px + 4 * 34px + 8px); bottom: calc(55cqh + 8px); }
 }
 
 .noscript-index { position: relative; z-index: 10; background: #fff; padding: 12px 16px; }

@@ -30,6 +30,8 @@ for (const r of rooms) {
 }
 
 const { columns, rows } = house.grid;
+// The narrowest bay of the grid: its measurements are hidden when they'd run together (map.ts).
+const minGap = Math.min(...columns.slice(1).map((c, i) => c - columns[i]), ...rows.slice(1).map((r, i) => r - rows[i]));
 // Extra names people use for each floor, so "upstairs", "2F" or "阁楼" all find something.
 const floorAliases: Record<string, string> = {
   f1: 'ground floor level 1 1f downstairs 一层 一楼 首层',
@@ -103,6 +105,7 @@ const mini = {
 ---
 <div class="house-map" id="house-map" data-floor={initialFloor} data-current={current?.slug ?? ''} data-zoom-level="1" data-keep="house-map">
   <div class="map-viewport" tabindex="0" {...attr('aria-label', tr.mapHelp)}>
+    <div class="map-pan">
     {floors.map((f, fi) => {
       const b = floorBounds(f);
       const m = 2400;
@@ -118,8 +121,8 @@ const mini = {
           role="group"
           {...attr('aria-label', { en: f.name, zh: f.zh })}
         >
-          <image class="scan" href={scans[f.id]} x={f.scan.x} y={f.scan.y} width={f.scan.width} height={f.scan.height} preserveAspectRatio="none" />
-          <g class="grid" aria-hidden="true">
+          <image class="scan" data-href={scans[f.id]} x={f.scan.x} y={f.scan.y} width={f.scan.width} height={f.scan.height} preserveAspectRatio="none" />
+          <g class="grid" aria-hidden="true" data-gap={minGap}>
             {columns.map((cx) => <line x1={cx} x2={cx} y1={rows[0] - 1500} y2={rows[rows.length - 1] + 1500} />)}
             {rows.map((cy) => <line y1={cy} y2={cy} x1={columns[0] - 1500} x2={columns[columns.length - 1] + 1500} />)}
             {columns.slice(1).map((cx, i) => <text class="dim" x={(cx + columns[i]) / 2} y={rows[0] - 1700}>{cx - columns[i]}</text>)}
@@ -159,10 +162,14 @@ const mini = {
                 <text class="chapter" x={x + 150} y={y + 380}>{r.locked ? '—' : r.chapter}</text>
               </>
             );
+            // data-w / data-h: the room's size, to fit its label (map.ts); data-tip: its full name,
+            // in a yellow tooltip when the mouse rests on it (handy when the label is too big to show).
+            const tip = r.locked ? { en: `${r.en}, ${tr.locked.en}`, zh: `${r.zh}，${tr.locked.zh}` } : { en: name('en'), zh: name('zh') };
+            const box = { 'data-w': w, 'data-h': h, 'data-tip': tip.en, 'data-tip-zh': tip.zh };
             return r.locked ? (
-              <g class="room locked" data-slug={r.slug} {...attr('aria-label', { en: `${r.en}, ${tr.locked.en}`, zh: `${r.zh}，${tr.locked.zh}` })}>{inner}</g>
+              <g class="room locked" data-slug={r.slug} {...box} {...attr('aria-label', { en: `${r.en}, ${tr.locked.en}`, zh: `${r.zh}，${tr.locked.zh}` })}>{inner}</g>
             ) : (
-              <a class:list={['room', { 'has-contents': !!r.contents, outdoor: r.outdoor, current: current?.slug === r.slug }]} href={`/house/${r.slug}`} data-slug={r.slug} {...attr('aria-label', { en: name('en'), zh: name('zh') })}>{inner}</a>
+              <a class:list={['room', { 'has-contents': !!r.contents, outdoor: r.outdoor, current: current?.slug === r.slug }]} href={`/house/${r.slug}`} data-slug={r.slug} {...box} {...attr('aria-label', { en: name('en'), zh: name('zh') })}>{inner}</a>
             );
           })}
           {/* Doors as on the drawings: a gap in the wall, the leaf and its swing. */}
@@ -192,7 +199,7 @@ const mini = {
             const tip = sb.dir === 'up' ? -1 : 1;
             const barb = Math.min(260, half * 0.35);
             return (
-              <a class:list={['stair-link', sb.dir]} href={`/house/${sb.to.slug}`} data-stairs={sb.dir} data-to-floor={to.id} {...attr('aria-label', label)}>
+              <a class:list={['stair-link', sb.dir]} href={`/house/${sb.to.slug}`} data-stairs={sb.dir} data-to-floor={to.id} data-w={sb.w} data-h={half} {...attr('aria-label', label)}>
                 <title {...text(label)}>{label.en}</title>
                 <rect class="stair-band" x={sb.x} y={sb.y} width={sb.w} height={sb.h} />
                 <g class="treads">{sb.treads.map((tx) => <line x1={tx} x2={tx} y1={outerY} y2={outerY + half} />)}</g>
@@ -206,6 +213,7 @@ const mini = {
         </svg>
       );
     })}
+    </div>
   </div>
 
   <div class="map-ui map-floors" role="toolbar" {...attr('aria-label', tr.floors)}>
