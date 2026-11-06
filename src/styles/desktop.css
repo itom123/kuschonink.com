@@ -389,3 +389,61 @@ html[data-busy="wait"], html[data-busy="wait"] * { cursor: wait !important; }
 @media (prefers-reduced-motion: reduce) {
   .wm-zoom { display: none; }
 }
+
+/* ===== Menus: placement, animation ===== */
+html.js .desktop-icons { position: relative; }
+.desktop-icons.dragging-icons .icon { cursor: inherit; }
+.menu.popup:focus, .start-list:focus { outline: none; }
+.menu.sub.flip { left: auto; right: calc(100% - 3px); }
+.menu.popup, .menu > li.open > .menu.sub, .start[open] > .start-menu {
+  animation: menu-slide 0.13s steps(6, end);
+}
+@keyframes menu-slide { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+.start[open] > .start-menu { animation-name: menu-rise; }
+@keyframes menu-rise { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+@media (prefers-reduced-motion: reduce) {
+  .menu.popup, .menu > li.open > .menu.sub, .start[open] > .start-menu { animation: none; }
+}
+.menubar[role="menubar"] { padding: 1px 0 1px; }
+.mb-item { cursor: inherit; }
+
+/* View ▸ Toolbars / Status Bar */
+[data-hide~="toolbar"] > [data-window-inner] > .toolbar,
+[data-hide~="address"] > [data-window-inner] > .addressbar,
+[data-hide~="links"] > [data-window-inner] > .linksbar,
+[data-hide~="status"] > [data-window-inner] > .status-bar { display: none; }
+
+/* ===== Property sheets ===== */
+.prop-sheet { display: flex; flex-direction: column; padding: 8px 8px 8px; width: min(360px, calc(100vw - 40px)); box-sizing: border-box; }
+.prop-tabs { margin-bottom: -2px; }
+.prop-tabs a { cursor: inherit; }
+.prop-panel { padding: 12px 12px 14px; display: flex; flex-direction: column; gap: 6px; min-height: 240px; }
+.prop-head { display: flex; align-items: center; gap: 14px; margin-bottom: 2px; }
+.prop-head input { flex: 1; min-width: 0; }
+.prop-head input[type="text"]:read-only { background: #fff; color: #000; }
+.prop-sep { height: 0; margin: 6px 0; border-top: 1px solid var(--shadow); border-bottom: 1px solid var(--hi); }
+.prop-row { display: grid; grid-template-columns: 92px 1fr; gap: 8px; line-height: 15px; }
+.prop-val { overflow-wrap: anywhere; }
+.prop-attrs { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.prop-buttons { display: flex; justify-content: flex-end; gap: 6px; padding-top: 8px; }
+
+/* ===== About kuschonink 98 ===== */
+.about-box { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px 10px; width: min(420px, calc(100vw - 40px)); box-sizing: border-box; }
+.about-logo { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: #fff; background: linear-gradient(90deg, #000, #000080 70%, #1084d0); font: 22px/1 "Arial Black", Arial, sans-serif; }
+.about-logo .ico { width: 40px; height: 40px; filter: drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff) drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff); }
+.about-logo div { font-weight: normal; }
+.about-text p { margin: 0 0 6px; line-height: 15px; }
+.about-small { color: #404040; }
+
+/* ===== Printing: only the window in front ===== */
+@media print {
+  body.kus98 { background: #fff !important; overflow: visible !important; height: auto !important; }
+  body.kus98 > :not(#k98-windows) { display: none !important; }
+  #k98-windows { position: static !important; }
+  #k98-windows > .app-window:not([data-active]) { display: none !important; }
+  #k98-windows > .app-window[data-active] { position: static !important; width: auto !important; height: auto !important; box-shadow: none; padding: 0; background: #fff; }
+  .app-window[data-active] > .title-bar, .app-window[data-active] .menubar, .app-window[data-active] .toolbar,
+  .app-window[data-active] .addressbar, .app-window[data-active] .linksbar, .app-window[data-active] .status-bar,
+  .app-window[data-active] .window-side, .app-window[data-active] .rz { display: none !important; }
+  .app-window[data-active] .wbody { overflow: visible !important; border: 0 !important; }
+}

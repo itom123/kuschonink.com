@@ -39,25 +39,6 @@ function startClock() {
   tick();
 }
 
-/** The Start menu without the full menu widget: open, close, close on choice. */
-function initStartBasics() {
-  const start = document.getElementById('k98-start') as HTMLDetailsElement | null;
-  if (!start) return;
-  document.addEventListener('pointerdown', (e) => {
-    if (start.open && !start.contains(e.target as Node)) start.open = false;
-  });
-  start.addEventListener('click', (e) => {
-    const item = (e.target as Element).closest('.menu-item');
-    if (item && !item.closest('.has-sub > .menu-item')) start.open = false;
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && start.open) {
-      start.open = false;
-      start.querySelector('summary')?.focus();
-    }
-  });
-}
-
 export function initTaskbar() {
   const tasks = document.getElementById('k98-tasks');
   if (tasks) {
@@ -74,5 +55,4 @@ export function initTaskbar() {
   }
   document.querySelector('[data-cmd="show-desktop"]')?.addEventListener('click', () => wm.showDesktop());
   startClock();
-  initStartBasics();
 }

@@ -9,6 +9,7 @@
 //   [data-cmd="…"]       minimize, maximize, close, back, forward, up, home, refresh, stop
 import { APPS, addressFor, cleanPath, type AppId } from '../../lib/apps';
 import type { QuickLink, Tool } from '../../lib/chrome';
+import { accelHtml, accelKey, plainLabel } from '../../lib/menus';
 
 interface Props {
   /** Toolbar buttons (commands need JavaScript and are hidden without it). */
@@ -34,8 +35,17 @@ interface Props {
   alt?: string;
   /** The program's home page (toolbar Home). */
   home?: string;
+  /** Menu bar menus ("&File"…); defaults by variant. */
+  menus?: string[];
 }
-const { app, title, icon, url, address, status, variant = 'folder', maximized, w, h, bodyClass, alt, home, tools = [], links = [] } = Astro.props;
+const MENUS: Record<string, string[]> = {
+  folder: ['&File', '&Edit', '&View', '&Go', 'F&avorites', '&Help'],
+  browser: ['&File', '&Edit', '&View', '&Go', 'F&avorites', '&Help'],
+  document: ['&File', '&Edit', '&View', '&Help'],
+  mail: ['&File', '&Edit', '&View', '&Help'],
+};
+const { app, title, icon, url, address, status, variant = 'folder', maximized, w, h, bodyClass, alt, home, tools = [], links = [], menus } = Astro.props;
+const menuNames = menus ?? MENUS[variant] ?? [];
 const info = APPS[app];
 const path = cleanPath(url ?? Astro.url.pathname);
 const ico = icon ?? info.icon;
@@ -67,7 +77,13 @@ const titleId = `${app}-title`;
     </div>
   </div>
   <div class="window-inner" data-window-inner>
-    {Astro.slots.has('menu') && <nav class="menubar" aria-label="Menu bar"><slot name="menu" /></nav>}
+    {menuNames.length > 0 && (
+      <div class="menubar" role="menubar" aria-label="Menu bar" data-js-only>
+        {menuNames.map((m) => (
+          <button type="button" class="mb-item" role="menuitem" aria-haspopup="menu" aria-expanded="false" data-menu={plainLabel(m).toLowerCase()} data-key={accelKey(m)} set:html={accelHtml(m)} />
+        ))}
+      </div>
+    )}
     {(tools.length > 0 || Astro.slots.has('toolbar')) && (
       <div class="toolbar" role="toolbar" aria-label="Standard buttons" data-js-only={tools.every((t) => !t.href) && !Astro.slots.has('toolbar') ? '' : undefined}>
         {tools.map((t) =>

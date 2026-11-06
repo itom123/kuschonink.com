@@ -33,6 +33,10 @@ const items: MenuItem[] = [
       { label: '&Welcome', href: '/', icon: 'welcome' },
     ],
   },
+  {
+    label: '&Documents', icon: 'documents', big: true, jsOnly: true, attrs: { 'data-recent': '' },
+    sub: [{ label: '(Empty)', disabled: true }],
+  },
   { label: '&Help', href: '/help', icon: 'help', big: true },
 ];
 ---

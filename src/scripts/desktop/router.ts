@@ -316,7 +316,7 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
   await runScripts(scripts);
   emit(win.el, 'desktop:content', { url: target });
   document.dispatchEvent(new Event('astro:page-load'));
-  emit(document, 'desktop:navigate', { url: target, app, title: docTitle });
+  emit(document, 'desktop:navigate', { url: target, app, title: wm.titleOf(win), icon: win.el.dataset.icon ?? 'document', docTitle });
   wm.focus(win, { history: false });
   if (o.source === 'keyboard') {
     const h1 = win.el.querySelector<HTMLElement>('[data-window-body] h1');

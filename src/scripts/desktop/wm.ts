@@ -583,6 +583,45 @@ function drag(win: Win, e: PointerEvent, mode: string) {
   addEventListener('pointercancel', up);
 }
 
+/** System menu ▸ Move / Size: arrow keys move the outline, Enter puts it down, Esc cancels. */
+export function keyboardMove(win: Win, mode: 'move' | 'size') {
+  if (win.state !== 'normal') return;
+  const L = layer.getBoundingClientRect();
+  let g: Geom = { x: win.x, y: win.y, w: win.w, h: win.h };
+  const outline = document.createElement('div');
+  outline.className = 'wm-outline';
+  document.body.appendChild(outline);
+  html.dataset.dragging = mode === 'move' ? 'move' : 'se';
+  const show = () => (outline.style.cssText = `left:${L.left + g.x}px;top:${L.top + g.y}px;width:${g.w}px;height:${g.h}px`);
+  show();
+  const done = (apply: boolean) => {
+    removeEventListener('keydown', key, true);
+    removeEventListener('pointerdown', click, true);
+    outline.remove();
+    delete html.dataset.dragging;
+    if (apply) {
+      Object.assign(win, g);
+      place(win);
+      emit(win.el, 'desktop:resize');
+    }
+  };
+  const key = (e: KeyboardEvent) => {
+    const step = e.ctrlKey ? 1 : 8;
+    const d = ({ ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] } as Record<string, [number, number]>)[e.key];
+    if (d) {
+      g = mode === 'move' ? clampMove({ ...g, x: g.x + d[0], y: g.y + d[1] }) : { ...g, w: Math.max(MIN_W, g.w + d[0]), h: Math.max(MIN_H, g.h + d[1]) };
+      show();
+    } else if (e.key !== 'Enter' && e.key !== 'Escape') return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (e.key === 'Enter') done(true);
+    if (e.key === 'Escape') done(false);
+  };
+  const click = () => done(true);
+  addEventListener('keydown', key, true);
+  addEventListener('pointerdown', click, true);
+}
+
 function onPointerDown(e: PointerEvent) {
   if (e.button !== 0 || !e.isPrimary) return;
   const t = e.target as Element;
