@@ -1,7 +1,9 @@
 // The site's Worker. Static files are served by Cloudflare directly; only
-// /v1/contact/* runs this code: the contact form backend (worker/contact.ts).
+// /v1/contact/* runs this code: the contact form backend (worker/contact.ts)
+// and Paint's "Send to Xiangyin" (worker/drawing.ts).
 import { EmailMessage } from 'cloudflare:email';
-import { CONTACT_PATH, handleContact, type EmailOut, type TurnstileResult } from './contact';
+import { CONTACT_PATH, handleContact, type Deps, type EmailOut, type TurnstileResult } from './contact';
+import { DRAWING_PATH, handleDrawing } from './drawing';
 import { buildMime } from './mime';
 
 interface Env {
@@ -30,6 +32,7 @@ async function siteverify(secret: string, token: string, ip: string | null): Pro
 
 // Send with the structured Email Service API; if the binding only supports the
 // classic Email Routing form (an error with no code), resend as a raw message.
+// Pictures go along either way: as `attachments`, or as MIME parts.
 async function sendMail(env: Env, mail: EmailOut): Promise<unknown> {
   try {
     return await env.EMAIL.send({ ...mail, to: env.CONTACT_TO });
@@ -41,18 +44,19 @@ async function sendMail(env: Env, mail: EmailOut): Promise<unknown> {
   }
 }
 
+const depsFor = (env: Env): Deps => ({
+  secret: env.TURNSTILE_SECRET,
+  verify: siteverify,
+  send: (mail) => sendMail(env, mail),
+  allow: async (key) => (await env.CONTACT_LIMIT.limit({ key })).success,
+  log: (...args) => console.error(...args),
+});
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-    if (url.pathname === CONTACT_PATH) {
-      return handleContact(request, {
-        secret: env.TURNSTILE_SECRET,
-        verify: siteverify,
-        send: (mail) => sendMail(env, mail),
-        allow: async (key) => (await env.CONTACT_LIMIT.limit({ key })).success,
-        log: (...args) => console.error(...args),
-      });
-    }
+    if (url.pathname === CONTACT_PATH) return handleContact(request, depsFor(env));
+    if (url.pathname === DRAWING_PATH) return handleDrawing(request, depsFor(env));
     return env.ASSETS.fetch(request);
   },
 };
