@@ -1,0 +1,49 @@
+/* ===== Pages inside windows: an early-web document (Times New Roman) =====
+   98.css styles bare elements for the whole page (Arial body, 5rem h1, hidden
+   checkboxes…). These resets use :where() so they stay as weak as an element
+   selector and never beat a component's own classes. */
+
+.doc {
+  background: #fff;
+  color: #000;
+  font-family: "Times New Roman", Times, "Songti SC", SimSun, serif;
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: auto;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.doc-page { padding: 16px 22px 40px; }
+:where(.doc) :is(h1, h2, h3, h4, h5, h6) { font-family: inherit; font-weight: bold; line-height: 1.2; }
+:where(.doc) h1 { font-size: 2em; margin: 0.35em 0 0.5em; }
+:where(.doc) h2 { font-size: 1.5em; margin: 0.8em 0 0.4em; }
+:where(.doc) h3 { font-size: 1.17em; margin: 1em 0 0.4em; }
+:where(.doc) h4 { font-size: 1em; }
+:where(.doc) a { color: #0000ee; }
+:where(.doc) a:visited { color: #551a8b; }
+:where(.doc) a:active { color: #ee0000; }
+:where(.doc) a:focus { outline: none; }
+:where(.doc) a:focus-visible { outline: 1px dotted currentColor; }
+:where(.doc) u { border-bottom: 0; text-decoration: underline; }
+:where(.doc) table { white-space: normal; font-family: inherit; font-size: inherit; }
+:where(.doc) label, :where(.doc) legend { font-family: inherit; font-size: inherit; }
+:where(.doc) img { max-width: 100%; height: auto; }
+:where(.doc) hr { border: 0; border-top: 1px solid #808080; border-bottom: 1px solid #fff; margin: 1em 0; }
+:where(.doc) pre, :where(.doc) code { font-family: "Courier New", Courier, monospace; }
+
+/* Pages of the Projects folder, About and Contact: galleries laid flat so
+   everything is visible at once (the house keeps its own layout). */
+.app-window:not([data-app="house"]) .doc-page img { max-width: 100%; height: auto; }
+.app-window:not([data-app="house"]) .doc-page .section-bg img,
+.app-window:not([data-app="house"]) .doc-page .block-image img,
+.app-window:not([data-app="house"]) .doc-page .banner-slide img { max-height: 80vh; width: auto; margin: 0 auto; display: block; }
+.app-window:not([data-app="house"]) [data-gallery] .gallery-track { overflow: visible; flex-wrap: wrap; scroll-snap-type: none; }
+.app-window:not([data-app="house"]) [data-gallery] .gallery-item { flex: 1 1 220px; }
+.app-window:not([data-app="house"]) [data-gallery] .gallery-item img { max-height: none; width: 100%; height: auto; }
+.app-window:not([data-app="house"]) .gallery-reel .gallery-item img { height: auto; max-width: 100%; }
+.app-window:not([data-app="house"]) .gallery-controls { display: none; }
+.app-window:not([data-app="house"]) .doc-page .section { margin: 1.5em 0; }
+.app-window:not([data-app="house"]) .doc-page .section-bg { margin-bottom: 0.8em; }
+.doc .project-nav { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.doc .project-block + .project-block { margin-top: 3em; padding-top: 1em; border-top: 2px groove #c0c0c0; }
+.doc .up-link { margin-top: 0; }

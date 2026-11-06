@@ -17,6 +17,8 @@
     "three": "0.187.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "typescript": "^6.0.3",
     "@types/three": "0.186.0",
     "wrangler": "^4.155.0"
   }

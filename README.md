@@ -13,15 +13,46 @@ npm run preview   # run the built site on the local Workers runtime (wrangler)
 npm run deploy    # build and deploy to Cloudflare Workers
 ```
 
-## Two ways in
+## Xiangyin 98
 
-**The house** (`/house/facade`, `/house`, `/house/<room>`): the site is the family house, drawn from
-the 2008 renovation plans. The façade (`/house/facade`) is the south elevation: the door and
-windows lead inside. The floorplan works like an indoor map: drag to move, scroll
-or pinch to zoom, switch floors with **R / A / 2 / 1** (buttons or keys) or
-PageUp / PageDown, search with *Search this house*, and tick **Blueprint** to see
-the original drawings. Rooms hold projects, About and Contact. Everything is set
-in Times New Roman.
+The whole site works like a computer from 1998, called **Xiangyin 98**. The
+first page of a visit starts up (a short BIOS screen and a splash) and asks the
+visitor to log on: any name works, and there's no password. Then the desktop
+appears with the page they asked for open in a window.
+
+- **The desktop**: icons for My Computer, Projects, The House, About.doc,
+  Contact, Help, Instagram and the Recycle Bin. Double-click to open; drag to
+  arrange; right-click almost anything for a menu (press and hold on a phone).
+- **Windows** move, resize, minimise and maximise, and each has a button on the
+  taskbar. The **Start menu** reaches every page, plus Find, Run, Help, the
+  Control Panel, Log Off and Shut Down.
+- **Programs**: Welcome (`/`), Projects (`/image`, a folder with thumbnails,
+  list and details views, and a Web View pane), each project (`/image/<slug>`,
+  with an Image Viewer for the photographs), About.doc (`/about`, a document),
+  Contact (`/contact`, a New Message window), The House (`/house/…`, a browser
+  window) and Help (`/help`).
+- **The Control Panel**: Display (wallpaper, screen saver, colour schemes
+  including High Contrast, window effects), Mouse (pointer trails, larger
+  pointers, double-click speed), Sounds, and Folder Options (single or double
+  click). Settings stay in the visitor's browser.
+- Sounds, pointers, icons and screens are made for the site: nothing is taken
+  from Windows. No visible text says "kuschonink"; addresses read `C:\xiangyin\…`.
+
+Every URL is still a real page with its content in the HTML, so search engines,
+link previews and visitors without JavaScript see ordinary pages. How it's
+built, and how to add a program, an icon or a setting:
+[`docs/DESKTOP.md`](docs/DESKTOP.md).
+
+### The House
+
+**The house** (`/house/facade`, `/house`, `/house/<room>`) opens as a program in a
+browser-style window. The site is the family house, drawn from the 2008 renovation
+plans. The façade (`/house/facade`) is the south elevation: the door and windows lead
+inside. The floorplan works like an indoor map: drag to move, scroll or pinch to zoom,
+switch floors with **R / A / 2 / 1** (buttons or keys) or PageUp / PageDown, search
+with *Search this house*, and tick **Blueprint** to see the original drawings. Rooms
+hold projects, About and Contact. Inside its window, the House is set in Times New
+Roman.
 
 You can also walk through the house:
 
@@ -68,16 +99,6 @@ browser zoom). If WebGL doesn't come back, the page says so and offers to draw i
 To see what a browser reports about its graphics (WebGL / WebGL2, the GPU and ANGLE
 backend, limits, canvas sizes, context losses), add `?debug=3d` to `/house/3d` or `/house`.
 three.js is loaded only on this page. The page is `noindex` and is not in the sitemap.
-
-**The simple view** (`/`, `/image`, `/image/<slug>`, `/image/all`, `/about`, `/contact`):
-the default view visitors land on at `/`. A Windows 98 desktop for anyone who wants to see the work quickly. Every gallery
-is laid flat, so a project is one page. `/image/all` puts every project on one page.
-On a computer with a mouse and a wide screen, the desktop works like Windows 98
-(`src/scripts/win98-wm.ts`): drag windows by the title bar, resize from the corner,
-minimise, maximise and close them, and open several at once. Double-click a desktop
-icon (or use Start) to open a window; links load inside their window, and
-Shift-click opens a link in a new one. The taskbar lists open windows. Phones and
-narrow screens get plain pages.
 
 ### The rules of the house (after Perec)
 
@@ -152,7 +173,7 @@ a sheet of paper.
 - **Unlisted, not secret.** Each piece lives at `/house/drawer/<id>` with
   `noindex` (meta tag and `X-Robots-Tag` in `public/_headers`). Its text is
   fetched only when the drawer is opened, and it's left out of the sitemap,
-  the Index and the simple view. Anyone who opens the drawer can read it.
+  the Index, Find and the Projects folder. Anyone who opens the drawer can read it.
 
 To add a piece, add `src/content/writings/<id>.json` (title, date, object,
 objectLabel, html, references). The rules find it a drawer.
@@ -163,8 +184,8 @@ Every page can be read in English or Chinese, one at a time. The language is
 picked automatically: first-time visitors get the first of their browser's
 preferred languages that the site has (so a browser set to French, then Chinese,
 gets Chinese), and English if neither is listed. The **中 / EN** switch changes it
-at any time: top right in the house header, and in the simple view as two
-buttons in the taskbar tray next to the clock (always visible, on phones too).
+at any time: two buttons in the taskbar tray next to the clock (always visible,
+on phones too).
 Once someone uses the switch, their choice is remembered in the browser.
 
 How it works: each page carries both languages. Elements marked `data-l="en"` /
@@ -184,6 +205,12 @@ Where the words live:
     artist writes them).
 - Anything without a Chinese version shows its English in both modes, so a new
   project still works before it's translated. Fill in both when you can.
+- **The computer's own words** are bilingual, in the terms of the Chinese
+  edition of Windows 98: window titles, toolbars, the Start menu, desktop icons,
+  the log-on screen, Welcome, right-click menus and menu bars, message boxes,
+  Properties, the Control Panel, Run, Find, the Image Viewer and Help. Whatever
+  is open changes as soon as the switch is pressed. How to add words:
+  `docs/DESKTOP.md`, "Two languages".
 
 ### Contact form
 
@@ -218,7 +245,8 @@ There's no code in this repo and no cookie banner is needed.
 | --- | --- |
 | `src/content/house.json` | The house: floors, rooms, what's in each room |
 | `src/content/site.json` | Site name, Instagram link, email, phone, contact form fields |
-| `src/content/home.json` | Order of projects (simple view) and site description |
+| `src/content/home.json` | Order of projects and site description |
+| `src/content/help.json` | The Help topics (`/help`) |
 | `src/content/about.json`, `contact.json` | About and Contact |
 | `src/content/projects/*.json` | One file per project |
 | `src/assets/images/` | All photos, grouped by page |
@@ -226,8 +254,10 @@ There's no code in this repo and no cookie banner is needed.
 | `src/lib/house.ts` | Knight's tour, chapter order, inventories |
 | `src/scripts/map.ts` | Map interaction (pan, zoom, floors, search) |
 | `src/components/house/` | Floorplan map and room panel |
-| `src/layouts/House.astro`, `Win98.astro` | The two views |
-| `src/styles/house.css`, `win98.css`, `blocks.css` | Styling (98.css is vendored in `src/styles/vendor/`) |
+| `src/layouts/Desktop.astro` | Every page: the Xiangyin 98 desktop with the page in a window |
+| `src/components/desktop/` | Window, taskbar, Start menu, desktop icons, start-up screens |
+| `src/scripts/desktop/` | The desktop shell: windows, menus, sounds, Control Panel… (see [`docs/DESKTOP.md`](docs/DESKTOP.md)) |
+| `src/styles/` | `desktop.css`, `system.css`, `schemes.css` (the computer), `doc.css`, `blocks.css`, `house.css`, `explorer.css`, `apps.css`, `lang.css` (what's in the windows); 98.css is vendored in `src/styles/vendor/` |
 | `wrangler.jsonc` | Cloudflare Workers config |
 
 ### Page content format

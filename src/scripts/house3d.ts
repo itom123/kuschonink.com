@@ -114,9 +114,14 @@ function cutWall(a: Pt, b: Pt, cuts: Seg[]): { pieces: [Pt, Pt][]; gaps: [number
 
 function init() {
   const root = document.getElementById('house-3d');
-  if (!root || root === active?.root) return;
+  if (root && root === active?.root) return;
+  // The House window moved on to another page (or closed): let the old model go.
   active?.dispose();
   active = null;
+  if (!root) return;
+  /** The window this model is in (on the desktop), and its page's URL. */
+  const win = root.closest<HTMLElement>('[data-window]');
+  const pageUrl = () => new URL(win?.dataset.url ?? location.pathname + location.search, location.origin);
 
   const data = JSON.parse(document.getElementById('house-3d-data')!.textContent!) as Data;
   const D = data.details;
@@ -956,7 +961,11 @@ function init() {
   }
 
   function setUrl() {
-    history.replaceState(history.state, '', `/house/3d${current ? `?room=${current.slug}` : ''}`);
+    const url = `/house/3d${current ? `?room=${current.slug}` : ''}`;
+    if (window.kus98 && win) window.kus98.replaceUrl(root!, url);
+    else {
+      try { history.replaceState(history.state, '', url); } catch { /* Safari limits replaceState */ }
+    }
   }
 
   function select(r: RoomM, fly = true) {
@@ -1130,10 +1139,18 @@ function init() {
 
   // ---- Start: whole house, or the room in the URL ----
   applyFloors(0);
-  const start = roomBySlug.get(new URLSearchParams(location.search).get('room') ?? '');
+  const start = roomBySlug.get(pageUrl().searchParams.get('room') ?? '');
   if (start) select(start, true);
   if (root.querySelector<HTMLInputElement>('[data-blueprint3d]')!.checked) showBlueprint(true);
   void blueprint;
+
+  // Closing the window frees the graphics card at once.
+  win?.addEventListener('desktop:close', () => {
+    if (active?.root === root) {
+      active.dispose();
+      active = null;
+    }
+  }, { once: true, signal });
 
   active = {
     root,

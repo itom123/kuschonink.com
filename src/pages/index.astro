@@ -1,6 +1,12 @@
 ---
-// The default view: the simple view's Projects window. The house's façade is at /house/facade.
-import ProjectsIndex from '../components/ProjectsIndex.astro';
+// The home page: the desktop with the Welcome window open.
+import Desktop from '../layouts/Desktop.astro';
+import Window from '../components/desktop/Window.astro';
+import Welcome from '../components/apps/Welcome.astro';
 import { home } from '../lib/content';
 ---
-<ProjectsIndex seo={home.seo} />
+<Desktop seo={home.seo}>
+  <Window app="welcome" title={{ en: 'Welcome', zh: '欢迎' }} variant="welcome" address={false} bodyClass="flat" w={680} h={470}>
+    <Welcome />
+  </Window>
+</Desktop>

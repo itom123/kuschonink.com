@@ -1,7 +1,9 @@
 ---
 // An unlisted page for one piece kept in a drawer. Not in the sitemap, the
-// Index or the simple view; served with noindex (see public/_headers).
-import House from '../../../layouts/House.astro';
+// Index or the Projects folder; served with noindex (see public/_headers).
+import Desktop from '../../../layouts/Desktop.astro';
+import Window from '../../../components/desktop/Window.astro';
+import { HOUSE_LINKS, houseTools } from '../../../lib/chrome';
 import HouseMap from '../../../components/house/HouseMap.astro';
 import { placements, sharedItems, pieces, roomByKey, type Placement } from '../../../lib/house';
 import { projects, site } from '../../../lib/content';
@@ -22,7 +24,21 @@ const refLabel = (ref: Placement['piece']['references'][number]) => {
 // The writings are in Traditional Chinese, as the artist writes them.
 const zhLang = 'zh-Hant';
 ---
-<House seo={{ title: `${piece.title} — ${site.name}`, titleZh: `${piece.titleZh ?? piece.title} — ${site.name}` }} noindex bodyClass="house-map-page">
+<Desktop seo={{ title: `${piece.title} — ${site.name}`, titleZh: `${piece.titleZh ?? piece.title} — ${site.name}` }} noindex>
+  <Window
+    app="house"
+    variant="browser"
+    title={{ en: `${piece.title} - The House`, zh: `${piece.titleZh ?? piece.title} - 房子` }}
+    home="/house/facade"
+    tools={houseTools()}
+    links={HOUSE_LINKS}
+    bodyClass="doc house-body"
+    status={[
+      { en: `Chapter ${room.chapter} · ${furniture.en}, drawer ${drawer}`, zh: `第${room.chapter}章 · ${furniture.zh}${drawerN(drawer).zh}` },
+      { en: room.floor.name, zh: room.floor.zh },
+    ]}
+  >
+  <div class="house-view">
   <HouseMap current={room} />
   <aside class="room-panel" data-room-page={room.slug} aria-labelledby="room-title">
     <div class="panel-bar">
@@ -62,4 +78,6 @@ const zhLang = 'zh-Hant';
       <p><a href={`/house/${room.slug}`}>← <Bi t={t.closeDrawer} /></a></p>
     </div>
   </aside>
-</House>
+  </div>
+  </Window>
+</Desktop>

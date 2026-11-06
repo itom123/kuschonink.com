@@ -1,5 +1,6 @@
 // The house map: pan, zoom, floors, search, URL state. Plain DOM, no framework.
 // Works like an indoor map: the viewport shows one floor at a time, rooms are links.
+// It lives inside The House's window, so it measures the window, never the screen.
 import { getLang, pick } from './lang';
 import { searchRooms, type SearchRoom } from './search';
 import { startMini, type MiniData } from './house-mini';
@@ -12,18 +13,14 @@ type IndexRoom = SearchRoom;
 const MIN_Z = 0.6;
 const MAX_Z = 12;
 
-// The map currently on the page. ClientRouter can drop the map (e.g. on the
-// façade page) and bring a fresh, uninitialised copy back later, so set up
-// whichever map is present after every navigation.
-let active: { root: HTMLElement; sync: () => void; off: AbortController } | null = null;
+// The map currently on the page. The House window keeps its map while it
+// changes page; closing the window drops it, and opening the House again
+// brings a fresh copy, so set up whichever map is present after every page.
+let active: { root: HTMLElement; off: AbortController } | null = null;
 
 export function startMap() {
   initMap();
-  document.addEventListener('astro:page-load', () => {
-    initMap();
-    active?.sync();
-  });
-  if (document.readyState === 'complete') active?.sync();
+  document.addEventListener('astro:page-load', () => initMap());
 }
 
 function initMap() {
@@ -34,17 +31,24 @@ function initMap() {
   if (!root) return;
   root.dataset.ready = '1';
   const off = new AbortController();
+  const { signal } = off;
+  const win = root.closest<HTMLElement>('[data-window]');
+  win?.addEventListener('desktop:close', () => off.abort(), { once: true });
+  /** This page's URL: the window's (on the desktop) or the browser's. */
+  const pageUrl = () => new URL(win?.dataset.url ?? location.pathname + location.search, location.origin);
+  /** Side panel on the right when the window is wide; a sheet at the bottom when narrow. */
+  const wide = () => root.clientWidth > 800;
 
   const viewport = root.querySelector<HTMLElement>('.map-viewport')!;
   // The small turning house beside the floor buttons.
   const mini = startMini(
     root.querySelector<HTMLCanvasElement>('.map-mini')!,
-    JSON.parse(document.getElementById('house-mini')!.textContent!) as MiniData,
-    off.signal,
+    JSON.parse(root.querySelector('#house-mini')!.textContent!) as MiniData,
+    signal,
   );
-  showDiag(root, () => [...root.querySelectorAll<HTMLCanvasElement>('canvas')], off.signal);
+  showDiag(root, () => [...root.querySelectorAll<HTMLCanvasElement>('canvas')], signal);
   const svgs = [...root.querySelectorAll<SVGSVGElement>('svg.floor')];
-  const index = JSON.parse(document.getElementById('house-index')!.textContent!) as {
+  const index = JSON.parse(root.querySelector('#house-index')!.textContent!) as {
     rooms: IndexRoom[];
     floors: { id: string; name: string; zh: string; zhShort: string; level: string }[];
     text: { none: { en: string; zh: string }; noDoor: { en: string; zh: string } };
@@ -87,6 +91,7 @@ function initMap() {
   const scale = () => baseScale() * view.z;
 
   function render() {
+    if (!viewport.clientWidth || !viewport.clientHeight) return;
     const s = scale();
     const w = viewport.clientWidth / s;
     const h = viewport.clientHeight / s;
@@ -110,8 +115,8 @@ function initMap() {
   function visibleArea(s: number, w: number, h: number): [number, number, number, number] {
     let vw = w, vh = h;
     if (root!.classList.contains('has-panel')) {
-      if (window.innerWidth > 800) vw -= Math.min(560, window.innerWidth * 0.45) / s;
-      else vh -= (window.innerHeight * 0.55) / s;
+      if (wide()) vw -= Math.min(560, root!.clientWidth * 0.45) / s;
+      else vh -= (root!.clientHeight * 0.55) / s;
     }
     return [view.cx - w / 2, view.cy - h / 2, Math.max(0, vw), Math.max(0, vh)];
   }
@@ -223,16 +228,16 @@ function initMap() {
     const f = (el.closest('svg') as SVGSVGElement).dataset.floor!;
     const box = el.getBBox();
     const b = all;
-    const panel = window.innerWidth > 800 ? Math.min(560, window.innerWidth * 0.45) : 0;
+    const panel = wide() ? Math.min(560, root!.clientWidth * 0.45) : 0;
     const availW = viewport.clientWidth - panel;
-    const availH = window.innerWidth > 800 ? viewport.clientHeight : viewport.clientHeight * 0.45;
+    const availH = wide() ? viewport.clientHeight : viewport.clientHeight * 0.45;
     const base = Math.min(viewport.clientWidth / b.w, viewport.clientHeight / b.h);
     // Close enough to see the room, far enough to keep its neighbours in view.
     const z = Math.min(3, Math.max(1, Math.min(availW / (box.width * 2.2), availH / (box.height * 2.2)) / base));
     const s = base * z;
     // Shift the centre so the room sits in the free area (left of the panel / above the sheet).
     const dx = panel / 2 / s;
-    const dy = window.innerWidth > 800 ? 0 : (viewport.clientHeight * 0.275) / s;
+    const dy = wide() ? 0 : (viewport.clientHeight * 0.275) / s;
     return { floor: f, view: { z, cx: box.x + box.width / 2 + dx, cy: box.y + box.height / 2 + dy } };
   }
 
@@ -253,20 +258,32 @@ function initMap() {
   // ---- URL state (only on /house itself) ----
   let urlTimer = 0;
   function scheduleUrl() {
-    if (!/^\/house\/?$/.test(location.pathname)) return;
+    if (!/^\/house\/?$/.test(pageUrl().pathname)) return;
     clearTimeout(urlTimer);
     urlTimer = window.setTimeout(() => {
+      if (!root!.isConnected || !/^\/house\/?$/.test(pageUrl().pathname)) return;
       const q = new URLSearchParams({ floor, x: String(Math.round(view.cx)), y: String(Math.round(view.cy)), z: view.z.toFixed(2) });
-      history.replaceState(history.state, '', `/house?${q}`);
-    }, 250);
+      const url = `/house?${q}`;
+      if (window.kus98 && win) window.kus98.replaceUrl(root!, url);
+      else {
+        try { history.replaceState(history.state, '', url); } catch { /* Safari limits replaceState */ }
+      }
+    }, 400);
   }
 
   // ---- Pointer: drag to pan, pinch to zoom ----
   const pointers = new Map<number, { x: number; y: number }>();
   let moved = 0;
   let pinchDist = 0;
+  const forget = (id: number) => {
+    pointers.delete(id);
+    if (pointers.size < 2) pinchDist = 0;
+    if (!pointers.size) viewport.classList.remove('dragging');
+  };
   viewport.addEventListener('pointerdown', (e) => {
     if ((e.target as Element).closest('.map-ui')) return;
+    // Only the main button pans (a right-click opens a menu instead).
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     moved = 0;
     cancelAnimationFrame(anim);
@@ -274,10 +291,11 @@ function initMap() {
       const [a, b] = [...pointers.values()];
       pinchDist = Math.hypot(a.x - b.x, a.y - b.y);
     }
-  });
+  }, { signal });
   viewport.addEventListener('pointermove', (e) => {
     const p = pointers.get(e.pointerId);
     if (!p) return;
+    if (e.pointerType === 'mouse' && !(e.buttons & 1)) return forget(e.pointerId);
     const dx = e.clientX - p.x, dy = e.clientY - p.y;
     if (pointers.size === 1) {
       moved += Math.abs(dx) + Math.abs(dy);
@@ -297,14 +315,12 @@ function initMap() {
       pinchDist = d;
       moved = 99;
     }
-  });
-  const end = (e: PointerEvent) => {
-    pointers.delete(e.pointerId);
-    if (pointers.size < 2) pinchDist = 0;
-    if (!pointers.size) viewport.classList.remove('dragging');
-  };
-  viewport.addEventListener('pointerup', end);
-  viewport.addEventListener('pointercancel', end);
+  }, { signal });
+  const end = (e: PointerEvent) => forget(e.pointerId);
+  viewport.addEventListener('pointerup', end, { signal });
+  viewport.addEventListener('pointercancel', end, { signal });
+  viewport.addEventListener('lostpointercapture', end, { signal });
+  viewport.addEventListener('pointerleave', (e) => { if (!e.buttons) forget(e.pointerId); }, { signal });
   // A drag is not a click.
   viewport.addEventListener('click', (e) => {
     if (moved > 4) {
@@ -314,14 +330,14 @@ function initMap() {
       return;
     }
     const locked = (e.target as Element).closest('.room.locked');
-    if (locked) toast(pick(index.text.noDoor));
-  }, true);
+    if (locked) noDoor();
+  }, { capture: true, signal });
 
   viewport.addEventListener('wheel', (e) => {
     e.preventDefault();
     const factor = Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.001));
     zoomAt(factor, e.clientX, e.clientY);
-  }, { passive: false });
+  }, { passive: false, signal });
 
   // R / A / 2 / 1: the labels on the floor buttons.
   const floorKeys = new Map(
@@ -345,20 +361,18 @@ function initMap() {
     e.preventDefault();
     view = clampView(view);
     render();
-  });
+  }, { signal });
 
   root.querySelectorAll<HTMLButtonElement>('[data-zoom]').forEach((b) =>
     b.addEventListener('click', () => {
-      const r = viewport.getBoundingClientRect();
       const f = b.dataset.zoom === 'in' ? 1.6 : 1 / 1.6;
       flyTo({ ...view, z: view.z * f }, 250);
-      void r;
-    }),
+    }, { signal }),
   );
-  root.querySelectorAll<HTMLButtonElement>('[data-floor-btn]').forEach((b) => b.addEventListener('click', () => setFloor(b.dataset.floorBtn!)));
+  root.querySelectorAll<HTMLButtonElement>('[data-floor-btn]').forEach((b) => b.addEventListener('click', () => setFloor(b.dataset.floorBtn!), { signal }));
   root.querySelector<HTMLInputElement>('[data-blueprint]')!.addEventListener('change', (e) => {
     root!.classList.toggle('blueprint', (e.target as HTMLInputElement).checked);
-  });
+  }, { signal });
 
   // ---- Search ----
   const input = root.querySelector<HTMLInputElement>('.map-search input')!;
@@ -379,24 +393,36 @@ function initMap() {
       : `<li class="none">${escape(pick(index.text.none))}</li>`;
     results.hidden = false;
   }
-  input.addEventListener('input', showResults);
-  document.addEventListener('langchange', () => { showFloorName(); showResults(); });
+  input.addEventListener('input', showResults, { signal });
+  document.addEventListener('langchange', () => { showFloorName(); showResults(); }, { signal });
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const a = results.querySelector<HTMLAnchorElement>('a');
       if (a) { e.preventDefault(); a.click(); }
     }
     if (e.key === 'Escape') { input.value = ''; showResults(); }
-  });
+  }, { signal });
   results.addEventListener('click', (e) => {
     const a = (e.target as Element).closest<HTMLAnchorElement>('a');
     if (!a) return;
-    if (a.hasAttribute('data-locked')) { e.preventDefault(); focusRoom(a.dataset.slug!); toast(pick(index.text.noDoor)); }
+    if (a.hasAttribute('data-locked')) { e.preventDefault(); focusRoom(a.dataset.slug!); noDoor(); }
     input.value = '';
     showResults();
-  });
+  }, { signal });
 
-  // ---- Toast ----
+  // ---- The room without a door: "Access is denied" on the desktop ----
+  function noDoor() {
+    if (window.kus98) {
+      window.kus98.alert({
+        title: pick({ en: 'Room without a door', zh: '没有门的房间' }),
+        icon: 'error',
+        text: pick({ en: 'This room has no door. Access is denied.', zh: '这个房间没有门。拒绝访问。' }),
+        owner: root,
+      });
+    } else toast(pick(index.text.noDoor));
+  }
+
+  // ---- Toast (when the map runs outside the desktop) ----
   let toastEl: HTMLElement | null = null;
   function toast(msg: string) {
     toastEl ??= Object.assign(document.createElement('div'), { className: 'map-toast', role: 'status' });
@@ -407,7 +433,7 @@ function initMap() {
   }
 
   // ---- Start ----
-  const params = new URLSearchParams(location.search);
+  const params = pageUrl().searchParams;
   const startFloor = params.get('floor');
   if (startFloor && bounds.has(startFloor)) floor = startFloor;
   const start: View = {
@@ -418,13 +444,17 @@ function initMap() {
   setFloor(floor, start);
   arrow = '';
   showFloorName();
-  window.addEventListener('resize', () => render(), { signal: off.signal });
-  off.signal.addEventListener('abort', () => { endLeave(); cancelAnimationFrame(anim); });
+  // The window can be any size: follow the map's own box, not the screen.
+  const ro = new ResizeObserver(() => render());
+  ro.observe(viewport);
+  signal.addEventListener('abort', () => { endLeave(); cancelAnimationFrame(anim); ro.disconnect(); clearTimeout(urlTimer); });
 
-  // After every page (initial and ClientRouter navigations), follow the current room.
+  // After every page shown in the window, follow the current room (or the floor in the URL).
   const sync = () => {
-    const page = document.querySelector<HTMLElement>('[data-room-page]');
-    root!.classList.toggle('has-panel', !!page || !!document.querySelector('[data-panel]'));
+    if (!root!.isConnected) return;
+    const scope: ParentNode = win ?? document;
+    const page = scope.querySelector<HTMLElement>('[data-room-page]');
+    root!.classList.toggle('has-panel', !!page || !!scope.querySelector('[data-panel]'));
     // The 3D link opens the model at the room you're in.
     const link3d = root!.querySelector<HTMLAnchorElement>('.map-3d');
     if (link3d) link3d.href = page ? `/house/3d?room=${encodeURIComponent(page.dataset.roomPage!)}` : '/house/3d';
@@ -432,11 +462,17 @@ function initMap() {
     else {
       root!.querySelectorAll('.room.current').forEach((r) => r.classList.remove('current'));
       mini.set({ room: null });
+      const f = pageUrl().searchParams.get('floor');
+      if (root!.dataset.synced && f && f !== floor && bounds.has(f)) setFloor(f);
     }
     render();
     root!.dataset.synced = '1';
   };
-  active = { root, sync, off };
+  // On the desktop the window says when it shows a new page; on its own, the document does.
+  if (win) win.addEventListener('desktop:content', sync, { signal });
+  else document.addEventListener('astro:page-load', sync, { signal });
+  sync();
+  active = { root, off };
 }
 
 function escape(s: string) {

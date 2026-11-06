@@ -4,7 +4,7 @@ import { rooms } from '../lib/house';
 
 export const GET: APIRoute = () => {
   const paths = [
-    '/', '/house', '/house/facade', '/image', '/image/all', '/about', '/contact',
+    '/', '/house/facade', '/house', '/image', '/image/all', '/about', '/contact', '/help',
     ...projects.map((p) => `/image/${p.slug}`),
     ...rooms.map((r) => `/house/${r.slug}`),
   ];

@@ -1,0 +1,226 @@
+/* ===== Xiangyin 98: start-up, log-on, shut-down, trails, tray, Control Panel ===== */
+
+/* Saved icon places, applied before the shell runs (see the script in Desktop.astro). */
+html.js[data-icons-free] .desktop-icons { position: relative; }
+html.js[data-icons-free] .desktop-icons .desk-item { position: absolute; left: var(--ix); top: var(--iy); width: 78px; }
+
+/* ---- Start-up screens ---- */
+.boot { display: none; }
+html[data-boot] .boot { display: block; position: fixed; inset: 0; z-index: 7000; overflow: hidden; color: #fff; background: #000; -webkit-user-select: none; user-select: none; }
+.boot > * { display: none; }
+
+html[data-boot="boot"] .boot[data-step="bios"] .boot-bios {
+  display: block; position: absolute; inset: 0; padding: 22px 26px; color: #c0c0c0; background: #000;
+  font: 15px/1.4 "Courier New", Consolas, "Lucida Console", monospace;
+}
+.bios-head { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+.bios-head .ico { width: 48px; height: 48px; filter: drop-shadow(1px 0 0 #c0c0c0) drop-shadow(-1px 0 0 #c0c0c0) drop-shadow(0 1px 0 #c0c0c0) drop-shadow(0 -1px 0 #c0c0c0); }
+.bios-head b { color: #fff; }
+.boot .bios-text { margin: 0; padding: 0; color: inherit; font: inherit; background: none; box-shadow: none; white-space: pre-wrap; }
+
+html[data-boot="boot"] .boot[data-step="splash"] .boot-splash,
+html[data-boot="shutting"] .boot-splash {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: absolute; inset: 0; overflow: hidden;
+  background: linear-gradient(#1c5cc4 0%, #3f86e0 38%, #7eb6f2 72%, #b7daf9 100%);
+}
+.splash-clouds { position: absolute; inset: 0; }
+.splash-clouds i {
+  position: absolute; display: block; border-radius: 50%; opacity: 0.9;
+  background: radial-gradient(closest-side, #fff 0%, rgba(255, 255, 255, 0.85) 45%, rgba(255, 255, 255, 0) 100%);
+}
+.splash-clouds i:nth-child(1) { width: 46vw; height: 16vh; left: -8vw; top: 8vh; }
+.splash-clouds i:nth-child(2) { width: 38vw; height: 13vh; right: -6vw; top: 18vh; }
+.splash-clouds i:nth-child(3) { width: 54vw; height: 20vh; left: 18vw; bottom: 6vh; opacity: 0.75; }
+.splash-clouds i:nth-child(4) { width: 30vw; height: 11vh; left: 4vw; bottom: 26vh; opacity: 0.6; }
+.splash-clouds i:nth-child(5) { width: 34vw; height: 12vh; right: 4vw; bottom: 30vh; opacity: 0.7; }
+.splash-logo { position: relative; display: flex; align-items: center; gap: 20px; color: #fff; text-shadow: 2px 2px 0 rgba(0, 0, 40, 0.45); }
+.splash-logo .ico { width: 96px; height: 96px; filter: drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(3px 4px 0 rgba(0, 0, 40, 0.35)); }
+.splash-word { font: 900 clamp(34px, 7vw, 64px)/0.95 "Arial Black", "Arial Bold", Arial, sans-serif; letter-spacing: -1px; }
+.splash-word small { display: block; font: italic 400 clamp(14px, 2.2vw, 20px)/1.4 "Times New Roman", Times, serif; letter-spacing: 3px; }
+.splash-word span { font-family: Arial, sans-serif; font-weight: 400; font-size: 0.62em; vertical-align: top; margin-left: 6px; }
+.splash-msg { position: relative; min-height: 1.4em; margin: 34px 0 0; font: 18px/1.4 Arial, sans-serif; text-shadow: 1px 1px 0 rgba(0, 0, 40, 0.6); }
+.splash-bar {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 10px;
+  background: linear-gradient(90deg, #000080, #1084d0, #00c0ff, #1084d0, #000080) 0 0 / 50% 100% repeat-x;
+  animation: splash-bar 1.4s linear infinite;
+}
+@keyframes splash-bar { to { background-position: 100% 0; } }
+
+html[data-boot="boot"] .boot-skip { display: block; position: absolute; right: 14px; bottom: 18px; margin: 0; color: #808080; font: 11px var(--ui-font); z-index: 2; }
+html[data-boot="boot"] .boot[data-step="splash"] .boot-skip { color: #fff; text-shadow: 1px 1px 0 #000; }
+
+/* ---- Log on ---- */
+html[data-boot="login"] .boot { background: var(--desktop-bg) var(--wallpaper, none) center / var(--wallpaper-size, auto) var(--wallpaper-repeat, no-repeat); }
+html[data-boot="login"] .boot-login { display: flex; position: absolute; inset: 0; align-items: center; justify-content: center; padding: 12px; }
+.login-window { width: min(452px, 100%); color: #000; }
+.login-body { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; padding: 14px 10px 12px; align-items: start; }
+.login-keys { margin: 2px 4px 0; }
+.login-fields p { margin: 0 0 12px; line-height: 15px; }
+.login-row { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 6px; margin-bottom: 8px; }
+.login-row input { width: 100%; }
+.login-hint { color: #000080; margin-top: 4px !important; }
+.login-buttons { display: flex; flex-direction: column; gap: 6px; }
+@media (max-width: 480px) {
+  .login-body { grid-template-columns: 1fr; }
+  .login-keys { display: none; }
+  .login-buttons { flex-direction: row; justify-content: flex-end; }
+}
+
+/* ---- Shut down ---- */
+html[data-boot="safe"] .boot, html[data-boot="standby"] .boot { background: #000; }
+html[data-boot="safe"] .boot-safe {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; position: absolute; inset: 0;
+  text-align: center; color: #ff8a00; font: bold clamp(22px, 4.5vw, 36px)/1.35 Arial, Helvetica, sans-serif;
+}
+.boot-safe p { margin: 0; }
+.boot-safe small { margin-top: 48px; color: #404040; font: 11px var(--ui-font); }
+html.js #k98-windows.over-taskbar { z-index: 1001; }
+.shutdown-dim { position: fixed; inset: 0; z-index: 899999; pointer-events: none; background: repeating-conic-gradient(rgba(0, 0, 0, 0.55) 0 25%, transparent 0 50%) 0 0 / 2px 2px; }
+.shutdown-choices .field-row { margin: 6px 0 0 4px; }
+.shutdown-choices .msg-text { margin-bottom: 8px; }
+
+/* ---- Pointer trails ---- */
+.trail-ghost {
+  position: fixed; left: 0; top: 0; z-index: 9500; pointer-events: none; will-change: transform;
+  width: var(--k98-pointer-size, 32px); height: var(--k98-pointer-size, 32px);
+  background: var(--k98i-arrow) 0 0 / 100% 100% no-repeat;
+}
+.trail-ghost[data-kind="hand"] { background-image: var(--k98i-hand); margin-left: -5px; }
+.trail-ghost[data-kind="text"] { background-image: var(--k98i-text); margin: -8px 0 0 -3px; }
+html[data-pointers="large"] .trail-ghost[data-kind="hand"] { margin-left: -10px; }
+html[data-pointers="large"] .trail-ghost[data-kind="text"] { margin: -16px 0 0 -6px; }
+
+/* ---- Tray volume ---- */
+.volume-popup { position: fixed; right: 4px; bottom: calc(var(--taskbar-h) + 2px); z-index: 1200; width: 86px; padding: 8px 6px 8px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.volume-popup p { margin: 0; }
+.volume-track { height: 150px; width: 40px; display: flex; justify-content: center; }
+.volume-track .is-vertical { transform: none; }
+.volume-track .is-vertical > input[type="range"] { transform: rotate(270deg) translateX(-100%); margin: 0; }
+
+/* ---- "Click here to begin" ---- */
+.begin-hint {
+  position: fixed; left: 6px; bottom: calc(var(--taskbar-h) + 12px); z-index: 1150;
+  min-width: 0; min-height: 0; padding: 6px 10px; color: #000; text-shadow: none;
+  background: var(--tip); border: 1px solid #000; box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.45);
+  font: bold 11px var(--ui-font); animation: begin-bob 1.1s steps(2) infinite;
+}
+.begin-hint::before, .begin-hint::after { content: ""; position: absolute; left: 16px; border: 8px solid transparent; border-bottom: 0; }
+.begin-hint::before { bottom: -9px; border-top-color: #000; }
+.begin-hint::after { bottom: -7px; border-top-color: var(--tip); }
+@keyframes begin-bob { 50% { transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { .begin-hint, .splash-bar { animation: none; } }
+
+/* ---- Folders of icons inside windows (Control Panel, My Computer…) ---- */
+.folder-view { list-style: none; margin: 0; padding: 10px; display: grid; grid-template-columns: repeat(auto-fill, 84px); gap: 14px 6px; align-content: start; min-height: 100%; box-sizing: border-box; }
+.folder-view .icon { color: #000; width: 82px; }
+.folder-view .icon-label { color: #000; }
+.folder-view .icon.selected .icon-label { background: var(--sel); color: #fff; }
+.folder-view .icon:focus-visible .icon-label, .folder-view .icon.selected:focus .icon-label { outline: 1px dotted #000; }
+
+/* ---- Property pages (Mouse, Sounds, Display…) ---- */
+.prop-sheet.wide { width: min(420px, calc(100vw - 40px)); }
+.prop-page { display: flex; flex-direction: column; gap: 10px; }
+.prop-page fieldset { display: flex; flex-direction: column; gap: 8px; }
+.prop-note { margin: 2px 0 0; color: #404040; line-height: 14px; }
+.slider-row { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; }
+.slider-row input[type="range"] { min-width: 0; }
+.dbl-row { display: flex; align-items: center; gap: 10px; }
+.dbl-test { min-width: 0; min-height: 0; padding: 4px; background: #fff; box-shadow: var(--sunken); }
+.dbl-test .ico { width: 32px; height: 32px; }
+.pointer-list { list-style: none; margin: 0; padding: 2px; background: #fff; box-shadow: var(--sunken); max-height: 190px; overflow: auto; }
+.pointer-list li { display: flex; align-items: center; justify-content: space-between; padding: 1px 6px; }
+.pointer-img { width: 32px; height: 32px; background: center / 32px 32px no-repeat; }
+.sound-events { width: 100%; height: auto; padding: 0; background-image: none; }
+
+/* ---- Lists in property sheets (Wallpaper, Sounds) ---- */
+select[size]:not([size="1"]) { height: auto; padding: 0; background-image: none; }
+select[size]:not([size="1"]):focus { background-color: #fff; color: #000; }
+select[size] option:checked { background: var(--sel); color: var(--sel-text); }
+/* A fixed height: the list fills in after the dialog has measured itself. */
+.list-box { width: 100%; height: 98px !important; }
+input.num { width: 56px; }
+.field-row .grow { flex: 1; }
+.prop-buttons button:disabled { pointer-events: none; }
+
+/* ---- Display Properties ---- */
+.monitor { display: flex; flex-direction: column; align-items: center; margin: 2px auto 4px; }
+.mon-case { position: relative; width: 172px; height: 132px; padding: 9px 10px 13px; box-sizing: border-box; background: var(--face); box-shadow: var(--raised-window), 1px 1px 0 var(--dark); }
+.mon-screen { position: relative; width: 100%; height: 100%; box-sizing: border-box; overflow: hidden; border: 2px solid; border-color: var(--shadow) var(--hi) var(--hi) var(--shadow); background: var(--desktop-bg); }
+.mon-screen.mon-black { background: #000 !important; }
+.mon-led { position: absolute; right: 12px; bottom: 4px; width: 7px; height: 3px; background: #00c000; box-shadow: 0 0 2px #00ff00; }
+.mon-neck { width: 54px; height: 7px; background: var(--face); box-shadow: inset -1px 0 var(--dark), inset 1px 0 var(--hi); }
+.mon-foot { width: 128px; height: 9px; background: var(--face); box-shadow: var(--raised); }
+.wp-row { display: grid; gap: 4px; }
+/* Every tab of a property sheet is the same size (the tallest), as in Windows 98. */
+.prop-panel { display: grid; }
+.prop-panel > .prop-page { grid-area: 1 / 1; }
+.prop-panel > .prop-page[hidden] { display: flex !important; visibility: hidden; }
+.fo-art { display: flex; justify-content: center; gap: 24px; padding: 6px 0 2px; }
+
+/* Appearance: a little desktop drawn in the chosen colours */
+.ap-preview { position: relative; height: 156px; overflow: hidden; background: var(--desktop-bg); box-shadow: var(--sunken); }
+.ap-win { position: absolute; padding: 3px; box-sizing: border-box; background: var(--face); box-shadow: var(--raised-window); }
+.ap-back { left: 10px; top: 10px; width: 236px; height: 62px; }
+.ap-front { left: 24px; top: 34px; width: 262px; height: 96px; }
+.ap-msg { left: 128px; top: 92px; width: 176px; height: 56px; }
+.ap-title { display: flex; align-items: center; height: 18px; padding: 0 4px; color: var(--title-text); font-weight: bold; background: linear-gradient(90deg, var(--title-a), var(--title-b)); }
+.ap-title.inactive { color: var(--title-itext); background: linear-gradient(90deg, var(--title-ia), var(--title-ib)); }
+.ap-menu { display: flex; gap: 10px; padding: 3px 4px; }
+.ap-disabled { color: var(--shadow); text-shadow: 1px 1px var(--hi); }
+.ap-sel { padding: 0 3px; background: var(--sel); color: var(--sel-text); }
+.ap-text { height: 36px; margin: 0 1px; padding: 4px; box-sizing: border-box; background: #fff; color: #000; box-shadow: var(--sunken); }
+.ap-msg-body { display: flex; align-items: center; justify-content: space-between; padding: 6px; }
+.ap-ok { padding: 2px 14px; background: var(--face); box-shadow: var(--raised); }
+
+/* ---- Screen savers ---- */
+.screensaver { position: fixed; inset: 0; z-index: 950000; overflow: hidden; background: #000; }
+html[data-saver] .trail-ghost, html[data-saver] .tooltip { display: none; }
+.saver-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.saver-slide { position: absolute; inset: 0; margin: 0; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.4s linear; }
+.saver-slide.on { opacity: 1; }
+.saver-slide img { max-width: 90%; max-height: 86%; object-fit: contain; }
+.saver-slide figcaption { position: absolute; left: 24px; bottom: 18px; color: #a0a0a0; font: 12px var(--ui-font); letter-spacing: 0.5px; }
+.saver-slide.drift-a img { animation: saver-drift-a 11s linear both; }
+.saver-slide.drift-b img { animation: saver-drift-b 11s linear both; }
+@keyframes saver-drift-a { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.06) translate(-1.5%, -1%); } }
+@keyframes saver-drift-b { from { transform: scale(1.06) translate(1.5%, 1%); } to { transform: scale(1) translate(0, 0); } }
+.mon-screen .saver-slide { transition-duration: 0.6s; }
+.mon-screen .saver-slide img { width: 100%; height: 100%; max-width: none; max-height: none; object-fit: cover; }
+@media (prefers-reduced-motion: reduce) { .saver-slide { transition: none; } .saver-slide img { animation: none !important; } }
+
+/* ---- Run ---- */
+.run-body { display: flex; flex-direction: column; gap: 12px; width: min(380px, calc(100vw - 48px)); padding: 12px 12px 10px; box-sizing: border-box; }
+.run-row { display: flex; align-items: flex-start; gap: 12px; }
+.run-row p { margin: 0; padding-top: 2px; line-height: 15px; }
+.run-open { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px; }
+.run-open input { width: 100%; min-width: 0; }
+.run-buttons { display: flex; justify-content: flex-end; gap: 6px; }
+.run-buttons button { min-width: 75px; }
+
+/* ---- Find ---- */
+.find-form { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; flex: none; padding: 6px 8px 8px; box-shadow: inset 0 -1px var(--shadow), inset 0 1px var(--hi); }
+.find-fields { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 6px 8px; min-width: 0; }
+.find-fields :is(input, select) { width: 100%; min-width: 0; }
+.find-actions { display: flex; flex-direction: column; align-items: stretch; gap: 5px; }
+.find-actions button { min-width: 88px; }
+.find-anim { align-self: center; margin-top: 2px; }
+.find-anim.searching { animation: find-look 0.5s steps(4) infinite; }
+@keyframes find-look { 25% { transform: translate(3px, -2px); } 50% { transform: translate(5px, 1px); } 75% { transform: translate(2px, 3px); } }
+.find-body { background: #fff; }
+.find-results { width: 100%; }
+.find-results td { padding: 1px 6px; }
+.find-results tbody tr:focus { outline: 1px dotted #000; outline-offset: -1px; }
+.find-results tbody tr.highlighted { background: var(--sel); color: var(--sel-text); }
+.find-name { display: inline-flex; align-items: center; gap: 4px; }
+@media (max-width: 520px) { .find-form { grid-template-columns: 1fr; } .find-actions { flex-direction: row; flex-wrap: wrap; } .find-anim { display: none; } }
+
+/* ---- Recycle Bin ---- */
+.bin-body { min-height: 100%; }
+.bin-empty { margin: 0; padding: 4px 14px 14px; color: #404040; line-height: 15px; }
+
+/* ---- Folder Options ▸ single-click: icon names underline when pointed at, like links ---- */
+html[data-click="single"] .icon:hover .icon-label { text-decoration: underline; }
+
+/* ---- Always maximize windows: the page's window is full size from the first paint ---- */
+html.js[data-maxall] #k98-windows > .app-window:not([data-win-id]):not(.v-dialog) { left: 0; top: 0; width: 100%; height: 100%; }

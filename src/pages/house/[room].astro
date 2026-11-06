@@ -1,9 +1,12 @@
 ---
-import House from '../../layouts/House.astro';
+import Desktop from '../../layouts/Desktop.astro';
+import Window from '../../components/desktop/Window.astro';
 import HouseMap from '../../components/house/HouseMap.astro';
 import RoomView from '../../components/house/RoomView.astro';
 import { rooms, type Room } from '../../lib/house';
 import { projects, site } from '../../lib/content';
+import { HOUSE_LINKS, houseTools } from '../../lib/chrome';
+import { floorZh } from '../../lib/i18n';
 
 export function getStaticPaths() {
   return rooms.map((room) => ({ params: { room: room.slug }, props: { room } }));
@@ -11,10 +14,29 @@ export function getStaticPaths() {
 const { room } = Astro.props as { room: Room };
 const c = room.contents;
 const project = c && 'project' in c ? projects.find((p) => p.slug === c.project) : undefined;
-const simpleHref = project ? `/image/${project.slug}` : c && 'page' in c && (c.page === 'about' || c.page === 'contact') ? `/${c.page}` : '/image';
+// The same thing in the Projects folder (or About / Contact).
+const altHref = project ? `/image/${project.slug}` : c && 'page' in c && (c.page === 'about' || c.page === 'contact') ? `/${c.page}` : undefined;
 const description = project?.seo.description ?? `${room.en}${room.zh ? ' (' + room.zh + ')' : ''}, ${room.floor.name.toLowerCase()} of the house. ${room.inventory.join('; ')}.`;
+const chapter = room.locked ? '—' : String(room.chapter);
 ---
-<House seo={{ title: `${room.title} — ${site.name}`, titleZh: `${room.titleZh} — ${site.name}`, description }} simpleHref={simpleHref} bodyClass="house-map-page">
-  <HouseMap current={room} />
-  <RoomView room={room} transition:animate="fade" />
-</House>
+<Desktop seo={{ title: `${room.title} — ${site.name}`, titleZh: `${room.titleZh} — ${site.name}`, description }}>
+  <Window
+    app="house"
+    variant="browser"
+    title={{ en: `Chapter ${chapter}: ${room.title} - The House`, zh: `第${chapter}章：${room.titleZh || room.title} - 房子` }}
+    home="/house/facade"
+    tools={houseTools(altHref)}
+    links={HOUSE_LINKS}
+    alt={altHref}
+    bodyClass="doc house-body"
+    status={[
+      { en: `Chapter ${chapter} · ${room.en}`, zh: `第${chapter}章 · ${room.zh || room.en}` },
+      { en: room.floor.name, zh: floorZh(room.floor.zh) },
+    ]}
+  >
+    <div class="house-view">
+      <HouseMap current={room} />
+      <RoomView room={room} />
+    </div>
+  </Window>
+</Desktop>
