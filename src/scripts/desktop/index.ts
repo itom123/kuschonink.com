@@ -6,6 +6,7 @@ import { initContextMenus } from './contextmenu';
 import { initDesktopIcons } from './icons';
 import { initMenubars } from './menubar';
 import { initMenus } from './menu';
+import { initMemory, restoreDesk, settleLoad } from './memory';
 import { initRouter, navigate } from './router';
 import { initSettings } from './settings';
 import { initStartMenu, remember } from './startmenu';
@@ -36,7 +37,10 @@ window.__kus98 = true;
 window.kus98 = api;
 
 initSettings();
+// Before the page's window is put on the desktop: each program opens where it was left.
+initMemory();
 wm.initWM();
+settleLoad();
 initTaskbar();
 initRouter();
 initCommands();
@@ -160,6 +164,8 @@ function ready() {
     }
   }
   document.dispatchEvent(new Event('astro:page-load'));
+  // After a refresh, the other windows come back as they were.
+  void restoreDesk();
 }
 const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
 if (document.readyState === 'complete' || (nav && nav.domContentLoadedEventStart > 0)) setTimeout(ready);

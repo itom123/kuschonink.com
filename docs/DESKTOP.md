@@ -53,6 +53,7 @@ Ground rules:
 | `sound.ts`, `trails.ts`, `tooltips.ts` | Sounds, pointer trails, yellow tooltips |
 | `screensaver.ts`, `whatsthis.ts` | Idle timer for the screen saver; What's This? notes |
 | `settings.ts` | Visitor settings (Control Panel) |
+| `memory.ts` | What the desktop remembers between page loads: each program's window as it was left, the whole desktop for a refresh, and whether the home page opens Welcome |
 | `api.ts` | `window.kus98`, what page content may ask of the desktop |
 | `apps/` | Programs without a page of their own: Control Panel (Mouse, Sounds), Display Properties and Folder Options, My Computer, Recycle Bin, Run, Find, Image Viewer, screen savers |
 
@@ -179,14 +180,34 @@ Kept in this browser only.
 | | `kus98:user` | The last log-on name |
 | | `kus98:run` | What was typed in Run |
 | | `kus98:paint` | Paint: the tool in hand, colours, custom colours, tool options |
+| | `kus98:windows` | Each program's window as it was last left: place and size, maximised, the bars hidden with View ▸ Toolbars and Status Bar |
 | IndexedDB | `kus98-paint` | Paint: the picture being drawn (a PNG), until File ▸ New |
 | | `lang` | The language chosen with the 中/EN switch |
 | `sessionStorage` | `kus98:begun` | The "Click here to begin" hint was used |
+| | `kus98:desk` | For a refresh: the pages open in windows, front to back, minimised or not, how far each was scrolled, each one's Back and Forward |
+| | `kus98:draft` | Contact: a message not sent yet (cleared once it's sent) |
 
-The script at the top of `Desktop.astro` reads settings, icon places and the
-Recycle Bin before the first paint and sets these on `<html>`, so nothing
+**What a refresh keeps.** Reloading the page (or a phone reloading a tab it put
+to sleep) brings the desktop back as it was: `memory.ts` writes `kus98:desk`
+whenever windows change and when the page is hidden or left, and after the next
+load reopens those pages in their windows (quietly: no caption animation, no
+sound, no error box if a page has gone, and Start ▸ Documents is left as it
+was). A new tab, or start-up and log-on in a new browser session, starts afresh.
+A program's window opens where it was last left (`kus98:windows`), as Windows 98
+does for folders; dialog boxes always open in the middle, and on a phone every
+window fills the screen anyway.
+
+**Welcome.** "Show this screen each time Xiangyin 98 starts" decides at
+log-on (`boot.ts`) and at every load of the home page: unticked, `/` shows the
+desktop without Welcome; ticked, a refresh shows Welcome only if it was open
+before (closing every window and reloading leaves the desktop empty).
+
+The script at the top of `Desktop.astro` reads settings, icon places, window
+places (a style, `#k98-early-windows`, that `memory.ts` removes once the window
+is placed) and the Recycle Bin before the first paint and sets these on `<html>`, so nothing
 jumps: `class="js"`, `data-scheme`, `data-pointers`, `data-click`,
-`data-maxall`, `data-boot` (start-up screens), `--wallpaper`. While the shell
+`data-maxall`, `data-boot` (start-up screens), `data-nowelcome` (the home page
+without Welcome; `memory.ts` closes it and removes the attribute), `--wallpaper`. While the shell
 runs it also sets `data-busy` (hourglass), `data-dragging`, `data-help-mode`
 and `data-saver`.
 

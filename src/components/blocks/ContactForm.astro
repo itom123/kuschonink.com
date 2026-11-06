@@ -101,6 +101,31 @@ const placeholder = (name: string) => (PLACEHOLDERS[name] ? attr('placeholder', 
     return turnstileLoading;
   }
 
+  // An unsent message is kept for this tab: a refresh, or closing the window and
+  // opening it again, doesn't lose it. Sending clears it. (Never the spam trap.)
+  const DRAFT = 'kus98:draft';
+  const draftFields = (form: HTMLFormElement) =>
+    [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[name]:not([type="hidden"]):not([type="checkbox"]), textarea[name]')].filter((el) => el.name !== 'website');
+  function readDraft(): Record<string, string> {
+    try {
+      const d = JSON.parse(sessionStorage.getItem(DRAFT) || '{}');
+      return d && typeof d === 'object' ? d : {};
+    } catch {
+      return {};
+    }
+  }
+  function writeDraft(form: HTMLFormElement) {
+    const d: Record<string, string> = {};
+    for (const el of draftFields(form)) if (el.value.trim()) d[el.name] = el.value;
+    try {
+      if (Object.keys(d).length) sessionStorage.setItem(DRAFT, JSON.stringify(d));
+      else sessionStorage.removeItem(DRAFT);
+    } catch { /* private mode: nothing is kept */ }
+  }
+  function clearDraft() {
+    try { sessionStorage.removeItem(DRAFT); } catch { /* ignore */ }
+  }
+
   /** On the desktop, results also come up as a message box. */
   function box(form: HTMLFormElement, text: string, ok: boolean) {
     window.kus98?.alert({
@@ -120,6 +145,11 @@ const placeholder = (name: string) => (PLACEHOLDERS[name] ? attr('placeholder', 
       const endpoint = form.dataset.endpoint;
       let token = '';
       let widget: string | undefined;
+
+      // Bring back an unsent message (into empty fields only), and keep it as it's written.
+      const draft = readDraft();
+      for (const el of draftFields(form)) if (!el.value && typeof draft[el.name] === 'string') el.value = draft[el.name];
+      form.addEventListener('input', () => writeDraft(form));
 
       if (endpoint && form.dataset.sitekey) {
         loadTurnstile()
@@ -164,6 +194,7 @@ const placeholder = (name: string) => (PLACEHOLDERS[name] ? attr('placeholder', 
           });
           if (res.ok) {
             form.reset();
+            clearDraft();
             say('');
             success.hidden = false;
             form.querySelectorAll('.field, .turnstile, .form-actions, .mail-headers').forEach((el) => ((el as HTMLElement).hidden = true));

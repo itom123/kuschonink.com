@@ -5,6 +5,7 @@ import { cleanPath, upOf } from '../../lib/apps';
 import { aboutBox } from './aboutbox';
 import { commands } from './commands';
 import type { MenuSpec } from './menu';
+import { rememberBars } from './memory';
 import { showImageProperties, showPropertiesFor } from './properties';
 import { navigate } from './router';
 import { settings } from './settings';
@@ -53,6 +54,7 @@ function toggleBar(win: wm.Win, part: string) {
   if (set.has(part)) set.delete(part);
   else set.add(part);
   win.el.dataset.hide = [...set].join(' ');
+  rememberBars(win);
 }
 
 export function toolbarsMenu(win: wm.Win): MenuSpec[] {
