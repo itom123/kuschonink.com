@@ -91,7 +91,7 @@ export function msgbox(o: MsgOpts): Promise<string> {
       h('div', { class: 'msg-buttons' }, btns),
     ]);
     const win = openDialog({
-      title: o.title ?? 'kuschonink 98',
+      title: o.title ?? 'Xiangyin 98',
       icon: o.icon,
       body,
       owner: o.owner,

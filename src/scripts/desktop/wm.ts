@@ -6,7 +6,7 @@
 import { APPS, addressFor, cleanPath, upOf, type AppId } from '../../lib/apps';
 import { settings } from './settings';
 import { play } from './sound';
-import { clamp, emit, html, isCompact, reducedMotion, siteTitle } from './util';
+import { clamp, emit, html, isCompact, reducedMotion, siteTitle, lang, shownText } from './util';
 
 export type WinState = 'normal' | 'max' | 'min';
 
@@ -27,6 +27,8 @@ export interface Win {
   /** Nodes kept between pages of this window (see [data-keep]). */
   keep: Map<string, Element>;
   docTitle: string;
+  /** The page's Chinese title (meta title-zh), for the 中/EN switch. */
+  docTitleZh?: string;
   /** Has a taskbar button. */
   task: boolean;
   /** A dialog's owner (the dialog blocks it). */
@@ -41,6 +43,7 @@ export interface Win {
 
 export interface OpenOpts {
   docTitle?: string;
+  docTitleZh?: string;
   state?: WinState;
   task?: boolean;
   owner?: Win;
@@ -78,7 +81,10 @@ export function byEl(node: Element | null | undefined): Win | undefined {
 /** The page window of a program (dialogs excluded). */
 export const find = (app: string) => wins.find((w) => w.app === app && !w.dialog);
 export const urlOf = (win: Win) => win.el.dataset.url ?? '';
-export const titleOf = (win: Win) => win.el.querySelector(':scope > .title-bar [data-title]')?.textContent ?? '';
+/** The window's title, in the language showing. */
+export const titleOf = (win: Win) => shownText(win.el.querySelector(':scope > .title-bar [data-title]'));
+/** The browser tab's title for a window's page, in the language showing. */
+export const pageTitle = (win: Win) => (lang() === 'zh' && win.docTitleZh) || win.docTitle;
 export const isPage = (win: Win) => !!win.el.dataset.url && !win.dialog;
 const zOf = (win: Win) => Number(win.el.style.zIndex) || 0;
 
@@ -141,6 +147,7 @@ function adopt(el: HTMLElement, o: OpenOpts = {}): Win {
     hi: 0,
     keep: new Map(),
     docTitle: o.docTitle ?? document.title,
+    docTitleZh: o.docTitleZh,
     task: o.task ?? true,
     owner: o.owner,
     global: o.global,
@@ -300,7 +307,22 @@ export function syncLocation(win: Win) {
       history.replaceState({ ...(history.state ?? {}), kus98: 1, app: win.app }, '', url);
     } catch { /* Safari rate limit */ }
   }
-  if (win.docTitle) document.title = win.docTitle;
+  syncTitle(win);
+}
+
+/** The browser tab's title (and the title metas the 中/EN switch reads) follow a window's page. */
+export function syncTitle(win: Win) {
+  if (!win.docTitle) return;
+  document.title = pageTitle(win);
+  for (const [name, value] of [['title-en', win.docTitle], ['title-zh', win.docTitleZh || win.docTitle]]) {
+    let m = document.head.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
+    if (!m) {
+      m = document.createElement('meta');
+      m.name = name;
+      document.head.appendChild(m);
+    }
+    m.content = value;
+  }
 }
 
 /** Clicking the desktop: no window is active. */
@@ -445,7 +467,7 @@ export function arrange(how: 'cascade' | 'tile-h' | 'tile-v') {
  * Show another page in an existing window: everything below the title bar is
  * replaced, except nodes marked [data-keep] (the house map keeps its state).
  */
-export function swap(win: Win, incoming: HTMLElement, url: string, docTitle: string, pushHistory: boolean) {
+export function swap(win: Win, incoming: HTMLElement, url: string, docTitle: string, pushHistory: boolean, docTitleZh?: string) {
   const oldInner = win.el.querySelector<HTMLElement>(':scope > [data-window-inner]');
   const newInner = incoming.querySelector<HTMLElement>(':scope > [data-window-inner]');
   if (!oldInner || !newInner) return;
@@ -468,13 +490,15 @@ export function swap(win: Win, incoming: HTMLElement, url: string, docTitle: str
     else win.el.setAttribute(attr, v);
   }
   win.el.className = incoming.className;
-  const title = incoming.querySelector(':scope > .title-bar [data-title]')?.textContent ?? '';
+  // Both languages of the title come along (the 中/EN switch shows one).
+  const title = incoming.querySelector(':scope > .title-bar [data-title]');
   const t = win.el.querySelector(':scope > .title-bar [data-title]');
-  if (t) t.textContent = title;
+  if (t && title) t.innerHTML = title.innerHTML;
   const ico = win.el.querySelector(':scope > .title-bar .title-ico');
   if (ico) ico.className = `ico ico16 ico-${win.el.dataset.icon} title-ico`;
   win.el.dataset.url = url;
   win.docTitle = docTitle;
+  win.docTitleZh = docTitleZh;
   if (pushHistory) {
     win.hist = win.hist.slice(0, win.hi + 1);
     win.hist.push(url);
@@ -730,13 +754,19 @@ function onViewportResize() {
 
 export function initWM() {
   layer = document.getElementById('k98-windows')!;
-  for (const el of layer.querySelectorAll<HTMLElement>(':scope > [data-window]')) adopt(el, { docTitle: document.title });
+  const meta = (n: string) => document.head.querySelector<HTMLMetaElement>(`meta[name="${n}"]`)?.content;
+  for (const el of layer.querySelectorAll<HTMLElement>(':scope > [data-window]')) adopt(el, { docTitle: meta('title-en') || document.title, docTitleZh: meta('title-zh') });
   document.addEventListener('pointerdown', onPointerDownCapture, true);
   layer.addEventListener('pointerdown', onPointerDown);
   layer.addEventListener('click', onClick);
   layer.addEventListener('dblclick', onDblClick);
   addEventListener('keydown', onKey);
   addEventListener('resize', onViewportResize);
+  // The 中/EN switch: the browser tab's title and the taskbar follow.
+  document.addEventListener('langchange', () => {
+    if (active) syncLocation(active);
+    emit(document, 'wm:change');
+  });
   // Control Panel ▸ Display ▸ "Always maximize windows": maximise what's open now, too.
   settings.on((s, changed) => {
     if (!changed.alwaysMax || !s.alwaysMax) return;

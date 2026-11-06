@@ -1,21 +1,26 @@
 ---
-// The taskbar: Start, Quick Launch, a button per open window, the tray.
+// The taskbar: Start, Quick Launch, a button per open window, the tray
+// (the 中/EN switch, the volume and the clock).
 import StartMenu from './StartMenu.astro';
+import LangToggle from '../LangToggle.astro';
+import { attr } from '../../lib/i18n';
+const tip = (en: string, zh: string) => ({ ...attr('title', { en, zh }), ...attr('aria-label', { en, zh }) });
 ---
-<footer class="taskbar" id="k98-taskbar" aria-label="Taskbar">
+<footer class="taskbar" id="k98-taskbar" {...attr('aria-label', { en: 'Taskbar', zh: '任务栏' })}>
   <StartMenu />
   <span class="tb-etch ql" aria-hidden="true"></span>
   <span class="tb-handle ql" aria-hidden="true"></span>
-  <div class="tb-group quick-launch" role="toolbar" aria-label="Quick Launch">
-    <button type="button" class="ql-btn" data-cmd="show-desktop" data-js-only title="Show Desktop" aria-label="Show Desktop"><span class="ico ico16 ico-desktop" aria-hidden="true"></span></button>
-    <a class="ql-btn" href="/house/facade" title="The House" aria-label="The House"><span class="ico ico16 ico-house" aria-hidden="true"></span></a>
-    <a class="ql-btn" href="/image" title="Projects" aria-label="Projects"><span class="ico ico16 ico-folder" aria-hidden="true"></span></a>
+  <div class="tb-group quick-launch" role="toolbar" {...attr('aria-label', { en: 'Quick Launch', zh: '快速启动' })}>
+    <button type="button" class="ql-btn" data-cmd="show-desktop" data-js-only {...tip('Show Desktop', '显示桌面')}><span class="ico ico16 ico-desktop" aria-hidden="true"></span></button>
+    <a class="ql-btn" href="/house/facade" {...tip('The House', '房子')}><span class="ico ico16 ico-house" aria-hidden="true"></span></a>
+    <a class="ql-btn" href="/image" {...tip('Projects', '作品')}><span class="ico ico16 ico-folder" aria-hidden="true"></span></a>
   </div>
   <span class="tb-etch" aria-hidden="true"></span>
   <span class="tb-handle" aria-hidden="true"></span>
-  <div class="tasks" id="k98-tasks" role="toolbar" aria-label="Open windows"></div>
+  <div class="tasks" id="k98-tasks" role="toolbar" {...attr('aria-label', { en: 'Open windows', zh: '打开的窗口' })}></div>
   <div class="tray" id="k98-tray" data-js-only>
-    <button type="button" class="tray-btn" id="k98-volume" aria-label="Volume"><span class="ico ico16 ico-speaker" aria-hidden="true"></span></button>
+    <LangToggle variant="tray" />
+    <button type="button" class="tray-btn" id="k98-volume" {...attr('aria-label', { en: 'Volume', zh: '音量' })}><span class="ico ico16 ico-speaker" aria-hidden="true"></span></button>
     <time class="clock" id="k98-clock"></time>
   </div>
 </footer>

@@ -6,7 +6,7 @@ import { arrangeIcons, lineUpIcons, openIcon, select } from './icons';
 import * as menu from './menu';
 import { showIconProperties } from './properties';
 import { navigate } from './router';
-import { isCompact } from './util';
+import { isCompact, shownText } from './util';
 import { linkMenu, mailAbout, pageMenu, photoMenu, systemMenu, toolbarsMenu } from './winmenus';
 import { binItemMenu, recycleIconMenu } from './apps/recycle';
 import * as wm from './wm';
@@ -15,7 +15,7 @@ type Target = { specs: menu.MenuSpec[]; owner?: HTMLElement | null } | null;
 
 function iconMenu(icon: HTMLElement): menu.MenuSpec[] {
   const group = icon.closest('[data-icon-group]');
-  const label = icon.querySelector('.icon-label')?.textContent?.trim() ?? icon.textContent?.trim() ?? '';
+  const label = shownText(icon.querySelector('.icon-label') ?? icon).trim();
   const href = icon.getAttribute('href');
   const outside = !!href && new URL(href, location.href).origin !== location.origin;
   return [

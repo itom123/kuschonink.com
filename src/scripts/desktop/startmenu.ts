@@ -27,7 +27,7 @@ function fillDocuments(start: HTMLElement) {
             `<li role="none"><a class="menu-item" role="menuitem" tabindex="-1" href="${escapeHtml(r.url)}"><span class="ico ico16 ico-${escapeHtml(r.icon)}" aria-hidden="true"></span><span class="mi-label">${escapeHtml(r.title)}</span></a></li>`,
         )
         .join('')
-    : '<li role="none"><span class="menu-item" role="menuitem" aria-disabled="true" tabindex="-1"><span class="mi-label">(Empty)</span></span></li>';
+    : '<li role="none"><span class="menu-item" role="menuitem" aria-disabled="true" tabindex="-1"><span class="mi-label"><span data-l="en">(Empty)</span><span data-l="zh" lang="zh-Hans">(空)</span></span></span></li>';
 }
 
 export function initStartMenu() {

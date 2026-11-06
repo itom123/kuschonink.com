@@ -1,5 +1,7 @@
 ---
 import { site } from '../../lib/content';
+import { t, attr, type Bi as BiText } from '../../lib/i18n';
+import Bi from '../Bi.astro';
 
 interface Props {
   /** "mail": laid out as a New Message window (the Contact program); "plain": a page form (the house). */
@@ -9,49 +11,62 @@ const { variant = 'plain' } = Astro.props;
 const { email, form } = site.contact;
 // With a Turnstile site key, the form posts to the site's Worker.
 // Without one, it opens the visitor's email app with the message filled in.
+// The email address itself is never shown on the page.
 const live = Boolean(form.turnstileSiteKey && form.endpoint);
-const MAIL_LABELS: Record<string, string> = { name: 'From:', email: 'E-mail:', subject: 'Subject:' };
-const PLACEHOLDERS: Record<string, string> = { name: 'Your name', email: 'you@example.com', subject: 'What is it about?', message: 'Write your message here.' };
+const MAIL_LABELS: Record<string, BiText> = {
+  name: { en: 'From:', zh: '发件人：' },
+  email: { en: 'E-mail:', zh: '电子邮箱：' },
+  subject: { en: 'Subject:', zh: '主题：' },
+};
+const PLACEHOLDERS: Record<string, BiText> = {
+  name: { en: 'Your name', zh: '你的名字' },
+  email: { en: 'you@example.com', zh: 'you@example.com' },
+  subject: { en: 'What is it about?', zh: '关于什么？' },
+  message: { en: 'Write your message here.', zh: '在这里写下你的消息。' },
+};
 const maxlength = (name: string) => (name === 'email' ? 254 : name === 'subject' ? 180 : 120);
 const autocomplete = (name: string) => (name === 'name' ? 'name' : name === 'email' ? 'email' : 'off');
 const lines = form.fields.filter((f) => f.type !== 'textarea');
 const bodies = form.fields.filter((f) => f.type === 'textarea');
+const label = (f: (typeof form.fields)[number]): BiText => ({ en: f.label, zh: f.labelZh ?? '' });
+const placeholder = (name: string) => (PLACEHOLDERS[name] ? attr('placeholder', PLACEHOLDERS[name]) : {});
 ---
 <form
   class:list={['block', 'block-form', 'contact-form', { 'mail-form': variant === 'mail' }]}
   action={live ? form.endpoint : `mailto:${email}`}
   method="post"
   enctype={live ? undefined : 'text/plain'}
-  data-email={email}
+  data-email={live ? undefined : email}
   data-endpoint={live ? form.endpoint : undefined}
   data-sitekey={live ? form.turnstileSiteKey : undefined}
   data-success={form.successMessage}
+  data-success-zh={form.successMessageZh}
 >
   {variant === 'mail' ? (
     <>
       <div class="mail-headers">
         <div class="mail-row">
-          <span class="mail-key">To:</span>
+          <span class="mail-key"><Bi t={{ en: 'To:', zh: '收件人：' }} /></span>
           <span class="mail-to"><span class="ico ico16 ico-mail" aria-hidden="true"></span>{site.name}</span>
         </div>
         {lines.map((f) => (
           <label class="field mail-row">
-            <span class="mail-key">{MAIL_LABELS[f.name] ?? `${f.label}:`}{f.required && <span class="sr-only"> (required)</span>}</span>
-            <input type={f.type as "text" | "email"} name={f.name} required={f.required} maxlength={maxlength(f.name)} autocomplete={autocomplete(f.name)} placeholder={PLACEHOLDERS[f.name]} />
+            <span class="mail-key"><Bi t={MAIL_LABELS[f.name] ?? { en: `${f.label}:`, zh: f.labelZh ? `${f.labelZh}：` : '' }} />{f.required && <span class="sr-only"> (<Bi t={t.required} />)</span>}</span>
+            <input type={f.type as "text" | "email"} name={f.name} required={f.required} maxlength={maxlength(f.name)} autocomplete={autocomplete(f.name)} {...placeholder(f.name)} />
           </label>
         ))}
       </div>
       {bodies.map((f) => (
         <label class="field mail-body">
-          <span class="sr-only">{f.label}{f.required && ' (required)'}</span>
-          <textarea name={f.name} required={f.required} rows="10" maxlength="4000" placeholder={PLACEHOLDERS[f.name]}></textarea>
+          <span class="sr-only"><Bi t={label(f)} />{f.required && <> (<Bi t={t.required} />)</>}</span>
+          <textarea name={f.name} required={f.required} rows="10" maxlength="4000" {...placeholder(f.name)}></textarea>
         </label>
       ))}
     </>
   ) : (
     form.fields.map((f) => (
       <label class="field">
-        <span class="field-label">{f.label}{f.required && <span class="field-required"> (required)</span>}</span>
+        <span class="field-label"><Bi t={label(f)} />{f.required && <span class="field-required"> (<Bi t={t.required} />)</span>}</span>
         {f.type === 'textarea' ? (
           <textarea name={f.name} required={f.required} rows="6" maxlength="4000"></textarea>
         ) : (
@@ -63,19 +78,13 @@ const bodies = form.fields.filter((f) => f.type === 'textarea');
   {/* Spam trap: people never see or fill this. */}
   <label class="field-trap" aria-hidden="true">Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
   {live && <div class="turnstile"></div>}
-  <div class="form-actions"><button type="submit" class:list={['button', { default: variant === 'mail' }]}>{form.submitText}</button></div>
+  <div class="form-actions"><button type="submit" class:list={['button', { default: variant === 'mail' }]}><Bi t={{ en: form.submitText, zh: form.submitTextZh ?? '' }} /></button></div>
   <p class="form-status" role="status" aria-live="polite" hidden></p>
-  <p class="form-success" hidden>{form.successMessage}</p>
+  <p class="form-success" hidden><Bi t={{ en: form.successMessage, zh: form.successMessageZh ?? '' }} /></p>
 </form>
 <script>
-  const ERRORS: Record<string, string> = {
-    verification_failed: 'The anti-spam check failed. Please try again.',
-    rate_limited: 'Too many messages just now. Please try again later.',
-    missing_required_field: 'Please fill in every field.',
-    field_too_long: 'One of the fields is too long.',
-    invalid_submission: 'Please check your email address.',
-    delivery_in_progress: 'Your message is already on its way. Please wait a moment.',
-  };
+  import { formErrors } from '../../lib/i18n';
+  import { pick } from '../../scripts/lang';
   type TS = { render: (el: Element, o: object) => string; reset: (id?: string) => void; remove?: (id: string) => void };
   let turnstileLoading: Promise<TS> | null = null;
   function loadTurnstile(): Promise<TS> {
@@ -94,7 +103,12 @@ const bodies = form.fields.filter((f) => f.type === 'textarea');
 
   /** On the desktop, results also come up as a message box. */
   function box(form: HTMLFormElement, text: string, ok: boolean) {
-    window.kus98?.alert({ title: ok ? 'Message sent' : 'Contact', icon: ok ? 'info' : 'error', text, owner: form });
+    window.kus98?.alert({
+      title: ok ? pick({ en: 'Message sent', zh: '消息已发送' }) : pick({ en: 'Contact', zh: '联系' }),
+      icon: ok ? 'info' : 'error',
+      text,
+      owner: form,
+    });
   }
 
   function initForms() {
@@ -118,7 +132,7 @@ const bodies = form.fields.filter((f) => f.type === 'textarea');
               'expired-callback': () => { token = ''; },
             });
           })
-          .catch(() => say('The anti-spam check could not load. You can also write to ' + form.dataset.email + '.'));
+          .catch(() => say(pick({ en: 'The anti-spam check could not load. Please reload the page and try again.', zh: '反垃圾验证无法加载，请刷新页面后重试。' })));
         // When its window closes, take the anti-spam widget with it.
         form.closest('[data-window]')?.addEventListener('desktop:close', () => {
           const w = window as unknown as { turnstile?: TS };
@@ -138,10 +152,10 @@ const bodies = form.fields.filter((f) => f.type === 'textarea');
           success.hidden = false;
           return;
         }
-        if (!token) return say('Please wait for the anti-spam check to finish.');
+        if (!token) return say(pick({ en: 'Please wait for the anti-spam check to finish.', zh: '请等待反垃圾验证完成。' }));
         const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
         button.disabled = true;
-        say('Sending…');
+        say(pick({ en: 'Sending…', zh: '正在发送……' }));
         try {
           const res = await fetch(endpoint, {
             method: 'POST',
@@ -153,17 +167,23 @@ const bodies = form.fields.filter((f) => f.type === 'textarea');
             say('');
             success.hidden = false;
             form.querySelectorAll('.field, .turnstile, .form-actions, .mail-headers').forEach((el) => ((el as HTMLElement).hidden = true));
-            box(form, form.dataset.success ?? 'Your message has been sent.', true);
+            box(form, pick({ en: form.dataset.success ?? 'Your message has been sent.', zh: form.dataset.successZh ?? '' }), true);
             return;
           }
           const err = (await res.json().catch(() => ({}))) as { error?: string; detail?: string };
           // Unknown failures show their code, so a problem can be traced.
           const code = [err.error ?? 'error', err.detail].filter(Boolean).join(': ');
-          const msg = ERRORS[err.error ?? ''] ?? `The message could not be sent (${code}, ${res.status}). Please write to ${form.dataset.email}.`;
+          const known = formErrors[err.error ?? ''];
+          const msg = known
+            ? pick(known)
+            : pick({
+                en: `The message could not be sent (${code}, ${res.status}). Please try again later.`,
+                zh: `消息未能发送（${code}，${res.status}）。请稍后再试。`,
+              });
           say(msg);
           box(form, msg, false);
         } catch {
-          const msg = `The message could not be sent. Please write to ${form.dataset.email}.`;
+          const msg = pick({ en: 'The message could not be sent. Please try again later.', zh: '消息未能发送。请稍后再试。' });
           say(msg);
           box(form, msg, false);
         } finally {

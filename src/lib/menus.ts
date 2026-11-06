@@ -3,6 +3,8 @@
 
 export interface MenuItem {
   label?: string;
+  /** The Chinese label (the 中/EN switch), with its own & access key: "程序(&P)". */
+  zh?: string;
   href?: string;
   /** A shell command instead of a link (needs JavaScript). */
   cmd?: string;
@@ -41,3 +43,23 @@ export function accelKey(label = ''): string {
 }
 
 export const plainLabel = (label = '') => label.replace(/&&/g, '\u0000').replace(/&/g, '').replace(/\u0000/g, '&');
+
+/** A label in both languages for the 中/EN switch (English only when there's no Chinese). */
+export function biAccelHtml(label: string, zh?: string): string {
+  if (!zh) return accelHtml(label);
+  return `<span data-l="en">${accelHtml(label)}</span><span data-l="zh" lang="zh-Hans">${accelHtml(zh)}</span>`;
+}
+
+/** Menu bar names in Chinese, as in the Chinese edition of Windows 98. */
+export const MENU_ZH: Record<string, string> = {
+  '&File': '文件(&F)',
+  '&Edit': '编辑(&E)',
+  '&View': '查看(&V)',
+  '&Go': '转到(&G)',
+  'F&avorites': '收藏(&A)',
+  '&Help': '帮助(&H)',
+  '&Options': '选项(&O)',
+  '&Tools': '工具(&T)',
+  'F&ormat': '格式(&O)',
+  '&Insert': '插入(&I)',
+};

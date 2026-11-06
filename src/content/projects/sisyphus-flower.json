@@ -1,8 +1,10 @@
 {
   "title": "Sisyphus Flower",
+  "titleZh": "西西弗斯之花",
   "order": 13,
   "seo": {
-    "title": "Sisyphus Flower — Xiangyin Gu"
+    "title": "Sisyphus Flower — Xiangyin Gu",
+    "titleZh": "西西弗斯之花 — Xiangyin Gu"
   },
   "sections": [
     {
@@ -14,7 +16,8 @@
       "blocks": [
         {
           "type": "text",
-          "html": "<p class=\"display\">Sisyphus Flower</p>"
+          "html": "<p class=\"display\">Sisyphus Flower</p>",
+          "htmlZh": "<p class=\"display\">西西弗斯之花</p>"
         }
       ]
     },

@@ -1,4 +1,4 @@
-// The programs of kuschonink 98 and which URLs open in which program.
+// The programs of Xiangyin 98 and which URLs open in which program.
 // No Astro imports: this file is also bundled into the browser (the shell).
 
 export type AppId = 'welcome' | 'explorer' | 'about' | 'contact' | 'house' | 'help' | 'error';
@@ -46,13 +46,11 @@ export function appFor(path: string): AppId {
 /** What a window's address bar shows for a page. */
 export function addressFor(path: string): string {
   const p = cleanPath(path);
-  const app = appFor(p);
-  if (app === 'house') return `http://kuschonink.com${p}`;
-  if (p === '/') return 'C:\\kuschonink\\Desktop';
-  if (p === '/about') return 'C:\\kuschonink\\About.doc';
-  if (p === '/contact') return 'C:\\kuschonink\\Contact';
-  if (p === '/help') return 'C:\\kuschonink\\Help';
-  return 'C:\\kuschonink' + p.replace(/\//g, '\\');
+  if (p === '/') return 'C:\\xiangyin\\Desktop';
+  if (p === '/about') return 'C:\\xiangyin\\About.doc';
+  if (p === '/contact') return 'C:\\xiangyin\\Contact';
+  if (p === '/help') return 'C:\\xiangyin\\Help';
+  return 'C:\\xiangyin' + p.replace(/\//g, '\\');
 }
 
 /** The toolbar's Up button: the folder a page sits in (null at the top). */
@@ -65,7 +63,7 @@ export function upOf(url: string): string | null {
 
 /**
  * Turn what someone typed into an address bar or the Run box into a site path.
- * Accepts site paths, kuschonink.com URLs and C:\kuschonink\… paths.
+ * Accepts site paths, kuschonink.com URLs and C:\xiangyin\… paths.
  * Returns null when it isn't an address on this site.
  */
 export function addressToPath(input: string): string | null {
@@ -73,7 +71,7 @@ export function addressToPath(input: string): string | null {
   if (!s) return null;
   s = s.replace(/^(https?:\/\/)?(www\.)?kuschonink\.com/i, '');
   if (/^[a-z]:\\/i.test(s)) {
-    s = s.replace(/^[a-z]:\\kuschonink/i, '').replace(/^[a-z]:/i, '').replace(/\\/g, '/');
+    s = s.replace(/^[a-z]:\\(xiangyin|kuschonink)/i, '').replace(/^[a-z]:/i, '').replace(/\\/g, '/');
     s = s.replace(/^\/desktop$/i, '/').replace(/^\/about\.(doc|txt)$/i, '/about');
   }
   if (/^[a-z]+:/i.test(s)) return null;

@@ -2,61 +2,64 @@
 // Start-up, log-on and shut-down screens. Hidden unless <html data-boot> is
 // set (by the script in <head>, only with JavaScript and never for search
 // engines), so the page underneath is always complete.
+import Bi from '../Bi.astro';
+import { attr } from '../../lib/i18n';
 ---
 <div class="boot" id="k98-boot" data-step="bios" data-js-only>
   <div class="boot-bios" aria-hidden="true">
     <div class="bios-head">
       <span class="ico ico-start"></span>
-      <div><b>kuschonink BIOS</b> v4.10, An Archive Ally<br />Copyright (C) 1998–2026, Xiangyin Gu</div>
+      <div><b>Xiangyin BIOS</b> v4.10, An Archive Ally<br />Copyright (C) 1998–2026, Xiangyin Gu</div>
     </div>
     <pre class="bios-text"></pre>
   </div>
 
-  <div class="boot-splash" role="img" aria-label="kuschonink 98 is starting">
+  <div class="boot-splash" role="img" {...attr('aria-label', { en: 'Xiangyin 98 is starting', zh: 'Xiangyin 98 正在启动' })}>
     <div class="splash-clouds" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
     <div class="splash-logo">
       <span class="ico ico-start" aria-hidden="true"></span>
-      <div class="splash-word"><small>Xiangyin Gu</small><b>kuschonink</b><span>98</span></div>
+      <div class="splash-word"><b>Xiangyin</b><span>98</span></div>
     </div>
     <p class="splash-msg" data-splash-msg></p>
     <div class="splash-bar" aria-hidden="true"></div>
   </div>
 
-  <p class="boot-skip">Click or press any key to skip</p>
+  <p class="boot-skip"><Bi t={{ en: 'Click or press any key to skip', zh: '单击或按任意键跳过' }} /></p>
 
   <div class="boot-login">
     <section class="window login-window" role="dialog" aria-modal="true" aria-labelledby="login-title" aria-describedby="login-intro">
       <div class="title-bar">
-        <div class="title-bar-text" id="login-title">Welcome to kuschonink 98</div>
+        <div class="title-bar-text" id="login-title"><Bi t={{ en: 'Welcome to Xiangyin 98', zh: '欢迎使用 Xiangyin 98' }} /></div>
         <div class="title-bar-controls">
-          <button type="button" class="tb-btn tb-help" aria-label="Help" title="There is no account: any name will do." data-login-help></button>
-          <button type="button" class="tb-btn tb-close" aria-label="Close" title="Close" data-login="cancel"></button>
+          <button type="button" class="tb-btn tb-help" {...attr('aria-label', { en: 'Help', zh: '帮助' })} {...attr('title', { en: 'There is no account: any name will do.', zh: '没有帐户：任何名字都可以。' })} data-login-help></button>
+          <button type="button" class="tb-btn tb-close" {...attr('aria-label', { en: 'Close', zh: '关闭' })} {...attr('title', { en: 'Close', zh: '关闭' })} data-login="cancel"></button>
         </div>
       </div>
       <form class="login-body" data-login-form autocomplete="off">
         <span class="ico ico-keys login-keys" aria-hidden="true"></span>
         <div class="login-fields">
-          <p id="login-intro">Type a user name and password to log on to kuschonink 98.</p>
+          <p id="login-intro"><Bi t={{ en: 'Type a user name and password to log on to Xiangyin 98.', zh: '键入用户名和密码以登录 Xiangyin 98。' }} /></p>
           <div class="login-row">
-            <label for="login-name"><u>U</u>ser name:</label>
+            <label for="login-name"><span data-l="en"><u>U</u>ser name:</span><span data-l="zh" lang="zh-Hans">用户名(<u>U</u>)：</span></label>
             <input id="login-name" name="user" type="text" maxlength="32" spellcheck="false" autocapitalize="off" autocomplete="off" />
           </div>
           <div class="login-row">
-            <label for="login-pass"><u>P</u>assword:</label>
+            <label for="login-pass"><span data-l="en"><u>P</u>assword:</span><span data-l="zh" lang="zh-Hans">密码(<u>P</u>)：</span></label>
             <input id="login-pass" type="text" spellcheck="false" autocapitalize="off" autocomplete="off" data-1p-ignore data-lpignore="true" aria-describedby="login-hint" />
           </div>
-          <p class="login-hint" id="login-hint">No password needed: just press <b>OK</b>.</p>
+          <p class="login-hint" id="login-hint"><span data-l="en">No password needed: just press <b>OK</b>.</span><span data-l="zh" lang="zh-Hans">不需要密码：直接按<b>确定</b>。</span></p>
         </div>
         <div class="login-buttons">
-          <button type="submit" class="default">OK</button>
-          <button type="button" data-login="cancel">Cancel</button>
+          <button type="submit" class="default"><Bi t={{ en: 'OK', zh: '确定' }} /></button>
+          <button type="button" data-login="cancel"><Bi t={{ en: 'Cancel', zh: '取消' }} /></button>
         </div>
       </form>
     </section>
   </div>
 
   <div class="boot-safe" role="status">
-    <p>It’s now safe to turn off<br />your computer.</p>
-    <small>Click or press any key to start kuschonink 98 again.</small>
+    <p data-l="en">It’s now safe to turn off<br />your computer.</p>
+    <p data-l="zh" lang="zh-Hans">现在可以安全地<br />关闭计算机了。</p>
+    <small><Bi t={{ en: 'Click or press any key to start Xiangyin 98 again.', zh: '单击或按任意键重新启动 Xiangyin 98。' }} /></small>
   </div>
 </div>

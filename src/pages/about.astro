@@ -3,19 +3,25 @@
 import Desktop from '../layouts/Desktop.astro';
 import Window from '../components/desktop/Window.astro';
 import Section from '../components/Section.astro';
+import Bi from '../components/Bi.astro';
 import { about as page, site } from '../lib/content';
 import { roomForPage } from '../lib/house';
+import { t, floorZh } from '../lib/i18n';
 const room = roomForPage('about');
+const title = { en: page.title, zh: page.titleZh ?? t.about.zh };
 ---
 <Desktop seo={page.seo}>
   <Window
     app="about"
-    title="About.doc - Document Viewer"
+    title={{ en: 'About.doc - Document Viewer', zh: '关于.doc - 文档查看器' }}
     variant="document"
     address={false}
     bodyClass="paper-desk"
     alt={room ? `/house/${room.slug}` : undefined}
-    status={['For Help, press F1', room ? `In the house: ${room.en}, ${room.floor.name.toLowerCase()}` : site.name]}
+    status={[
+      { en: 'For Help, press F1', zh: '按 F1 获取帮助' },
+      room ? { en: `In the house: ${room.en}, ${room.floor.name.toLowerCase()}`, zh: `在房子里：${floorZh(room.floor.zh)}${room.zh}` } : site.name,
+    ]}
   >
     <div class="format-bar" slot="toolbar" aria-hidden="true">
       <span class="fake-select wide">Times New Roman</span>
@@ -30,7 +36,7 @@ const room = roomForPage('about');
       <div class="ruler"></div>
     </div>
     <article class="paper doc">
-      <h1>{page.title}</h1>
+      <h1><Bi t={title} /></h1>
       {page.sections.map((s, i) => <Section section={s} first={i === 0} />)}
     </article>
   </Window>

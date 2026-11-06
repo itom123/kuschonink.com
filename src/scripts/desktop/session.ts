@@ -1,4 +1,4 @@
-// Who is logged on. kuschonink 98 has no accounts: any name, no password.
+// Who is logged on. Xiangyin 98 has no accounts: any name, no password.
 // "Logged on" is a session cookie, so new tabs see it (sessionStorage wouldn't).
 const COOKIE = 'kus98_session';
 

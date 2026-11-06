@@ -1,52 +1,64 @@
 ---
-// "Welcome to kuschonink 98": the home page, and the first thing after log-in.
+// "Welcome to Xiangyin 98": the home page, and the first thing after log-in.
 // Single-click choices on the left; the right side explains each one.
 import { getImage } from 'astro:assets';
 import { home, projects, site } from '../../lib/content';
 import { img } from '../../lib/images';
+import { attr } from '../../lib/i18n';
+import Bi from '../Bi.astro';
 
 const photo = await getImage({ src: img(home.background.src), width: 720, format: 'webp', quality: 75 });
 
+// Each choice in English and Chinese (the 中/EN switch shows one).
 const options = [
   {
-    id: 'house', href: '/house/facade', icon: 'house', label: 'Enter the', strong: 'House',
-    title: 'Enter the House',
-    text: 'The site is also a house, drawn from the plans of the 2008 renovation of the family house. Every room keeps a project, About or Contact. Knock on the door to go in, then walk through the floorplans.',
+    id: 'house', href: '/house/facade', icon: 'house', label: 'Enter the', strong: 'House', zh: ['走进', '房子'],
+    title: { en: 'Enter the House', zh: '走进房子' },
+    text: {
+      en: 'The site is also a house, drawn from the plans of the 2008 renovation of the family house. Every room keeps a project, About or Contact. Knock on the door to go in, then walk through the floorplans.',
+      zh: '这个网站也是一座房子，取自家宅2008年翻修时的图纸。每个房间保存一件作品、“关于”或“联系”。敲门进去，然后在平面图中走动。',
+    },
   },
   {
-    id: 'projects', href: '/image', icon: 'folder', label: 'Browse the', strong: 'projects',
-    title: 'Browse the projects',
-    text: `All the work as one folder: ${projects.length} projects with their photographs, texts and videos. Open one to see it whole, or view them all on one page.`,
+    id: 'projects', href: '/image', icon: 'folder', label: 'Browse the', strong: 'projects', zh: ['浏览', '作品'],
+    title: { en: 'Browse the projects', zh: '浏览作品' },
+    text: {
+      en: `All the work as one folder: ${projects.length} projects with their photographs, texts and videos. Open one to see it whole, or view them all on one page.`,
+      zh: `全部作品都在一个文件夹里：${projects.length} 件作品，附有照片、文字和视频。打开一件完整观看，或在一页上看全部。`,
+    },
   },
   {
-    id: 'about', href: '/about', icon: 'document', label: 'About the', strong: 'artist',
-    title: 'About the artist',
-    text: 'Biography, and selected conferences, exhibitions and programmes.',
+    id: 'about', href: '/about', icon: 'document', label: 'About the', strong: 'artist', zh: ['关于', '艺术家'],
+    title: { en: 'About the artist', zh: '关于艺术家' },
+    text: { en: 'Biography, and selected conferences, exhibitions and programmes.', zh: '个人简介，以及部分会议、展览和项目。' },
   },
   {
-    id: 'contact', href: '/contact', icon: 'mail', label: 'Get in', strong: 'touch',
-    title: 'Get in touch',
-    text: 'Write a message from the New Message window; it goes straight to the artist’s inbox.',
+    id: 'contact', href: '/contact', icon: 'mail', label: 'Get in', strong: 'touch', zh: ['取得', '联系'],
+    title: { en: 'Get in touch', zh: '取得联系' },
+    text: { en: 'Write a message from the New Message window; it goes straight to the artist’s inbox.', zh: '在“新邮件”窗口里写一条消息，它会直接送到艺术家的邮箱。' },
   },
   {
-    id: 'help', href: '/help', icon: 'help', label: 'How to use this', strong: 'computer',
-    title: 'How to use this computer',
-    text: 'Clicking, double-clicking and right-clicking, windows, the Start menu, and how to walk through the house. Press F1 at any time.',
+    id: 'help', href: '/help', icon: 'help', label: 'How to use this', strong: 'computer', zh: ['如何使用这台', '电脑'],
+    title: { en: 'How to use this computer', zh: '如何使用这台电脑' },
+    text: {
+      en: 'Clicking, double-clicking and right-clicking, windows, the Start menu, and how to walk through the house. Press F1 at any time.',
+      zh: '单击、双击和右击，窗口，“开始”菜单，以及如何在房子里走动。随时按 F1。',
+    },
   },
 ];
 ---
 <div class="welcome" data-welcome>
   <header class="welcome-head">
     <span class="ico ico-start" aria-hidden="true"></span>
-    <h1><small>Welcome to</small> <b>kuschonink</b> 98</h1>
+    <h1><small><Bi t={{ en: 'Welcome to', zh: '欢迎使用' }} /></small> <b>Xiangyin</b> 98</h1>
   </header>
   <div class="welcome-main">
-    <ul class="welcome-options" aria-label="Choices">
+    <ul class="welcome-options" {...attr('aria-label', { en: 'Choices', zh: '选项' })}>
       {options.map((o) => (
         <li>
           <a class="welcome-option" href={o.href} data-desc={o.id}>
             <span class={`ico ico-${o.icon}`} aria-hidden="true"></span>
-            <span>{o.label} <b>{o.strong}</b></span>
+            <span data-l="en">{o.label} <b>{o.strong}</b></span><span data-l="zh" lang="zh-Hans">{o.zh[0]}<b>{o.zh[1]}</b></span>
           </a>
         </li>
       ))}
@@ -54,18 +66,19 @@ const options = [
     <div class="welcome-panel" aria-live="polite">
       <section class="welcome-desc" data-for="intro">
         <h2>{site.name}</h2>
-        <p>{site.description}</p>
+        <p><Bi t={{ en: home.seo.description ?? site.description, zh: home.seo.descriptionZh ?? '' }} /></p>
         <figure class="welcome-figure">
           <img src={photo.src} width={photo.attributes.width} height={photo.attributes.height} alt="" loading="eager" />
-          <figcaption>From the archive.</figcaption>
+          <figcaption><Bi t={{ en: 'From the archive.', zh: '出自档案。' }} /></figcaption>
         </figure>
-        <p><b>This website is a computer.</b> To begin, choose one of the options on the left, or double-click an icon on the desktop.</p>
+        <p data-l="en"><b>This website is a computer.</b> To begin, choose one of the options on the left, or double-click an icon on the desktop.</p>
+        <p data-l="zh" lang="zh-Hans"><b>这个网站是一台电脑。</b>开始吧：选择左边的一个选项，或双击桌面上的一个图标。</p>
       </section>
       {options.map((o) => (
         <section class="welcome-desc" data-for={o.id}>
-          <h2><a href={o.href}>{o.title}</a></h2>
-          <p>{o.text}</p>
-          <a class="button-link welcome-go" href={o.href}>Open</a>
+          <h2><a href={o.href}><Bi t={o.title} /></a></h2>
+          <p><Bi t={o.text} /></p>
+          <a class="button-link welcome-go" href={o.href}><Bi t={{ en: 'Open', zh: '打开' }} /></a>
         </section>
       ))}
     </div>
@@ -73,9 +86,9 @@ const options = [
   <footer class="welcome-foot">
     <div class="field-row" data-js-only>
       <input type="checkbox" id="welcome-show" checked />
-      <label for="welcome-show">Show this screen each time kuschonink 98 starts</label>
+      <label for="welcome-show"><Bi t={{ en: 'Show this screen each time Xiangyin 98 starts', zh: '每次启动 Xiangyin 98 时显示此屏幕' }} /></label>
     </div>
-    <a class="button-link" href="/image" data-cmd="close">Close</a>
+    <a class="button-link" href="/image" data-cmd="close"><Bi t={{ en: 'Close', zh: '关闭' }} /></a>
   </footer>
 </div>
 

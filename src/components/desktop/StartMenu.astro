@@ -2,70 +2,73 @@
 // The Start button and its menu. Every item that can be a link is one, so
 // the menu works without JavaScript (submenus open on hover/focus).
 import MenuList from './MenuList.astro';
+import Bi from '../Bi.astro';
 import { projects, site } from '../../lib/content';
+import { attr } from '../../lib/i18n';
 import type { MenuItem } from '../../lib/menus';
 
 const amp = (s: string) => s.replace(/&/g, '&&');
-const projectItems: MenuItem[] = projects.map((p) => ({ label: amp(p.title), href: `/image/${p.slug}`, icon: 'folder' }));
+const projectItems: MenuItem[] = projects.map((p) => ({ label: amp(p.title), zh: p.titleZh ? amp(p.titleZh) : undefined, href: `/image/${p.slug}`, icon: 'folder' }));
 
 const items: MenuItem[] = [
   { label: '&Instagram', href: site.social[0].href, external: true, icon: 'camera', big: true },
   { sep: true },
   {
-    label: '&Programs', href: '/image', icon: 'programs', big: true,
+    label: '&Programs', zh: '程序(&P)', href: '/image', icon: 'programs', big: true,
     sub: [
-      { label: '&Projects', href: '/image', icon: 'folder', sub: [...projectItems, { sep: true }, { label: '&All projects on one page', href: '/image/all', icon: 'documents' }] },
+      { label: '&Projects', zh: '作品(&P)', href: '/image', icon: 'folder', sub: [...projectItems, { sep: true }, { label: '&All projects on one page', zh: '全部作品在一页(&A)', href: '/image/all', icon: 'documents' }] },
       {
-        label: 'The &House', href: '/house/facade', icon: 'house',
+        label: 'The &House', zh: '房子(&H)', href: '/house/facade', icon: 'house',
         sub: [
-          { label: '&Front of the house', href: '/house/facade', icon: 'house' },
-          { label: '&Floorplan', href: '/house', icon: 'plan' },
+          { label: '&Front of the house', zh: '房子的正面(&F)', href: '/house/facade', icon: 'house' },
+          { label: '&Floorplan', zh: '平面图(&L)', href: '/house', icon: 'plan' },
+          { label: 'The house in &3D', zh: '3D房子(&3)', href: '/house/3d', icon: 'house' },
           { sep: true },
-          { label: '&Index', href: '/house/appendix/index', icon: 'topic' },
-          { label: '&Chronology', href: '/house/appendix/chronology', icon: 'topic' },
-          { label: 'Check&list of the chapters', href: '/house/appendix/checklist', icon: 'topic' },
-          { label: '&Rules of the house', href: '/house/appendix/rules', icon: 'topic' },
+          { label: '&Index', zh: '索引(&I)', href: '/house/appendix/index', icon: 'topic' },
+          { label: '&Chronology', zh: '年表(&C)', href: '/house/appendix/chronology', icon: 'topic' },
+          { label: 'Check&list of the chapters', zh: '章节清单(&L)', href: '/house/appendix/checklist', icon: 'topic' },
+          { label: '&Rules of the house', zh: '房子的规则(&R)', href: '/house/appendix/rules', icon: 'topic' },
         ],
       },
-      { label: '&About.doc', href: '/about', icon: 'document' },
-      { label: '&Contact', href: '/contact', icon: 'mail' },
+      { label: '&About.doc', zh: '关于.doc(&A)', href: '/about', icon: 'document' },
+      { label: '&Contact', zh: '联系(&C)', href: '/contact', icon: 'mail' },
       { sep: true },
-      { label: '&Welcome', href: '/', icon: 'welcome' },
+      { label: '&Welcome', zh: '欢迎(&W)', href: '/', icon: 'welcome' },
     ],
   },
   {
-    label: '&Documents', icon: 'documents', big: true, jsOnly: true, attrs: { 'data-recent': '' },
-    sub: [{ label: '(Empty)', disabled: true }],
+    label: '&Documents', zh: '文档(&D)', icon: 'documents', big: true, jsOnly: true, attrs: { 'data-recent': '' },
+    sub: [{ label: '(Empty)', zh: '(空)', disabled: true }],
   },
   {
-    label: '&Settings', icon: 'control', big: true, jsOnly: true,
+    label: '&Settings', zh: '设置(&S)', icon: 'control', big: true, jsOnly: true,
     sub: [
-      { label: '&Control Panel', cmd: 'control-panel', icon: 'control' },
+      { label: '&Control Panel', zh: '控制面板(&C)', cmd: 'control-panel', icon: 'control' },
       { sep: true },
-      { label: '&Display...', cmd: 'display-properties', icon: 'display' },
-      { label: '&Folder Options...', cmd: 'folder-options', icon: 'folder' },
+      { label: '&Display...', zh: '显示(&D)...', cmd: 'display-properties', icon: 'display' },
+      { label: '&Folder Options...', zh: '文件夹选项(&F)...', cmd: 'folder-options', icon: 'folder' },
     ],
   },
   {
-    label: '&Find', icon: 'find', big: true, jsOnly: true,
+    label: '&Find', zh: '查找(&F)', icon: 'find', big: true, jsOnly: true,
     sub: [
-      { label: '&Files or Folders...', cmd: 'find', icon: 'find' },
-      { label: '&Rooms in the House...', cmd: 'find-room', icon: 'house' },
+      { label: '&Files or Folders...', zh: '文件或文件夹(&F)...', cmd: 'find', icon: 'find' },
+      { label: '&Rooms in the House...', zh: '房子里的房间(&R)...', cmd: 'find-room', icon: 'house' },
     ],
   },
-  { label: '&Help', href: '/help', icon: 'help', big: true },
-  { label: '&Run...', cmd: 'run', icon: 'run', big: true, jsOnly: true },
+  { label: '&Help', zh: '帮助(&H)', href: '/help', icon: 'help', big: true },
+  { label: '&Run...', zh: '运行(&R)...', cmd: 'run', icon: 'run', big: true, jsOnly: true },
   { sep: true, jsOnly: true },
-  { label: '&Log Off Guest...', cmd: 'logoff', icon: 'keys', big: true, jsOnly: true, attrs: { 'data-logoff': '' } },
-  { label: 'Sh&ut Down...', cmd: 'shutdown', icon: 'shutdown', big: true, jsOnly: true },
+  { label: '&Log Off Guest...', zh: '注销 Guest(&L)...', cmd: 'logoff', icon: 'keys', big: true, jsOnly: true, attrs: { 'data-logoff': '' } },
+  { label: 'Sh&ut Down...', zh: '关闭系统(&U)...', cmd: 'shutdown', icon: 'shutdown', big: true, jsOnly: true },
 ];
 ---
 <details class="start" id="k98-start">
-  <summary class="start-button" aria-label="Start" title="Click here to begin">
-    <span class="ico ico16 ico-start" aria-hidden="true"></span><span class="start-label">Start</span>
+  <summary class="start-button" {...attr('aria-label', { en: 'Start', zh: '开始' })} {...attr('title', { en: 'Click here to begin', zh: '单击这里开始' })}>
+    <span class="ico ico16 ico-start" aria-hidden="true"></span><span class="start-label"><Bi t={{ en: 'Start', zh: '开始' }} /></span>
   </summary>
   <div class="start-menu" id="k98-start-menu">
-    <div class="start-banner" aria-hidden="true"><span><b>kuschonink</b>98</span></div>
-    <MenuList items={items} class="start-list" label="Start menu" />
+    <div class="start-banner" aria-hidden="true"><span><b>Xiangyin</b>98</span></div>
+    <MenuList items={items} class="start-list" label="Start menu" labelZh="“开始”菜单" />
   </div>
 </details>

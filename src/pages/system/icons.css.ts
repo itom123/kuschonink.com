@@ -5,7 +5,7 @@ import { ICONS } from '../../lib/iconset';
 import { svgUrl, toSvg } from '../../lib/pixels';
 
 export const GET: APIRoute = () => {
-  let css = '/* kuschonink 98 icons: drawn in src/lib/iconset.ts */\n';
+  let css = '/* Xiangyin 98 icons: drawn in src/lib/iconset.ts */\n';
   for (const [name, draw] of Object.entries(ICONS)) css += `.ico-${name}{--icon:${svgUrl(toSvg(draw().rows()))}}\n`;
   return new Response(css, { headers: { 'Content-Type': 'text/css; charset=utf-8' } });
 };

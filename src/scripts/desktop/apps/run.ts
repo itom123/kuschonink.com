@@ -1,5 +1,5 @@
 // Start ▸ Run…: type the name of a project, a room, a page or a program (or
-// an address) and kuschonink 98 opens it. Remembers what was typed.
+// an address) and Xiangyin 98 opens it. Remembers what was typed.
 import { addressToPath, cleanPath } from '../../../lib/apps';
 import { commands } from '../commands';
 import { desktopData, type DesktopData } from '../data';
@@ -25,7 +25,7 @@ const ALIASES: [string[], Action][] = [
   [['recycle bin', 'recycle', 'bin', 'trash'], { cmd: 'recycle-bin' }],
   [['find', 'search'], { cmd: 'find' }],
   [['screen saver', 'screensaver'], { cmd: 'saver-now' }],
-  [['ver', 'about kuschonink 98', 'kuschonink 98'], { cmd: 'about-k98' }],
+  [['ver', 'about Xiangyin 98', 'Xiangyin 98'], { cmd: 'about-k98' }],
   [['log off', 'logoff'], { cmd: 'logoff' }],
   [['shut down', 'shutdown'], { cmd: 'shutdown' }],
   [['welcome', 'home', 'start'], { url: '/' }],
@@ -53,7 +53,7 @@ function resolve(raw: string, d: DesktopData | null): Action | null {
   for (const [names, action] of ALIASES) if (names.includes(q)) return action;
   if (q === 'instagram' || q === 'insta') return { external: d?.site.instagram ?? 'https://www.instagram.com/kuschonink' };
 
-  // Addresses: C:\kuschonink\…, kuschonink.com/…, /…, or the wider Internet.
+  // Addresses: C:\xiangyin\…, kuschonink.com/…, /…, or the wider Internet.
   if (/^([a-z]:\\|\/|(https?:\/\/)?(www\.)?kuschonink\.com)/i.test(text)) {
     const p = addressToPath(text);
     if (!p) return null;
@@ -104,7 +104,7 @@ export function runDialog() {
   const form = h('form', { class: 'run-body', autocomplete: 'off' }, [
     h('div', { class: 'run-row' }, [
       h('span', { class: 'ico ico-run', 'aria-hidden': 'true' }),
-      h('p', { id: 'k98-run-text' }, 'Type the name of a program, folder, document, or Internet resource, and kuschonink 98 will open it for you.'),
+      h('p', { id: 'k98-run-text' }, 'Type the name of a program, folder, document, or Internet resource, and Xiangyin 98 will open it for you.'),
     ]),
     h('div', { class: 'run-open' }, [h('label', { for: 'k98-run-input' }, 'Open:'), input, h('datalist', { id: listId }, suggestions.map((v) => h('option', { value: v })))]),
     h('div', { class: 'run-buttons' }, [ok, cancel, browse]),

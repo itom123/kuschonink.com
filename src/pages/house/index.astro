@@ -2,20 +2,25 @@
 import Desktop from '../../layouts/Desktop.astro';
 import Window from '../../components/desktop/Window.astro';
 import HouseMap from '../../components/house/HouseMap.astro';
+import Bi from '../../components/Bi.astro';
 import { rooms, floors } from '../../lib/house';
 import { site } from '../../lib/content';
 import { HOUSE_LINKS, houseTools } from '../../lib/chrome';
+import { t, seoTitle } from '../../lib/i18n';
 ---
-<Desktop seo={{ title: `The House — ${site.name}`, description: site.description }}>
+<Desktop seo={{ ...seoTitle(t.theHouse, site.name), description: site.description }}>
   <Window
     app="house"
     variant="browser"
-    title="Floorplan - The House"
+    title={{ en: 'Floorplan - The House', zh: '平面图 - 房子' }}
     home="/house/facade"
     tools={houseTools()}
     links={HOUSE_LINKS}
     bodyClass="doc house-body"
-    status={['Drag to move · scroll or pinch to zoom · R A 2 1 change floors', 'Done']}
+    status={[
+      { en: 'Drag to move · scroll or pinch to zoom · R A 2 1 change floors', zh: '拖动以移动 · 滚动或双指缩放 · R A 2 1 切换楼层' },
+      { en: 'Done', zh: '完成' },
+    ]}
   >
     <div class="house-view">
       <HouseMap />
@@ -23,8 +28,8 @@ import { HOUSE_LINKS, houseTools } from '../../lib/chrome';
         <div class="noscript-index">
           {floors.map((f) => (
             <>
-              <h2>{f.name} · {f.zh}</h2>
-              <ul>{rooms.filter((r) => r.floor.id === f.id).map((r) => <li><a href={`/house/${r.slug}`}>Chapter {r.locked ? '—' : r.chapter}: {r.title}</a></li>)}</ul>
+              <h2><Bi t={{ en: f.name, zh: f.zh }} /></h2>
+              <ul>{rooms.filter((r) => r.floor.id === f.id).map((r) => <li><a href={`/house/${r.slug}`}><Bi t={{ en: `Chapter ${r.locked ? '—' : r.chapter}: ${r.title}`, zh: `第${r.locked ? '—' : r.chapter}章：${r.titleZh}` }} /></a></li>)}</ul>
             </>
           ))}
         </div>

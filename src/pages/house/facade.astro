@@ -1,58 +1,58 @@
 ---
 // The façade: the south elevation. The door and windows lead into the house.
-// It's The House program's opening page (it used to be the home page).
+// It's The House program's opening page.
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import Desktop from '../../layouts/Desktop.astro';
 import Window from '../../components/desktop/Window.astro';
+import Bi from '../../components/Bi.astro';
 import { house, roomByKey } from '../../lib/house';
-import { site } from '../../lib/content';
+import { home, site } from '../../lib/content';
 import { HOUSE_LINKS, houseTools } from '../../lib/chrome';
+import { t, attr, text, seoTitle } from '../../lib/i18n';
 
 const drawings = import.meta.glob<ImageMetadata>('../../assets/house/*.png', { eager: true, import: 'default' });
 const elevation = await getImage({ src: drawings[`../../assets/house/${house.elevation.src}`], width: 2400, format: 'webp' });
 // Hotspot boxes are in the drawing's 1200 × 1400 coordinate space.
 const view = '140 330 920 600';
 ---
-<Desktop seo={{ title: `The front of the house — ${site.name}`, description: `The south elevation of the house. Knock on the door, or look through a window: every room keeps a work by ${site.name}.` }}>
+<Desktop seo={{ ...seoTitle(t.theHouse, site.name), description: home.seo.description, descriptionZh: home.seo.descriptionZh }}>
   <Window
     app="house"
     variant="browser"
-    title="Front of the house - The House"
+    title={{ en: 'Front of the house - The House', zh: '房子的正面 - 房子' }}
     home="/house/facade"
     tools={houseTools()}
     links={HOUSE_LINKS}
     bodyClass="doc house-body"
-    status={['Done', 'Knock on the door, or look through a window.']}
+    status={[{ en: 'Done', zh: '完成' }, t.facadeHint]}
   >
     <div class="house-view facade-view">
       <div class="facade">
         <h1>{site.name}</h1>
-        <p class="facade-hint">This is a house. Knock on the door, or look through a window.</p>
+        <p class="facade-hint"><Bi t={t.facadeHint} /></p>
         <svg class="elevation" viewBox={view} role="img" aria-labelledby="elev-title">
-          <title id="elev-title">South elevation of the house (南立面图)</title>
+          <title id="elev-title" {...text(t.elevation)}>{t.elevation.en}</title>
           <image href={elevation.src} x="0" y="0" width="1200" height="1400" />
           {house.elevation.hotspots.map((h) => {
             const room = roomByKey.get(h.room);
             if (!room) return null;
             const [x, y, w, hh] = h.box;
             return (
-              <a href={`/house/${room.slug}`} class:list={['hotspot', { door: h.label.startsWith('Front door') }]} aria-label={`${h.label}: ${room.title}`}>
+              <a href={`/house/${room.slug}`} class:list={['hotspot', { door: h.label.startsWith('Front door') }]} {...attr('aria-label', { en: `${h.label}: ${room.title}`, zh: `${h.zh}：${room.titleZh}` })}>
                 <rect x={x} y={y} width={w} height={hh} />
-                <title>{h.label} → {room.title}</title>
+                <title {...text({ en: `${h.label} → ${room.title}`, zh: `${h.zh} → ${room.titleZh}` })}>{h.label} → {room.title}</title>
               </a>
             );
           })}
         </svg>
         <p class="facade-links">
-          <a href="/house/f1-porch">Enter by the front door</a> ·
-          <a href="/house">See the floorplans</a> ·
-          <a href="/image">Open the Projects folder</a>
+          <a href="/house/f1-porch"><Bi t={t.enterDoor} /></a>{' · '}
+          <a href="/house"><Bi t={t.seePlans} /></a>{' · '}
+          <a href="/image"><Bi t={{ en: 'Open the Projects folder', zh: '打开“作品”文件夹' }} /></a>
         </p>
         <hr />
-        <address>
-          <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
-        </address>
+        <p><a href="/contact"><Bi t={t.contact} /></a></p>
       </div>
     </div>
   </Window>

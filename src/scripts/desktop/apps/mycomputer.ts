@@ -1,5 +1,5 @@
 // My Computer: the drives (A: and D: are empty, as they usually were),
-// kuschonink (C:) with everything on the site, and the Control Panel.
+// xiangyin (C:) with everything on the site, and the Control Panel.
 import { appWindow } from '../appwindow';
 import { commands } from '../commands';
 import { msgbox } from '../dialogs';
@@ -25,7 +25,7 @@ async function notReady(drive: string) {
 export function myComputer() {
   const list = h('ul', { class: 'folder-view', 'aria-label': 'My Computer' }, [
     icon('3½ Floppy (A:)', 'floppy', { open: 'drive-a', type: '3½ Inch Floppy Disk' }),
-    icon('kuschonink (C:)', 'drive', { open: 'drive-c', type: 'Local Disk', tip: 'Everything on this computer.' }),
+    icon('xiangyin (C:)', 'drive', { open: 'drive-c', type: 'Local Disk', tip: 'Everything on this computer.' }),
     icon('Compact Disc (D:)', 'cd', { open: 'drive-d', type: 'CD-ROM Disc' }),
     icon('Control Panel', 'control', { open: 'control-panel', type: 'System Folder', tip: 'Mouse, sounds, display and more.' }),
   ]);
@@ -34,7 +34,7 @@ export function myComputer() {
 }
 
 export function driveC() {
-  const list = h('ul', { class: 'folder-view', 'aria-label': 'kuschonink (C:)' }, [
+  const list = h('ul', { class: 'folder-view', 'aria-label': 'xiangyin (C:)' }, [
     icon('Projects', 'folder', { href: '/image', type: 'File Folder' }),
     icon('The House', 'house', { href: '/house/facade', type: 'Program' }),
     icon('About.doc', 'document', { href: '/about', type: 'Document' }),
@@ -42,7 +42,7 @@ export function driveC() {
     icon('Help', 'help', { href: '/help', type: 'Help file' }),
     icon('Welcome', 'welcome', { href: '/', type: 'Program' }),
   ]);
-  appWindow({ app: 'drive-c', title: 'kuschonink (C:)', icon: 'drive', w: 560, h: 340, body: list, address: 'C:\\', status: ['6 object(s)', 'Double-click an item to open it.'] });
+  appWindow({ app: 'drive-c', title: 'xiangyin (C:)', icon: 'drive', w: 560, h: 340, body: list, address: 'C:\\', status: ['6 object(s)', 'Double-click an item to open it.'] });
   bindIconGroup(list);
 }
 

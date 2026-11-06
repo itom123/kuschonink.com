@@ -3,6 +3,14 @@
 
 type View = 'thumbs' | 'list' | 'details';
 
+const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+/** Write text in both languages; the 中/EN switch shows one (src/styles/lang.css). */
+function bi(el: Element, en: string, zh = '') {
+  el.innerHTML = zh && zh !== en ? `<span data-l="en">${esc(en)}</span><span data-l="zh" lang="zh-Hans">${esc(zh)}</span>` : esc(en);
+}
+/** A cell's text in the language showing. */
+const shown = (c: Element) => (c.querySelector(`[data-l="${document.documentElement.dataset.lang === 'zh' ? 'zh' : 'en'}"]`) ?? c).textContent!.trim();
+
 function initSort(table: HTMLTableElement) {
   const heads = [...table.tHead!.rows[0].cells];
   heads.forEach((th, i) => {
@@ -14,8 +22,8 @@ function initSort(table: HTMLTableElement) {
       const num = th.dataset.sort === 'num';
       const rows = [...table.tBodies[0].rows];
       rows.sort((a, b) => {
-        const x = a.cells[i].textContent!.trim();
-        const y = b.cells[i].textContent!.trim();
+        const x = shown(a.cells[i]);
+        const y = shown(b.cells[i]);
         const d = num ? Number(x) - Number(y) : x.localeCompare(y);
         return asc ? d : -d;
       });
@@ -106,14 +114,20 @@ export function initExplorerFolder() {
         if (one) {
           const img = item.querySelector<HTMLImageElement>('.wv-thumb')!;
           img.src = one.dataset.thumb ?? '';
-          item.querySelector('.wv-name')!.textContent = one.querySelector('.icon-label')?.textContent ?? '';
-          item.querySelector('.wv-desc')!.textContent = one.dataset.desc ?? '';
-          item.querySelector('.wv-facts')!.textContent = one.dataset.facts ?? '';
-          item.querySelector('.wv-room')!.textContent = one.dataset.room ?? '';
+          item.querySelector('.wv-name')!.innerHTML = one.querySelector('.icon-label')?.innerHTML ?? '';
+          bi(item.querySelector('.wv-desc')!, one.dataset.desc ?? '', one.dataset.descZh);
+          bi(item.querySelector('.wv-facts')!, one.dataset.facts ?? '', one.dataset.factsZh);
+          bi(item.querySelector('.wv-room')!, one.dataset.room ?? '', one.dataset.roomZh);
         }
       }
-      if (fields?.[0]) fields[0].textContent = sel.length ? `${sel.length} object(s) selected` : `${count} object(s)`;
-      if (fields?.[1]) fields[1].textContent = one ? one.dataset.facts ?? '' : 'Double-click a project to open it.';
+      if (fields?.[0]) {
+        if (sel.length) bi(fields[0], `${sel.length} object(s) selected`, `已选定 ${sel.length} 个对象`);
+        else bi(fields[0], `${count} object(s)`, `${count} 个对象`);
+      }
+      if (fields?.[1]) {
+        if (one) bi(fields[1], one.dataset.facts ?? '', one.dataset.factsZh);
+        else bi(fields[1], 'Double-click a project to open it.', '双击一件作品即可打开。');
+      }
     });
   }
 }

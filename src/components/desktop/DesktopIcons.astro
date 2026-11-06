@@ -2,8 +2,10 @@
 // The icons on the desktop. Links open their page (or, with JavaScript, a
 // window); buttons open programs that only exist in the browser.
 import { DESK_ICONS } from '../../lib/desktop';
+import { attr } from '../../lib/i18n';
+import Bi from '../Bi.astro';
 ---
-<ul class="desktop-icons" id="k98-icons" aria-label="Desktop">
+<ul class="desktop-icons" id="k98-icons" {...attr('aria-label', { en: 'Desktop', zh: '桌面' })}>
   {DESK_ICONS.map((i) => (
     <li class="desk-item" data-js-only={i.open ? '' : undefined}>
       {i.href ? (
@@ -15,16 +17,17 @@ import { DESK_ICONS } from '../../lib/desktop';
           rel={i.external ? 'noopener' : undefined}
           data-icon-id={i.id}
           data-tip={i.tip}
+          data-tip-zh={i.tipZh}
           data-type={i.type}
           draggable="false"
         >
           <span class={`ico ico-${i.icon}`} aria-hidden="true">{i.shortcut && <span class="ico ico-shortcut"></span>}</span>
-          <span class="icon-label">{i.label}</span>
+          <span class="icon-label"><Bi t={{ en: i.label, zh: i.zh ?? '' }} /></span>
         </a>
       ) : (
-        <button type="button" class="icon" id={`icon-${i.id}`} data-open={i.open} data-icon-id={i.id} data-tip={i.tip} data-type={i.type} data-fixed={i.fixed ? '' : undefined}>
+        <button type="button" class="icon" id={`icon-${i.id}`} data-open={i.open} data-icon-id={i.id} data-tip={i.tip} data-tip-zh={i.tipZh} data-type={i.type} data-fixed={i.fixed ? '' : undefined}>
           <span class={`ico ico-${i.icon}`} aria-hidden="true"></span>
-          <span class="icon-label">{i.label}</span>
+          <span class="icon-label"><Bi t={{ en: i.label, zh: i.zh ?? '' }} /></span>
         </button>
       )}
     </li>

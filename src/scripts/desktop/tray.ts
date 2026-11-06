@@ -49,6 +49,7 @@ export function initTray() {
     const on = s.sound && s.volume > 0;
     ico.className = `ico ico16 ico-${on ? 'speaker' : 'speaker-mute'}`;
     btn.dataset.tip = on ? `Volume (${Math.round(s.volume * 100)}%)` : 'Volume (muted)';
+    btn.dataset.tipZh = on ? `音量（${Math.round(s.volume * 100)}%）` : '音量（已静音）';
     btn.setAttribute('aria-label', btn.dataset.tip);
   };
   sync();

@@ -1,5 +1,5 @@
 ---
-// kuschonink 98 Help: a real page (for search engines and anyone without
+// Xiangyin 98 Help: a real page (for search engines and anyone without
 // JavaScript), laid out like Windows Help: Contents / Index / Search, topics.
 import Desktop from '../layouts/Desktop.astro';
 import Window from '../components/desktop/Window.astro';
@@ -32,8 +32,8 @@ const tools: Tool[] = [
   { cmd: 'help-print', label: 'Print', icon: 'document', title: 'Print the Help' },
 ];
 ---
-<Desktop seo={{ title: `Help — ${site.name}`, description: `How to use kuschonink 98, the website of ${site.name}: the desktop, the mouse and keyboard, windows, the projects, the house, and getting in touch.` }}>
-  <Window app="help" variant="help" title="kuschonink 98 Help" address={false} tools={tools} bodyClass="doc" status={[`${topics.length} topics`, 'Press F1 for Help at any time.']}>
+<Desktop seo={{ title: `Help — ${site.name}`, description: `How to use Xiangyin 98, the website of ${site.name}: the desktop, the mouse and keyboard, windows, the projects, the house, and getting in touch.` }}>
+  <Window app="help" variant="help" title="Xiangyin 98 Help" address={false} tools={tools} bodyClass="doc" status={[`${topics.length} topics`, 'Press F1 for Help at any time.']}>
     <div class="help-side" slot="side" data-help-side>
       <menu role="tablist" class="help-tabs" aria-label="Help">
         <li role="tab" aria-selected="true"><a href="#help-contents" data-tab="help-contents">Contents</a></li>

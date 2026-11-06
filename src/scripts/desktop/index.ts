@@ -1,4 +1,4 @@
-// kuschonink 98: the desktop shell. Loaded once, in <head>, on every page.
+// Xiangyin 98: the desktop shell. Loaded once, in <head>, on every page.
 import { aboutBox } from './aboutbox';
 import { api, type DesktopApi } from './api';
 import { commands, initCommands } from './commands';
@@ -129,7 +129,9 @@ if (html.dataset.boot) {
 // Start ▸ "Log Off <name>..."
 function logOffLabel() {
   const name = escapeHtml(session.user() || 'Guest');
-  document.querySelectorAll('[data-logoff] .mi-label').forEach((el) => (el.innerHTML = `<u>L</u>og Off ${name}...`));
+  document.querySelectorAll('[data-logoff] .mi-label').forEach(
+    (el) => (el.innerHTML = `<span data-l="en"><u>L</u>og Off ${name}...</span><span data-l="zh" lang="zh-Hans">注销 ${name}(<u>L</u>)...</span>`),
+  );
 }
 logOffLabel();
 document.addEventListener('desktop:login', logOffLabel);

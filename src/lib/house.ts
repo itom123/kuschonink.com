@@ -3,6 +3,7 @@ import perecJson from '../content/perec.json';
 import drawersJson from '../content/drawers.json';
 import { projects, site, about, contact } from './content';
 import type { Block, Section } from './types';
+import { floorZh, t } from './i18n';
 
 export type RoomContents =
   | { project: string }
@@ -17,7 +18,6 @@ export interface RoomData {
   poly?: [number, number][];
   level?: string;
   windows?: string[];
-  doors?: string[];
   stairs?: string;
   outdoor?: boolean;
   arc?: boolean;
@@ -34,6 +34,26 @@ export interface FloorData {
   area?: string;
   scan: { src: string; x: number; y: number; width: number; height: number };
   rooms: RoomData[];
+  /** Floor that is no room (a lobby, a corridor), as polygons in mm. */
+  passages?: Passage[];
+  /** Walls the rooms don't draw, [x0, y0, x1, y1] in mm. */
+  walls?: [number, number, number, number][];
+  doors?: DoorData[];
+}
+
+export interface Passage { id: string; en: string; zh: string; poly: [number, number][] }
+
+export type DoorKind = 'door' | 'double' | 'opening' | 'glass' | 'sliding' | 'garage';
+export interface DoorData {
+  /** Along a wall, [x0, y0, x1, y1] in mm. */
+  at: [number, number, number, number];
+  kind: DoorKind;
+  /** The label on the drawing, e.g. M0922 (900 mm wide, 2200 mm high). */
+  code?: string;
+  /** Which end of `at` the leaf hangs from. */
+  hinge?: 'start' | 'end';
+  /** The room or passage the leaf swings into. */
+  into?: string;
 }
 
 export interface Room extends RoomData {
@@ -46,7 +66,9 @@ export interface Room extends RoomData {
   /** Grid square [column, row] where the knight first enters the room. */
   cell: [number, number];
   title: string;
+  titleZh: string;
   inventory: string[];
+  inventoryZh: string[];
   constraints: Constraint[];
 }
 
@@ -55,7 +77,9 @@ export type ConstraintStatus = 'fulfilled' | 'echoing' | 'semi-fulfilled' | 'not
 export interface Constraint {
   list: string;
   name: string;
+  nameZh: string;
   value: string;
+  valueZh: string;
   hidden: boolean;
   status: ConstraintStatus;
 }
@@ -64,8 +88,9 @@ interface HouseData {
   grid: { columns: number[]; rows: number[] };
   tourStart: [number, number];
   floors: FloorData[];
-  elevation: { src: string; hotspots: { room: string; label: string; box: [number, number, number, number] }[] };
+  elevation: { src: string; hotspots: { room: string; label: string; zh: string; box: [number, number, number, number] }[] };
   lockedNote: string;
+  lockedNoteZh: string;
 }
 
 export const house = houseJson as unknown as HouseData;
@@ -105,10 +130,13 @@ function overlaps(r: RoomData, c: number, row: number) {
   return x < cx1 && x + w > cx0 && y < cy1 && y + h > cy0;
 }
 
-function contentTitle(c?: RoomContents): string | undefined {
+function contentTitle(c?: RoomContents): { en: string; zh: string } | undefined {
   if (!c) return undefined;
-  if ('project' in c) return projects.find((p) => p.slug === c.project)?.title;
-  return { about: 'About', contact: 'Contact', writings: 'Writings', colophon: 'Colophon' }[c.page];
+  if ('project' in c) {
+    const p = projects.find((p) => p.slug === c.project);
+    return p && { en: p.title, zh: p.titleZh ?? '' };
+  }
+  return { about: t.about, contact: t.contact, writings: t.writings, colophon: t.colophon }[c.page];
 }
 
 function countBlocks(blocks: Block[]) {
@@ -124,14 +152,193 @@ function countBlocks(blocks: Block[]) {
 
 const plural = (n: number, one: string, many = one + 's') => `${n} ${n === 1 ? one : many}`;
 
-/** A Perec-style inventory, built only from facts in the drawings and the content. */
-function inventory(r: RoomData, floor: FloorData): string[] {
+// ---------------------------------------------------------------------------
+// Doors (house.json, per floor): the one list the 2D map, the room pages and
+// the 3D model all read. Each door is checked against the rooms at build time.
+// ---------------------------------------------------------------------------
+
+/** What lies at a point on a floor: a room, a passage (floor that is no room), or nothing (outside). */
+export type Space = { room: RoomData; passage?: undefined } | { passage: Passage; room?: undefined } | null;
+
+function pointIn(poly: [number, number][], x: number, y: number) {
+  let hit = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) hit = !hit;
+  }
+  return hit;
+}
+
+export function spaceAt(floor: FloorData, x: number, y: number): Space {
+  const room = floor.rooms.find((r) => pointIn(roomPoints(r), x, y));
+  if (room) return { room };
+  const passage = floor.passages?.find((p) => pointIn(p.poly, x, y));
+  return passage ? { passage } : null;
+}
+const spaceId = (s: Space) => s?.room?.id ?? s?.passage?.id ?? null;
+
+export interface Door extends DoorData {
+  floor: FloorData;
+  /** Along x (a wall running east–west) or along y. */
+  alongX: boolean;
+  width: number;
+  /** Top of the opening above the floor, in mm. */
+  height: number;
+  /** What's on each side: [north, south] for a wall along x, [west, east] along y. */
+  sides: [Space, Space];
+  /** Unit normal pointing into the side the leaf swings into (or the first side). */
+  normal: [number, number];
+}
+
+const DOOR_HEIGHT: Record<DoorKind, number> = { door: 2100, double: 2100, opening: 2100, glass: 2600, sliding: 2600, garage: 2400 };
+
+function resolveDoor(floor: FloorData, d: DoorData): Door {
+  const [x0, y0, x1, y1] = d.at;
+  const where = `house.json: door [${d.at.join(', ')}] on ${floor.id}`;
+  const alongX = y0 === y1;
+  if (!alongX && x0 !== x1) throw new Error(`${where} is not along x or y`);
+  const width = Math.hypot(x1 - x0, y1 - y0);
+  if (width < 500) throw new Error(`${where} is narrower than 500 mm`);
+  // Codes like M0922 / TLM2718: width and height in decimetres.
+  const code = d.code?.match(/^[A-Z]+(\d\d)(\d\d)$/);
+  const height = code ? Number(code[2]) * 100 : DOOR_HEIGHT[d.kind];
+  const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+  const n: [number, number] = alongX ? [0, -1] : [-1, 0];
+  const sides: [Space, Space] = [spaceAt(floor, mx + n[0] * 300, my + n[1] * 300), spaceAt(floor, mx - n[0] * 300, my - n[1] * 300)];
+  let normal: [number, number] = n;
+  if (d.into) {
+    const i = sides.findIndex((s) => spaceId(s) === d.into);
+    if (i < 0) throw new Error(`${where} swings into "${d.into}", which is on neither side (${sides.map((s) => spaceId(s) ?? 'outside').join(' / ')})`);
+    if (i === 1) normal = [-n[0], -n[1]];
+  }
+  if ((d.kind === 'door') !== !!d.hinge) throw new Error(`${where}: a "door" needs a hinge, and only a door has one`);
+  if ((d.kind === 'door' || d.kind === 'double') && !d.into) throw new Error(`${where}: say which way it swings ("into")`);
+  return { ...d, floor, alongX, width, height, sides, normal };
+}
+
+/** Does segment `at` lie along one of the lines `edges`? */
+function onEdge(at: [number, number, number, number], edges: [number, number, number, number][]) {
+  const [x0, y0, x1, y1] = at;
+  return edges.some(([a0, b0, a1, b1]) =>
+    y0 === y1
+      ? b0 === b1 && b0 === y0 && Math.min(x0, x1) >= Math.min(a0, a1) - 1 && Math.max(x0, x1) <= Math.max(a0, a1) + 1
+      : a0 === a1 && a0 === x0 && Math.min(y0, y1) >= Math.min(b0, b1) - 1 && Math.max(y0, y1) <= Math.max(b0, b1) + 1,
+  );
+}
+const edgesOf = (pts: [number, number][]) => pts.map((p, i) => [...p, ...pts[(i + 1) % pts.length]] as [number, number, number, number]);
+
+function buildDoors(floor: FloorData): Door[] {
+  const doors = (floor.doors ?? []).map((d) => resolveDoor(floor, d));
+  const roomEdges = [...floor.rooms.map(roomPoints), ...(floor.passages ?? []).map((p) => p.poly)].flatMap(edgesOf);
+  const walls = floor.walls ?? [];
+  for (const d of doors) {
+    const where = `house.json: door [${d.at.join(', ')}] on ${floor.id}`;
+    const inWall = onEdge(d.at, walls);
+    if (!inWall && !onEdge(d.at, roomEdges)) throw new Error(`${where} is not on a room's wall`);
+    const [a, b] = d.sides.map(spaceId);
+    if (a === b && !inWall) throw new Error(`${where} has ${a ?? 'outside'} on both sides`);
+    for (const s of d.sides) if (s?.room?.locked) throw new Error(`${where} opens into ${s.room.id}, which has no door`);
+  }
+  return doors;
+}
+
+export const doorsByFloor = new Map(floors.map((f) => [f.id, buildDoors(f)]));
+/** The doors in and out of a room (not those inside it, in a wall the room doesn't draw). */
+export const doorsOfRoom = (floor: FloorData, r: RoomData) =>
+  (doorsByFloor.get(floor.id) ?? []).filter((d) => d.sides.some((s) => s?.room?.id === r.id) && d.sides[0]?.room !== d.sides[1]?.room);
+
+/**
+ * How a door is drawn on a plan, as on the drawings, in mm: the gap it makes in the wall,
+ * and its marks (a leaf and the quarter circle it swings through; jambs for an opening;
+ * two offset panes for a sliding door; a dashed line for a garage door).
+ */
+export function doorPlan(d: Door): { gap: [number, number, number, number]; marks: string; swing: string } {
+  const [x0, y0, x1, y1] = d.at;
+  const [nx, ny] = d.normal;
+  const ux = (x1 - x0) / d.width, uy = (y1 - y0) / d.width;
+  const r = (v: number) => Math.round(v);
+  const leaf = (hx: number, hy: number, ex: number, ey: number) => {
+    const w = Math.hypot(ex - hx, ey - hy);
+    const lx = hx + nx * w, ly = hy + ny * w;
+    // Sweep from the closed position (the far jamb) to the open leaf, the short way round.
+    const sweep = (ex - hx) * (ly - hy) - (ey - hy) * (lx - hx) > 0 ? 1 : 0;
+    return { leaf: `M ${r(hx)} ${r(hy)} L ${r(lx)} ${r(ly)}`, swing: `M ${r(ex)} ${r(ey)} A ${r(w)} ${r(w)} 0 0 ${sweep} ${r(lx)} ${r(ly)}` };
+  };
+  let marks = '', swing = '';
+  if (d.kind === 'door') {
+    const [h, e] = d.hinge === 'end' ? [[x1, y1], [x0, y0]] : [[x0, y0], [x1, y1]];
+    const l = leaf(h[0], h[1], e[0], e[1]);
+    marks = l.leaf;
+    swing = l.swing;
+  } else if (d.kind === 'double') {
+    const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+    const a = leaf(x0, y0, mx, my), b = leaf(x1, y1, mx, my);
+    marks = `${a.leaf} ${b.leaf}`;
+    swing = `${a.swing} ${b.swing}`;
+  } else if (d.kind === 'opening') {
+    const j = 220;
+    marks = [[x0, y0], [x1, y1]].map(([x, y]) => `M ${r(x - nx * j)} ${r(y - ny * j)} L ${r(x + nx * j)} ${r(y + ny * j)}`).join(' ');
+  } else if (d.kind === 'sliding') {
+    const o = 50, part = d.width * 0.55;
+    marks = `M ${r(x0 + nx * o)} ${r(y0 + ny * o)} L ${r(x0 + ux * part + nx * o)} ${r(y0 + uy * part + ny * o)} M ${r(x1 - nx * o)} ${r(y1 - ny * o)} L ${r(x1 - ux * part - nx * o)} ${r(y1 - uy * part - ny * o)}`;
+  } else {
+    // glass and garage doors: a pane (or the closed door) along the wall
+    marks = `M ${r(x0)} ${r(y0)} L ${r(x1)} ${r(y1)}`;
+  }
+  return { gap: [x0, y0, x1, y1], marks, swing };
+}
+
+const KIND: Record<DoorKind, { en: string; zh: string; m: string }> = {
+  door: { en: 'door', zh: '门', m: '扇' },
+  double: { en: 'double door', zh: '双开门', m: '扇' },
+  opening: { en: 'opening', zh: '门洞', m: '个' },
+  glass: { en: 'glass door', zh: '玻璃门', m: '扇' },
+  sliding: { en: 'sliding door', zh: '推拉门', m: '扇' },
+  garage: { en: 'garage door', zh: '车库门', m: '扇' },
+};
+
+/** "door M0922", "2 sliding doors TLM2718", "1 opening" — doors counted by kind and code. */
+function doorInventory(doors: Door[]): { en: string[]; zh: string[] } {
+  const groups = new Map<string, { kind: DoorKind; code?: string; n: number }>();
+  for (const d of doors) {
+    const key = `${d.kind} ${d.code ?? ''}`;
+    const g = groups.get(key) ?? { kind: d.kind, code: d.code, n: 0 };
+    g.n++;
+    groups.set(key, g);
+  }
+  const en: string[] = [], zh: string[] = [];
+  for (const { kind, code, n } of groups.values()) {
+    const k = KIND[kind];
+    if (code) {
+      en.push(n === 1 ? `${k.en} ${code}` : `${plural(n, k.en)} ${code}`);
+      zh.push(n === 1 ? `${k.zh} ${code}` : `${n} ${k.m}${k.zh} ${code}`);
+    } else {
+      en.push(plural(n, k.en));
+      zh.push(`${n} ${k.m}${k.zh}`);
+    }
+  }
+  return { en, zh };
+}
+
+/** A Perec-style inventory, built only from facts in the drawings and the content. English and Chinese. */
+function inventory(r: RoomData, floor: FloorData): { en: string[]; zh: string[] } {
   const [, , w, h] = r.rect;
-  const list = [`${r.zh ? r.zh + ' · ' : ''}${r.en}`, `${w} × ${h} mm`, `floor level ${r.level ?? floor.level}`];
-  if (r.windows?.length) list.push(`window${r.windows.length > 1 ? 's' : ''} ${r.windows.join(', ')}`);
-  if (r.doors?.length) list.push(`door${r.doors.length > 1 ? 's' : ''} ${r.doors.join(', ')}`);
-  if (r.stairs) list.push(`stairs up to the ${floors.find((f) => f.id === r.stairs)?.name.toLowerCase()}`);
-  if (r.outdoor) list.push('open to the sky');
+  const level = r.level ?? floor.level;
+  const list = [r.en, `${w} × ${h} mm`, `floor level ${level}`];
+  const zh = [r.zh || r.en, `${w} × ${h} 毫米`, `楼面标高 ${level}`];
+  if (r.windows?.length) {
+    list.push(`window${r.windows.length > 1 ? 's' : ''} ${r.windows.join(', ')}`);
+    zh.push(`窗 ${r.windows.join('、')}`);
+  }
+  const doors = doorInventory(doorsOfRoom(floor, r));
+  list.push(...doors.en);
+  zh.push(...doors.zh);
+  if (r.stairs) {
+    const up = floors.find((f) => f.id === r.stairs);
+    list.push(`stairs up to the ${up?.name.toLowerCase()}`);
+    zh.push(`楼梯通往${up ? floorZh(up.zh) : ''}`);
+  }
+  if (r.outdoor) { list.push('open to the sky'); zh.push('露天'); }
   if (r.contents && 'project' in r.contents) {
     const p = projects.find((p) => p.slug === (r.contents as { project: string }).project);
     if (p) {
@@ -143,13 +350,14 @@ function inventory(r: RoomData, floor: FloorData): string[] {
         { images: 0, texts: 0, videos: 0 },
       );
       list.push(`“${p.title}”`);
-      if (n.images) list.push(plural(n.images, 'photograph'));
-      if (n.texts) list.push(plural(n.texts, 'text'));
-      if (n.videos) list.push(plural(n.videos, 'video'));
+      zh.push(`《${p.titleZh ?? p.title}》`);
+      if (n.images) { list.push(plural(n.images, 'photograph')); zh.push(`${n.images} 张照片`); }
+      if (n.texts) { list.push(plural(n.texts, 'text')); zh.push(`${n.texts} 段文字`); }
+      if (n.videos) { list.push(plural(n.videos, 'video')); zh.push(`${n.videos} 段视频`); }
     }
   }
-  if (r.locked) list.push('no door', 'no window');
-  return list;
+  if (r.locked) { list.push('no door', 'no window'); zh.push('无门', '无窗'); }
+  return { en: list, zh };
 }
 
 /** The grid square containing a point, clamped to the grid. */
@@ -183,6 +391,8 @@ function buildRooms(): Room[] {
     }
     for (const r of order) {
       chapter++;
+      const title = contentTitle(r.contents);
+      const inv = inventory(r, floor);
       out.push({
         ...r,
         key: `${floor.id}/${r.id}`,
@@ -190,8 +400,10 @@ function buildRooms(): Room[] {
         floor,
         chapter,
         cell: entry.get(r)!,
-        title: contentTitle(r.contents) ?? r.en,
-        inventory: inventory(r, floor),
+        title: title?.en ?? r.en,
+        titleZh: title?.zh || r.zh,
+        inventory: inv.en,
+        inventoryZh: inv.zh,
         constraints: [],
       });
     }
@@ -211,15 +423,17 @@ export const roomBySlug = new Map(rooms.map((r) => [r.slug, r]));
 export interface PerecList {
   id: string;
   name: string;
+  zh: string;
   hidden?: boolean;
   /** 'row' = the grid row; k = the Latin square L_k(c, r) = (k·c + r) mod 5. */
   square: 'row' | number;
-  items: { label: string; match: string[] }[];
+  items: { label: string; zh: string; match: string[] }[];
 }
 export const perec = perecJson as unknown as {
   lists: PerecList[];
   clinamen: string;
-  chronology: { when: string; what: string; room?: string }[];
+  clinamenZh: string;
+  chronology: { when: string; whenZh: string; what: string; whatZh: string; room?: string }[];
 };
 
 const N = columns.length - 1;
@@ -265,12 +479,16 @@ export interface Furniture { id: string; zh: string; en: string; rect: [number, 
 export interface Piece {
   id: string;
   title: string;
+  titleZh?: string;
   date: string;
   excerpt?: string;
+  excerptZh?: string;
   object: 'letter' | 'page' | 'notebook';
   objectLabel: string;
+  objectLabelZh?: string;
   references: ({ project: string } | { room: string } | { piece: string })[];
   html: string;
+  htmlZh?: string;
 }
 export interface Placement {
   piece: Piece;
@@ -278,7 +496,7 @@ export interface Placement {
   furniture: Furniture;
   drawer: number;
   /** The dealt constraints this piece fulfils in its room. */
-  fulfils: { name: string; value: string }[];
+  fulfils: { name: string; nameZh: string; value: string; valueZh: string }[];
 }
 
 const furnitureByRoom = (drawersJson as unknown as { rooms: Record<string, Furniture[]> }).rooms;
@@ -308,7 +526,7 @@ function place(): Placement[] {
       .map((room) => {
         const fulfils = dealt(room)
           .filter(({ item }) => item.match.some((w) => text.includes(w.toLowerCase())))
-          .map(({ list, item }) => ({ name: list.name, value: item.label }));
+          .map(({ list, item }) => ({ name: list.name, nameZh: list.zh, value: item.label, valueZh: item.zh }));
         return { room, fulfils };
       })
       .sort((a, b) => b.fulfils.length - a.fulfils.length || a.room.chapter - b.room.chapter);
@@ -368,12 +586,14 @@ for (const room of rooms) {
     else if (adjacent.get(room.key)!.some((o) => has(o.key, item.match))) status = 'echoing';
     else if (rooms.some((o) => o !== room && has(o.key, item.match))) status = 'semi-fulfilled';
     if (list.id === 'quote' && clinamenRooms.has(room.key)) status = 'clinamen';
-    return { list: list.id, name: list.name, value: item.label, hidden: !!list.hidden, status };
+    return { list: list.id, name: list.name, nameZh: list.zh, value: item.label, valueZh: item.zh, hidden: !!list.hidden, status };
   });
   room.constraints.unshift({
     list: 'coordinates',
     name: 'Room coordinates',
+    nameZh: '房间坐标',
     value: `${room.floor.name.toLowerCase()}, square ${coordinate(room.cell)}`,
+    valueZh: `${floorZh(room.floor.zh)}，${coordinate(room.cell)} 格`,
     hidden: true,
     status: 'fulfilled',
   });
@@ -398,6 +618,116 @@ export function neighbours(room: Room) {
   return { prev: rooms[i - 1], next: rooms[i + 1] };
 }
 
+// ---------------------------------------------------------------------------
+// Walking: stairs between floors, and the rooms next door.
+// ---------------------------------------------------------------------------
+
+export interface StairLink { from: Room; to: Room; floor: FloorData }
+export interface Stairs {
+  /** Where the stairs are drawn on this floor, in mm. */
+  box: [number, number, number, number];
+  up?: StairLink;
+  down?: StairLink;
+}
+
+const contains = (r: RoomData, x: number, y: number) => {
+  const [rx, ry, rw, rh] = r.rect;
+  return x >= rx && x <= rx + rw && y >= ry && y <= ry + rh;
+};
+
+/** The room you arrive in on `floor` when the stairs in `from` lead there. */
+function landing(floor: FloorData, from: RoomData): Room {
+  const [x, y, w, h] = from.rect;
+  const data =
+    floor.rooms.find((r) => r.stairs) ??
+    floor.rooms.find((r) => !r.locked && contains(r, x + w / 2, y + h / 2)) ??
+    floor.rooms.find((r) => !r.locked)!;
+  return roomByKey.get(`${floor.id}/${data.id}`)!;
+}
+
+/** The stairs on a floor: up to the next floor (a room's `stairs`), down to the floor whose stairs lead here. */
+export function stairsOf(floor: FloorData): Stairs | undefined {
+  const own = floor.rooms.find((r) => r.stairs);
+  const below = floors.find((f) => f.rooms.some((r) => r.stairs === floor.id));
+  const belowStairs = below?.rooms.find((r) => r.stairs === floor.id);
+  const here = own ?? belowStairs;
+  if (!here) return undefined;
+  const fromRoom = landing(floor, here);
+  const out: Stairs = { box: here.rect };
+  if (own) {
+    const upFloor = floors.find((f) => f.id === own.stairs);
+    if (!upFloor) throw new Error(`house.json: ${floor.id}/${own.id} has stairs to unknown floor "${own.stairs}"`);
+    out.up = { from: fromRoom, to: landing(upFloor, own), floor: upFloor };
+  }
+  if (below && belowStairs) {
+    out.down = { from: fromRoom, to: roomByKey.get(`${below.id}/${belowStairs.id}`)!, floor: below };
+  }
+  return out;
+}
+
+export const stairsByFloor = new Map(floors.map((f) => [f.id, stairsOf(f)]));
+
+export type Direction = 'north' | 'east' | 'south' | 'west';
+const DIRECTIONS: Direction[] = ['north', 'east', 'south', 'west'];
+const centre = (r: RoomData) => [r.rect[0] + r.rect[2] / 2, r.rect[1] + r.rect[3] / 2];
+
+const roomOf = (floor: FloorData, r: RoomData) => roomByKey.get(`${floor.id}/${r.id}`)!;
+
+/** Which wall of the room a door is in (top of the plan is north). */
+function sideOf(room: RoomData, d: Door): Direction {
+  const [cx, cy] = centre(room);
+  const [x0, y0, x1, y1] = d.at;
+  return d.alongX ? (y0 < cy ? 'north' : 'south') : (x0 + x1) / 2 < cx ? 'west' : 'east';
+}
+
+/**
+ * The rooms a room's doors lead to, each with the wall its door is in. A door onto a passage
+ * (a lobby, a corridor) leads to every room that opens onto that passage too.
+ */
+function throughDoors(room: Room): { to: Room; dir: Direction }[] {
+  const floor = room.floor;
+  const doors = doorsByFloor.get(floor.id) ?? [];
+  const out: { to: Room; dir: Direction }[] = [];
+  const add = (to: RoomData, dir: Direction) => {
+    if (to.id === room.id || to.locked || out.some((o) => o.to.id === to.id)) return;
+    out.push({ to: roomOf(floor, to), dir });
+  };
+  for (const d of doorsOfRoom(floor, room)) {
+    const other = d.sides.find((s) => s?.room?.id !== room.id);
+    if (!other) continue;
+    const dir = sideOf(room, d);
+    if (other.room) add(other.room, dir);
+    else for (const e of doors) {
+      if (!e.sides.some((s) => s?.passage === other.passage)) continue;
+      for (const s of e.sides) if (s?.room) add(s.room, dir);
+    }
+  }
+  return out;
+}
+
+/** The ways out of a room: rooms through its doors, by direction (no locked rooms), and the stairs if it has them. */
+export function exitsOf(room: Room) {
+  const next = throughDoors(room);
+  const byDir = DIRECTIONS.map((dir) => ({
+    dir,
+    rooms: next.filter((o) => o.dir === dir).map((o) => o.to).sort((a, b) => a.chapter - b.chapter),
+  })).filter((g) => g.rooms.length);
+  const s = stairsByFloor.get(room.floor.id);
+  const onStairs = s && (s.up?.from === room || s.down?.from === room);
+  return { byDir, up: onStairs ? s.up : undefined, down: onStairs ? s.down : undefined };
+}
+
+// Every room you can enter is reached through doors from its floor's stairs, or the build stops.
+for (const floor of floors) {
+  const start = floor.rooms.find((r) => r.stairs);
+  if (!start) continue;
+  const seen = new Set([start.id]);
+  const queue = [roomOf(floor, start)];
+  while (queue.length) for (const { to } of throughDoors(queue.shift()!)) if (!seen.has(to.id)) { seen.add(to.id); queue.push(to); }
+  const cut = floor.rooms.filter((r) => !r.outdoor && !r.locked && !seen.has(r.id));
+  if (cut.length) throw new Error(`house.json: on ${floor.id}, no door leads to ${cut.map((r) => r.id).join(', ')}`);
+}
+
 /** Bounding box of a floor (rooms only), in mm. */
 export function floorBounds(floor: FloorData) {
   const xs = floor.rooms.flatMap((r) => [r.rect[0], r.rect[0] + r.rect[2]]);
@@ -412,3 +742,68 @@ export function roomPoints(r: RoomData): [number, number][] {
 }
 
 export const siteName = site.name;
+
+// ---------------------------------------------------------------------------
+// The 3D model (/house/3d): the same rooms, in metres, with heights.
+// Plan x → world x, plan y (south is down) → world z, up is y.
+// ---------------------------------------------------------------------------
+
+/** "±0.000", "3.600", "−0.450" → metres. */
+export function levelMetres(s: string): number {
+  return Number(s.replace('±', '').replace('−', '-')) || 0;
+}
+
+/** The curved front of the porch and of the balcony above it (the rooms marked `arc`), bulging south over the porch's width. */
+function arcPoints(r: RoomData): [number, number][] {
+  const porch = floors[0].rooms.find((o) => o.arc);
+  const pts = roomPoints(r);
+  if (!r.arc || !porch) return pts;
+  // The south edge, running west: replace its middle with the curve.
+  const yb = r.rect[1] + r.rect[3];
+  const i = pts.findIndex((p, k) => {
+    const q = pts[(k + 1) % pts.length];
+    return p[1] === yb && q[1] === yb && q[0] < p[0];
+  });
+  if (i < 0) return pts;
+  const [xa] = pts[i], [xb] = pts[(i + 1) % pts.length];
+  const x0 = Math.max(xb, porch.rect[0]), x1 = Math.min(xa, porch.rect[0] + porch.rect[2]);
+  const curve: [number, number][] = [];
+  if (x1 < xa) curve.push([x1, yb]);
+  for (let k = 1; k < 16; k++) {
+    const t = k / 16;
+    curve.push([x1 + (x0 - x1) * t, yb + 2800 * t * (1 - t)]);
+  }
+  if (x0 > xb) curve.push([x0, yb]);
+  return [...pts.slice(0, i + 1), ...curve, ...pts.slice(i + 1)];
+}
+
+export function model3d() {
+  const m = (v: number) => Math.round(v) / 1000;
+  const levels = floors.map((f) => levelMetres(f.level));
+  return {
+    grid: { columns: house.grid.columns.map(m), rows: house.grid.rows.map(m) },
+    floors: floors.map((f, i) => ({
+      id: f.id, label: f.label, name: f.name, zh: floorZh(f.zh), level: levels[i],
+      storey: i < floors.length - 1 ? levels[i + 1] - levels[i] : 0,
+    })),
+    rooms: rooms.map((r) => {
+      return {
+        slug: r.slug, floor: r.floor.id, chapter: r.locked ? null : r.chapter,
+        en: r.en, zh: r.zh || r.en, title: r.title, titleZh: r.titleZh,
+        points: arcPoints(r).map(([x, y]) => [m(x), m(y)]),
+        rect: r.rect.map(m),
+        level: levelMetres(r.level ?? r.floor.level),
+        outdoor: !!r.outdoor, locked: !!r.locked, stairs: !!r.stairs, contents: !!r.contents,
+      };
+    }),
+    doors: floors.flatMap((f) =>
+      (doorsByFloor.get(f.id) ?? []).map((d) => ({
+        floor: f.id, at: d.at.map(m), kind: d.kind, code: d.code ?? null, hinge: d.hinge ?? null,
+        height: m(d.height), normal: d.normal,
+      })),
+    ),
+    walls: floors.flatMap((f) => (f.walls ?? []).map((w) => ({ floor: f.id, at: w.map(m) }))),
+    passages: floors.flatMap((f) => (f.passages ?? []).map((p) => ({ floor: f.id, id: p.id, points: p.poly.map(([x, y]) => [m(x), m(y)]) }))),
+  };
+}
+export type Model3d = ReturnType<typeof model3d>;

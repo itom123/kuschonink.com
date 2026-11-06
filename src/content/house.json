@@ -1,5 +1,5 @@
 {
- "_comment": "The house. Rooms are rectangles in millimetres [x, y, width, height] traced from the 2008 renovation drawings. 'contents' decides what is in each room: {project: slug} or {page: about|contact|writings|colophon}. Rooms without contents are only described (inventory). 'locked' rooms cannot be entered.",
+ "_comment": "The house. Rooms are rectangles in millimetres [x, y, width, height] traced from the 2008 renovation drawings. 'contents' decides what is in each room: {project: slug} or {page: about|contact|writings|colophon}. Rooms without contents are only described (inventory). 'locked' rooms cannot be entered. Each floor also lists its 'doors' ({at: [x0, y0, x1, y1] along a wall; kind: door, double, opening, glass, sliding or garage; code: the label on the drawing; hinge: start or end of 'at'; into: the room or passage the leaf swings into}), its 'passages' (floor that is no room: a lobby, a corridor) and its 'walls' (walls the rooms don't draw). The 2D map, the room pages and the 3D model all read these; the build checks every door sits on a wall and every room can be reached.",
  "grid": {
   "columns": [
    0,
@@ -112,7 +112,7 @@
     },
     {
      "id": "closet",
-     "zh": "",
+     "zh": "走道",
      "en": "Passage",
      "rect": [
       2100,
@@ -135,16 +135,13 @@
     },
     {
      "id": "side-entrance",
-     "zh": "",
+     "zh": "侧门",
      "en": "Side entrance",
      "rect": [
       10800,
       5600,
       3200,
       2600
-     ],
-     "doors": [
-      "M-2"
      ],
      "contents": {
       "project": "a-suivre"
@@ -182,7 +179,7 @@
     },
     {
      "id": "south-west-room",
-     "zh": "",
+     "zh": "西南房间",
      "en": "Room (south-west)",
      "rect": [
       0,
@@ -212,7 +209,7 @@
     },
     {
      "id": "east-room",
-     "zh": "",
+     "zh": "东房间",
      "en": "Room (east)",
      "rect": [
       10800,
@@ -258,14 +255,211 @@
       1700
      ],
      "level": "−0.280",
-     "doors": [
-      "M-1"
-     ],
      "outdoor": true,
      "arc": true,
      "contents": {
       "page": "contact"
      }
+    }
+   ],
+   "walls": [
+    [
+     3600,
+     2800,
+     7800,
+     2800
+    ],
+    [
+     4630,
+     3780,
+     6860,
+     3780
+    ],
+    [
+     4630,
+     3780,
+     4630,
+     5600
+    ],
+    [
+     6860,
+     3780,
+     6860,
+     5600
+    ]
+   ],
+   "doors": [
+    {
+     "at": [
+      2480,
+      2800,
+      3380,
+      2800
+     ],
+     "kind": "door",
+     "hinge": "end",
+     "into": "kitchen"
+    },
+    {
+     "at": [
+      3600,
+      3000,
+      3600,
+      3700
+     ],
+     "kind": "door",
+     "hinge": "start",
+     "into": "back-stairs"
+    },
+    {
+     "at": [
+      2380,
+      5600,
+      3280,
+      5600
+     ],
+     "kind": "door",
+     "hinge": "end",
+     "into": "dining-room"
+    },
+    {
+     "at": [
+      2100,
+      6600,
+      2100,
+      7300
+     ],
+     "kind": "door",
+     "hinge": "end",
+     "into": "west-bathroom"
+    },
+    {
+     "at": [
+      3600,
+      5750,
+      3600,
+      7200
+     ],
+     "kind": "opening"
+    },
+    {
+     "at": [
+      2500,
+      8600,
+      3400,
+      8600
+     ],
+     "kind": "opening"
+    },
+    {
+     "at": [
+      3600,
+      8800,
+      3600,
+      11500
+     ],
+     "kind": "opening"
+    },
+    {
+     "at": [
+      8050,
+      7300,
+      10050,
+      7300
+     ],
+     "kind": "opening"
+    },
+    {
+     "at": [
+      10800,
+      5700,
+      10800,
+      7250
+     ],
+     "kind": "opening"
+    },
+    {
+     "at": [
+      8000,
+      5600,
+      8850,
+      5600
+     ],
+     "kind": "door",
+     "hinge": "start",
+     "into": "garage"
+    },
+    {
+     "at": [
+      6860,
+      5600,
+      7750,
+      5600
+     ],
+     "kind": "opening"
+    },
+    {
+     "at": [
+      3750,
+      2800,
+      4600,
+      2800
+     ],
+     "kind": "door",
+     "hinge": "start",
+     "into": "back-stairs"
+    },
+    {
+     "at": [
+      14000,
+      6000,
+      14000,
+      7300
+     ],
+     "kind": "double",
+     "code": "M-2",
+     "into": "side-entrance"
+    },
+    {
+     "at": [
+      10900,
+      8200,
+      11800,
+      8200
+     ],
+     "kind": "door",
+     "hinge": "start",
+     "into": "east-room"
+    },
+    {
+     "at": [
+      12000,
+      9050,
+      12000,
+      9750
+     ],
+     "kind": "door",
+     "hinge": "end",
+     "into": "east-bathroom"
+    },
+    {
+     "at": [
+      8700,
+      13400,
+      10400,
+      13400
+     ],
+     "kind": "glass",
+     "code": "M-1"
+    },
+    {
+     "at": [
+      14800,
+      1900,
+      14800,
+      5300
+     ],
+     "kind": "garage"
     }
    ]
   },
@@ -286,7 +480,7 @@
    "rooms": [
     {
      "id": "north-balcony",
-     "zh": "",
+     "zh": "北阳台",
      "en": "North balcony",
      "rect": [
       -660,
@@ -331,6 +525,40 @@
       900,
       7700,
       4700
+     ],
+     "poly": [
+      [
+       7100,
+       900
+      ],
+      [
+       14800,
+       900
+      ],
+      [
+       14800,
+       5000
+      ],
+      [
+       14100,
+       5000
+      ],
+      [
+       14100,
+       5600
+      ],
+      [
+       7800,
+       5600
+      ],
+      [
+       7800,
+       2800
+      ],
+      [
+       7100,
+       2800
+      ]
      ],
      "outdoor": true,
      "contents": {
@@ -378,7 +606,7 @@
     },
     {
      "id": "east-balcony",
-     "zh": "",
+     "zh": "东阳台",
      "en": "East balcony",
      "rect": [
       14100,
@@ -454,8 +682,176 @@
       10800,
       1600
      ],
+     "poly": [
+      [
+       0,
+       13400
+      ],
+      [
+       3600,
+       13400
+      ],
+      [
+       3600,
+       12800
+      ],
+      [
+       10800,
+       12800
+      ],
+      [
+       10800,
+       15000
+      ],
+      [
+       0,
+       15000
+      ]
+     ],
      "outdoor": true,
      "arc": true
+    }
+   ],
+   "passages": [
+    {
+     "id": "lobby",
+     "en": "Lobby",
+     "zh": "过厅",
+     "poly": [
+      [
+       2100,
+       7300
+      ],
+      [
+       3600,
+       7300
+      ],
+      [
+       3600,
+       8600
+      ],
+      [
+       2100,
+       8600
+      ]
+     ]
+    }
+   ],
+   "doors": [
+    {
+     "at": [
+      2380,
+      5600,
+      3280,
+      5600
+     ],
+     "kind": "door",
+     "hinge": "end",
+     "into": "study"
+    },
+    {
+     "at": [
+      3750,
+      5600,
+      7650,
+      5600
+     ],
+     "kind": "opening"
+    },
+    {
+     "at": [
+      2100,
+      6600,
+      2100,
+      7300
+     ],
+     "kind": "door",
+     "hinge": "end",
+     "into": "west-bathroom"
+    },
+    {
+     "at": [
+      2100,
+      7300,
+      3600,
+      7300
+     ],
+     "kind": "opening"
+    },
+    {
+     "at": [
+      3900,
+      7300,
+      4800,
+      7300
+     ],
+     "kind": "door",
+     "hinge": "start",
+     "into": "sitting-room"
+    },
+    {
+     "at": [
+      2470,
+      8600,
+      3370,
+      8600
+     ],
+     "kind": "door",
+     "hinge": "end",
+     "into": "west-bedroom"
+    },
+    {
+     "at": [
+      9600,
+      7300,
+      10450,
+      7300
+     ],
+     "kind": "door",
+     "hinge": "end",
+     "into": "middle-bedroom"
+    },
+    {
+     "at": [
+      10800,
+      8550,
+      10800,
+      9350
+     ],
+     "kind": "door",
+     "hinge": "start",
+     "into": "east-bedroom"
+    },
+    {
+     "at": [
+      11700,
+      8200,
+      12500,
+      8200
+     ],
+     "kind": "door",
+     "hinge": "start",
+     "into": "east-bathroom"
+    },
+    {
+     "at": [
+      7950,
+      5600,
+      8850,
+      5600
+     ],
+     "kind": "door",
+     "hinge": "start",
+     "into": "terrace"
+    },
+    {
+     "at": [
+      4200,
+      12800,
+      6950,
+      12800
+     ],
+     "kind": "sliding"
     }
    ]
   },
@@ -475,7 +871,7 @@
    "rooms": [
     {
      "id": "north-west-room",
-     "zh": "",
+     "zh": "西北房间",
      "en": "Room (north-west)",
      "rect": [
       0,
@@ -516,7 +912,7 @@
     },
     {
      "id": "blind-room",
-     "zh": "",
+     "zh": "无门之室",
      "en": "Room without a door",
      "rect": [
       7900,
@@ -528,7 +924,7 @@
     },
     {
      "id": "north-east-room",
-     "zh": "",
+     "zh": "东北房间",
      "en": "Room (north-east)",
      "rect": [
       10800,
@@ -538,14 +934,11 @@
      ],
      "windows": [
       "C1506"
-     ],
-     "doors": [
-      "M0822"
      ]
     },
     {
      "id": "west-room",
-     "zh": "",
+     "zh": "西房间",
      "en": "Room (west)",
      "rect": [
       0,
@@ -559,7 +952,7 @@
     },
     {
      "id": "central-room",
-     "zh": "",
+     "zh": "中央房间",
      "en": "Central room",
      "rect": [
       3600,
@@ -567,17 +960,13 @@
       7200,
       4000
      ],
-     "doors": [
-      "TLM2718",
-      "TLM2718"
-     ],
      "contents": {
       "page": "writings"
      }
     },
     {
      "id": "east-room",
-     "zh": "",
+     "zh": "东房间",
      "en": "Room (east)",
      "rect": [
       10800,
@@ -592,7 +981,7 @@
     },
     {
      "id": "south-terrace",
-     "zh": "",
+     "zh": "南露台",
      "en": "South terrace",
      "rect": [
       3600,
@@ -601,6 +990,142 @@
       3500
      ],
      "outdoor": true
+    }
+   ],
+   "passages": [
+    {
+     "id": "corridor",
+     "en": "Corridor",
+     "zh": "走廊",
+     "poly": [
+      [
+       2100,
+       5600
+      ],
+      [
+       10800,
+       5600
+      ],
+      [
+       10800,
+       7300
+      ],
+      [
+       3600,
+       7300
+      ],
+      [
+       3600,
+       8600
+      ],
+      [
+       2100,
+       8600
+      ]
+     ]
+    }
+   ],
+   "doors": [
+    {
+     "at": [
+      2480,
+      5600,
+      3380,
+      5600
+     ],
+     "kind": "door",
+     "code": "M0922",
+     "hinge": "end",
+     "into": "north-west-room"
+    },
+    {
+     "at": [
+      3750,
+      5600,
+      7650,
+      5600
+     ],
+     "kind": "opening"
+    },
+    {
+     "at": [
+      2100,
+      6600,
+      2100,
+      7300
+     ],
+     "kind": "door",
+     "code": "M0822",
+     "hinge": "end",
+     "into": "bathroom"
+    },
+    {
+     "at": [
+      3930,
+      7300,
+      4830,
+      7300
+     ],
+     "kind": "door",
+     "code": "M0922",
+     "hinge": "start",
+     "into": "central-room"
+    },
+    {
+     "at": [
+      2480,
+      8600,
+      3380,
+      8600
+     ],
+     "kind": "door",
+     "code": "M0922",
+     "hinge": "end",
+     "into": "west-room"
+    },
+    {
+     "at": [
+      11700,
+      8200,
+      12500,
+      8200
+     ],
+     "kind": "door",
+     "code": "M0822",
+     "hinge": "start",
+     "into": "north-east-room"
+    },
+    {
+     "at": [
+      10800,
+      8500,
+      10800,
+      9400
+     ],
+     "kind": "door",
+     "code": "M0922",
+     "hinge": "start",
+     "into": "east-room"
+    },
+    {
+     "at": [
+      4250,
+      11300,
+      6950,
+      11300
+     ],
+     "kind": "sliding",
+     "code": "TLM2718"
+    },
+    {
+     "at": [
+      7450,
+      11300,
+      10150,
+      11300
+     ],
+     "kind": "sliding",
+     "code": "TLM2718"
     }
    ]
   },
@@ -647,7 +1172,8 @@
      738,
      149,
      130
-    ]
+    ],
+    "zh": "正门 M-1"
    },
    {
     "room": "f1/south-west-room",
@@ -657,7 +1183,8 @@
      738,
      116,
      88
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "f1/east-room",
@@ -667,7 +1194,8 @@
      738,
      75,
      88
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "f2/west-bedroom",
@@ -677,7 +1205,8 @@
      588,
      116,
      76
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "f2/sitting-room",
@@ -687,7 +1216,8 @@
      588,
      125,
      70
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "f2/middle-bedroom",
@@ -697,7 +1227,8 @@
      588,
      125,
      70
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "f2/east-bedroom",
@@ -707,7 +1238,8 @@
      588,
      75,
      76
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "attic/central-room",
@@ -717,7 +1249,8 @@
      455,
      263,
      50
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "attic/west-room",
@@ -727,7 +1260,8 @@
      510,
      116,
      32
-    ]
+    ],
+    "zh": "窗"
    },
    {
     "room": "attic/east-room",
@@ -737,9 +1271,11 @@
      510,
      75,
      32
-    ]
+    ],
+    "zh": "窗"
    }
   ]
  },
- "lockedNote": "Floor/house plan, traced back to early 2008. The original blueprint is supposedly lost."
+ "lockedNote": "Floor/house plan, traced back to early 2008. The original blueprint is supposedly lost.",
+ "lockedNoteZh": "平面图，可追溯至2008年初。原始蓝图据说已经遗失。"
 }

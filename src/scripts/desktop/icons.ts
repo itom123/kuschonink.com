@@ -4,7 +4,7 @@ import { commands } from './commands';
 import { navigate, prefetch } from './router';
 import { settings } from './settings';
 import { tipFor } from './tooltips';
-import { clamp, stored } from './util';
+import { clamp, stored, shownText } from './util';
 
 const CELL_W = 78;
 const CELL_H = 74;
@@ -105,7 +105,8 @@ export function arrangeIcons(group: HTMLElement, by: 'name' | 'type' | 'none' = 
   const items = [...group.querySelectorAll<HTMLElement>(':scope > .desk-item')].filter((i) => i.getClientRects().length > 0);
   const key = (i: HTMLElement) => {
     const icon = i.querySelector<HTMLElement>('.icon')!;
-    return by === 'type' ? `${icon.dataset.type ?? ''} ${icon.textContent}` : icon.textContent ?? '';
+    const name = shownText(icon.querySelector('.icon-label') ?? icon);
+    return by === 'type' ? `${icon.dataset.type ?? ''} ${name}` : name;
   };
   const order = by === 'none' ? items : [...items].sort((a, b) => key(a).localeCompare(key(b)));
   // My Computer and the Recycle Bin stay first, as in Windows.

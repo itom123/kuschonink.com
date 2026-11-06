@@ -6,7 +6,7 @@ import { session } from './session';
 import { settings } from './settings';
 import { play, unlockAudio } from './sound';
 import { tipFor } from './tooltips';
-import { coarseQuery, emit, h, html, reducedMotion } from './util';
+import { coarseQuery, emit, h, html, reducedMotion, tr } from './util';
 import * as wm from './wm';
 
 const box = () => document.getElementById('k98-boot')!;
@@ -16,11 +16,11 @@ const BIOS = [
   'Main Processor   : 333 MHz',
   'Memory Testing   : 65536K OK',
   '',
-  'Detecting IDE Primary Master   ... KUSCHONINK ARCHIVE',
+  'Detecting IDE Primary Master   ... XIANGYIN ARCHIVE',
   'Detecting IDE Primary Slave    ... THE HOUSE, 37 ROOMS',
   'Detecting IDE Secondary Master ... CD-ROM',
   '',
-  'Starting kuschonink 98...',
+  'Starting Xiangyin 98...',
 ];
 
 /** Everything behind the start-up screens is out of reach meanwhile. */
@@ -112,7 +112,7 @@ export function logOn(): Promise<string> {
       };
     });
     const help = b.querySelector<HTMLElement>('[data-login-help]');
-    if (help) help.onclick = () => tipFor(help, 'There is no account and no password. Type any name (or none) and press OK.', 6000);
+    if (help) help.onclick = () => tipFor(help, tr({ en: 'There is no account and no password. Type any name (or none) and press OK.', zh: '没有帐户，也没有密码。键入任意名称（或者不填），然后按“确定”。' }), 6000);
   });
 }
 
@@ -124,7 +124,7 @@ function finish(user: string) {
   shield(false);
   play('startup');
   emit(document, 'desktop:login', { user: n });
-  // The home page follows "Show this screen each time kuschonink 98 starts".
+  // The home page follows "Show this screen each time Xiangyin 98 starts".
   const welcome = wm.find('welcome');
   if (welcome && !settings.get().showWelcome) wm.close(welcome);
   showBeginHint();
@@ -138,7 +138,7 @@ export function showBeginHint() {
     if (sessionStorage.getItem('kus98:begun')) return;
   } catch { /* ignore */ }
   if (document.querySelector('.begin-hint')) return;
-  const hint = h('button', { type: 'button', class: 'begin-hint' }, [h('span', { class: 'begin-text' }, 'Click here to begin')]);
+  const hint = h('button', { type: 'button', class: 'begin-hint' }, [h('span', { class: 'begin-text' }, tr({ en: 'Click here to begin', zh: '单击这里开始' }))]);
   document.body.appendChild(hint);
   const done = () => {
     hint.remove();
@@ -161,8 +161,15 @@ function closeAll() {
 }
 
 export async function logOff() {
-  const r = await msgbox({ title: 'Log Off kuschonink 98', icon: 'question', text: 'Are you sure you want to log off?', buttons: ['Yes', 'No'], sound: false });
-  if (r !== 'Yes') return;
+  const yes = tr({ en: 'Yes', zh: '是' });
+  const r = await msgbox({
+    title: tr({ en: 'Log Off Xiangyin 98', zh: '注销 Xiangyin 98' }),
+    icon: 'question',
+    text: tr({ en: 'Are you sure you want to log off?', zh: '确实要注销吗？' }),
+    buttons: [yes, tr({ en: 'No', zh: '否' })],
+    sound: false,
+  });
+  if (r !== yes) return;
   play('logoff');
   closeAll();
   session.logOff();
@@ -193,7 +200,9 @@ async function goDown(how: 'shutdown' | 'restart') {
   b.dataset.step = 'splash';
   shield(true);
   b.querySelector<HTMLElement>('[data-splash-msg]')!.textContent =
-    how === 'restart' ? 'kuschonink 98 is restarting…' : 'Please wait while your computer shuts down.';
+    how === 'restart'
+      ? tr({ en: 'Xiangyin 98 is restarting…', zh: 'Xiangyin 98 正在重新启动……' })
+      : tr({ en: 'Please wait while your computer shuts down.', zh: '请稍候，计算机正在关闭。' });
   await sleep(reducedMotion.matches ? 600 : 2600);
   session.logOff();
   if (how === 'restart') {
@@ -213,15 +222,19 @@ export function shutDownDialog() {
   const dim = h('div', { class: 'shutdown-dim', 'aria-hidden': 'true' });
   layer.classList.add('over-taskbar');
   layer.appendChild(dim);
-  const choices: [string, string][] = [['standby', 'Stand by'], ['shutdown', 'Shut down'], ['restart', 'Restart']];
-  const ok = h('button', { type: 'button', class: 'default' }, 'OK');
-  const cancel = h('button', { type: 'button' }, 'Cancel');
-  const help = h('button', { type: 'button' }, 'Help');
+  const choices: [string, string][] = [
+    ['standby', tr({ en: 'Stand by', zh: '待机' })],
+    ['shutdown', tr({ en: 'Shut down', zh: '关闭计算机' })],
+    ['restart', tr({ en: 'Restart', zh: '重新启动' })],
+  ];
+  const ok = h('button', { type: 'button', class: 'default' }, tr({ en: 'OK', zh: '确定' }));
+  const cancel = h('button', { type: 'button' }, tr({ en: 'Cancel', zh: '取消' }));
+  const help = h('button', { type: 'button' }, tr({ en: 'Help', zh: '帮助' }));
   const body = h('div', { class: 'msgbox shutdown-box' }, [
     h('div', { class: 'msg-row' }, [
       h('span', { class: 'ico ico-shutdown', 'aria-hidden': 'true' }),
       h('div', { class: 'shutdown-choices' }, [
-        h('p', { class: 'msg-text' }, 'What do you want the computer to do?'),
+        h('p', { class: 'msg-text' }, tr({ en: 'What do you want the computer to do?', zh: '你希望计算机做什么？' })),
         ...choices.map(([v, l]) =>
           h('div', { class: 'field-row' }, [
             h('input', { type: 'radio', name: 'k98-shutdown', id: `k98-sd-${v}`, value: v, checked: v === 'shutdown' ? '' : undefined }),
@@ -233,7 +246,7 @@ export function shutDownDialog() {
     h('div', { class: 'msg-buttons' }, [ok, cancel, help]),
   ]);
   const win = openDialog({
-    title: 'Shut Down kuschonink 98',
+    title: tr({ en: 'Shut Down Xiangyin 98', zh: '关闭 Xiangyin 98' }),
     icon: 'shutdown',
     body,
     modal: true,

@@ -16,7 +16,7 @@ function catalogue(d: DesktopData): Hit[] {
     ...d.projects.map((p): Hit => ({
       name: p.title,
       icon: 'folder',
-      folder: 'C:\\kuschonink\\image',
+      folder: 'C:\\xiangyin\\image',
       type: 'Project folder',
       url: p.url,
       text: [p.slug, p.description, p.room?.en, p.room?.zh].join(' '),
@@ -35,7 +35,7 @@ function catalogue(d: DesktopData): Hit[] {
     ...d.pages.map((p): Hit => ({
       name: p.title,
       icon: p.icon,
-      folder: p.url.startsWith('/house') ? 'The House' : 'C:\\kuschonink',
+      folder: p.url.startsWith('/house') ? 'The House' : 'C:\\xiangyin',
       type: p.type,
       url: p.url,
       text: '',
@@ -75,7 +75,7 @@ export function findWindow(initial = '') {
   const named = h('input', { type: 'text', id: 'k98-find-named', value: initial, autocomplete: 'off', spellcheck: 'false', 'data-help': 'Type all or part of a name: a project, a room, a page or a Help topic. Leave it empty to list everything.' });
   const containing = h('input', { type: 'text', id: 'k98-find-text', autocomplete: 'off', 'data-help': 'Find only things whose description contains these words.' });
   const look = h('select', { id: 'k98-find-in', 'data-help': 'Where to look.' }, [
-    h('option', { value: 'all' }, 'kuschonink (C:)'),
+    h('option', { value: 'all' }, 'xiangyin (C:)'),
     h('option', { value: 'projects' }, 'Projects'),
     h('option', { value: 'house' }, 'The House'),
     h('option', { value: 'help' }, 'Help'),
@@ -145,7 +145,7 @@ export function findWindow(initial = '') {
         ),
       );
       status.textContent = `${hits.length} file(s) found`;
-      win.el.querySelectorAll<HTMLElement>('.status-bar-field')[1].textContent = hits.length ? 'Double-click a result to open it.' : 'Try fewer letters, or look in kuschonink (C:).';
+      win.el.querySelectorAll<HTMLElement>('.status-bar-field')[1].textContent = hits.length ? 'Double-click a result to open it.' : 'Try fewer letters, or look in xiangyin (C:).';
       stop.disabled = true;
       anim.classList.remove('searching');
     }, 300);

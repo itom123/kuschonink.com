@@ -2,30 +2,32 @@
 import Desktop from '../../layouts/Desktop.astro';
 import Window from '../../components/desktop/Window.astro';
 import ProjectBody from '../../components/ProjectBody.astro';
+import Bi from '../../components/Bi.astro';
 import { projects, site, home } from '../../lib/content';
 import { EXPLORER_LINKS, EXPLORER_TOOLS } from '../../lib/chrome';
+import { t, seoTitle } from '../../lib/i18n';
 ---
-<Desktop seo={{ title: `All projects — ${site.name}`, description: home.seo.description }}>
+<Desktop seo={{ ...seoTitle(t.allProjects, site.name), description: home.seo.description }}>
   <Window
     app="explorer"
-    title="All projects"
+    title={t.allProjects}
     icon="documents"
     home="/image"
-    address="C:\kuschonink\image\*.*"
+    address="C:\xiangyin\image\*.*"
     tools={EXPLORER_TOOLS}
     links={EXPLORER_LINKS}
     bodyClass="doc"
-    status={[`${projects.length} projects`, 'Every project on one page.']}
+    status={[{ en: `${projects.length} projects`, zh: `${projects.length} 件作品` }, { en: 'Every project on one page.', zh: '所有作品都在这一页。' }]}
   >
     <div class="doc-page" id="top">
-      <h1>All projects</h1>
+      <h1><Bi t={t.allProjects} /></h1>
       <ol>
-        {projects.map((p) => <li><a href={`#${p.slug}`}>{p.title}</a></li>)}
+        {projects.map((p) => <li><a href={`#${p.slug}`}><Bi t={{ en: p.title, zh: p.titleZh ?? '' }} /></a></li>)}
       </ol>
       {projects.map((p, i) => (
         <section class="project-block" id={p.slug}>
           <ProjectBody project={p} headingLevel="h2" eager={i === 0} />
-          <p><a href="#top">↑ Top</a> · <a href={`/image/${p.slug}`}>Open on its own</a></p>
+          <p><a href="#top"><Bi t={t.top} /></a> · <a href={`/image/${p.slug}`}><Bi t={t.openOnItsOwn} /></a></p>
         </section>
       ))}
     </div>

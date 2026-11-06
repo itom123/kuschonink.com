@@ -1,31 +1,34 @@
 ---
 import Desktop from '../layouts/Desktop.astro';
 import Window from '../components/desktop/Window.astro';
+import Bi from '../components/Bi.astro';
 import { site } from '../lib/content';
+import { t } from '../lib/i18n';
 ---
-<Desktop seo={{ title: `Not found — ${site.name}` }} noindex>
-  <Window app="error" title="kuschonink 98" variant="error" icon="error" address={false} w={480} h={330} bodyClass="flat">
+<Desktop seo={{ title: `Not found — ${site.name}`, titleZh: `找不到网页 — ${site.name}` }} noindex>
+  <Window app="error" title="Xiangyin 98" variant="error" icon="error" address={false} w={480} h={340} bodyClass="flat">
     <div class="error-page">
       <div class="msg-row">
         <span class="ico ico-error" aria-hidden="true"></span>
         <div>
-          <h1 class="error-title">The page cannot be found</h1>
-          <p>Cannot find '<span data-missing>C:\kuschonink\???</span>'. Make sure the path or Internet address is correct.</p>
-          <p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+          <h1 class="error-title"><Bi t={t.notFoundTitle} /></h1>
+          <p data-l="en">Cannot find '<span data-missing>C:\xiangyin\???</span>'. Make sure the path or Internet address is correct.</p>
+          <p data-l="zh" lang="zh-Hans">找不到“<span data-missing>C:\xiangyin\???</span>”。请确认路径或网址是否正确。</p>
+          <p><Bi t={t.notFoundBody} /></p>
           <ul>
-            <li><a href="/">Go to the Welcome screen</a></li>
-            <li><a href="/image">See all projects</a></li>
-            <li><a href="/house">Walk through the house</a></li>
+            <li><a href="/"><Bi t={{ en: 'Go to the Welcome screen', zh: '回到欢迎屏幕' }} /></a></li>
+            <li><a href="/image"><Bi t={t.seeAllProjects} /></a></li>
+            <li><a href="/house/facade"><Bi t={t.frontDoor} /></a></li>
           </ul>
         </div>
       </div>
-      <div class="msg-buttons"><a class="button-link default" href="/" data-cmd="close">OK</a></div>
-      <p class="error-code">HTTP 404 — File not found</p>
+      <div class="msg-buttons"><a class="button-link default" href="/" data-cmd="close"><Bi t={{ en: 'OK', zh: '确定' }} /></a></div>
+      <p class="error-code"><Bi t={{ en: 'HTTP 404 — File not found', zh: 'HTTP 404 — 找不到文件' }} /></p>
     </div>
   </Window>
 </Desktop>
 
 <script>
-  const missing = 'C:\\kuschonink' + decodeURIComponent(location.pathname).replace(/\//g, '\\');
+  const missing = 'C:\\xiangyin' + decodeURIComponent(location.pathname).replace(/\//g, '\\');
   document.querySelectorAll('[data-missing]').forEach((el) => (el.textContent = missing));
 </script>

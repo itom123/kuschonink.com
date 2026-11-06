@@ -100,10 +100,10 @@ function setBusy(win: wm.Win | undefined, on: boolean) {
   const f = win.el.querySelector<HTMLElement>('.status-bar-field');
   if (!f) return;
   if (on) {
-    f.dataset.text = f.textContent ?? '';
-    f.textContent = 'Opening page…';
+    f.dataset.text = f.innerHTML;
+    f.innerHTML = '<span data-l="en">Opening page…</span><span data-l="zh" lang="zh-Hans">正在打开网页……</span>';
   } else if (f.dataset.text != null) {
-    f.textContent = f.dataset.text;
+    f.innerHTML = f.dataset.text;
     delete f.dataset.text;
   }
 }
@@ -203,7 +203,7 @@ function announce(text: string) {
 
 export function notFound(what: string, owner?: Element | null) {
   return msgbox({
-    title: 'kuschonink 98',
+    title: 'Xiangyin 98',
     icon: 'error',
     text: `Cannot find '${what}'. Make sure the path or Internet address is correct.`,
     owner,
@@ -233,7 +233,7 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
     wm.focus(win, { history: false });
     if (url.hash) scrollToHash(win, url.hash);
     writeHistory(url, o.history ?? 'push', app);
-    if (win.docTitle) document.title = win.docTitle;
+    wm.syncTitle(win);
     return;
   }
 
@@ -262,9 +262,9 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
     if ((err as Error).name === 'AbortError' || seqs.get(app) !== seq) return;
     if (err instanceof TypeError || !navigator.onLine) {
       msgbox({
-        title: 'kuschonink 98',
+        title: 'Xiangyin 98',
         icon: 'error',
-        text: `kuschonink 98 cannot open ${addressFor(path)}.\n\nCheck your Internet connection, then try again.`,
+        text: `Xiangyin 98 cannot open ${addressFor(path)}.\n\nCheck your Internet connection, then try again.`,
         owner: win?.el,
       });
       return;
@@ -297,18 +297,19 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
   incoming.querySelectorAll<HTMLScriptElement>('script').forEach((s) => {
     if (isExecutable(s)) s.remove();
   });
-  const docTitle = doc.title;
+  const docTitle = doc.head.querySelector<HTMLMetaElement>('meta[name="title-en"]')?.content || doc.title;
+  const docTitleZh = doc.head.querySelector<HTMLMetaElement>('meta[name="title-zh"]')?.content;
   if (win && wm.list().includes(win)) {
-    wm.swap(win, incoming, target, docTitle, winHistory);
+    wm.swap(win, incoming, target, docTitle, winHistory, docTitleZh);
   } else {
-    win = wm.open(document.adoptNode(incoming), { docTitle });
+    win = wm.open(document.adoptNode(incoming), { docTitle, docTitleZh });
     win.el.dataset.url = target;
     win.hist = [target];
     win.hi = 0;
     wm.updateNav(win);
   }
   updateHeadMeta(doc);
-  document.title = docTitle;
+  wm.syncTitle(win);
   const body = win.el.querySelector<HTMLElement>('[data-window-body]');
   if (body) body.scrollTop = o.scroll ?? 0;
   if (url.hash) scrollToHash(win, url.hash);
@@ -325,7 +326,7 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
       h1.focus({ preventScroll: true });
     } else body?.focus({ preventScroll: true });
   }
-  announce(docTitle);
+  announce(wm.pageTitle(win));
 }
 
 function linkOf(e: Event): { el: Element; href: string; target: string | null } | null {

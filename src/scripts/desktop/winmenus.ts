@@ -152,7 +152,7 @@ export function barMenu(win: wm.Win, name: string): MenuSpec[] {
       return [
         { label: '&Help Topics', key: 'F1', icon: 'help', action: open('/help') },
         { sep: true },
-        { label: '&About kuschonink 98', action: aboutBox },
+        { label: '&About Xiangyin 98', action: aboutBox },
       ];
   }
   return [];

@@ -1,8 +1,10 @@
 {
   "title": "À Suivre",
+  "titleZh": "未完待续",
   "order": 8,
   "seo": {
-    "title": "À Suivre — Xiangyin Gu"
+    "title": "À Suivre — Xiangyin Gu",
+    "titleZh": "未完待续 — Xiangyin Gu"
   },
   "sections": [
     {
@@ -37,7 +39,8 @@
       "blocks": [
         {
           "type": "text",
-          "html": "<p><span class=\"accent\">It took me two days to arrive here. Mountains were steep. The leaves kept hitting my skin. My feet were bleeding. Running, chasing, yet one goes on forgetting.</span></p>"
+          "html": "<p><span class=\"accent\">It took me two days to arrive here. Mountains were steep. The leaves kept hitting my skin. My feet were bleeding. Running, chasing, yet one goes on forgetting.</span></p>",
+          "htmlZh": "<p><span class=\"accent\">我花了两天才来到这里。山很陡。树叶不停地打在我的皮肤上。我的脚在流血。奔跑，追逐，人却一路不断地遗忘。</span></p>"
         },
         {
           "type": "image",

@@ -1,12 +1,15 @@
 ---
 // Renders a menu (and its cascading submenus) as nested lists of real links,
 // so menus work as plain navigation without JavaScript.
-import { accelHtml, accelKey, plainLabel, type MenuItem } from '../../lib/menus';
+import { accelKey, biAccelHtml, plainLabel, type MenuItem } from '../../lib/menus';
+import { attr } from '../../lib/i18n';
 
-interface Props { items: MenuItem[]; class?: string; label?: string }
-const { items, class: className, label } = Astro.props;
+interface Props { items: MenuItem[]; class?: string; label?: string; labelZh?: string }
+const { items, class: className, label, labelZh } = Astro.props;
+/** aria-label in both languages (src/scripts/lang.ts swaps it). */
+const aria = (en?: string, zh?: string) => (en ? attr('aria-label', { en: plainLabel(en), zh: plainLabel(zh ?? '') }) : {});
 ---
-<ul class:list={['menu', className]} role="menu" aria-label={label}>
+<ul class:list={['menu', className]} role="menu" {...aria(label, labelZh)}>
   {items.map((it) =>
     it.sep ? (
       <li class="menu-sep" role="separator" data-js-only={it.jsOnly ? '' : undefined}></li>
@@ -23,11 +26,11 @@ const { items, class: className, label } = Astro.props;
             aria-haspopup={it.sub ? 'menu' : undefined}
             aria-expanded={it.sub ? 'false' : undefined}
             aria-disabled={it.disabled ? 'true' : undefined}
-            aria-label={plainLabel(it.label)}
+            {...aria(it.label, it.zh)}
             {...it.attrs}
           >
             {it.icon && <span class:list={['ico', it.big ? '' : 'ico16', `ico-${it.icon}`]} aria-hidden="true"></span>}
-            <span class="mi-label" set:html={accelHtml(it.label ?? '')} />
+            <span class="mi-label" set:html={biAccelHtml(it.label ?? '', it.zh)} />
             {it.key && <span class="mi-key">{it.key}</span>}
           </a>
         ) : (
@@ -40,15 +43,15 @@ const { items, class: className, label } = Astro.props;
             aria-haspopup={it.sub ? 'menu' : undefined}
             aria-expanded={it.sub ? 'false' : undefined}
             aria-disabled={it.disabled ? 'true' : undefined}
-            aria-label={plainLabel(it.label)}
+            {...aria(it.label, it.zh)}
             {...it.attrs}
           >
             {it.icon && <span class:list={['ico', it.big ? '' : 'ico16', `ico-${it.icon}`]} aria-hidden="true"></span>}
-            <span class="mi-label" set:html={accelHtml(it.label ?? '')} />
+            <span class="mi-label" set:html={biAccelHtml(it.label ?? '', it.zh)} />
             {it.key && <span class="mi-key">{it.key}</span>}
           </button>
         )}
-        {it.sub && <Astro.self items={it.sub} class="sub" label={plainLabel(it.label)} />}
+        {it.sub && <Astro.self items={it.sub} class="sub" label={it.label} labelZh={it.zh} />}
       </li>
     ),
   )}

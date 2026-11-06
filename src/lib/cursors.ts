@@ -1,4 +1,4 @@
-// The mouse pointers of kuschonink 98, drawn here pixel by pixel in the
+// The mouse pointers of Xiangyin 98, drawn here pixel by pixel in the
 // shapes of the classic pointers (no Windows bitmaps). /system/cursors.css
 // turns them into CSS cursors with a hotspot each.
 import { Canvas } from './pixels';

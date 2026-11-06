@@ -9,14 +9,14 @@ import { bindIconGroup, refreshIconPlaces, resetIconPlaces, selectedIn } from '.
 import type { MenuSpec } from '../menu';
 import { showIconProperties, showSheet } from '../properties';
 import { play } from '../sound';
-import { emit, h, stored } from '../util';
+import { emit, h, stored, shownText } from '../util';
 import * as wm from '../wm';
 
 interface Binned { id: string; t: number; gone?: boolean }
 const store = stored<Binned[]>('kus98:bin', []);
 
 const deskIcon = (id: string) => document.querySelector<HTMLElement>(`#k98-icons .icon[data-icon-id="${CSS.escape(id)}"]`);
-const nameOf = (icon: Element | null) => icon?.querySelector('.icon-label')?.textContent?.trim() ?? '';
+const nameOf = (icon: Element | null) => shownText(icon?.querySelector('.icon-label')).trim();
 /** What's in the bin now (not emptied). */
 export const inBin = () => store.get().filter((b) => !b.gone && deskIcon(b.id));
 const when = (t: number) => new Date(t).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
@@ -114,7 +114,12 @@ function binItems() {
         {},
         h('button', { type: 'button', class: 'icon', 'data-open': 'bin-item', 'data-bin-id': b.id, 'data-type': 'Deleted item', 'data-tip': `Deleted ${when(b.t)}.` }, [
           ico,
-          h('span', { class: 'icon-label' }, nameOf(src)),
+          (() => {
+            // Both languages of the name come along.
+            const label = h('span', { class: 'icon-label' });
+            label.innerHTML = src.querySelector('.icon-label')?.innerHTML ?? '';
+            return label;
+          })(),
         ]),
       );
     });
@@ -246,7 +251,7 @@ export function initRecycleBin() {
     const r = await msgbox({
       title: 'Recycle Bin',
       icon: 'info',
-      text: `'${icon.textContent?.trim()}' is in the Recycle Bin.\n\nTo use it, restore it to the desktop first.`,
+      text: `'${nameOf(icon)}' is in the Recycle Bin.\n\nTo use it, restore it to the desktop first.`,
       buttons: ['Restore', 'Cancel'],
       owner: icon,
     });

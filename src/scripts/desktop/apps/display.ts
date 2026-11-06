@@ -12,7 +12,7 @@ import { restoreDefaultDesktop } from './recycle';
 import { render, SAVERS } from './savers';
 
 const SCHEMES: [Settings['scheme'], string][] = [
-  ['standard', 'kuschonink 98 (standard)'],
+  ['standard', 'Xiangyin 98 (standard)'],
   ['contrast', 'High Contrast White'],
   ['slate', 'Slate'],
 ];

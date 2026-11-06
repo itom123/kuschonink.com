@@ -1,8 +1,10 @@
 {
   "title": "An Entangled Past",
+  "titleZh": "纠缠的过往",
   "order": 5,
   "seo": {
-    "title": "An Entangled Past — Xiangyin Gu"
+    "title": "An Entangled Past — Xiangyin Gu",
+    "titleZh": "纠缠的过往 — Xiangyin Gu"
   },
   "sections": [
     {
@@ -14,7 +16,8 @@
       "blocks": [
         {
           "type": "text",
-          "html": "<h2 class=\"display align-center\"><span class=\"accent\">Sometimes to spectate is to act, sometimes to act is to spectate.</span></h2>"
+          "html": "<h2 class=\"display align-center\"><span class=\"accent\">Sometimes to spectate is to act, sometimes to act is to spectate.</span></h2>",
+          "htmlZh": "<h2 class=\"display align-center\"><span class=\"accent\">有时旁观即是行动，有时行动即是旁观。</span></h2>"
         }
       ]
     },
@@ -49,11 +52,16 @@
           "items": [
             "William Blake and Conflict Beyond Borders and Forms",
             "*"
+          ],
+          "itemsZh": [
+            "威廉·布莱克与冲突：超越边界与形式",
+            "*"
           ]
         },
         {
           "type": "text",
-          "html": "<p>Date | 30 April 2024 18:30 - 21:00<br/>Venue l Fitzwilliam Museum, Cambridge CB2 1RB<br/>Curator Talks l 19:55 - 20:35, Ground Floor</p>"
+          "html": "<p>Date | 30 April 2024 18:30 - 21:00<br/>Venue l Fitzwilliam Museum, Cambridge CB2 1RB<br/>Curator Talks l 19:55 - 20:35, Ground Floor</p>",
+          "htmlZh": "<p>日期 | 2024年4月30日 18:30 - 21:00<br/>地点 | Fitzwilliam Museum，剑桥，CB2 1RB<br/>策展人讲座 | 19:55 - 20:35，一层</p>"
         },
         {
           "type": "image",
@@ -82,7 +90,8 @@
       "blocks": [
         {
           "type": "text",
-          "html": "<h2>An Entangled Past</h2><p>\"An Entangled Past\", installation space (35 sec). Video documenting of works, including Gestalt Lost in Time (book), An Entangled Past (triptych print) and Fragmented Ocean (installation) for 'RCA 2022'.</p>"
+          "html": "<h2>An Entangled Past</h2><p>\"An Entangled Past\", installation space (35 sec). Video documenting of works, including Gestalt Lost in Time (book), An Entangled Past (triptych print) and Fragmented Ocean (installation) for 'RCA 2022'.</p>",
+          "htmlZh": "<h2>纠缠的过往</h2><p>《纠缠的过往》，装置空间（35秒）。为“RCA 2022”拍摄的作品记录影像，包括《迷失于时间的格式塔》（书）、《纠缠的过往》（三联版画）和《破碎的海洋》（装置）。</p>"
         },
         {
           "type": "video",

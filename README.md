@@ -13,9 +13,9 @@ npm run preview   # run the built site on the local Workers runtime (wrangler)
 npm run deploy    # build and deploy to Cloudflare Workers
 ```
 
-## kuschonink 98
+## Xiangyin 98
 
-The whole site works like a computer from 1998, called **kuschonink 98**. The
+The whole site works like a computer from 1998, called **Xiangyin 98**. The
 first page of a visit starts up (a short BIOS screen and a splash) and asks the
 visitor to log on: any name works, and there's no password. Then the desktop
 appears with the page they asked for open in a window.
@@ -26,17 +26,17 @@ appears with the page they asked for open in a window.
 - **Windows** move, resize, minimise and maximise, and each has a button on the
   taskbar. The **Start menu** reaches every page, plus Find, Run, Help, the
   Control Panel, Log Off and Shut Down.
-- **Programs**: Projects (`/image`, a folder with thumbnails, list and details
-  views, and a Web View pane), each project (`/image/<slug>`, with an Image
-  Viewer for the photographs), About.doc (`/about`, a document), Contact
-  (`/contact`, a New Message window), The House (`/house/…`, a browser window),
-  Help (`/help`), and Welcome (`/`).
+- **Programs**: Welcome (`/`), Projects (`/image`, a folder with thumbnails,
+  list and details views, and a Web View pane), each project (`/image/<slug>`,
+  with an Image Viewer for the photographs), About.doc (`/about`, a document),
+  Contact (`/contact`, a New Message window), The House (`/house/…`, a browser
+  window) and Help (`/help`).
 - **The Control Panel**: Display (wallpaper, screen saver, colour schemes
   including High Contrast, window effects), Mouse (pointer trails, larger
   pointers, double-click speed), Sounds, and Folder Options (single or double
   click). Settings stay in the visitor's browser.
 - Sounds, pointers, icons and screens are made for the site: nothing is taken
-  from Windows.
+  from Windows. No visible text says "kuschonink"; addresses read `C:\xiangyin\…`.
 
 Every URL is still a real page with its content in the HTML, so search engines,
 link previews and visitors without JavaScript see ordinary pages. How it's
@@ -45,14 +45,60 @@ built, and how to add a program, an icon or a setting:
 
 ### The House
 
-**The House** (`/house/facade`, `/house`, `/house/<room>`) opens as a program in
-a browser-style window. The site is the family house, drawn from the 2008
-renovation plans. The façade (`/house/facade`) is the south elevation: the door
-and windows lead inside. The floorplan works like an indoor map: drag to move,
-scroll or pinch to zoom, switch floors with **R / A / 2 / 1**, search with
-*Search this house*, and tick **Blueprint** to see the original drawings. Rooms
-hold projects, About and Contact. Inside its window, the House is set in Times
-New Roman.
+**The house** (`/house/facade`, `/house`, `/house/<room>`) opens as a program in a
+browser-style window. The site is the family house, drawn from the 2008 renovation
+plans. The façade (`/house/facade`) is the south elevation: the door and windows lead
+inside. The floorplan works like an indoor map: drag to move, scroll or pinch to zoom,
+switch floors with **R / A / 2 / 1** (buttons or keys) or PageUp / PageDown, search
+with *Search this house*, and tick **Blueprint** to see the original drawings. Rooms
+hold projects, About and Contact. Inside its window, the House is set in Times New
+Roman.
+
+You can also walk through the house:
+
+- **Stairs.** The stairs are drawn on every floor: click *▲ Up* at the top of the
+  stairs or *▼ Down* at the bottom to arrive on the stairs of the next floor. The
+  roof has a hatch down to the attic.
+- **Doors.** The plan draws every door as the drawings do: a gap in the wall, the
+  leaf and the quarter circle it swings through (sliding and glass doors as panes,
+  openings as a plain gap). The same doors show in a room's furniture plan and in 3D.
+- **Next door.** Every room's panel lists the rooms its doors lead to, by the wall the
+  door is in (north is the top of the plan), plus the way up or down if you're on the
+  stairs. A door onto a corridor or a lobby leads to every room off it.
+- **How the floors stack.** All floors share one camera, so changing floors keeps
+  the same spot in view. Going up, the old floor sinks away; going down, it rises.
+  The floor below shows as dashed lines, and through open-air rooms (terraces,
+  balconies, the roof).
+- **Where you are.** A small model of the whole house turns slowly beside the floor
+  buttons (`src/scripts/house-mini.ts`, plain canvas, no three.js): the floors below
+  yours stand whole with their doors, glass and windows, yours is cut open at waist
+  height, the floors above are faint. The room you're in is yellow, the part of the
+  plan on screen is outlined in blue, and the dot is where you are. Drag it to turn
+  it, double-click to face the front; it stands still with reduced motion. Its roof
+  and eaves come from `src/lib/house-shell.ts`, shared with the 3D house.
+
+**The house in 3D (test)** (`/house/3d`, `/house/3d?room=<room>`): a rough model
+of the same rooms, in the house's own colours (`src/scripts/house3d.ts`), as a guide.
+Drag to turn it, scroll or pinch to zoom, use **R / A / 2 / 1** to cut the house away
+down to a floor, tick **Lift floors** to pull the storeys apart, and tick
+**Blueprint** to lay the original drawing on each floor and check the model against
+it. Click a room for its chapter. Rooms, levels, doors, passages and the stair core's
+walls come from `house.json`, shared with the plan. Doors have frames and leaves standing
+open the way they swing, with the swing marked on the floor; the garage has its car door;
+glass and sliding doors are glazed. Each wall is built once, brick outside and white
+inside. The rest is traced from the drawings into `src/content/house3d.json`: the living
+room's picture window, the stairs (a wooden U round the core from the ground floor to the
+first floor, then a straight flight to the attic; none to the roof), the stairwells, and
+the garage as a cellar a few steps down from the hall with a small stair up to a narrow
+loft. Edit that file to correct a stair. The roof, columns, balustrades and
+corner stones are approximations from the south elevation and photos of the house.
+Both 3D views (this page and the small turning house on the floorplan) redraw when
+Chrome drops and restores their graphics context (a GPU process restart, a driver reset,
+sleep, GPU memory running short) and when the device pixel ratio changes (another monitor,
+browser zoom). If WebGL doesn't come back, the page says so and offers to draw it again.
+To see what a browser reports about its graphics (WebGL / WebGL2, the GPU and ANGLE
+backend, limits, canvas sizes, context losses), add `?debug=3d` to `/house/3d` or `/house`.
+three.js is loaded only on this page. The page is `noindex` and is not in the sitemap.
 
 ### The rules of the house (after Perec)
 
@@ -72,6 +118,18 @@ It's the missing chapter.
 - **What's in a room** is its `contents`: `{ "project": "<slug>" }`, or
   `{ "page": "about" | "contact" | "writings" | "colophon" }`. To move a project,
   move its `contents` to another room. Rooms without `contents` are only described.
+- `stairs: "<floor id>"` marks the stairs room and where it leads up to. It draws
+  the *Up* link there and the *Down* link on that floor.
+- `doors` on each floor, traced from the drawings: `at` is `[x0, y0, x1, y1]` along a
+  wall; `kind` is `door`, `double`, `opening`, `glass`, `sliding` or `garage`; `code` is
+  the label on the drawing (M0922 is 900 mm wide and 2200 mm high, which sets the height
+  in 3D); a `door` has a `hinge` (`start` or `end` of `at`) and says which room or passage
+  it swings `into`. Door codes and counts in the inventory, "Next door", the plan and the
+  3D model all come from this list. The build stops if a door isn't on a wall, opens
+  into a locked room, or if a room on a floor can't be reached from its stairs.
+- `passages` are floor that is no room (the first floor's lobby, the attic corridor),
+  as polygons; `walls` are walls the rooms don't draw (the stair core).
+  "Echoing" constraints still count rooms that share a wall.
 - `locked: true` makes a room impossible to enter.
 - `scan` places the original drawing under the traced rooms (the Blueprint layer).
 - `elevation.hotspots` are the clickable door and windows on the façade.
@@ -120,6 +178,37 @@ a sheet of paper.
 To add a piece, add `src/content/writings/<id>.json` (title, date, object,
 objectLabel, html, references). The rules find it a drawer.
 
+### Two languages: the 中/EN toggle
+
+Every page can be read in English or Chinese, one at a time. The language is
+picked automatically: first-time visitors get the first of their browser's
+preferred languages that the site has (so a browser set to French, then Chinese,
+gets Chinese), and English if neither is listed. The **中 / EN** switch changes it
+at any time: two buttons in the taskbar tray next to the clock (always visible,
+on phones too).
+Once someone uses the switch, their choice is remembered in the browser.
+
+How it works: each page carries both languages. Elements marked `data-l="en"` /
+`data-l="zh"` show only when that language is on (`src/styles/lang.css`), and
+`src/scripts/lang.ts` swaps attributes like `aria-label` and the page title.
+
+Where the words live:
+
+- **Interface words** (buttons, headings, table labels, messages):
+  `src/lib/i18n.ts`, each as `{ en, zh }`. `src/components/Bi.astro` prints one.
+- **Content** keeps its Chinese next to the English:
+  - pages: `titleZh`, `seo.titleZh`, `seo.descriptionZh`;
+  - text blocks: `htmlZh`; images: `captionZh`, `altZh`; marquees: `itemsZh`;
+  - rooms and furniture: `zh` / `en`; list items, list names, façade hotspots: `zh`;
+    chronology: `whenZh` / `whatZh`; contact form: `labelZh`, `submitTextZh`;
+  - writings: `titleZh`, `excerptZh`, `htmlZh` (in Traditional Chinese, as the
+    artist writes them).
+- Anything without a Chinese version shows its English in both modes, so a new
+  project still works before it's translated. Fill in both when you can.
+- **The computer's own words** (window titles, toolbars, the Start menu, desktop
+  icons, the log-on screen, Welcome) are bilingual. Menus, dialog boxes, the
+  Control Panel and Help are in English for now.
+
 ### Contact form
 
 The form posts to `/v1/contact/kuschonink`, handled by the site's own Worker
@@ -162,10 +251,10 @@ There's no code in this repo and no cookie banner is needed.
 | `src/lib/house.ts` | Knight's tour, chapter order, inventories |
 | `src/scripts/map.ts` | Map interaction (pan, zoom, floors, search) |
 | `src/components/house/` | Floorplan map and room panel |
-| `src/layouts/Desktop.astro` | Every page: the kuschonink 98 desktop with the page in a window |
+| `src/layouts/Desktop.astro` | Every page: the Xiangyin 98 desktop with the page in a window |
 | `src/components/desktop/` | Window, taskbar, Start menu, desktop icons, start-up screens |
 | `src/scripts/desktop/` | The desktop shell: windows, menus, sounds, Control Panel… (see [`docs/DESKTOP.md`](docs/DESKTOP.md)) |
-| `src/styles/` | `desktop.css`, `system.css`, `schemes.css` (the computer), `doc.css`, `blocks.css`, `house.css`, `explorer.css`, `apps.css` (what's in the windows); 98.css is vendored in `src/styles/vendor/` |
+| `src/styles/` | `desktop.css`, `system.css`, `schemes.css` (the computer), `doc.css`, `blocks.css`, `house.css`, `explorer.css`, `apps.css`, `lang.css` (what's in the windows); 98.css is vendored in `src/styles/vendor/` |
 | `wrangler.jsonc` | Cloudflare Workers config |
 
 ### Page content format

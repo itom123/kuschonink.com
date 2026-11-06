@@ -58,5 +58,18 @@ export const normText = (s: string) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+/** The language the 中/EN switch shows (src/scripts/lang.ts). */
+export const lang = (): 'en' | 'zh' => (html.dataset.lang === 'zh' ? 'zh' : 'en');
+/** Pick the English or Chinese version of a text. */
+export const tr = (b: { en: string; zh?: string }) => (lang() === 'zh' && b.zh ? b.zh : b.en);
+/** An element's text in the language showing (both languages may be inside, as data-l spans). */
+export function shownText(el: Element | null | undefined): string {
+  if (!el) return '';
+  if (!el.querySelector('[data-l]')) return el.textContent ?? '';
+  const c = el.cloneNode(true) as Element;
+  c.querySelectorAll(`[data-l]:not([data-l="${lang()}"])`).forEach((n) => n.remove());
+  return c.textContent ?? '';
+}
+
 export const siteTitle = () =>
-  document.querySelector<HTMLMetaElement>('meta[property="og:site_name"]')?.content ?? 'kuschonink 98';
+  document.querySelector<HTMLMetaElement>('meta[property="og:site_name"]')?.content ?? 'Xiangyin 98';

@@ -1,4 +1,4 @@
-// The icons of kuschonink 98, drawn pixel by pixel at 32 × 32 (no Windows
+// The icons of Xiangyin 98, drawn pixel by pixel at 32 × 32 (no Windows
 // bitmaps). /system/icons.css turns each into a CSS class: .ico-<name>.
 import { Canvas } from './pixels';
 

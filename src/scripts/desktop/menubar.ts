@@ -1,5 +1,6 @@
 // Window menu bars (File, Edit, View, Go, Favorites, Help) and the system
 // menu in each title bar.
+import { shownText } from './util';
 import * as menu from './menu';
 import { barMenu, systemMenu } from './winmenus';
 import * as wm from './wm';
@@ -14,7 +15,7 @@ function openBarMenu(b: HTMLElement, focusFirst: boolean) {
   menu.popup(barMenu(win, b.dataset.menu ?? ''), r.left, r.bottom, {
     owner: b,
     focusFirst,
-    label: b.textContent ?? '',
+    label: shownText(b),
     onClose: () => b.setAttribute('aria-expanded', 'false'),
     onEdge: (dir) => {
       const items = [...b.parentElement!.querySelectorAll<HTMLElement>('.mb-item')];

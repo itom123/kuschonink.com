@@ -1,9 +1,9 @@
 {
-  "_comment": "kuschonink 98 Help (/help). Each topic has an id (its #anchor), a title, an icon, index keywords and HTML. {email} and {instagram} are filled in from site.json.",
+  "_comment": "Xiangyin 98 Help (/help). Each topic has an id (its #anchor), a title, an icon, index keywords and HTML. {email} and {instagram} are filled in from site.json.",
   "topics": [
     {
       "id": "welcome",
-      "title": "Welcome to kuschonink 98",
+      "title": "Welcome to Xiangyin 98",
       "icon": "welcome",
       "keywords": ["introduction", "getting started", "what is this"],
       "html": "<p>This is the website of Xiangyin Gu, an artist based in London. It works like a computer from 1998: the work is kept in folders and programs on a desktop. You don’t need to know Windows to use it. Everything opens with the mouse, a finger or the keyboard.</p><p>The quickest ways in:</p><ul><li><a href=\"/image\">Projects</a>: every project, as a folder.</li><li><a href=\"/house/facade\">The House</a>: the same work, kept in the rooms of a house.</li><li><a href=\"/about\">About.doc</a> and <a href=\"/contact\">Contact</a>.</li></ul>"
@@ -34,7 +34,7 @@
       "title": "Windows",
       "icon": "run",
       "keywords": ["window", "minimise", "maximise", "close", "move", "resize", "Back", "Forward", "Up", "address bar", "Always maximize"],
-      "html": "<p>Every page opens in a window. The three buttons at the top right minimise, maximise (fill the screen) and close it. Double-click the title bar to maximise it or put it back. Windows can overlap: click one to bring it to the front.</p><p>Folders and the House have <b>Back</b>, <b>Forward</b> and <b>Up</b> buttons, and an Address bar you can type into, for example <code>C:\\kuschonink\\image</code> or <code>/house</code>. Your browser’s own Back button works too, and the browser’s address always shows the window in front, so you can share it or bookmark it.</p><p>If overlapping windows get in the way, choose <b>Always maximize windows</b> in Control Panel → Display: every window then fills the screen, like an ordinary website.</p>"
+      "html": "<p>Every page opens in a window. The three buttons at the top right minimise, maximise (fill the screen) and close it. Double-click the title bar to maximise it or put it back. Windows can overlap: click one to bring it to the front.</p><p>Folders and the House have <b>Back</b>, <b>Forward</b> and <b>Up</b> buttons, and an Address bar you can type into, for example <code>C:\\xiangyin\\image</code> or <code>/house</code>. Your browser’s own Back button works too, and the browser’s address always shows the window in front, so you can share it or bookmark it.</p><p>If overlapping windows get in the way, choose <b>Always maximize windows</b> in Control Panel → Display: every window then fills the screen, like an ordinary website.</p>"
     },
     {
       "id": "projects",
@@ -62,7 +62,7 @@
       "title": "Getting in touch",
       "icon": "mail",
       "keywords": ["contact", "message", "email", "Send", "Instagram"],
-      "html": "<p>Open <a href=\"/contact\">Contact</a> to write a message: fill in your name, your email address, a subject and the message, then click <b>Send</b>. You can also write to <a href=\"mailto:{email}\">{email}</a> or follow <a href=\"{instagram}\" target=\"_blank\" rel=\"noopener\">kuschonink on Instagram</a>.</p>"
+      "html": "<p>Open <a href=\"/contact\">Contact</a> to write a message: fill in your name, your email address, a subject and the message, then click <b>Send</b>. You can also follow the work on <a href=\"{instagram}\" target=\"_blank\" rel=\"noopener\">Instagram</a>.</p>"
     },
     {
       "id": "settings",
@@ -76,7 +76,7 @@
       "title": "Starting, logging off and shutting down",
       "icon": "shutdown",
       "keywords": ["start-up", "log on", "password", "Log Off", "Shut Down", "Restart", "Stand by"],
-      "html": "<p>The first time you visit in a browser session, kuschonink 98 starts up and asks you to log on. There’s no account: type any name, or none, and press <b>OK</b> (<b>Cancel</b> works too). Click or press any key to skip the start-up screen.</p><p><b>Start → Log Off</b> shows the log-on box again. <b>Start → Shut Down</b> lets you shut the computer down (click to start again), restart it, or put it on stand-by.</p>"
+      "html": "<p>The first time you visit in a browser session, Xiangyin 98 starts up and asks you to log on. There’s no account: type any name, or none, and press <b>OK</b> (<b>Cancel</b> works too). Click or press any key to skip the start-up screen.</p><p><b>Start → Log Off</b> shows the log-on box again. <b>Start → Shut Down</b> lets you shut the computer down (click to start again), restart it, or put it on stand-by.</p>"
     },
     {
       "id": "trouble",

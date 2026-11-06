@@ -1,4 +1,4 @@
-// /system/cursors.css: the kuschonink 98 mouse pointers (src/lib/cursors.ts)
+// /system/cursors.css: the Xiangyin 98 mouse pointers (src/lib/cursors.ts)
 // as CSS cursors. Each is an SVG with a PNG fallback (for browsers that
 // won't take SVG cursors), plus a 2× set for Control Panel ▸ Mouse ▸ Large.
 // <html data-pointers="system"> turns them all off.
@@ -26,7 +26,7 @@ export const GET: APIRoute = async () => {
     normal += `--k98c-${name}:${n.svg} ${x} ${y},${n.png} ${x} ${y},auto;--k98i-${name}:${n.svg};--k98h-${name}:${x}px ${y}px;`;
     large += `--k98c-${name}:${l.svg} ${x * 2} ${y * 2},${l.png} ${x * 2} ${y * 2},auto;--k98i-${name}:${l.svg};--k98h-${name}:${x * 2}px ${y * 2}px;`;
   }
-  const css = `/* kuschonink 98 pointers: drawn in src/lib/cursors.ts */
+  const css = `/* Xiangyin 98 pointers: drawn in src/lib/cursors.ts */
 :root{${normal}--k98-pointer-size:32px}
 html[data-pointers="large"]{${large}--k98-pointer-size:64px}
 ${P},${P} *{cursor:var(--k98c-arrow)}

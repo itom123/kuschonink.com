@@ -2,9 +2,11 @@
 import Desktop from '../../layouts/Desktop.astro';
 import Window from '../../components/desktop/Window.astro';
 import ProjectBody from '../../components/ProjectBody.astro';
+import Bi from '../../components/Bi.astro';
 import { projects, imagesOf } from '../../lib/content';
 import { roomForProject } from '../../lib/house';
 import { EXPLORER_LINKS, EXPLORER_TOOLS } from '../../lib/chrome';
+import { t, attr, floorZh } from '../../lib/i18n';
 import type { Project } from '../../lib/types';
 
 export function getStaticPaths() {
@@ -13,27 +15,32 @@ export function getStaticPaths() {
 const { project, prev, next } = Astro.props as { project: Project & { slug: string }; prev?: Project & { slug: string }; next?: Project & { slug: string } };
 const room = roomForProject(project.slug);
 const n = imagesOf(project.sections).length;
+const title = (p: Project) => ({ en: p.title, zh: p.titleZh ?? '' });
 ---
 <Desktop seo={project.seo} image={imagesOf(project.sections)[0]}>
   <Window
     app="explorer"
-    title={project.title}
+    title={title(project)}
     icon="folder-open"
     home="/image"
     tools={EXPLORER_TOOLS}
     links={EXPLORER_LINKS}
     bodyClass="doc"
     alt={room ? `/house/${room.slug}` : undefined}
-    status={[`${n} image${n === 1 ? '' : 's'}`, 'Click a photograph to see it larger.', room ? `In the house: ${room.en}, ${room.floor.name.toLowerCase()}` : 'Projects']}
+    status={[
+      { en: `${n} image${n === 1 ? '' : 's'}`, zh: `${n} 张图片` },
+      { en: 'Click a photograph to see it larger.', zh: '点击照片可放大查看。' },
+      room ? { en: `In the house: ${room.en}, ${room.floor.name.toLowerCase()}`, zh: `在房子里：${floorZh(room.floor.zh)}${room.zh}` } : t.projects,
+    ]}
   >
     <div class="doc-page">
-      <p class="up-link"><a href="/image">↑ Up to Projects</a></p>
+      <p class="up-link"><a href="/image"><Bi t={t.upToProjects} /></a></p>
       <ProjectBody project={project} eager />
       <hr />
-      <nav class="project-nav" aria-label="More projects">
-        {prev ? <a href={`/image/${prev.slug}`}>← {prev.title}</a> : <span />}
-        {room && <a href={`/house/${room.slug}`}>Find it in the house</a>}
-        {next ? <a href={`/image/${next.slug}`}>{next.title} →</a> : <span />}
+      <nav class="project-nav" {...attr('aria-label', t.moreProjects)}>
+        {prev ? <a href={`/image/${prev.slug}`}>← <Bi t={title(prev)} /></a> : <span />}
+        {room && <a href={`/house/${room.slug}`}><Bi t={t.findInHouse} /></a>}
+        {next ? <a href={`/image/${next.slug}`}><Bi t={title(next)} /> →</a> : <span />}
       </nav>
     </div>
   </Window>

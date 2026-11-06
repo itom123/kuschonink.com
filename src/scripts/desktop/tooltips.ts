@@ -48,6 +48,8 @@ function textOf(node: HTMLElement) {
       if (!node.hasAttribute('aria-label') && !node.textContent?.trim()) node.setAttribute('aria-label', t);
     }
   }
+  // A Chinese tip (data-tip-zh) when the 中/EN switch shows Chinese.
+  if (document.documentElement.dataset.lang === 'zh' && node.dataset.tipZh) return node.dataset.tipZh;
   return node.dataset.tip ?? '';
 }
 

@@ -75,7 +75,7 @@ export function mouseProperties() {
   const scheme = dropdown<Settings['pointers']>(
     'k98-pointers',
     'Scheme:',
-    [['standard', 'kuschonink 98 (standard)'], ['large', 'kuschonink 98 (large)'], ['system', 'This computer’s own pointers']],
+    [['standard', 'Xiangyin 98 (standard)'], ['large', 'Xiangyin 98 (large)'], ['system', 'This computer’s own pointers']],
     s.pointers,
     (v) => settings.set({ pointers: v }),
     'Chooses how the mouse pointer looks. The large pointers are twice the size and easier to see.',
@@ -103,8 +103,8 @@ export function mouseProperties() {
 }
 
 const EVENTS: [SoundName, string][] = [
-  ['startup', 'Start kuschonink 98'],
-  ['shutdown', 'Exit kuschonink 98'],
+  ['startup', 'Start Xiangyin 98'],
+  ['shutdown', 'Exit Xiangyin 98'],
   ['logoff', 'Log off'],
   ['ding', 'Default sound'],
   ['chord', 'Critical stop'],
@@ -125,12 +125,12 @@ export function soundsProperties() {
   const page = h('div', { class: 'prop-page' }, [
     h('fieldset', {}, [
       h('legend', {}, 'Sounds'),
-      check('k98-sound', 'Play sounds', s.sound, (v) => settings.set({ sound: v }), 'Turns all the sounds of kuschonink 98 on or off. The speaker next to the clock does the same.'),
+      check('k98-sound', 'Play sounds', s.sound, (v) => settings.set({ sound: v }), 'Turns all the sounds of Xiangyin 98 on or off. The speaker next to the clock does the same.'),
       slider('k98-volume-slider', 'Volume', ['Low', 'High'], Math.round(s.volume * 100), [0, 100, 5], (v) => settings.set({ volume: v / 100 }), 'How loud the sounds are.'),
       check('k98-navclick', 'Click when a page opens', s.navClick, (v) => settings.set({ navClick: v }), 'A soft click each time a window opens a page.'),
     ]),
     h('fieldset', {}, [h('legend', {}, 'Events'), events, h('div', { class: 'field-row', style: 'justify-content:flex-end;margin-top:6px' }, [previewBtn])]),
-    h('p', { class: 'prop-note' }, 'The sounds of kuschonink 98 were composed for this site.'),
+    h('p', { class: 'prop-note' }, 'The sounds of Xiangyin 98 were composed for this site.'),
   ]);
   const [tabList, holder] = tabs(['Sounds'], [page]);
   const body = h('div', { class: 'prop-sheet' }, [tabList, holder, sheetButtons(() => win, before)]);

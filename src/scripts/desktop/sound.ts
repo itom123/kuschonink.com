@@ -1,4 +1,4 @@
-// System sounds, composed for kuschonink 98 and played with Web Audio (no
+// System sounds, composed for Xiangyin 98 and played with Web Audio (no
 // recordings, nothing from Windows). Browsers only allow sound after a click
 // or key press: the log-on click unlocks it, and so does any first press.
 import { settings } from './settings';

@@ -19,7 +19,10 @@ function renderTasks(tasks: HTMLElement) {
     }
     const title = wm.titleOf(w);
     b.querySelector('.ico')!.className = `ico ico16 ico-${w.el.dataset.icon ?? 'folder'}`;
-    b.querySelector('.task-label')!.textContent = title;
+    // The title's two languages come along; the 中/EN switch shows one.
+    const label = b.querySelector('.task-label')!;
+    const src = w.el.querySelector(':scope > .title-bar [data-title]');
+    if (src && label.innerHTML !== src.innerHTML) label.innerHTML = src.innerHTML;
     b.title = title;
     b.setAttribute('aria-pressed', String(w === act && w.state !== 'min'));
   }
@@ -29,14 +32,19 @@ function renderTasks(tasks: HTMLElement) {
 function startClock() {
   const el = document.getElementById('k98-clock') as HTMLTimeElement | null;
   if (!el) return;
+  let timer = 0;
   const tick = () => {
     const d = new Date();
-    el.textContent = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    // In the language the 中/EN switch shows.
+    const locale = document.documentElement.lang || [];
+    el.textContent = d.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
     el.dateTime = d.toISOString();
-    el.title = d.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    setTimeout(tick, 60000 - (Date.now() % 60000) + 50);
+    el.title = d.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    clearTimeout(timer);
+    timer = window.setTimeout(tick, 60000 - (Date.now() % 60000) + 50);
   };
   tick();
+  document.addEventListener('langchange', tick);
 }
 
 export function initTaskbar() {

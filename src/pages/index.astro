@@ -6,7 +6,7 @@ import Welcome from '../components/apps/Welcome.astro';
 import { home } from '../lib/content';
 ---
 <Desktop seo={home.seo}>
-  <Window app="welcome" title="Welcome" variant="welcome" address={false} bodyClass="flat" w={680} h={470}>
+  <Window app="welcome" title={{ en: 'Welcome', zh: '欢迎' }} variant="welcome" address={false} bodyClass="flat" w={680} h={470}>
     <Welcome />
   </Window>
 </Desktop>

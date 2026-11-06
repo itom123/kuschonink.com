@@ -1,4 +1,4 @@
-// The screen savers of kuschonink 98: the artist's photographs, Lines (two
+// The screen savers of Xiangyin 98: the artist's photographs, Lines (two
 // four-cornered shapes bouncing round the screen with their echoes), and a
 // blank screen. With "reduce motion", photographs change without drifting and
 // Lines stands still.

@@ -1,7 +1,7 @@
 # Migration from Squarespace
 
 > The site has since been redesigned twice: first as *the house*, then as
-> *kuschonink 98*, a Windows 98-style desktop in which every page opens in a
+> *Xiangyin 98*, a Windows 98-style desktop in which every page opens in a
 > window (see the README and [`DESKTOP.md`](DESKTOP.md)). The old URLs
 > `/image/<slug>`, `/about` and `/contact` still work and are still ordinary
 > pages; `/` is now the Welcome window and the house façade moved to

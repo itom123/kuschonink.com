@@ -1,6 +1,6 @@
-# kuschonink 98: how the desktop works
+# Xiangyin 98: how the desktop works
 
-The whole site runs as **kuschonink 98**, a Windows 98-style computer: a desktop,
+The whole site runs as **Xiangyin 98**, a Windows 98-style computer: a desktop,
 windows, a taskbar and Start menu, right-click menus, a log-on screen, sounds,
 Win98 pointers and the Control Panel. This file is for whoever changes the code.
 For visitors, the same things are explained in `/help` (`src/content/help.json`).
@@ -14,7 +14,7 @@ Ground rules:
 - **No Microsoft assets.** No Windows logo or wordmark, no Microsoft sounds or
   bitmaps. Icons and pointers are drawn pixel by pixel in `src/lib/iconset.ts`
   and `src/lib/cursors.ts`, the sounds are synthesised in
-  `src/scripts/desktop/sound.ts`, and the system is called "kuschonink 98".
+  `src/scripts/desktop/sound.ts`, and the system is called "Xiangyin 98".
   [98.css](https://github.com/jdan/98.css) (MIT, vendored in `src/styles/vendor/`)
   draws the basic controls.
 - **Everything works with a keyboard, a screen reader, a touch screen and
@@ -116,6 +116,24 @@ may run more than once, and their page may sit in a window next to others:
 | `astro:page-load` | `document` | After each page opens (so existing component inits run) |
 | `wm:change`, `start:open`, `icons:select`, `bin:change` | | Window, Start menu, selection and Recycle Bin changes |
 
+## Two languages (the 中/EN switch)
+
+The site carries English and Chinese side by side; `<html data-lang>` picks
+which one shows (`src/styles/lang.css`, `src/scripts/lang.ts`, words in
+`src/lib/i18n.ts`). The switch is in the taskbar tray. The desktop follows it:
+
+- **In Astro**, wrap text in `<Bi t={{ en, zh }} />`, and translatable
+  attributes in `attr('title' | 'aria-label' | …, { en, zh })`. `Window.astro`
+  takes `title` and `status` as `{ en, zh }`; toolbar buttons and Links (`Tool`,
+  `QuickLink`), Start menu items (`MenuItem.zh`, e.g. `'程序(&P)'`) and desktop
+  icons (`DeskIcon.zh`, `tipZh`) have a `zh` field.
+- **In the shell**, `tr({ en, zh })` picks a text now, and `shownText(el)` reads
+  an element in the language showing. Tooltips read `data-tip-zh`. Window
+  titles keep both languages (the taskbar copies them), and the browser tab's
+  title comes from each page's `title-en` / `title-zh` metas.
+- Not yet translated: menus built in the browser (right-click menus, menu
+  bars), most dialog boxes, the Control Panel, Run, Find and Help.
+
 ## State
 
 Kept in this browser only.
@@ -129,6 +147,7 @@ Kept in this browser only.
 | | `kus98:recent` | Start ▸ Documents |
 | | `kus98:user` | The last log-on name |
 | | `kus98:run` | What was typed in Run |
+| | `lang` | The language chosen with the 中/EN switch |
 | `sessionStorage` | `kus98:begun` | The "Click here to begin" hint was used |
 
 The script at the top of `Desktop.astro` reads settings, icon places and the

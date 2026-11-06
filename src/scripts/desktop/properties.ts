@@ -4,7 +4,7 @@ import { addressFor, cleanPath } from '../../lib/apps';
 import { desktopData, type DesktopData } from './data';
 import { openDialog } from './dialogs';
 import * as wm from './wm';
-import { h } from './util';
+import { h, shownText } from './util';
 
 type Row = [string, string] | 'sep';
 
@@ -60,7 +60,7 @@ function projectRows(d: DesktopData, slug: string): Sheet | null {
   if (!p) return null;
   const rows: Row[] = [
     ['Type:', 'Project folder'],
-    ['Location:', 'C:\\kuschonink\\image'],
+    ['Location:', 'C:\\xiangyin\\image'],
     ['Contains:', [plural(p.images, 'image'), plural(p.texts, 'text'), plural(p.videos, 'video')].join(', ')],
   ];
   if (p.room) rows.push('sep', ['In the house:', `${p.room.en}${p.room.zh ? ' ' + p.room.zh : ''}, ${p.room.floor.toLowerCase()}`], ['Chapter:', String(p.room.chapter)]);
@@ -82,7 +82,7 @@ function roomRows(d: DesktopData, slug: string): Sheet | null {
       ['Size:', r.size],
       'sep',
       ['Contains:', project ? `“${project.title}”` : r.title !== r.en ? r.title : 'Only an inventory'],
-      ['Address:', `http://kuschonink.com${r.url}`],
+      ['Address:', addressFor(r.url)],
     ],
   };
 }
@@ -146,7 +146,7 @@ export function showImageProperties(img: HTMLImageElement, owner?: Element | nul
 
 /** Properties of a desktop icon. */
 export async function showIconProperties(icon: HTMLElement) {
-  const label = icon.querySelector('.icon-label')?.textContent ?? icon.textContent ?? '';
+  const label = shownText(icon.querySelector('.icon-label') ?? icon).trim();
   const ico = [...icon.querySelector('.ico')!.classList].find((c) => c.startsWith('ico-'))?.slice(4) ?? 'document';
   const href = icon.getAttribute('href');
   if (href) return showPropertiesFor(href, label, ico, null);
