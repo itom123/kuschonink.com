@@ -24,7 +24,7 @@ const n = imagesOf(project.sections).length;
     links={EXPLORER_LINKS}
     bodyClass="doc"
     alt={room ? `/house/${room.slug}` : undefined}
-    status={[`${n} image${n === 1 ? '' : 's'}`, room ? `In the house: ${room.en}, ${room.floor.name.toLowerCase()}` : 'Projects']}
+    status={[`${n} image${n === 1 ? '' : 's'}`, 'Click a photograph to see it larger.', room ? `In the house: ${room.en}, ${room.floor.name.toLowerCase()}` : 'Projects']}
   >
     <div class="doc-page">
       <p class="up-link"><a href="/image">↑ Up to Projects</a></p>

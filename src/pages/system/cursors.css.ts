@@ -32,7 +32,7 @@ html[data-pointers="large"]{${large}--k98-pointer-size:64px}
 ${P},${P} *{cursor:var(--k98c-arrow)}
 ${P} .doc :is(p,li,dd,dt,td,th,h1,h2,h3,h4,figcaption,blockquote,pre,code,em,strong,b,i,small,address,mark),
 ${P} :is(input:not([type]),input[type="text"],input[type="email"],input[type="search"],input[type="url"],input[type="tel"],input[type="number"],textarea,[contenteditable="true"]){cursor:var(--k98c-text)}
-${P} :is(a[href],a[href] *,area[href],.hotspot,.hotspot *,.welcome-option,.welcome-option *,.drawer,.drawer *,.constraints summary,[data-tab]){cursor:var(--k98c-hand)}
+${P} :is(a[href],a[href] *,area[href],.hotspot,.hotspot *,.welcome-option,.welcome-option *,.drawer,.drawer *,.constraints summary,[data-tab],[data-viewable]){cursor:var(--k98c-hand)}
 ${P} :is(.room.locked,.room.locked *){cursor:var(--k98c-no)}
 ${P} :is([data-resize="n"],[data-resize="s"]){cursor:var(--k98c-ns)}
 ${P} :is([data-resize="e"],[data-resize="w"]){cursor:var(--k98c-ew)}

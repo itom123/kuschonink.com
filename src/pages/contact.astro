@@ -1,23 +1,47 @@
 ---
+// Contact: a New Message window. The form, its fields and the backend are
+// the same as before (src/components/blocks/ContactForm.astro).
 import Desktop from '../layouts/Desktop.astro';
 import Window from '../components/desktop/Window.astro';
+import Blocks from '../components/Blocks.astro';
 import Section from '../components/Section.astro';
+import ContactForm from '../components/blocks/ContactForm.astro';
 import { contact as page, site } from '../lib/content';
 import { roomForPage } from '../lib/house';
+import { SEP, type Tool } from '../lib/chrome';
 const room = roomForPage('contact');
+// The first section's text (email, phone) goes beside the message; later sections below it.
+const [first, ...rest] = page.sections;
+const details = first?.blocks.filter((b) => b.type !== 'contactForm') ?? [];
+const tools: Tool[] = [
+  { cmd: 'mail-send', label: 'Send', icon: 'tb-send', title: 'Send the message' },
+  SEP,
+  { cmd: 'help', label: 'Help', icon: 'help', title: 'Help' },
+];
 ---
 <Desktop seo={page.seo}>
   <Window
     app="contact"
-    title="Contact"
+    title="New Message"
     variant="mail"
-    bodyClass="doc"
+    icon="mail"
+    address={false}
+    tools={tools}
+    bodyClass="mail-desk"
     alt={room ? `/house/${room.slug}` : undefined}
-    status={[room ? `In the house: ${room.en}, ${room.floor.name.toLowerCase()}` : site.name]}
+    status={['Write to ' + site.name + '. Every field is needed.', room ? `In the house: ${room.en}, ${room.floor.name.toLowerCase()}` : site.name]}
   >
-    <div class="doc-page">
-      <h1>{page.title}</h1>
-      {page.sections.map((s, i) => <Section section={s} first={i === 0} />)}
+    <div class="mail-window">
+      <h1 class="sr-only">{page.title}</h1>
+      <ContactForm variant="mail" />
+      <aside class="mail-card doc" aria-label="Contact details">
+        <h2 class="mail-card-title">Contact details</h2>
+        <Blocks blocks={details} />
+        <p><strong>Instagram</strong><br /><a href={site.social[0].href} target="_blank" rel="noopener">@kuschonink</a></p>
+      </aside>
+      <div class="mail-stationery doc">
+        {rest.map((s) => <Section section={s} />)}
+      </div>
     </div>
   </Window>
 </Desktop>

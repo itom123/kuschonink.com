@@ -19,6 +19,7 @@ export interface DeskIcon {
 }
 
 export const DESK_ICONS: DeskIcon[] = [
+  { id: 'computer', label: 'My Computer', icon: 'computer', open: 'mycomputer', tip: 'The drives of this computer, and the Control Panel.', type: 'System Folder', fixed: true },
   { id: 'projects', label: 'Projects', icon: 'folder', href: '/image', tip: 'All the work, as a folder.', type: 'File Folder' },
   { id: 'house', label: 'The House', icon: 'house', href: '/house/facade', tip: 'Walk through the house: every room keeps a project.', type: 'Program' },
   { id: 'about', label: 'About.doc', icon: 'document', href: '/about', tip: 'About the artist.', type: 'Document' },

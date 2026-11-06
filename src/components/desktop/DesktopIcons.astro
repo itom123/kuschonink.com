@@ -22,7 +22,7 @@ import { DESK_ICONS } from '../../lib/desktop';
           <span class="icon-label">{i.label}</span>
         </a>
       ) : (
-        <button type="button" class="icon" id={`icon-${i.id}`} data-open={i.open} data-icon-id={i.id} data-tip={i.tip} data-type={i.type}>
+        <button type="button" class="icon" id={`icon-${i.id}`} data-open={i.open} data-icon-id={i.id} data-tip={i.tip} data-type={i.type} data-fixed={i.fixed ? '' : undefined}>
           <span class={`ico ico-${i.icon}`} aria-hidden="true"></span>
           <span class="icon-label">{i.label}</span>
         </button>

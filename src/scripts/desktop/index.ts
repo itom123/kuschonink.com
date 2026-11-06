@@ -12,10 +12,14 @@ import { initStartMenu, remember } from './startmenu';
 import { initTaskbar } from './taskbar';
 import { initTooltips } from './tooltips';
 import { initControlPanel } from './apps/controlpanel';
+import { initMyComputer } from './apps/mycomputer';
+import { initViewer } from './apps/viewer';
+import * as menu from './menu';
 import { session } from './session';
 import { initSound } from './sound';
 import { initTrails } from './trails';
 import { initTray } from './tray';
+import { settings } from './settings';
 import { escapeHtml, html } from './util';
 import * as wm from './wm';
 
@@ -44,6 +48,40 @@ initSound();
 initTrails();
 initTray();
 initControlPanel();
+initMyComputer();
+initViewer();
+
+// Views ▾ in a folder's toolbar.
+commands.register('views', (ctx) => {
+  const el = ctx.el as HTMLElement | null;
+  if (!el) return;
+  const v = settings.get().explorerView;
+  const r = el.getBoundingClientRect();
+  menu.popup(
+    [
+      { label: 'Thu&mbnails', radio: true, checked: v === 'thumbs', action: () => settings.set({ explorerView: 'thumbs' }) },
+      { label: '&List', radio: true, checked: v === 'list', action: () => settings.set({ explorerView: 'list' }) },
+      { label: '&Details', radio: true, checked: v === 'details', action: () => settings.set({ explorerView: 'details' }) },
+    ],
+    r.left,
+    r.bottom,
+    { owner: el },
+  );
+});
+// Send in the New Message window.
+commands.register('mail-send', (ctx) => {
+  const form = wm.byEl(ctx.el)?.el.querySelector<HTMLFormElement>('form.contact-form');
+  form?.requestSubmit();
+});
+// Backspace goes up a level in folders and the House.
+addEventListener('keydown', (e) => {
+  if (e.key !== 'Backspace' || e.defaultPrevented || (e.target as Element).closest?.('input, textarea, select, [contenteditable]')) return;
+  const w = wm.getActive();
+  if (w && (w.app === 'explorer' || w.app === 'house')) {
+    e.preventDefault();
+    wm.hooks.nav(w, 'up');
+  }
+});
 
 // Start-up, log-on, log-off and shut-down live in their own file, loaded when needed.
 const boot = () => import('./boot');

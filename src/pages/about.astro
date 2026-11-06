@@ -1,4 +1,5 @@
 ---
+// About: a document, open in a WordPad-style window (a sheet of paper on a grey desk).
 import Desktop from '../layouts/Desktop.astro';
 import Window from '../components/desktop/Window.astro';
 import Section from '../components/Section.astro';
@@ -9,15 +10,28 @@ const room = roomForPage('about');
 <Desktop seo={page.seo}>
   <Window
     app="about"
-    title="About.doc"
+    title="About.doc - Document Viewer"
     variant="document"
-    bodyClass="doc"
+    address={false}
+    bodyClass="paper-desk"
     alt={room ? `/house/${room.slug}` : undefined}
-    status={[room ? `In the house: ${room.en}, ${room.floor.name.toLowerCase()}` : site.name, 'Page 1']}
+    status={['For Help, press F1', room ? `In the house: ${room.en}, ${room.floor.name.toLowerCase()}` : site.name]}
   >
-    <div class="doc-page">
+    <div class="format-bar" slot="toolbar" aria-hidden="true">
+      <span class="fake-select wide">Times New Roman</span>
+      <span class="fake-select">12</span>
+      <span class="fake-btn"><b>B</b></span>
+      <span class="fake-btn"><i>I</i></span>
+      <span class="fake-btn"><u>U</u></span>
+      <span class="tool-sep"></span>
+      <span class="fake-btn align-l"></span>
+      <span class="fake-btn align-c"></span>
+      <span class="fake-btn align-r"></span>
+      <div class="ruler"></div>
+    </div>
+    <article class="paper doc">
       <h1>{page.title}</h1>
       {page.sections.map((s, i) => <Section section={s} first={i === 0} />)}
-    </div>
+    </article>
   </Window>
 </Desktop>

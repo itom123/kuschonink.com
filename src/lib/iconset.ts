@@ -516,6 +516,53 @@ export const ICONS: Record<string, Draw> = {
     c.rect(5, 11, 4, 3, 'h').rect(10, 6, 2, 3, 'a');
     return c;
   },
+  'tb-views'() {
+    const c = new Canvas(20, 20);
+    for (const [x, y] of [[2, 2], [11, 2], [2, 11], [11, 11]]) {
+      c.rect(x, y, 7, 7, 'k').rect(x + 1, y + 1, 5, 5, 'y').rect(x + 1, y + 1, 5, 1, 'w');
+    }
+    return c;
+  },
+  'tb-send'() {
+    const c = new Canvas(20, 20);
+    c.rect(1, 5, 15, 11, 'k').rect(2, 6, 13, 9, 'w');
+    c.line(2, 6, 8, 11, 'k').line(14, 6, 8, 11, 'k');
+    c.poly([[11, 13], [19, 13], [15, 9.5]], 'e').rect(13, 13, 4, 5, 'e').box(13, 13, 4, 5, 'k');
+    c.line(11, 13, 15, 9, 'k').line(15, 9, 19, 13, 'k');
+    return c;
+  },
+  'tb-print'() {
+    const c = new Canvas(20, 20);
+    c.rect(5, 1, 10, 7, 'k').rect(6, 2, 8, 6, 'w');
+    c.rect(1, 7, 18, 9, 'k').rect(2, 8, 16, 7, 's').rect(2, 8, 16, 1, 'w');
+    c.rect(14, 10, 2, 1, 'l');
+    c.rect(5, 13, 10, 6, 'k').rect(6, 14, 8, 5, 'w');
+    c.rect(7, 15, 6, 1, 'g').rect(7, 17, 5, 1, 'g');
+    return c;
+  },
+  'tb-zoomin'() {
+    const c = new Canvas(20, 20);
+    c.disc(8, 8, 7, 'k').disc(8, 8, 5.6, 'w');
+    c.rect(5, 7, 6, 2, 'k').rect(7, 5, 2, 6, 'k');
+    for (let i = 0; i < 3; i++) c.line(12 + i, 13, 17 + i, 18, 'm');
+    return c;
+  },
+  'tb-zoomout'() {
+    const c = new Canvas(20, 20);
+    c.disc(8, 8, 7, 'k').disc(8, 8, 5.6, 'w');
+    c.rect(5, 7, 6, 2, 'k');
+    for (let i = 0; i < 3; i++) c.line(12 + i, 13, 17 + i, 18, 'm');
+    return c;
+  },
+  'tb-fit'() {
+    const c = new Canvas(20, 20);
+    c.rect(2, 3, 16, 14, 'k').rect(3, 4, 14, 12, 'a');
+    c.poly([[3, 16], [8, 9], [11, 13], [13, 11], [17, 16]], 'e');
+    for (const [x, y, dx, dy] of [[1, 1, 1, 1], [18, 1, -1, 1], [1, 18, 1, -1], [18, 18, -1, -1]]) {
+      c.set(x, y, 'k').set(x + dx, y, 'k').set(x, y + dy, 'k');
+    }
+    return c;
+  },
   'tb-stop'() {
     const c = new Canvas(20, 20);
     c.disc(10, 10, 9, 'k').disc(10, 10, 8, 'r');

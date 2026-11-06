@@ -1,6 +1,7 @@
 // What page content (the house map, drawers, the contact form) may ask of the
 // desktop, as window.kus98. Content checks it exists, so pages still work alone.
 import { msgbox, openDialog } from './dialogs';
+import { bindIconGroup } from './icons';
 import { navigate } from './router';
 import { settings } from './settings';
 import { play } from './sound';
@@ -32,6 +33,8 @@ export const api = {
   play,
   /** Visitor settings (Control Panel). */
   settings,
+  /** Give a list of .icon elements folder behaviour (select, double-click, arrows). */
+  bindIcons: (el: HTMLElement) => bindIconGroup(el),
 };
 
 export type DesktopApi = typeof api;

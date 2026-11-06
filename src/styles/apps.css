@@ -74,3 +74,56 @@ html:not(.js) .welcome-desc + .welcome-desc { margin-top: 16px; padding-top: 12p
 .help-topic dt { font-weight: bold; margin-top: 8px; }
 .help-topic dd { margin-left: 18px; }
 .help-hidden-side .window-side { display: none; }
+
+/* ---- Image Viewer ---- */
+.viewer-body { background: #808080; }
+.viewer-stage { min-height: 100%; box-sizing: border-box; display: flex; align-items: flex-start; justify-content: flex-start; padding: 8px; overflow: auto; touch-action: pan-x pan-y pinch-zoom; }
+.viewer-stage.fit { position: absolute; inset: 0; align-items: center; justify-content: center; overflow: hidden; }
+.viewer-img { display: block; max-width: none; background: #fff; box-shadow: 2px 2px 0 #000; image-rendering: auto; -webkit-user-drag: none; user-select: none; }
+.viewer-stage.fit .viewer-img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+.viewer-window .tool:disabled { color: var(--shadow); }
+
+/* ---- New Message (Contact) ---- */
+.mail-desk { background: var(--face); }
+.mail-window { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 8px; padding: 8px; align-items: start; }
+.mail-form { display: flex; flex-direction: column; gap: 6px; max-width: none; font: 11px var(--ui-font); }
+.mail-headers { display: grid; gap: 4px; padding: 6px; box-shadow: var(--thin-down); }
+.mail-row { display: grid; grid-template-columns: 64px 1fr; align-items: center; gap: 6px; }
+.mail-key { text-align: right; }
+.mail-to { display: flex; align-items: center; gap: 4px; height: 21px; padding: 0 4px; background: var(--light); box-shadow: var(--sunken); }
+.mail-row input { width: 100%; }
+.mail-body textarea { width: 100%; min-height: 220px; resize: vertical; box-sizing: border-box; font: 15px/1.4 "Times New Roman", Times, serif; }
+.mail-form .form-actions { display: flex; justify-content: flex-end; }
+.mail-form .form-status { padding: 4px 6px; background: #ffffe1; border: 1px solid #000; }
+.mail-form .form-success { padding: 10px; font: 15px/1.4 "Times New Roman", Times, serif; background: #fff; box-shadow: var(--sunken); }
+.mail-card { padding: 10px 12px; font-size: 14px; box-shadow: var(--sunken); }
+.mail-card-title { margin: 0 0 8px; font: bold 11px var(--ui-font); }
+.mail-card p { margin: 0 0 10px; }
+.mail-stationery { grid-column: 1 / -1; padding: 0; background: #fff; box-shadow: var(--sunken); }
+.mail-stationery .section { margin: 0; }
+.mail-stationery .section-bg img { width: 100%; height: auto; max-height: none; }
+.mail-stationery .section-inner { padding: 10px 16px 18px; }
+@media (max-width: 700px) {
+  .mail-window { grid-template-columns: 1fr; }
+}
+
+/* ---- Document window (About.doc) ---- */
+.paper-desk { background: #808080; }
+.paper { box-sizing: border-box; max-width: 780px; margin: 18px auto 28px; padding: 44px 52px 56px; background: #fff; box-shadow: 1px 1px 0 #000, 3px 3px 0 rgba(0, 0, 0, 0.35); }
+.paper .section-bg img { max-height: 70vh; width: auto; margin: 0 auto; display: block; }
+.format-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; width: 100%; }
+.fake-select { display: inline-flex; align-items: center; height: 19px; min-width: 34px; padding: 0 22px 0 4px; box-sizing: border-box; background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='17' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='silver' d='M0 0h16v17H0z'/%3E%3Cpath fill='%23fff' d='M0 0h15v1H1v15H0z'/%3E%3Cpath fill='gray' d='M1 15h14V1h1v15H1z'/%3E%3Cpath fill='%23000' d='M4 6h7v1H4zM5 7h5v1H5zM6 8h3v1H6zM7 9h1v1H7z'/%3E%3C/svg%3E") right 1px center no-repeat; box-shadow: var(--sunken); }
+.fake-select.wide { min-width: 150px; }
+.fake-btn { display: inline-grid; place-items: center; width: 22px; height: 20px; font: 13px "Times New Roman", serif; box-shadow: var(--thin-up); }
+.fake-btn.align-l, .fake-btn.align-c, .fake-btn.align-r { background: linear-gradient(#000 0 0) 4px 5px / 12px 1px no-repeat, linear-gradient(#000 0 0) 4px 8px / 8px 1px no-repeat, linear-gradient(#000 0 0) 4px 11px / 12px 1px no-repeat, linear-gradient(#000 0 0) 4px 14px / 8px 1px no-repeat; }
+.fake-btn.align-c { background-position: 4px 5px, 6px 8px, 4px 11px, 6px 14px; }
+.fake-btn.align-r { background-position: 4px 5px, 8px 8px, 4px 11px, 8px 14px; }
+.ruler {
+  flex-basis: 100%; height: 16px; margin-top: 3px; background-color: #fff; box-shadow: var(--sunken);
+  background-image: repeating-linear-gradient(90deg, #000 0 1px, transparent 1px 38px), repeating-linear-gradient(90deg, #808080 0 1px, transparent 1px 9.5px);
+  background-size: 100% 6px, 100% 3px; background-position: 40px 100%, 40px 100%; background-repeat: no-repeat;
+}
+@media (max-width: 700px) {
+  .paper { margin: 0; padding: 18px 16px 32px; box-shadow: none; }
+  .format-bar { display: none; }
+}
