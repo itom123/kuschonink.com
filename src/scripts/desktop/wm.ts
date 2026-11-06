@@ -41,6 +41,17 @@ export interface Win {
   onClose?: () => void;
 }
 
+/** Where a window was left (memory.ts keeps it): place and size, maximised, the bars it hides. */
+export interface Place {
+  x?: number;
+  y?: number;
+  w?: number;
+  h?: number;
+  max?: boolean;
+  /** View ▸ Toolbars / Status Bar: the parts hidden ([data-hide]). */
+  bars?: string;
+}
+
 export interface OpenOpts {
   docTitle?: string;
   docTitleZh?: string;
@@ -51,6 +62,10 @@ export interface OpenOpts {
   dialog?: boolean;
   near?: Win | null;
   center?: boolean;
+  /** Open exactly here (a refresh putting the desktop back), instead of where the program was last left. */
+  at?: Place;
+  /** No caption flying out (a refresh putting windows back). */
+  quiet?: boolean;
   onClose?: () => void;
 }
 
@@ -69,6 +84,8 @@ let hiddenByShowDesktop: Win[] = [];
 export const hooks = {
   nav: (_win: Win, _cmd: string) => {},
   sysmenu: (_win: Win, _x: number, _y: number) => {},
+  /** Where a program's window was last left (memory.ts), or null. */
+  place: (_app: string): Place | null => null,
 };
 
 export const list = () => wins.slice();
@@ -103,6 +120,22 @@ function place(win: Win) {
   s.setProperty('--y', `${Math.round(win.y)}px`);
   s.setProperty('--w', `${Math.round(win.w)}px`);
   s.setProperty('--h', `${Math.round(win.h)}px`);
+}
+
+const num = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+
+/** Size and put a window as it was left, kept within this screen, with the bars it showed. */
+function fitPlace(win: Win, p: Place) {
+  const a = area();
+  if (num(p.w) && num(p.h)) {
+    win.w = Math.max(MIN_W, Math.min(p.w, a.w - 16));
+    win.h = Math.max(MIN_H, Math.min(p.h, a.h - 16));
+  }
+  if (num(p.x) && num(p.y)) Object.assign(win, clampMove({ x: p.x, y: p.y, w: win.w, h: win.h }));
+  if (typeof p.bars === 'string') {
+    if (p.bars) win.el.dataset.hide = p.bars;
+    else delete win.el.dataset.hide;
+  }
 }
 
 const DIRS = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
@@ -162,8 +195,12 @@ function adopt(el: HTMLElement, o: OpenOpts = {}): Win {
   el.dataset.winId = String(win.id);
   addHandles(el);
   wins.push(win);
+  // A program's window opens where it was last left (dialog boxes always open in the middle).
+  const p = o.dialog ? null : (o.at ?? hooks.place(app));
+  if (p) fitPlace(win, p);
   place(win);
-  const max = !o.dialog && (o.state === 'max' || el.dataset.state === 'max' || settings.get().alwaysMax);
+  const wasMax = typeof p?.max === 'boolean' ? p.max : el.dataset.state === 'max';
+  const max = !o.dialog && (o.state === 'max' || wasMax || settings.get().alwaysMax);
   win.state = max ? 'max' : 'normal';
   if (max) win.restore = 'max';
   el.dataset.state = win.state;
@@ -202,7 +239,7 @@ export function open(el: HTMLElement, o: OpenOpts = {}): Win {
   if (!el.isConnected) layer.appendChild(el);
   const win = adopt(el, { near: active, ...o });
   if (el.classList.contains('auto-size')) fit(win);
-  if (!o.dialog && !reducedMotion.matches) {
+  if (!o.dialog && !o.quiet && !reducedMotion.matches) {
     // Windows 98 draws the caption flying out when a program starts.
     zoomRect(rectFor(win, 'min') ?? centerRect(win), rectFor(win, win.state));
   }
@@ -366,6 +403,15 @@ export function restore(win: Win) {
   if (win.state === 'min') setState(win, win.restore);
   else if (win.state === 'max') setState(win, 'normal');
   focus(win);
+}
+
+/** Put an open window back as it was left (a refresh): place, size, maximised, bars. */
+export function setPlace(win: Win, p: Place) {
+  if (win.dialog) return;
+  fitPlace(win, p);
+  place(win);
+  if (typeof p.max === 'boolean' && win.state !== 'min') setState(win, p.max || settings.get().alwaysMax ? 'max' : 'normal', false);
+  emit(win.el, 'desktop:resize');
 }
 
 export function close(win: Win) {

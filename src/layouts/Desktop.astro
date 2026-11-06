@@ -53,9 +53,39 @@ const { seo, image, noindex } = Astro.props;
         st.textContent = css;
         document.head.appendChild(st);
       }
+      // Each program's window where it was last left, with the bars it hid (memory.ts),
+      // so the page's window doesn't show in the middle first. memory.ts removes this
+      // once the window manager has placed the window.
+      var wv = {}, wcss = '', a, p, q, parts = { toolbar: '.toolbar', address: '.addressbar', links: '.linksbar', status: '.status-bar' };
+      var n = function (v) { return typeof v === 'number' && isFinite(v); };
+      try { wv = JSON.parse(localStorage.getItem('kus98:windows') || '{}') || {}; } catch (e) {}
+      for (a in wv) {
+        p = wv[a];
+        if (!p || !/^[a-z0-9-]+$/.test(a)) continue;
+        q = 'html.js #k98-windows>[data-app="' + a + '"]';
+        // Maximised or not as it was left; if that wasn't noted, as the page has it (as wm.ts does).
+        if (!s.alwaysMax && p.max === true) wcss += q + '{left:0;top:0;width:100%;height:100%}';
+        else if (!s.alwaysMax && n(p.x) && n(p.y) && n(p.w) && n(p.h)) wcss += q + (p.max === false ? '' : ':not([data-state="max"])') + '{left:' + p.x + 'px;top:' + p.y + 'px;width:min(' + p.w + 'px,calc(100% - 16px));height:min(' + p.h + 'px,calc(100% - 16px))}';
+        if (typeof p.bars === 'string') p.bars.split(' ').forEach(function (b) { if (parts[b]) wcss += q + '>[data-window-inner]>' + parts[b] + '{display:none}'; });
+      }
+      if (wcss) {
+        var ws = document.createElement('style');
+        ws.id = 'k98-early-windows';
+        ws.textContent = wcss;
+        document.head.appendChild(ws);
+      }
       var bot = navigator.webdriver || /bot|crawl|spider|slurp|lighthouse|pagespeed|headless|preview|facebookexternalhit|embedly|whatsapp|telegram|discord|slack/i.test(navigator.userAgent);
       if (!bot && !/(?:^|;\s*)kus98_session=/.test(document.cookie)) d.setAttribute('data-boot', 'boot');
       setTimeout(function () { if (!window.__kus98) d.removeAttribute('data-boot'); }, 10000);
+      // The home page without Welcome: "Show this screen each time Xiangyin 98 starts" is
+      // unticked, or a refresh of a desktop where Welcome wasn't open. memory.ts decides and
+      // closes it; this only keeps it from flashing up first.
+      if (!d.hasAttribute('data-boot') && location.pathname === '/') {
+        var desk = null, open = true;
+        try { desk = JSON.parse(sessionStorage.getItem('kus98:desk') || 'null'); } catch (e) {}
+        if (desk && desk.v === 1 && Array.isArray(desk.wins)) open = desk.wins.some(function (w) { return w && w.app === 'welcome'; });
+        if (s.showWelcome === false || !open) d.setAttribute('data-nowelcome', '');
+      }
     })();
   </script>
   <Fragment slot="head">

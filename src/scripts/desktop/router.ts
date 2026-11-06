@@ -19,6 +19,11 @@ export interface NavOpts {
   source?: 'keyboard' | 'pointer' | 'script';
   /** Add the page to the window's own Back/Forward list. */
   winHistory?: boolean;
+  /**
+   * A refresh putting a window back (memory.ts): it opens quietly, as it was
+   * left, and if its page can't come back it stays closed, with no message.
+   */
+  restore?: wm.Place;
 }
 
 const CACHE_MAX = 20;
@@ -259,7 +264,7 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
     page = await fetchPage(url, o.reload, ctrl.signal);
   } catch (err) {
     done();
-    if ((err as Error).name === 'AbortError' || seqs.get(app) !== seq) return;
+    if ((err as Error).name === 'AbortError' || seqs.get(app) !== seq || o.restore) return;
     if (err instanceof TypeError || !navigator.onLine) {
       msgbox({
         title: 'Xiangyin 98',
@@ -285,10 +290,11 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
   const build = doc.querySelector<HTMLMetaElement>('meta[name="kus98-build"]')?.content;
   if (page.status === 404) {
     done();
-    notFound(addressFor(path), win?.el);
+    if (!o.restore) notFound(addressFor(path), win?.el);
     return;
   }
   if (!incoming || build !== buildId) {
+    if (o.restore) return done();
     location.assign(url.href);
     return;
   }
@@ -305,7 +311,7 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
   if (win && wm.list().includes(win)) {
     wm.swap(win, incoming, target, docTitle, winHistory, docTitleZh);
   } else {
-    win = wm.open(document.adoptNode(incoming), { docTitle, docTitleZh });
+    win = wm.open(document.adoptNode(incoming), { docTitle, docTitleZh, at: o.restore, quiet: !!o.restore });
     win.el.dataset.url = target;
     win.hist = [target];
     win.hi = 0;
@@ -321,7 +327,7 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
   emit(win.el, 'desktop:content', { url: target });
   document.dispatchEvent(new Event('astro:page-load'));
   const titles = wm.titlesOf(win);
-  emit(document, 'desktop:navigate', { url: target, app, title: titles.en, titleZh: titles.zh, icon: win.el.dataset.icon ?? 'document', docTitle });
+  emit(document, 'desktop:navigate', { url: target, app, title: titles.en, titleZh: titles.zh, icon: win.el.dataset.icon ?? 'document', docTitle, restored: !!o.restore });
   wm.focus(win, { history: false });
   if (o.source === 'keyboard') {
     const h1 = win.el.querySelector<HTMLElement>('[data-window-body] h1');

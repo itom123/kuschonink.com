@@ -36,6 +36,12 @@ appears with the page they asked for open in a window.
   including High Contrast, window effects), Mouse (faint pointer trails, off to
   begin with; larger pointers; double-click speed), Sounds, and Folder Options
   (single or double click). Settings stay in the visitor's browser.
+- **It remembers**, in the visitor's browser only. A reload brings the desktop
+  back as it was: the same windows, front to back, minimised or not, scrolled
+  to the same place. Each program opens where it was last left (place, size,
+  maximised, toolbars), "Show this screen each time Xiangyin 98 starts" holds
+  on every load of the home page, and an unsent Contact message survives a
+  reload until it's sent or the tab is closed.
 - Sounds, pointers, icons and screens are made for the site: nothing is taken
   from Windows. No visible text says "kuschonink"; addresses read `C:\xiangyin\…`.
 

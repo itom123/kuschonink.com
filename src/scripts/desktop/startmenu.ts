@@ -79,7 +79,9 @@ export function initStartMenu() {
     }
   });
   document.addEventListener('desktop:navigate', (e) => {
-    const d = (e as CustomEvent<Recent>).detail;
+    const d = (e as CustomEvent<Recent & { restored?: boolean }>).detail;
+    // A refresh putting a window back isn't opening it again.
+    if (d.restored) return;
     remember({ url: d.url, title: d.title, titleZh: d.titleZh, icon: d.icon });
   });
 }

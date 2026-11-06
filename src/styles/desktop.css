@@ -377,6 +377,9 @@ html:not(.js) .has-sub:hover > .menu.sub, html:not(.js) .has-sub:focus-within > 
 html[data-busy="bg"], html[data-busy="bg"] * { cursor: progress !important; }
 html[data-busy="wait"], html[data-busy="wait"] * { cursor: wait !important; }
 
+/* The home page without Welcome (the head script in Desktop.astro): hidden until memory.ts closes it. */
+html[data-nowelcome] #k98-windows > [data-app="welcome"] { display: none; }
+
 /* ===== Phones and small screens: every window is full-size ===== */
 @media (max-width: 700px), (max-height: 480px) {
   html.js .app-window:not(.v-dialog) { left: 0 !important; top: 0 !important; width: 100% !important; height: 100% !important; }
