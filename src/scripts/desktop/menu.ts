@@ -51,19 +51,34 @@ function focusItem(item?: HTMLElement | null) {
   item?.focus({ preventScroll: true });
 }
 
+/**
+ * A submenu opens to the right of its item, or to the left when the right has no
+ * room. When neither side has room (a phone), it opens on the roomier side and
+ * moves back onto the screen, over its own menu, as Windows does at the edge.
+ */
 function placeSub(sub: HTMLElement) {
+  const s = sub.style;
   sub.classList.remove('flip');
-  sub.style.top = '';
-  sub.style.maxHeight = '';
-  if (sub.getBoundingClientRect().right > innerWidth - 2) sub.classList.add('flip');
-  const r = sub.getBoundingClientRect();
+  s.left = s.top = s.maxHeight = s.overflowY = '';
+  const right = innerWidth - 2;
   const limit = innerHeight - 2;
-  if (r.height > limit - 4) {
-    sub.style.maxHeight = `${limit - 4}px`;
-    sub.style.overflowY = 'auto';
+  // Taller than the screen: it scrolls. (Before the sideways check: a scroll bar widens it.)
+  if (sub.getBoundingClientRect().height > limit - 4) {
+    s.maxHeight = `${limit - 4}px`;
+    s.overflowY = 'auto';
+  }
+  const r = sub.getBoundingClientRect();
+  if (r.right > right) {
+    sub.classList.add('flip');
+    const f = sub.getBoundingClientRect();
+    if (f.left < 2) {
+      const toLeft = f.right - 2 > right - r.left;
+      sub.classList.remove('flip');
+      s.left = `${(toLeft ? 2 : right - r.width) - sub.parentElement!.getBoundingClientRect().left}px`;
+    }
   }
   const r2 = sub.getBoundingClientRect();
-  if (r2.bottom > limit) sub.style.top = `${-3 - (r2.bottom - limit)}px`;
+  if (r2.bottom > limit) s.top = `${-3 - (r2.bottom - limit)}px`;
 }
 
 function closeSub(li: Element) {
