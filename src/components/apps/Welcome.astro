@@ -1,0 +1,108 @@
+---
+// "Welcome to kuschonink 98": the home page, and the first thing after log-in.
+// Single-click choices on the left; the right side explains each one.
+import { getImage } from 'astro:assets';
+import { home, projects, site } from '../../lib/content';
+import { img } from '../../lib/images';
+
+const photo = await getImage({ src: img(home.background.src), width: 720, format: 'webp', quality: 75 });
+
+const options = [
+  {
+    id: 'house', href: '/house/facade', icon: 'house', label: 'Enter the', strong: 'House',
+    title: 'Enter the House',
+    text: 'The site is also a house, drawn from the plans of the 2008 renovation of the family house. Every room keeps a project, About or Contact. Knock on the door to go in, then walk through the floorplans.',
+  },
+  {
+    id: 'projects', href: '/image', icon: 'folder', label: 'Browse the', strong: 'projects',
+    title: 'Browse the projects',
+    text: `All the work as one folder: ${projects.length} projects with their photographs, texts and videos. Open one to see it whole, or view them all on one page.`,
+  },
+  {
+    id: 'about', href: '/about', icon: 'document', label: 'About the', strong: 'artist',
+    title: 'About the artist',
+    text: 'Biography, and selected conferences, exhibitions and programmes.',
+  },
+  {
+    id: 'contact', href: '/contact', icon: 'mail', label: 'Get in', strong: 'touch',
+    title: 'Get in touch',
+    text: 'Write a message from the New Message window; it goes straight to the artist’s inbox.',
+  },
+  {
+    id: 'help', href: '/help', icon: 'help', label: 'How to use this', strong: 'computer',
+    title: 'How to use this computer',
+    text: 'Clicking, double-clicking and right-clicking, windows, the Start menu, and how to walk through the house. Press F1 at any time.',
+  },
+];
+---
+<div class="welcome" data-welcome>
+  <header class="welcome-head">
+    <span class="ico ico-start" aria-hidden="true"></span>
+    <h1><small>Welcome to</small> <b>kuschonink</b> 98</h1>
+  </header>
+  <div class="welcome-main">
+    <ul class="welcome-options" aria-label="Choices">
+      {options.map((o) => (
+        <li>
+          <a class="welcome-option" href={o.href} data-desc={o.id}>
+            <span class={`ico ico-${o.icon}`} aria-hidden="true"></span>
+            <span>{o.label} <b>{o.strong}</b></span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="welcome-panel" aria-live="polite">
+      <section class="welcome-desc" data-for="intro">
+        <h2>{site.name}</h2>
+        <p>{site.description}</p>
+        <figure class="welcome-figure">
+          <img src={photo.src} width={photo.attributes.width} height={photo.attributes.height} alt="" loading="eager" />
+          <figcaption>From the archive.</figcaption>
+        </figure>
+        <p><b>This website is a computer.</b> To begin, choose one of the options on the left, or double-click an icon on the desktop.</p>
+      </section>
+      {options.map((o) => (
+        <section class="welcome-desc" data-for={o.id}>
+          <h2><a href={o.href}>{o.title}</a></h2>
+          <p>{o.text}</p>
+          <a class="button-link welcome-go" href={o.href}>Open</a>
+        </section>
+      ))}
+    </div>
+  </div>
+  <footer class="welcome-foot">
+    <div class="field-row" data-js-only>
+      <input type="checkbox" id="welcome-show" checked />
+      <label for="welcome-show">Show this screen each time kuschonink 98 starts</label>
+    </div>
+    <a class="button-link" href="/image" data-cmd="close">Close</a>
+  </footer>
+</div>
+
+<script>
+  // Point at a choice to read about it; remember "show this screen".
+  function initWelcome() {
+    for (const w of document.querySelectorAll<HTMLElement>('[data-welcome]:not([data-ready])')) {
+      w.dataset.ready = '1';
+      const descs = [...w.querySelectorAll<HTMLElement>('.welcome-desc')];
+      const options = [...w.querySelectorAll<HTMLElement>('[data-desc]')];
+      const show = (id: string) => {
+        descs.forEach((d) => (d.hidden = d.dataset.for !== id));
+        options.forEach((o) => o.setAttribute('aria-current', String(o.dataset.desc === id)));
+      };
+      show('intro');
+      for (const o of options) {
+        o.addEventListener('pointerenter', () => show(o.dataset.desc!));
+        o.addEventListener('focus', () => show(o.dataset.desc!));
+      }
+      const k = window.kus98;
+      const box = w.querySelector<HTMLInputElement>('#welcome-show');
+      if (box && k) {
+        box.checked = k.settings.get().showWelcome;
+        box.addEventListener('change', () => k.settings.set({ showWelcome: box.checked }));
+      }
+    }
+  }
+  initWelcome();
+  document.addEventListener('astro:page-load', initWelcome);
+</script>

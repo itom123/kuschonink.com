@@ -1,7 +1,9 @@
 ---
 // An unlisted page for one piece kept in a drawer. Not in the sitemap, the
-// Index or the simple view; served with noindex (see public/_headers).
-import House from '../../../layouts/House.astro';
+// Index or the Projects folder; served with noindex (see public/_headers).
+import Desktop from '../../../layouts/Desktop.astro';
+import Window from '../../../components/desktop/Window.astro';
+import { HOUSE_LINKS, houseTools } from '../../../lib/chrome';
 import HouseMap from '../../../components/house/HouseMap.astro';
 import { placements, sharedItems, pieces, roomByKey, type Placement } from '../../../lib/house';
 import { projects, site } from '../../../lib/content';
@@ -18,7 +20,18 @@ const refLabel = (ref: Placement['piece']['references'][number]) => {
   const q = pieces.find((y) => y.id === ref.piece)!; return { href: `/house/drawer/${q.id}`, label: q.title };
 };
 ---
-<House seo={{ title: `${piece.title} — ${site.name}` }} noindex bodyClass="house-map-page">
+<Desktop seo={{ title: `${piece.title} — ${site.name}` }} noindex>
+  <Window
+    app="house"
+    variant="browser"
+    title={`${piece.title} - The House`}
+    home="/house/facade"
+    tools={houseTools()}
+    links={HOUSE_LINKS}
+    bodyClass="doc house-body"
+    status={[`Chapter ${room.chapter} · ${furniture.en}, drawer ${drawer}`, room.floor.name]}
+  >
+  <div class="house-view">
   <HouseMap current={room} />
   <aside class="room-panel" data-room-page={room.slug} aria-labelledby="room-title">
     <div class="panel-bar">
@@ -48,4 +61,6 @@ const refLabel = (ref: Placement['piece']['references'][number]) => {
       <p><a href={`/house/${room.slug}`}>← Close the drawer</a></p>
     </div>
   </aside>
-</House>
+  </div>
+  </Window>
+</Desktop>

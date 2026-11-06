@@ -2,6 +2,7 @@
 // desktop, as window.kus98. Content checks it exists, so pages still work alone.
 import { msgbox, openDialog } from './dialogs';
 import { navigate } from './router';
+import { settings } from './settings';
 import { play } from './sound';
 import * as wm from './wm';
 
@@ -29,6 +30,8 @@ export const api = {
   /** Open a site page in its window. */
   open: (url: string) => navigate(url),
   play,
+  /** Visitor settings (Control Panel). */
+  settings,
 };
 
 export type DesktopApi = typeof api;

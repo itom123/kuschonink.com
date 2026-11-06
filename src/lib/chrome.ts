@@ -26,10 +26,25 @@ export const EXPLORER_TOOLS: Tool[] = [
 export const EXPLORER_LINKS: QuickLink[] = [
   { label: 'Projects', href: '/image', icon: 'folder' },
   { label: 'All on one page', href: '/image/all', icon: 'documents' },
-  { label: 'The House', href: '/house', icon: 'house' },
+  { label: 'The House', href: '/house/facade', icon: 'house' },
   { label: 'About', href: '/about', icon: 'document' },
   { label: 'Contact', href: '/contact', icon: 'mail' },
 ];
+
+/** The House's browser toolbar. `alt` is the same thing in the Projects folder. */
+export function houseTools(alt?: string): Tool[] {
+  return [
+    { cmd: 'back', label: 'Back', icon: 'tb-back' },
+    { cmd: 'forward', label: 'Forward', icon: 'tb-forward' },
+    { cmd: 'stop', label: 'Stop', icon: 'tb-stop' },
+    { cmd: 'refresh', label: 'Refresh', icon: 'tb-refresh' },
+    { cmd: 'home', label: 'Home', icon: 'house', title: 'The front of the house' },
+    SEP,
+    { href: '/house', label: 'Floorplan', icon: 'plan', title: 'The floorplans' },
+    { href: '/house/appendix/index', label: 'Index', icon: 'topic', title: 'The index of the house' },
+    { href: alt ?? '/image', label: 'Projects', icon: 'folder', title: alt ? 'Show this in the Projects folder' : 'The Projects folder' },
+  ];
+}
 
 export const HOUSE_LINKS: QuickLink[] = [
   { label: 'Façade', href: '/house/facade', icon: 'house' },

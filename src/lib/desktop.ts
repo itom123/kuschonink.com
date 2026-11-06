@@ -20,8 +20,9 @@ export interface DeskIcon {
 
 export const DESK_ICONS: DeskIcon[] = [
   { id: 'projects', label: 'Projects', icon: 'folder', href: '/image', tip: 'All the work, as a folder.', type: 'File Folder' },
-  { id: 'house', label: 'The House', icon: 'house', href: '/house', tip: 'Walk through the house: every room keeps a project.', type: 'Program' },
+  { id: 'house', label: 'The House', icon: 'house', href: '/house/facade', tip: 'Walk through the house: every room keeps a project.', type: 'Program' },
   { id: 'about', label: 'About.doc', icon: 'document', href: '/about', tip: 'About the artist.', type: 'Document' },
   { id: 'contact', label: 'Contact', icon: 'mail', href: '/contact', tip: 'Write a message.', type: 'Program' },
+  { id: 'help', label: 'Help', icon: 'help', href: '/help', tip: 'How to use this computer (F1).', type: 'Help file' },
   { id: 'instagram', label: 'Instagram', icon: 'camera', href: site.social[0].href, external: true, shortcut: true, tip: 'kuschonink on Instagram (opens a new tab).', type: 'Internet Shortcut' },
 ];

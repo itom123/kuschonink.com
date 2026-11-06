@@ -6,7 +6,9 @@ import '../styles/vendor/98css/98.css';
 import '../styles/desktop.css';
 import '../styles/doc.css';
 import '../styles/blocks.css';
+import '../styles/house.css';
 import '../styles/explorer.css';
+import '../styles/apps.css';
 import DesktopIcons from '../components/desktop/DesktopIcons.astro';
 import Taskbar from '../components/desktop/Taskbar.astro';
 import { BUILD_ID } from '../lib/build';
@@ -22,11 +24,11 @@ const { seo, image, noindex } = Astro.props;
     <link rel="stylesheet" href={`/system/icons.css?v=${BUILD_ID}`} />
     <script>import '../scripts/desktop/index';</script>
   </Fragment>
-  <a class="skip-link" href="#windows">Skip to the open window</a>
-  <div id="desktop" class="desktop">
+  <a class="skip-link" href="#k98-windows">Skip to the open window</a>
+  <div id="k98-desktop" class="desktop">
     <DesktopIcons />
   </div>
-  <main id="windows" class="windows"><slot /></main>
+  <main id="k98-windows" class="windows"><slot /></main>
   <Taskbar />
-  <div id="desktop-announcer" class="sr-only" aria-live="polite"></div>
+  <div id="k98-announcer" class="sr-only" aria-live="polite"></div>
 </Base>

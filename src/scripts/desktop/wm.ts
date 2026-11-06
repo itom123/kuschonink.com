@@ -389,7 +389,7 @@ function blockOwner(owner: Win, on: boolean) {
 /** Minimised windows and everything behind a desktop-wide dialog can't be reached. */
 function refreshInert() {
   const g = globals[globals.length - 1];
-  document.getElementById('desktop')?.toggleAttribute('inert', !!g);
+  document.getElementById('k98-desktop')?.toggleAttribute('inert', !!g);
   for (const w of wins) {
     const behind = !!g && w !== g && !(w.owner && w.owner === g);
     w.el.inert = w.state === 'min' || behind;
@@ -619,7 +619,7 @@ function onPointerDownCapture(e: PointerEvent) {
       return;
     }
     if (win !== active) focus(win);
-  } else if (t.closest('#desktop') || t === document.body || t === html) {
+  } else if (t.closest('#k98-desktop') || t === document.body || t === html) {
     blurAll();
   }
 }
@@ -690,7 +690,7 @@ function onViewportResize() {
 }
 
 export function initWM() {
-  layer = document.getElementById('windows')!;
+  layer = document.getElementById('k98-windows')!;
   for (const el of layer.querySelectorAll<HTMLElement>(':scope > [data-window]')) adopt(el, { docTitle: document.title });
   document.addEventListener('pointerdown', onPointerDownCapture, true);
   layer.addEventListener('pointerdown', onPointerDown);

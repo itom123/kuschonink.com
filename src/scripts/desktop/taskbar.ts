@@ -27,7 +27,7 @@ function renderTasks(tasks: HTMLElement) {
 }
 
 function startClock() {
-  const el = document.getElementById('clock') as HTMLTimeElement | null;
+  const el = document.getElementById('k98-clock') as HTMLTimeElement | null;
   if (!el) return;
   const tick = () => {
     const d = new Date();
@@ -41,7 +41,7 @@ function startClock() {
 
 /** The Start menu without the full menu widget: open, close, close on choice. */
 function initStartBasics() {
-  const start = document.getElementById('start') as HTMLDetailsElement | null;
+  const start = document.getElementById('k98-start') as HTMLDetailsElement | null;
   if (!start) return;
   document.addEventListener('pointerdown', (e) => {
     if (start.open && !start.contains(e.target as Node)) start.open = false;
@@ -59,7 +59,7 @@ function initStartBasics() {
 }
 
 export function initTaskbar() {
-  const tasks = document.getElementById('tasks');
+  const tasks = document.getElementById('k98-tasks');
   if (tasks) {
     const render = () => renderTasks(tasks);
     document.addEventListener('wm:change', render);

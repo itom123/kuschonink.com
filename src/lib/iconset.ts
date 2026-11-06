@@ -508,6 +508,14 @@ export const ICONS: Record<string, Draw> = {
     c.rect(1, 11, 2, 2, 'k');
     return c;
   },
+  plan() {
+    const c = new Canvas(20, 20);
+    c.rect(1, 2, 18, 16, 'k').rect(2, 3, 16, 14, 'w');
+    c.box(4, 5, 12, 10, 'n');
+    c.rect(9, 5, 1, 5, 'n').rect(4, 10, 3, 1, 'n').rect(12, 10, 4, 1, 'n').rect(12, 5, 1, 3, 'n');
+    c.rect(5, 11, 4, 3, 'h').rect(10, 6, 2, 3, 'a');
+    return c;
+  },
   'tb-stop'() {
     const c = new Canvas(20, 20);
     c.disc(10, 10, 9, 'k').disc(10, 10, 8, 'r');

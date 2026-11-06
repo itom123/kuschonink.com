@@ -1,19 +1,34 @@
 ---
-import House from '../../layouts/House.astro';
+import Desktop from '../../layouts/Desktop.astro';
+import Window from '../../components/desktop/Window.astro';
 import HouseMap from '../../components/house/HouseMap.astro';
 import { rooms, floors } from '../../lib/house';
 import { site } from '../../lib/content';
+import { HOUSE_LINKS, houseTools } from '../../lib/chrome';
 ---
-<House seo={{ title: `The House — ${site.name}`, description: site.description }} bodyClass="house-map-page">
-  <HouseMap />
-  <noscript>
-    <div class="noscript-index">
-      {floors.map((f) => (
-        <>
-          <h2>{f.name} · {f.zh}</h2>
-          <ul>{rooms.filter((r) => r.floor.id === f.id).map((r) => <li><a href={`/house/${r.slug}`}>Chapter {r.locked ? '—' : r.chapter}: {r.title}</a></li>)}</ul>
-        </>
-      ))}
+<Desktop seo={{ title: `The House — ${site.name}`, description: site.description }}>
+  <Window
+    app="house"
+    variant="browser"
+    title="Floorplan - The House"
+    home="/house/facade"
+    tools={houseTools()}
+    links={HOUSE_LINKS}
+    bodyClass="doc house-body"
+    status={['Drag to move · scroll or pinch to zoom · R A 2 1 change floors', 'Done']}
+  >
+    <div class="house-view">
+      <HouseMap />
+      <noscript>
+        <div class="noscript-index">
+          {floors.map((f) => (
+            <>
+              <h2>{f.name} · {f.zh}</h2>
+              <ul>{rooms.filter((r) => r.floor.id === f.id).map((r) => <li><a href={`/house/${r.slug}`}>Chapter {r.locked ? '—' : r.chapter}: {r.title}</a></li>)}</ul>
+            </>
+          ))}
+        </div>
+      </noscript>
     </div>
-  </noscript>
-</House>
+  </Window>
+</Desktop>

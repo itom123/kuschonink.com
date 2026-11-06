@@ -1,6 +1,6 @@
 // kuschonink 98: the desktop shell. Loaded once, in <head>, on every page.
 import { api, type DesktopApi } from './api';
-import { initRouter } from './router';
+import { initRouter, navigate } from './router';
 import { initSettings } from './settings';
 import { initTaskbar } from './taskbar';
 import { initWM } from './wm';
@@ -20,9 +20,17 @@ initWM();
 initTaskbar();
 initRouter();
 
+// F1 opens Help (where the browser lets the page have it).
+addEventListener('keydown', (e) => {
+  if (e.key === 'F1' && !e.altKey && !e.ctrlKey && !e.metaKey) {
+    e.preventDefault();
+    navigate('/help', { source: 'keyboard' });
+  }
+});
+
 // Once every script on the page has run, tell page content its window is ready.
 function ready() {
-  for (const el of document.querySelectorAll<HTMLElement>('#windows > [data-window]')) {
+  for (const el of document.querySelectorAll<HTMLElement>('#k98-windows > [data-window]')) {
     el.dispatchEvent(new CustomEvent('desktop:content', { bubbles: true, detail: { url: el.dataset.url, initial: true } }));
   }
   document.dispatchEvent(new Event('astro:page-load'));

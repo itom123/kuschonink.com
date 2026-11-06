@@ -16,9 +16,10 @@ const items: MenuItem[] = [
     sub: [
       { label: '&Projects', href: '/image', icon: 'folder', sub: [...projectItems, { sep: true }, { label: '&All projects on one page', href: '/image/all', icon: 'documents' }] },
       {
-        label: 'The &House', href: '/house', icon: 'house',
+        label: 'The &House', href: '/house/facade', icon: 'house',
         sub: [
-          { label: '&Floorplan', href: '/house', icon: 'house' },
+          { label: '&Front of the house', href: '/house/facade', icon: 'house' },
+          { label: '&Floorplan', href: '/house', icon: 'plan' },
           { sep: true },
           { label: '&Index', href: '/house/appendix/index', icon: 'topic' },
           { label: '&Chronology', href: '/house/appendix/chronology', icon: 'topic' },
@@ -28,15 +29,18 @@ const items: MenuItem[] = [
       },
       { label: '&About.doc', href: '/about', icon: 'document' },
       { label: '&Contact', href: '/contact', icon: 'mail' },
+      { sep: true },
+      { label: '&Welcome', href: '/', icon: 'welcome' },
     ],
   },
+  { label: '&Help', href: '/help', icon: 'help', big: true },
 ];
 ---
-<details class="start" id="start">
+<details class="start" id="k98-start">
   <summary class="start-button" aria-label="Start" title="Click here to begin">
     <span class="ico ico16 ico-start" aria-hidden="true"></span><span class="start-label">Start</span>
   </summary>
-  <div class="start-menu" id="start-menu">
+  <div class="start-menu" id="k98-start-menu">
     <div class="start-banner" aria-hidden="true"><span><b>kuschonink</b>98</span></div>
     <MenuList items={items} class="start-list" label="Start menu" />
   </div>

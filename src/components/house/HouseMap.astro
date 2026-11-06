@@ -29,6 +29,8 @@ for (const r of rooms) {
 const { columns, rows } = house.grid;
 const search = rooms.map((r) => ({ slug: r.slug, floor: r.floor.id, title: r.title, zh: r.zh, en: r.en, chapter: r.chapter, locked: !!r.locked }));
 const initialFloor = current?.floor.id ?? 'f1';
+/** `hidden` isn't in Astro's SVG attribute types; spread it in. */
+const hiddenAttr = (on: boolean): Record<string, string> => (on ? { hidden: '' } : {});
 
 // Layout of up to 4 thumbnails inside a room, as a 2 × 2 grid with a margin.
 function thumbBoxes(r: Room, n: number) {
@@ -39,7 +41,7 @@ function thumbBoxes(r: Room, n: number) {
   return Array.from({ length: n }, (_, i) => ({ x: x + pad + (i % cols) * cw + 40, y: y + pad + 500 + Math.floor(i / cols) * chh + 40, w: cw - 80, h: chh - 80 }));
 }
 ---
-<div class="house-map" id="house-map" data-floor={initialFloor} data-current={current?.slug ?? ''} data-zoom-level="1" transition:persist="house-map">
+<div class="house-map" id="house-map" data-floor={initialFloor} data-current={current?.slug ?? ''} data-zoom-level="1" data-keep="house-map">
   <div class="map-viewport" tabindex="0" aria-label="Floorplan. Drag to move, scroll to zoom, PageUp and PageDown change floors.">
     {floors.map((f) => {
       const b = floorBounds(f);
@@ -51,7 +53,7 @@ function thumbBoxes(r: Room, n: number) {
           data-bounds={`${b.x - m} ${b.y - m} ${b.w + m * 2} ${b.h + m * 2}`}
           viewBox={`${b.x - m} ${b.y - m} ${b.w + m * 2} ${b.h + m * 2}`}
           preserveAspectRatio="xMidYMid meet"
-          hidden={f.id !== initialFloor}
+          {...hiddenAttr(f.id !== initialFloor)}
           role="group"
           aria-label={`${f.name} (${f.zh})`}
         >
@@ -98,7 +100,7 @@ function thumbBoxes(r: Room, n: number) {
 
   <div class="map-ui map-floors" role="toolbar" aria-label="Floors">
     {[...floors].reverse().map((f) => (
-      <button type="button" data-floor-btn={f.id} aria-pressed={String(f.id === initialFloor)} title={`${f.name} · ${f.zh} · ${f.level}`}>{f.label}</button>
+      <button type="button" data-floor-btn={f.id} aria-pressed={f.id === initialFloor ? 'true' : 'false'} title={`${f.name} · ${f.zh} · ${f.level}`}>{f.label}</button>
     ))}
   </div>
   <div class="map-ui map-zoom" role="toolbar" aria-label="Zoom">
@@ -109,7 +111,7 @@ function thumbBoxes(r: Room, n: number) {
     <input type="search" placeholder="Search this house" aria-label="Search rooms and projects" autocomplete="off" />
     <ul class="search-results" hidden></ul>
   </div>
-  <label class="map-ui map-blueprint"><input type="checkbox" data-blueprint /> Blueprint</label>
+  <div class="map-ui map-blueprint"><input type="checkbox" id="house-blueprint" data-blueprint /><label for="house-blueprint">Blueprint</label></div>
   <div class="map-ui map-floorname" aria-live="polite"></div>
   <script type="application/json" id="house-index" set:html={JSON.stringify({ rooms: search, floors: floors.map((f) => ({ id: f.id, name: f.name, zh: f.zh, level: f.level })) })} />
 </div>
@@ -117,4 +119,6 @@ function thumbBoxes(r: Room, n: number) {
 <script>
   import { initMap } from '../../scripts/map';
   initMap();
+  // A House window opened later (or again) brings a new map.
+  document.addEventListener('astro:page-load', initMap);
 </script>

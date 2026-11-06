@@ -1,0 +1,144 @@
+---
+// kuschonink 98 Help: a real page (for search engines and anyone without
+// JavaScript), laid out like Windows Help: Contents / Index / Search, topics.
+import Desktop from '../layouts/Desktop.astro';
+import Window from '../components/desktop/Window.astro';
+import helpJson from '../content/help.json';
+import { site } from '../lib/content';
+import type { Tool } from '../lib/chrome';
+
+interface Topic { id: string; title: string; icon: string; keywords: string[]; html: string }
+const topics = (helpJson as { topics: Topic[] }).topics.map((t) => ({
+  ...t,
+  html: t.html.replaceAll('{email}', site.contact.email).replaceAll('{instagram}', site.social[0].href),
+}));
+
+// The Index: every keyword (and title), alphabetically, with its topics.
+const byKey = new Map<string, Topic[]>();
+for (const t of topics) {
+  for (const k of [...t.keywords, t.title]) {
+    const list = byKey.get(k) ?? [];
+    if (!list.includes(t)) list.push(t);
+    byKey.set(k, list);
+  }
+}
+const index = [...byKey].sort((a, b) => a[0].localeCompare(b[0], 'en', { sensitivity: 'base' }));
+const plain = (html: string) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
+const tools: Tool[] = [
+  { cmd: 'help-hide', label: 'Hide', icon: 'run', title: 'Hide or show the Contents' },
+  { cmd: 'back', label: 'Back', icon: 'tb-back' },
+  { cmd: 'forward', label: 'Forward', icon: 'tb-forward' },
+  { cmd: 'help-print', label: 'Print', icon: 'document', title: 'Print the Help' },
+];
+---
+<Desktop seo={{ title: `Help — ${site.name}`, description: `How to use kuschonink 98, the website of ${site.name}: the desktop, the mouse and keyboard, windows, the projects, the house, and getting in touch.` }}>
+  <Window app="help" variant="help" title="kuschonink 98 Help" address={false} tools={tools} bodyClass="doc" status={[`${topics.length} topics`, 'Press F1 for Help at any time.']}>
+    <div class="help-side" slot="side" data-help-side>
+      <menu role="tablist" class="help-tabs" aria-label="Help">
+        <li role="tab" aria-selected="true"><a href="#help-contents" data-tab="help-contents">Contents</a></li>
+        <li role="tab" aria-selected="false"><a href="#help-index" data-tab="help-index">Index</a></li>
+        <li role="tab" aria-selected="false"><a href="#help-search" data-tab="help-search">Search</a></li>
+      </menu>
+      <div class="window help-tabpanel" role="tabpanel">
+        <div class="help-panel" id="help-contents">
+          <ul class="tree-view">
+            {topics.map((t) => <li><a href={`#${t.id}`}><span class={`ico ico16 ico-${t.icon}`} aria-hidden="true"></span>{t.title}</a></li>)}
+          </ul>
+        </div>
+        <div class="help-panel" id="help-index">
+          <ul class="help-index">
+            {index.map(([k, ts]) => ts.length === 1 ? (
+              <li><a href={`#${ts[0].id}`}>{k}</a></li>
+            ) : (
+              <li>{k}{ts.map((t) => <div class="sub"><a href={`#${t.id}`}>{t.title}</a></div>)}</li>
+            ))}
+          </ul>
+        </div>
+        <div class="help-panel" id="help-search">
+          <form class="help-search-form" data-help-search>
+            <label for="help-q">Type in the word(s) to search for:</label>
+            <input id="help-q" type="search" autocomplete="off" />
+            <button type="submit">List Topics</button>
+          </form>
+          <ul class="help-results" aria-live="polite"></ul>
+        </div>
+      </div>
+    </div>
+    <div class="help-topics">
+      {topics.map((t) => (
+        <article class="help-topic" id={t.id} data-title={t.title} data-text={`${t.title} ${t.keywords.join(' ')} ${plain(t.html)}`.toLowerCase()}>
+          <h2><span class={`ico ico-${t.icon}`} aria-hidden="true"></span>{t.title}</h2>
+          <div set:html={t.html} />
+        </article>
+      ))}
+    </div>
+  </Window>
+</Desktop>
+
+<script>
+  // Tabs, Search, Hide and Print for the Help window.
+  function initHelp() {
+    for (const side of document.querySelectorAll<HTMLElement>('[data-help-side]:not([data-ready])')) {
+      side.dataset.ready = '1';
+      const win = side.closest<HTMLElement>('[data-window]')!;
+      const tabs = [...side.querySelectorAll<HTMLAnchorElement>('[data-tab]')];
+      const panels = [...side.querySelectorAll<HTMLElement>('.help-panel')];
+      const show = (id: string) => {
+        panels.forEach((p) => (p.hidden = p.id !== id));
+        tabs.forEach((t) => t.parentElement!.setAttribute('aria-selected', String(t.dataset.tab === id)));
+      };
+      show('help-contents');
+      tabs.forEach((t) => t.addEventListener('click', (e) => {
+        e.preventDefault();
+        show(t.dataset.tab!);
+        if (t.dataset.tab === 'help-search') side.querySelector<HTMLInputElement>('#help-q')?.focus();
+      }));
+
+      const form = side.querySelector<HTMLFormElement>('[data-help-search]')!;
+      const results = side.querySelector<HTMLElement>('.help-results')!;
+      const topics = [...win.querySelectorAll<HTMLElement>('.help-topic')];
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const words = (form.querySelector('input')!.value.toLowerCase().match(/[\p{L}\p{N}+-]+/gu) ?? []);
+        const hits = words.length ? topics.filter((t) => words.every((w) => t.dataset.text!.includes(w))) : [];
+        results.innerHTML = '';
+        if (!words.length) return;
+        if (!hits.length) {
+          results.textContent = 'No topics found.';
+          return;
+        }
+        for (const t of hits) {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `#${t.id}`;
+          a.textContent = t.dataset.title!;
+          li.append(a);
+          results.append(li);
+        }
+      });
+
+      win.addEventListener('click', (e) => {
+        const c = (e.target as Element).closest<HTMLElement>('[data-cmd]');
+        if (c?.dataset.cmd === 'help-hide') win.classList.toggle('help-hidden-side');
+        if (c?.dataset.cmd === 'help-print') window.print();
+      });
+
+      // Highlight the topic in Contents as it scrolls into view.
+      const body = win.querySelector<HTMLElement>('[data-window-body]');
+      const links = new Map([...side.querySelectorAll<HTMLAnchorElement>('#help-contents a')].map((a) => [a.hash.slice(1), a]));
+      if (body && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          for (const en of entries) {
+            if (!en.isIntersecting) continue;
+            links.forEach((a, id) => a.classList.toggle('current', id === en.target.id));
+          }
+        }, { root: body, rootMargin: '0px 0px -70% 0px' });
+        topics.forEach((t) => io.observe(t));
+        win.addEventListener('desktop:close', () => io.disconnect(), { once: true });
+      }
+    }
+  }
+  initHelp();
+  document.addEventListener('astro:page-load', initHelp);
+</script>

@@ -100,9 +100,9 @@ html.has-wallpaper .desktop .icon-label { background: var(--desktop-bg); }
 }
 
 /* ===== Windows ===== */
-#windows { position: relative; }
-html.js #windows { position: fixed; inset: 0 0 var(--taskbar-h) 0; z-index: 10; pointer-events: none; }
-html.js #windows > * { pointer-events: auto; }
+#k98-windows { position: relative; }
+html.js #k98-windows { position: fixed; inset: 0 0 var(--taskbar-h) 0; z-index: 10; pointer-events: none; }
+html.js #k98-windows > * { pointer-events: auto; }
 .app-window { display: flex; flex-direction: column; box-sizing: border-box; min-width: 0; }
 html:not(.js) .app-window { width: calc(100% - 16px); max-width: 1100px; margin: 8px auto calc(var(--taskbar-h) + 16px); }
 html.js .app-window {
@@ -155,7 +155,7 @@ html:not(.js) .window-inner { min-height: 60vh; }
 .wbody:focus { outline: none; }
 html:not(.js) .wbody { overflow: visible; }
 .wbody.flat { border: 0; background: transparent; }
-.window-side { flex: none; width: 210px; overflow: auto; margin-right: 2px; }
+.window-side { flex: none; width: var(--side-w, 210px); overflow: auto; margin-right: 2px; }
 
 .menubar { display: flex; flex-wrap: wrap; align-items: center; flex: none; padding: 1px 0; gap: 0; }
 .menubar > a, .mb-item {

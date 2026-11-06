@@ -195,7 +195,7 @@ function scrollToHash(win: wm.Win, hash: string) {
 }
 
 function announce(text: string) {
-  const a = document.getElementById('desktop-announcer');
+  const a = document.getElementById('k98-announcer');
   if (!a) return;
   a.textContent = '';
   setTimeout(() => (a.textContent = text), 60);
