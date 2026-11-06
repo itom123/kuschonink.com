@@ -62,4 +62,6 @@ export const MENU_ZH: Record<string, string> = {
   '&Tools': '工具(&T)',
   'F&ormat': '格式(&O)',
   '&Insert': '插入(&I)',
+  '&Image': '图像(&I)',
+  '&Colors': '颜色(&C)',
 };

@@ -54,6 +54,56 @@ function thick(c: Canvas, x0: number, y0: number, x1: number, y1: number, col: s
   return c;
 }
 
+/** A copy flipped left to right. */
+function mirrored(src: Canvas) {
+  const c = new Canvas(src.w, src.h);
+  for (let y = 0; y < src.h; y++) for (let x = 0; x < src.w; x++) c.set(src.w - 1 - x, y, src.get(x, y));
+  return c;
+}
+
+/**
+ * A tool lying on the diagonal, from its tip at the lower left to its end at
+ * the upper right (Paint's pencil and brush). `paint(t, s)` colours each pixel
+ * of the band: t runs along the tool (-11 at the tip … 11 at the end), s
+ * across it (-1 lit side, 0 middle, 1 shaded side).
+ */
+function diagonalTool(c: Canvas, paint: (t: number, s: number) => string | null) {
+  for (let y = 0; y < 16; y++) {
+    for (let x = 0; x < 16; x++) {
+      const s = x + y - 15;
+      const t = x - y;
+      if (Math.abs(s) > 1 || Math.abs(t) > 11) continue;
+      const col = paint(t, s);
+      if (col) c.set(x, y, col);
+    }
+  }
+  return c.outline('k');
+}
+
+/** The undo arrow: a hook that turns back to the left (redo is its mirror). */
+function undoArrow() {
+  const c = new Canvas(20, 20);
+  c.stamp(1, 3, [
+    '....kk.............',
+    '...kbk.............',
+    '..kbbkkkkkkkk......',
+    '.kbbbbbbbbbbbkk....',
+    'kbbbbbbbbbbbbbbk...',
+    '.kbbbbbbbbbbbbbbk..',
+    '..kbbkkkkkkkkbbbbk.',
+    '...kbk.......kkbbbk',
+    '....kk.........kbbk',
+    '................kbk',
+    '................kbk',
+    '...............kbbk',
+    '..............kbbk.',
+    '............kkbbk..',
+    '..........kkbbkk...',
+    '..........kkkk.....',
+  ]);
+  return c;
+}
+
 const KNIGHT = [
   '...........kk...........',
   '..........kwk...kk......',
@@ -580,6 +630,255 @@ export const ICONS: Record<string, Draw> = {
       c.line(11, o + 2, o + 2, 11, 'g');
     }
     return c;
+  },
+  // ---- Paint ----
+  /** The program: a wooden palette with five dabs of paint, and a brush laid across it. */
+  paint() {
+    const c = N();
+    c.ellipse(15, 18.5, 14.5, 11.5, 'x');
+    c.ellipse(27, 27.5, 4.6, 3.8, '.'); // the notch
+    c.ellipse(9.5, 23.5, 2.5, 2.2, '.'); // the thumb hole
+    c.outline('k');
+    // A lit rim along the top edge, darker wood along the bottom edge.
+    for (let x = 0; x < 32; x++) {
+      let top = true;
+      for (let y = 0; y < 32; y++) {
+        if (c.get(x, y) !== 'x') continue;
+        if (top && c.get(x, y - 1) === 'k') c.set(x, y, 'z');
+        top = false;
+        if (c.get(x, y + 1) === 'k' && y > 20) c.set(x, y, 'q');
+      }
+    }
+    for (const [x, y, col] of [[7.5, 15.5, 'r'], [11.5, 10.5, 'y'], [18, 9.5, 'b'], [24, 13.5, 'e'], [17.5, 22.5, 'w']] as const) {
+      c.disc(x, y, 3.4, 'k');
+      c.disc(x, y, 2.6, col);
+      c.set(Math.floor(x) - 1, Math.floor(y) - 1, col === 'w' ? 'u' : 'w');
+    }
+    // The brush on its own layer, outlined, then laid on top: handle, ferrule, bristles with red paint.
+    const b = N();
+    for (let y = 0; y < 32; y++) {
+      for (let x = 0; x < 32; x++) {
+        const s = x + y - 31, t = x - y;
+        if (Math.abs(s) > 1 || t < 3 || t > 31) continue;
+        if (t >= 15) b.set(x, y, s === 1 ? 'q' : s === -1 ? 'z' : 'x');
+        else if (t >= 11) b.set(x, y, s === 1 ? 'g' : s === -1 ? 'w' : 's');
+        else if (t >= 6) b.set(x, y, 'k');
+        else if (Math.abs(s) <= (t - 3) / 2) b.set(x, y, 'r');
+      }
+    }
+    b.outline('k');
+    for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) if (b.get(x, y) !== '.') c.set(x, y, b.get(x, y));
+    return c;
+  },
+  'pt-select'() {
+    const c = new Canvas(16, 16);
+    for (let x = 1; x <= 14; x++) if (x % 2) c.set(x, 2, 'k').set(x, 13, 'k');
+    for (let y = 2; y <= 13; y++) if (y % 2 === 0) c.set(1, y, 'k').set(14, y, 'k');
+    c.set(14, 13, 'k');
+    return c;
+  },
+  'pt-eraser'() {
+    const c = new Canvas(16, 16);
+    c.poly([[6, 3], [15, 3], [10, 8], [1, 8]], 'w');
+    c.poly([[1, 8], [10, 8], [10, 13], [1, 13]], 'w');
+    c.poly([[10, 8], [15, 3], [15, 8], [10, 13]], 's');
+    c.rect(5, 8, 3, 5, 'b').poly([[5, 8], [8, 8], [13, 3], [10, 3]], 'a');
+    c.poly([[8, 8], [8, 13], [13, 8], [13, 3]], 'n');
+    c.line(1, 8, 10, 8, 'k').line(10, 8, 15, 3, 'k').line(10, 8, 10, 13, 'k');
+    c.outline('k');
+    return c;
+  },
+  'pt-fill'() {
+    const c = new Canvas(16, 16);
+    c.stamp(0, 0, [
+      '......kk........',
+      '.....k..k.......',
+      '....k....k......',
+      '...kkk....k.....',
+      '..kwwwkk...k....',
+      '.kwwwwwwkk.k....',
+      'kbkwwwwwwwkk....',
+      'kbbkwwwwwwsk....',
+      'kbbbkwwwwssk....',
+      'kbbbbkwwsssk....',
+      'kbbbb.kksssk....',
+      'kbbbb...kkk.....',
+      'kbbbb...........',
+      '.kbbk...........',
+      '..kk............',
+      '................',
+    ]);
+    return c;
+  },
+  'pt-picker'() {
+    const c = new Canvas(16, 16);
+    c.stamp(0, 0, [
+      '...........kkk..',
+      '..........kgggk.',
+      '..........kgggk.',
+      '.........kkgggk.',
+      '........kwkkkk..',
+      '.......kwwk.....',
+      '......kwwk......',
+      '.....kwwk.......',
+      '....kwwk........',
+      '...kwwk.........',
+      '..kwak..........',
+      '.kaak...........',
+      '.kak............',
+      'kk..............',
+      '................',
+      '................',
+    ]);
+    return c;
+  },
+  'pt-zoom'() {
+    const c = new Canvas(16, 16);
+    c.stamp(0, 0, [
+      '................',
+      '...kkkk.........',
+      '..kaaaak........',
+      '.kawwaaak.......',
+      '.kawaaaak.......',
+      '.kaaaaaak.......',
+      '.kaaaaaak.......',
+      '..kaaaak........',
+      '...kkkkkk.......',
+      '.......kkk......',
+      '........kkk.....',
+      '.........kkk....',
+      '..........kkk...',
+      '...........kk...',
+      '................',
+      '................',
+    ]);
+    return c;
+  },
+  'pt-pencil'() {
+    return diagonalTool(new Canvas(16, 16), (t, s) => {
+      if (t <= -10) return s === 0 ? 'k' : null;
+      if (t <= -8) return Math.abs(s) <= (t + 10) ? 'x' : null;
+      if (t <= 5) return s === 1 ? 'o' : s === -1 ? 'h' : 'y';
+      if (t <= 7) return s === 1 ? 'g' : 's';
+      return 'r';
+    });
+  },
+  'pt-brush'() {
+    return diagonalTool(new Canvas(16, 16), (t, s) => {
+      if (t <= -9) return Math.abs(s) <= (t + 11) / 2 ? 'n' : null;
+      if (t <= -5) return 'k';
+      if (t <= -3) return s === 1 ? 'g' : 's';
+      if (t <= 10) return s === 1 ? 'm' : 'x';
+      return s === 0 ? 'm' : null;
+    });
+  },
+  'pt-airbrush'() {
+    const c = new Canvas(16, 16);
+    c.stamp(0, 0, [
+      '.........kkk....',
+      '.k.k....kgssk...',
+      'k...k...ksssk...',
+      '.k.k.k.kkkkkkk..',
+      'k.k..kkksswssk..',
+      '.k.k...ksswssk..',
+      '..k.k..ksswssk..',
+      '.......ksswssk..',
+      '.......ksswssk..',
+      '.......ksswssk..',
+      '.......ksswssk..',
+      '.......ksswssk..',
+      '.......kgsssgk..',
+      '........kkkkk...',
+      '................',
+      '................',
+    ]);
+    return c;
+  },
+  'pt-text'() {
+    const c = new Canvas(16, 16);
+    c.stamp(0, 0, [
+      '................',
+      '................',
+      '.......k........',
+      '.......kk.......',
+      '......kkk.......',
+      '......k.kk......',
+      '.....k..kk......',
+      '.....k...kk.....',
+      '....kkkkkkk.....',
+      '....k.....kk....',
+      '...k......kk....',
+      '..kkk....kkkk...',
+      '................',
+      '................',
+      '................',
+      '................',
+    ]);
+    return c;
+  },
+  'pt-line'() {
+    const c = new Canvas(16, 16);
+    c.line(2, 13, 13, 2, 'k');
+    return c;
+  },
+  'pt-rect'() {
+    const c = new Canvas(16, 16);
+    c.box(1, 3, 14, 10, 'k');
+    return c;
+  },
+  'pt-ellipse'() {
+    const c = new Canvas(16, 16);
+    c.ellipse(8, 8, 7, 5.5, 'k');
+    c.ellipse(8, 8, 6, 4.5, '.');
+    return c;
+  },
+  'tb-new'() {
+    const c = new Canvas(20, 20);
+    c.stamp(3, 1, [
+      'kkkkkkkkk....',
+      'kwwwwwwwkk...',
+      'kwwwwwwwksk..',
+      'kwwwwwwwksskk',
+      'kwwwwwwwkkkkk',
+      'kwwwwwwwwwwwk',
+      'kwwwwwwwwwwwk',
+      'kwwwwwwwwwwwk',
+      'kwwwwwwwwwwwk',
+      'kwwwwwwwwwwwk',
+      'kwwwwwwwwwwwk',
+      'kwwwwwwwwwwwk',
+      'kwwwwwwwwwwwk',
+      'kwwwwwwwwwwwk',
+      'kwwwwwwwwwwwk',
+      'kwwwwwwwwwwwk',
+      'kwwwwwwwwwwwk',
+      'kkkkkkkkkkkkk',
+    ]);
+    return c;
+  },
+  'tb-open'() {
+    const c = new Canvas(20, 20);
+    c.poly([[1, 4], [3, 2], [8, 2], [10, 4], [16, 4], [16, 17], [1, 17]], 'o');
+    c.rect(2, 3, 6, 2, 'y');
+    c.poly([[4, 8], [19, 8], [16, 17], [1, 17]], 'y');
+    c.line(5, 9, 17, 9, 'h');
+    c.outline('k');
+    return c;
+  },
+  'tb-save'() {
+    const c = new Canvas(20, 20);
+    c.rect(2, 2, 16, 16, 'k');
+    c.rect(3, 3, 14, 14, 'n');
+    c.rect(6, 3, 8, 6, 's').rect(11, 4, 2, 4, 'n');
+    c.rect(5, 11, 10, 6, 'w').rect(6, 13, 8, 1, 'g').rect(6, 15, 6, 1, 'g');
+    c.set(17, 2, '.').set(16, 3, 'k');
+    return c;
+  },
+  'tb-undo'() {
+    return undoArrow();
+  },
+  'tb-redo'() {
+    return mirrored(undoArrow());
   },
   shortcut() {
     const c = N();

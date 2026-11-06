@@ -29,7 +29,8 @@ appears with the page they asked for open in a window.
 - **Programs**: Welcome (`/`), Projects (`/image`, a folder with thumbnails,
   list and details views, and a Web View pane), each project (`/image/<slug>`,
   with an Image Viewer for the photographs), About.doc (`/about`, a document),
-  Contact (`/contact`, a New Message window), The House (`/house/…`, a browser
+  Contact (`/contact`, a New Message window), Paint (`/paint`, for drawing
+  something and sending it to the artist), The House (`/house/…`, a browser
   window) and Help (`/help`).
 - **The Control Panel**: Display (wallpaper, screen saver, colour schemes
   including High Contrast, window effects), Mouse (faint pointer trails, off to
@@ -233,6 +234,43 @@ email goes to the visitor.
 
 The old `kuschonink-contact` Worker is no longer used by the site.
 
+### Paint (画图): drawings sent to the artist
+
+**Paint** (`/paint`, on the desktop and in Start ▸ Programs ▸ Accessories) is a
+1998-style paint program for drawing something and sending it to the artist.
+It works with a mouse, a finger or a pen: the brush follows a pen's pressure,
+the far end of a pen rubs out, a resting palm is ignored, and on a touch screen
+two fingers pinch to zoom and drag to scroll. Twelve tools (select, eraser,
+fill, pick colour, magnifier, pencil, brush, airbrush, text, line, rectangle,
+ellipse), the Windows 98 colour box and Edit Colors dialog, Undo and Redo,
+copy and paste, opening a picture to draw on, and flip, rotate, invert and
+resize. The window says, in a yellow note that is always in view, where the
+picture goes, and *How Sending Works* explains it step by step.
+
+**Sending.** *Send to Xiangyin* shows the picture and asks, all optional, for a
+name, an email address (so he can reply) and a note. It posts them to
+`/v1/contact/drawing`, handled by `worker/drawing.ts`: the same checks as the
+contact form (origin, a per-visitor rate limit kept apart from messages, and
+Turnstile with its own action, `kuschonink-drawing`), plus the picture itself,
+which must be a complete PNG of at most 2 MB and 2400 pixels a side (Paint
+shrinks busier pictures to fit). The email goes to the same inbox through the
+`EMAIL` binding, with the drawing shown in the message (an inline attachment,
+`drawing-<date>-<time>-<name>.png`); replying goes to the visitor when they gave
+an address. Nothing is stored on the server.
+
+**In the visitor's browser.** The picture being drawn is kept in IndexedDB
+(`kus98-paint`), so closing Paint doesn't lose it; File ▸ New clears it. Tool
+choices and custom colours are in `localStorage` (`kus98:paint`).
+
+- **Code:** the page is `src/pages/paint.astro`; the program is in
+  `src/scripts/paint/` (`app.ts` the window, `doc.ts` the picture and Undo,
+  `tools.ts`, `select.ts`, `text.ts`, `fill.ts`, `colors.ts`, `send.ts`,
+  `store.ts`); tool and colour lists are in `src/lib/paint.ts`; styles in
+  `src/styles/paint.css`. Icons and pointers are drawn in `src/lib/iconset.ts`
+  and `src/lib/cursors.ts`.
+- **Tests:** `npm test` also runs the drawing handler (`worker/drawing.test.mts`,
+  with real PNGs) and the fill (`src/scripts/paint/fill.test.mts`).
+
 ### Analytics
 
 Cloudflare Web Analytics is enabled for the kuschonink.com zone with automatic
@@ -254,10 +292,12 @@ There's no code in this repo and no cookie banner is needed.
 | `src/lib/house.ts` | Knight's tour, chapter order, inventories |
 | `src/scripts/map.ts` | Map interaction (pan, zoom, floors, search) |
 | `src/components/house/` | Floorplan map and room panel |
+| `src/pages/paint.astro`, `src/scripts/paint/` | Paint, and sending a drawing to the artist |
+| `worker/` | The Worker: the contact form (`contact.ts`) and Paint's drawings (`drawing.ts`) |
 | `src/layouts/Desktop.astro` | Every page: the Xiangyin 98 desktop with the page in a window |
 | `src/components/desktop/` | Window, taskbar, Start menu, desktop icons, start-up screens |
 | `src/scripts/desktop/` | The desktop shell: windows, menus, sounds, Control Panel… (see [`docs/DESKTOP.md`](docs/DESKTOP.md)) |
-| `src/styles/` | `desktop.css`, `system.css`, `schemes.css` (the computer), `doc.css`, `blocks.css`, `house.css`, `explorer.css`, `apps.css`, `lang.css` (what's in the windows); 98.css is vendored in `src/styles/vendor/` |
+| `src/styles/` | `desktop.css`, `system.css`, `schemes.css` (the computer), `doc.css`, `blocks.css`, `house.css`, `explorer.css`, `apps.css`, `paint.css`, `lang.css` (what's in the windows); 98.css is vendored in `src/styles/vendor/` |
 | `wrangler.jsonc` | Cloudflare Workers config |
 
 ### Page content format
@@ -317,7 +357,7 @@ Worker's *Settings → Domains & Routes*. Until then the site is available at
 ### Adding server features later
 
 `worker/index.ts` runs only for the paths listed in `assets.run_worker_first`
-(currently `/v1/contact/*`). Everything else is served as static files. Add a
+(currently `/v1/contact/*`: the contact form and Paint's drawings). Everything else is served as static files. Add a
 path there and handle it in the Worker to add an API route.
 
 ## Migration notes

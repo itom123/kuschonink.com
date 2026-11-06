@@ -35,6 +35,7 @@ const ALIASES: [string[], Action][] = [
   [['help', 'help topics', '?', '帮助', '帮助主题'], { url: '/help' }],
   [['about', 'about.doc', 'biography', 'bio', 'cv', '关于', '关于.doc', '简历', '简介'], { url: '/about' }],
   [['contact', 'mail', 'email', 'e-mail', 'new message', 'write', '联系', '邮件', '电子邮件', '新邮件', '写信'], { url: '/contact' }],
+  [['paint', 'mspaint', 'pbrush', 'paint.exe', 'draw', 'drawing', 'sketch', '画图', '绘图', '画画', '画'], { url: '/paint' }],
   [['house', 'the house', 'facade', 'house.exe', '房子', '立面'], { url: '/house/facade' }],
   [['floorplan', 'floor plan', 'plan', 'map', '平面图', '地图'], { url: '/house' }],
   [['projects', 'project', 'image', 'images', 'work', 'works', 'explorer', 'portfolio', '作品', '图像'], { url: '/image' }],
@@ -57,7 +58,7 @@ const SUGGEST: { en: string; zh: string }[] = [
   { en: 'find', zh: '查找' },
 ];
 
-const STATIC = new Set(['/', '/image', '/image/all', '/about', '/contact', '/help', '/house', '/house/facade', '/house/appendix/index', '/house/appendix/chronology', '/house/appendix/checklist', '/house/appendix/rules']);
+const STATIC = new Set(['/', '/image', '/image/all', '/about', '/contact', '/paint', '/help', '/house', '/house/facade', '/house/appendix/index', '/house/appendix/chronology', '/house/appendix/checklist', '/house/appendix/rules']);
 
 const norm = normText;
 

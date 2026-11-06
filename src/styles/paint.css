@@ -1,0 +1,281 @@
+/* ===== Paint (画图): src/pages/paint.astro, src/scripts/paint/ =====
+   The tool box on the left, the picture on a grey desk, the colour box below,
+   as in 1998. In a narrow window (a phone) the tool box moves under the
+   picture with finger-sized buttons, and the colour box stretches to fit. */
+
+.app-window[data-app="paint"] { --pt: 25px; }
+@media (pointer: coarse) { .app-window[data-app="paint"] { --pt: 32px; } }
+.paint-body { overflow: hidden !important; background: var(--face) !important; }
+html:not(.js) .paint-body { overflow: visible !important; }
+
+.paint {
+  display: flex; flex-direction: column; height: 100%; min-height: 0; box-sizing: border-box;
+  background: var(--face); color: #000; font: 11px var(--ui-font);
+  container: paint / inline-size;
+  -webkit-user-select: none; user-select: none;
+  touch-action: manipulation; /* no double-tap zoom on the buttons */
+}
+html:not(.js) .paint { min-height: 460px; }
+.paint button { font: 11px var(--ui-font); color: #000; text-shadow: none; }
+
+/* ---- The note: how the picture reaches the artist, always in view ---- */
+.paint-note {
+  flex: none; display: flex; align-items: center; gap: 6px; margin: 0 0 2px; padding: 3px 6px 3px 5px;
+  background: var(--tip); border: 1px solid #000; line-height: 14px;
+}
+.paint-note-text { flex: 1; min-width: 0; }
+.paint-note-more { flex: none; color: #0000ee; white-space: nowrap; }
+.paint-note-more:visited { color: #0000ee; }
+.paint.no-note .paint-note { display: none; }
+
+/* ---- The Text tool's Fonts bar: floats over the picture, as in 1998, so nothing moves ---- */
+.paint-fontbar {
+  position: absolute; z-index: 6; top: 5px; right: 22px; max-width: calc(100% - 40px); box-sizing: border-box;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 3px 5px;
+  background: var(--face); box-shadow: var(--raised-window);
+}
+.pf-title { padding-right: 4px; font-weight: bold; }
+.paint-fontbar select { height: 21px; max-width: 46%; }
+.pf-toggle { min-width: 23px !important; min-height: 21px !important; padding: 0 !important; font-size: 13px !important; }
+.pf-bold { font-weight: bold !important; }
+.pf-italic { font-style: italic !important; font-family: "Times New Roman", serif !important; }
+.pf-toggle[aria-pressed="true"] { box-shadow: var(--pressed); background: var(--dither); }
+
+/* ---- The work area: tool box and picture ---- */
+.paint-work { position: relative; flex: 1; min-height: 0; display: flex; gap: 2px; }
+.paint-toolbox { flex: none; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 1px 2px 0 1px; }
+.paint.no-toolbox .paint-toolbox { display: none; }
+.paint-tools { display: grid; grid-template-columns: repeat(2, var(--pt)); grid-auto-rows: var(--pt); }
+.paint-tool {
+  width: var(--pt); height: var(--pt); min-width: 0 !important; min-height: 0 !important; padding: 0 !important; margin: 0;
+  display: grid; place-items: center; background: var(--face); box-shadow: var(--raised);
+}
+.paint-tool[aria-checked="true"], .paint-tool:not(:disabled):active { box-shadow: var(--pressed); background: var(--dither); }
+.paint-tool[aria-checked="true"] .ico { transform: translate(1px, 1px); }
+.paint-tool:focus { outline: none; }
+.paint-tool:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+
+.paint-options {
+  box-sizing: border-box; width: calc(var(--pt) * 2); min-height: 66px; padding: 3px 2px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  box-shadow: inset 1px 1px var(--shadow), inset -1px -1px var(--hi);
+}
+.paint-options[data-for="brush"] { display: grid; grid-template-columns: repeat(3, 15px); justify-content: center; align-content: center; gap: 1px; }
+.paint-opt {
+  min-width: 0 !important; min-height: 0 !important; padding: 1px !important; margin: 0; border: 0;
+  display: grid; place-items: center; background: transparent; box-shadow: none !important;
+}
+.paint-opt:focus { outline: none; }
+.paint-opt:focus-visible { outline: 1px dotted #000; outline-offset: 0; }
+.paint-opt[aria-pressed="true"] { background: var(--sel); }
+.paint-opt[aria-pressed="true"] .opt-pic:not(.in-colour) { filter: invert(1); }
+.paint-opt[aria-pressed="true"] .opt-pic.in-colour { box-shadow: 0 0 0 1px var(--sel-text); }
+.paint-opt[aria-pressed="true"] .opt-text { color: var(--sel-text); }
+.opt-pic { display: block; image-rendering: pixelated; }
+.opt-text { display: block; padding: 0 6px; line-height: 13px; }
+
+/* ---- The picture on its grey desk ---- */
+.paint-view {
+  flex: 1; min-width: 0; min-height: 0; position: relative; overflow: auto;
+  background: #808080; box-shadow: var(--sunken); outline: none;
+  touch-action: none; overscroll-behavior: contain;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+}
+.paint-view:focus-visible { box-shadow: var(--sunken), inset 0 0 0 3px #808080, inset 0 0 0 4px #fff; }
+.paint-stage { position: relative; margin: 3px 14px 14px 3px; width: 640px; height: 400px; }
+.paint-canvas, .paint-overlay { position: absolute; left: 0; top: 0; display: block; image-rendering: pixelated; }
+.paint-canvas { background: #fff; }
+.paint-overlay { pointer-events: none; }
+.paint-stage.smooth :is(.paint-canvas, .paint-overlay) { image-rendering: auto; }
+.paint-stage.grid::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image: linear-gradient(to right, rgba(128, 128, 128, 0.55) 1px, transparent 1px), linear-gradient(to bottom, rgba(128, 128, 128, 0.55) 1px, transparent 1px);
+  background-size: var(--z) var(--z);
+}
+/* Resize handles, just outside the picture's right and bottom edges. */
+.paint-handle { position: absolute; z-index: 2; width: 4px; height: 4px; background: var(--sel); touch-action: none; }
+.paint-handle::before { content: ""; position: absolute; inset: -6px; }
+.h-e { left: calc(100% + 1px); top: calc(50% - 2px); cursor: ew-resize; }
+.h-s { top: calc(100% + 1px); left: calc(50% - 2px); cursor: ns-resize; }
+.h-se { left: calc(100% + 1px); top: calc(100% + 1px); cursor: nwse-resize; }
+@media (pointer: coarse) {
+  .paint-handle { width: 7px; height: 7px; }
+  .paint-handle::before { inset: -12px; }
+  .h-e { top: calc(50% - 3px); }
+  .h-s { left: calc(50% - 3px); }
+}
+.paint-ghost { position: absolute; left: 0; top: 0; z-index: 3; box-sizing: border-box; border: 1px dashed #000; pointer-events: none; }
+.paint-marquee {
+  position: absolute; z-index: 2; box-sizing: border-box; pointer-events: none;
+  border: 1px dashed var(--sel); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75);
+}
+.paint .paint-textbox {
+  position: absolute; z-index: 3; box-sizing: content-box; margin: 0; padding: 0 1px; border: 0; border-radius: 0;
+  outline: 1px dashed var(--sel); outline-offset: 1px; box-shadow: none; resize: none; overflow: hidden;
+  white-space: pre; min-width: 0; min-height: 0; -webkit-user-select: text; user-select: text; caret-color: currentColor;
+}
+/* Without JavaScript a canvas shows nothing: just the note, and how else to reach the artist. */
+html:not(.js) .paint-stage { display: none; }
+.paint-noscript { position: absolute; left: 24px; top: 24px; right: 24px; max-width: 520px; padding: 12px 16px; background: var(--tip); border: 1px solid #000; }
+.paint-noscript p { margin: 0 0 8px; }
+
+/* Pointers: one for each tool (src/lib/cursors.ts), or the system's own. */
+.paint .paint-stage { cursor: crosshair; }
+.paint[data-active-tool="text"] .paint-stage { cursor: text; }
+.paint[data-active-tool="zoom"] .paint-stage { cursor: zoom-in; }
+.paint[data-active-tool="eraser"] .paint-stage { cursor: none; }
+.paint .paint-view.over-selection .paint-stage, .paint .paint-view.panning, .paint .paint-view.panning * { cursor: move; }
+html:not([data-pointers="system"]) body.kus98 .paint .paint-stage { cursor: var(--k98c-cross); }
+html:not([data-pointers="system"]) body.kus98 .paint[data-active-tool="pencil"] .paint-stage { cursor: var(--k98c-pen); }
+html:not([data-pointers="system"]) body.kus98 .paint[data-active-tool="fill"] .paint-stage { cursor: var(--k98c-paint-fill); }
+html:not([data-pointers="system"]) body.kus98 .paint[data-active-tool="picker"] .paint-stage { cursor: var(--k98c-paint-picker); }
+html:not([data-pointers="system"]) body.kus98 .paint[data-active-tool="zoom"] .paint-stage { cursor: var(--k98c-paint-zoom); }
+html:not([data-pointers="system"]) body.kus98 .paint[data-active-tool="text"] .paint-stage { cursor: var(--k98c-text); }
+html:not([data-pointers="system"]) body.kus98 .paint[data-active-tool="eraser"] .paint-stage { cursor: none; }
+html:not([data-pointers="system"]) body.kus98 .paint .paint-textbox { cursor: var(--k98c-text); }
+html:not([data-pointers="system"]) body.kus98 .paint .over-selection .paint-stage,
+html:not([data-pointers="system"]) body.kus98 .paint .panning,
+html:not([data-pointers="system"]) body.kus98 .paint .panning * { cursor: var(--k98c-move); }
+html:not([data-pointers="system"]) body.kus98 .paint .h-e { cursor: var(--k98c-ew); }
+html:not([data-pointers="system"]) body.kus98 .paint .h-s { cursor: var(--k98c-ns); }
+html:not([data-pointers="system"]) body.kus98 .paint .h-se { cursor: var(--k98c-nwse); }
+
+/* ---- The colour box ---- */
+.paint-colorbox { flex: none; display: flex; align-items: flex-start; gap: 4px; padding: 4px 2px 1px; }
+.paint.no-colorbox .paint-colorbox { display: none; }
+.paint-current { flex: none; position: relative; width: 32px; height: 32px; background: var(--dither); box-shadow: var(--sunken); }
+.paint-fg, .paint-bg {
+  position: absolute; box-sizing: border-box; width: 15px; height: 15px; min-width: 0 !important; min-height: 0 !important; padding: 0 !important;
+  border: 1px solid #000; background: var(--c, #000); box-shadow: 0 0 0 1px #fff !important;
+}
+.paint-fg { left: 5px; top: 5px; z-index: 1; }
+.paint-bg { right: 5px; bottom: 5px; }
+.paint-fg:focus-visible, .paint-bg:focus-visible { outline: 1px dotted #000; outline-offset: 2px; }
+.paint-palette { display: grid; grid-template-columns: repeat(14, 16px); grid-auto-rows: 16px; }
+.paint-swatch {
+  box-sizing: border-box; width: 16px; height: 16px; min-width: 0 !important; min-height: 0 !important; padding: 0 !important; margin: 0; border: 0;
+  background: var(--c); box-shadow: var(--sunken) !important; -webkit-touch-callout: none;
+}
+.paint-swatch:focus { outline: none; }
+.paint-swatch:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
+
+/* ---- A narrow window (a phone): tool box under the picture ---- */
+@container paint (max-width: 560px) {
+  .paint-note { padding: 2px 5px; }
+  .paint-work { flex-direction: column; gap: 3px; }
+  .paint-toolbox { order: 2; flex-direction: row; justify-content: center; align-items: stretch; gap: 6px; padding: 0; }
+  .paint-tools { grid-template-columns: repeat(6, 36px); grid-auto-rows: 34px; }
+  .paint-tool { width: 36px; height: 34px; }
+  .paint-options { width: auto; min-width: 72px; max-width: 140px; height: 68px; min-height: 0; flex-wrap: wrap; align-content: center; padding: 2px 4px; }
+  .paint-options[data-for="brush"] { grid-template-columns: repeat(4, 15px); }
+  .paint-colorbox { align-items: center; gap: 5px; padding: 4px 1px 2px; }
+  .paint-current { width: 40px; height: 40px; }
+  .paint-fg, .paint-bg { width: 20px; height: 20px; }
+  .paint-fg { left: 5px; top: 5px; }
+  .paint-bg { right: 4px; bottom: 4px; }
+  .paint-palette { flex: 1; min-width: 0; grid-template-columns: repeat(14, minmax(0, 1fr)); grid-auto-rows: auto; }
+  .paint-swatch { width: auto; height: auto; aspect-ratio: 1; max-height: 26px; }
+}
+@container paint (max-width: 340px) {
+  .paint-tools { grid-template-columns: repeat(6, 32px); grid-auto-rows: 32px; }
+  .paint-tool { width: 32px; height: 32px; }
+}
+/* The Send button is the one to find. */
+.app-window[data-app="paint"] .toolbar [data-cmd="paint-send"] { font-weight: bold; min-width: 64px; }
+
+/* ---- Dialogs: Send, How Sending Works, Edit Colors, Attributes ---- */
+/* They grow with what they hold (the anti-spam check, progress, messages)
+   but never past the bottom of the screen; beyond that they scroll. */
+html.js .app-window:is(.paint-send-dialog, .paint-how-dialog, .paint-colors-dialog, .paint-attrs-dialog) { height: auto; max-height: calc(100% - var(--y, 8px) - 6px); }
+.app-window:is(.paint-send-dialog, .paint-how-dialog, .paint-colors-dialog, .paint-attrs-dialog) > .window-inner { min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.paint-send, .paint-how, .paint-attrs { box-sizing: border-box; padding: 10px 12px 10px; font: 11px var(--ui-font); line-height: 14px; }
+.paint-send { display: flex; flex-direction: column; gap: 8px; width: min(440px, calc(100vw - 40px)); }
+.ps-picture { display: flex; align-items: center; gap: 10px; }
+.ps-thumb {
+  flex: none; display: block; width: auto; height: auto; max-width: 112px; max-height: 84px; image-rendering: pixelated;
+  background: #fff; box-shadow: 0 0 0 1px #000, 2px 2px 0 1px rgba(0, 0, 0, 0.35);
+}
+.ps-file { display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+.ps-scaled { color: var(--shadow); }
+.ps-headers { display: grid; gap: 4px; padding: 6px; box-shadow: var(--thin-down); }
+.ps-row { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: 6px; }
+.ps-key { text-align: right; }
+.ps-row input { width: 100%; }
+.ps-to { display: flex; align-items: center; gap: 4px; min-height: 21px; padding: 0 4px; background: var(--light); box-shadow: var(--sunken); }
+.ps-note textarea { display: block; width: 100%; min-height: 76px; resize: vertical; box-sizing: border-box; font: 15px/1.35 "Times New Roman", Times, "Songti SC", SimSun, serif; -webkit-user-select: text; user-select: text; }
+.ps-trap { position: absolute !important; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.ps-how { display: flex; align-items: flex-start; gap: 6px; padding: 6px 8px; background: #fff; box-shadow: var(--sunken); }
+.ps-how p { margin: 0; }
+.ps-how .ico { margin-top: 1px; }
+.ps-turnstile:empty { display: none; }
+.ps-wait { color: var(--shadow); }
+.ps-progress-text { margin: 0 0 4px; }
+.ps-progress .progress-indicator { height: 22px; padding: 3px; }
+.ps-progress .progress-indicator-bar { transition: width 0.2s steps(4, end); }
+.ps-status { margin: 0; padding: 4px 6px; background: var(--tip); border: 1px solid #000; }
+.ps-buttons, .ph-buttons, .pa-buttons, .pc-buttons { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 6px; }
+.ps-buttons button, .ph-buttons button, .pa-buttons button, .pc-buttons button { min-width: 75px; }
+.ps-done { display: flex; align-items: flex-start; gap: 12px; padding: 4px 2px 6px; }
+.ps-done p { margin: 0 0 6px; }
+.ps-done-title { font-weight: bold; font-size: 12px; }
+
+.paint-how { width: min(500px, calc(100vw - 40px)); display: flex; flex-direction: column; gap: 10px; }
+.ph-row { display: flex; align-items: flex-start; gap: 12px; }
+.ph-row > .ico { margin-top: 2px; }
+.ph-lead { margin: 0 0 6px; font-weight: bold; }
+.paint-how ol { margin: 0 0 10px; padding-left: 18px; }
+.paint-how li { margin-bottom: 4px; }
+.paint-how p { margin: 0 0 6px; }
+
+.paint-attrs { display: flex; flex-direction: column; gap: 10px; width: min(330px, calc(100vw - 40px)); }
+.paint-attrs p { margin: 0; }
+.pa-fields { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.pa-fields label { display: inline-flex; align-items: center; gap: 6px; }
+.pa-fields input { width: 64px; }
+.pa-note { color: #404040; }
+
+.paint-colors { box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 12px; padding: 10px 12px; font: 11px var(--ui-font); max-width: calc(100vw - 40px); }
+.pc-left { display: flex; flex-direction: column; gap: 4px; width: 216px; }
+.pc-label { margin: 2px 0 0; }
+.pc-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px 5px; }
+.pc-swatch {
+  box-sizing: border-box; width: 22px; height: 18px; min-width: 0 !important; min-height: 0 !important; padding: 0 !important; margin: 0; border: 0;
+  background: var(--c); box-shadow: var(--sunken) !important;
+}
+.pc-swatch:focus { outline: 1px dotted #000; outline-offset: 1px; }
+.pc-swatch.slot { outline: 1px solid #000; outline-offset: 1px; }
+.pc-define { margin-top: 6px; }
+.pc-buttons { justify-content: flex-start; margin-top: 8px; }
+.pc-right { display: flex; flex-direction: column; gap: 8px; }
+.pc-pickers { display: flex; gap: 8px; }
+.pc-spec-wrap, .pc-lum-wrap { position: relative; touch-action: none; padding: 2px; line-height: 0; }
+.pc-spec-wrap { box-shadow: var(--sunken); }
+.pc-lum-wrap { padding-right: 14px; }
+.pc-lumbar { box-shadow: 0 0 0 1px var(--shadow); }
+.pc-spectrum, .pc-lumbar { display: block; }
+.pc-cross {
+  position: absolute; width: 19px; height: 19px; margin: -9px 0 0 -9px; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='19' height='19'%3E%3Cpath d='M8 0h3v6H8zM8 13h3v6H8zM0 8h6v3H0zM13 8h6v3h-6z' fill='%23000'/%3E%3C/svg%3E") no-repeat;
+}
+.pc-arrow { position: absolute; left: 17px; margin-top: -5px; width: 0; height: 0; border: 5px solid transparent; border-left: 0; border-right: 6px solid #000; pointer-events: none; }
+.pc-values { display: flex; gap: 10px; align-items: flex-start; }
+.pc-preview-box { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.pc-preview { display: block; width: 46px; height: 36px; box-shadow: var(--sunken); }
+.pc-fields { display: grid; grid-template-columns: auto auto; gap: 3px 10px; }
+.pc-field { display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+.pc-field input { width: 46px; height: 21px; }
+
+/* On its own (no desktop): a native dialog dressed the same way. */
+.paint-native-dialog { padding: 3px; border: 0; max-width: calc(100vw - 16px); }
+.paint-native-dialog::backdrop { background: rgba(0, 0, 0, 0.2); }
+
+@media (max-height: 700px), (max-width: 480px) {
+  .paint-send { gap: 6px; padding: 8px 10px; }
+  .ps-thumb { max-width: 84px; max-height: 60px; }
+  .ps-note textarea { min-height: 52px; }
+  .ps-headers { padding: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-progress .progress-indicator-bar { transition: none; }
+}

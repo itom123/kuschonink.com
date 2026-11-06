@@ -3,16 +3,18 @@
 // so it can be tested without Cloudflare's services.
 
 export const CONTACT_PATH = '/v1/contact/kuschonink';
-const ALLOWED_ORIGINS = new Set(['https://kuschonink.com', 'https://www.kuschonink.com']);
-const ALLOWED_HOSTNAMES = new Set(['kuschonink.com', 'www.kuschonink.com']);
+export const ALLOWED_ORIGINS = new Set(['https://kuschonink.com', 'https://www.kuschonink.com']);
+export const ALLOWED_HOSTNAMES = new Set(['kuschonink.com', 'www.kuschonink.com']);
 const TURNSTILE_ACTION = 'kuschonink-contact';
-const SENDER = { email: 'noreply@kuschonink.com', name: 'kuschonink.com' };
+export const SENDER = { email: 'noreply@kuschonink.com', name: 'kuschonink.com' };
 const MAX_BODY_BYTES = 32 * 1024;
 const LIMITS = { name: 120, email: 254, subject: 180, message: 4000, website: 254, turnstileToken: 2048 };
 
 export interface Submission { name: string; email: string; subject: string; message: string; website: string; turnstileToken: string }
 export interface TurnstileResult { success: boolean; hostname?: string; action?: string; 'error-codes'?: string[] }
-export interface EmailOut { from: { email: string; name: string }; replyTo: string; subject: string; text: string; html: string }
+/** A file sent with an email: base64 content. "inline" with a contentId shows in the HTML (cid:…). */
+export interface Attachment { content: string; filename: string; type: string; disposition: 'attachment' | 'inline'; contentId?: string }
+export interface EmailOut { from: { email: string; name: string }; replyTo?: string; subject: string; text: string; html: string; attachments?: Attachment[] }
 
 export interface Deps {
   secret: string | undefined;
@@ -25,7 +27,7 @@ export interface Deps {
   log: (...args: unknown[]) => void;
 }
 
-const json = (body: unknown, status: number, origin?: string | null) =>
+export const json = (body: unknown, status: number, origin?: string | null) =>
   new Response(JSON.stringify(body), {
     status,
     headers: {
@@ -34,12 +36,12 @@ const json = (body: unknown, status: number, origin?: string | null) =>
     },
   });
 
-const text = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
-const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
-const isEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
-const hasLineBreak = (s: string) => /[\r\n]/.test(s);
+export const text = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
+export const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+export const isEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+export const hasLineBreak = (s: string) => /[\r\n]/.test(s);
 // eslint-disable-next-line no-control-regex
-const unsafe = (s: string) => /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(s);
+export const unsafe = (s: string) => /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(s);
 
 export function validate(p: Submission): string | null {
   if (!p.name || !p.email || !p.subject || !p.message) return 'missing_required_field';

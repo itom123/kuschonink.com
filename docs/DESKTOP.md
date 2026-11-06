@@ -56,6 +56,10 @@ Ground rules:
 | `api.ts` | `window.kus98`, what page content may ask of the desktop |
 | `apps/` | Programs without a page of their own: Control Panel (Mouse, Sounds), Display Properties and Folder Options, My Computer, Recycle Bin, Run, Find, Image Viewer, screen savers |
 
+Paint (`/paint`) is a program with a page, but its code lives apart, in
+`src/scripts/paint/`: it is page content (see below) and only talks to the
+shell through `window.kus98`.
+
 ## The window contract
 
 `Window.astro` renders the markup the shell relies on:
@@ -90,6 +94,9 @@ may run more than once, and their page may sit in a window next to others:
    size. Use a `ResizeObserver` or container queries (`house.css` does).
 5. **Ask the desktop through `window.kus98`**, and check it exists, so the page
    still works on its own.
+6. **Using the right button yourself?** Call `preventDefault()` on the
+   `contextmenu` event (Paint paints with the right button); the desktop's
+   right-click menu then leaves it alone.
 
 ### `window.kus98`
 
@@ -103,6 +110,7 @@ may run more than once, and their page may sit in a window next to others:
 | `play(name)` | A system sound (`ding`, `chord`, `exclamation`…) |
 | `settings` | `get()`, `set(patch)`, `on(listener)` |
 | `bindIcons(list)` | Give a list of `.icon` elements folder behaviour |
+| `menus(el, provider)` | The window's own menu bar: `provider(name)` gets `"file"`, `"edit"`… each time a menu opens and returns its items (`MenuSpec[]`), or null for the standard ones. Paint uses it for File, Edit, View, Image, Colors and Help |
 
 ### Events
 
@@ -170,6 +178,8 @@ Kept in this browser only.
 | | `kus98:recent` | Start ▸ Documents |
 | | `kus98:user` | The last log-on name |
 | | `kus98:run` | What was typed in Run |
+| | `kus98:paint` | Paint: the tool in hand, colours, custom colours, tool options |
+| IndexedDB | `kus98-paint` | Paint: the picture being drawn (a PNG), until File ▸ New |
 | | `lang` | The language chosen with the 中/EN switch |
 | `sessionStorage` | `kus98:begun` | The "Click here to begin" hint was used |
 
@@ -189,6 +199,12 @@ start-up screen after 10 seconds if the shell fails to load.
 **Add a program with a page.** Add its id to `AppId` and `APPS` in
 `src/lib/apps.ts` and teach `appFor()` its URLs. Write the page as
 `<Desktop seo={…}><Window app="…" title="…">…</Window></Desktop>`.
+
+A program can bring its own menu bar: list the menus in `Window`'s `menus`
+prop (`['&File', '&Edit', '&Image']`, with Chinese names in `MENU_ZH` in
+`src/lib/menus.ts`) and fill them with `window.kus98.menus(el, provider)`.
+Toolbar buttons with `data-cmd="<name>-…"` that no shell command handles are
+the page's own: listen for clicks on its window (Paint and Help do).
 
 **Add a program without a page** (like the Recycle Bin). Write it in
 `src/scripts/desktop/apps/`, using `appWindow()` (`appwindow.ts`) for a window

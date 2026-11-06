@@ -1,0 +1,101 @@
+---
+// Paint (画图): draw something with a mouse, a finger or a pen, and send it
+// to the artist. The page is the program's window, rendered in full on the
+// server; src/scripts/paint/ draws. Sending goes through the site's Worker
+// (worker/drawing.ts), which emails the picture to the artist's inbox.
+import Desktop from '../layouts/Desktop.astro';
+import Window from '../components/desktop/Window.astro';
+import Bi from '../components/Bi.astro';
+import { site } from '../lib/content';
+import { attr, seoTitle } from '../lib/i18n';
+import { SEP, type Tool } from '../lib/chrome';
+import { COLOR_NAMES, PALETTE, TOOLS } from '../lib/paint';
+
+const artist = site.name.split(' ')[0];
+const seo = {
+  ...seoTitle({ en: 'Paint', zh: '画图' }, site.name),
+  description: `Draw something with a mouse, a finger or a pen, and send it to the artist ${site.name}. Your picture goes straight to his inbox.`,
+  descriptionZh: `用鼠标、手指或手写笔画点什么，然后发给艺术家 ${site.name}。你的画会直接送到他的邮箱。`,
+};
+const tools: Tool[] = [
+  { cmd: 'paint-send', label: `Send to ${artist}`, zh: `发给 ${artist}`, icon: 'tb-send', title: `Send this picture to ${artist} (Ctrl+Enter)`, titleZh: `把这幅画发给 ${artist}（Ctrl+Enter）` },
+  SEP,
+  { cmd: 'paint-new', label: 'New', zh: '新建', icon: 'tb-new', title: 'Start a new picture (Ctrl+Alt+N)', titleZh: '新建一幅画（Ctrl+Alt+N）' },
+  { cmd: 'paint-open', label: 'Open', zh: '打开', icon: 'tb-open', title: 'Open a picture from your device to draw on (Ctrl+O)', titleZh: '从你的设备上打开一幅图片来画（Ctrl+O）' },
+  { cmd: 'paint-save', label: 'Save', zh: '保存', icon: 'tb-save', title: 'Save a copy on your device (Ctrl+S)', titleZh: '在你的设备上保存一份（Ctrl+S）' },
+  SEP,
+  { cmd: 'paint-undo', label: 'Undo', zh: '撤消', icon: 'tb-undo', title: 'Undo (Ctrl+Z)', titleZh: '撤消（Ctrl+Z）' },
+  { cmd: 'paint-redo', label: 'Redo', zh: '重做', icon: 'tb-redo', title: 'Redo (Ctrl+Y)', titleZh: '重做（Ctrl+Y）' },
+];
+const hint = { en: `Draw with a mouse, a finger or a pen. When you’re done, click Send to ${artist}.`, zh: `用鼠标、手指或手写笔作画。画好后，单击“发给 ${artist}”。` };
+---
+<Desktop seo={seo}>
+  <Window
+    app="paint"
+    title={{ en: 'untitled - Paint', zh: '未命名 - 画图' }}
+    variant="paint"
+    icon="paint"
+    address={false}
+    menus={['&File', '&Edit', '&View', '&Image', '&Colors', '&Help']}
+    tools={tools}
+    bodyClass="paint-body flat"
+    status={[hint, ' ', ' ']}
+  >
+    <div class="paint" data-paint data-artist={artist} data-artist-full={site.name} data-sitekey={site.contact.form.turnstileSiteKey || undefined}>
+      <p class="paint-note" data-note>
+        <span class="ico ico16 ico-mail" aria-hidden="true"></span>
+        <span class="paint-note-text">
+          <span data-l="en">Draw something, then click <b>Send to {artist}</b>: it goes to his inbox as a picture, and isn’t posted on this website.</span>
+          <span data-l="zh" lang="zh-Hans">画点什么，然后单击“<b>发给 {artist}</b>”：它会以图片的形式送到他的邮箱，不会发布在这个网站上。</span>
+        </span>
+        <a class="paint-note-more" href="/help#paint" data-paint-cmd="how"><Bi t={{ en: 'How sending works', zh: '如何发送' }} /></a>
+      </p>
+      <div class="paint-work">
+        <div class="paint-fontbar" data-fontbar role="toolbar" {...attr('aria-label', { en: 'Fonts', zh: '字体' })} hidden></div>
+        <div class="paint-toolbox" data-toolbox>
+          <div class="paint-tools" role="radiogroup" {...attr('aria-label', { en: 'Tools', zh: '工具' })} data-js-only>
+            {TOOLS.map((t) => (
+              <button type="button" class="paint-tool" role="radio" aria-checked="false" data-tool={t.id} {...attr('aria-label', t.name)} {...attr('title', t.name)}>
+                <span class={`ico ico16 ico-${t.icon}`} aria-hidden="true"></span>
+              </button>
+            ))}
+          </div>
+          <div class="paint-options" data-options role="group" {...attr('aria-label', { en: 'Tool options', zh: '工具选项' })} data-js-only></div>
+        </div>
+        <div class="paint-view" data-view tabindex="0" {...attr('aria-label', { en: 'Picture: draw here with a mouse, a finger or a pen', zh: '图片：用鼠标、手指或手写笔在这里作画' })}>
+          <div class="paint-stage" data-stage>
+            <canvas class="paint-canvas" data-canvas width="640" height="400" {...attr('aria-label', { en: 'Your picture', zh: '你的画' })} role="img"></canvas>
+            <canvas class="paint-overlay" data-overlay width="640" height="400" aria-hidden="true"></canvas>
+            <div class="paint-marquee" data-marquee hidden></div>
+            <span class="paint-handle h-e" data-handle="e" aria-hidden="true"></span>
+            <span class="paint-handle h-s" data-handle="s" aria-hidden="true"></span>
+            <span class="paint-handle h-se" data-handle="se" aria-hidden="true"></span>
+          </div>
+          <noscript>
+            <div class="paint-noscript doc">
+              <p data-l="en">Paint needs JavaScript to draw. You can still reach {site.name}: write from <a href="/contact">Contact</a>, or on <a href={site.social[0].href}>Instagram</a>.</p>
+              <p data-l="zh" lang="zh-Hans">画图需要 JavaScript 才能作画。你仍然可以联系 {site.name}：在<a href="/contact">联系</a>里写信，或者通过 <a href={site.social[0].href}>Instagram</a>。</p>
+            </div>
+          </noscript>
+        </div>
+      </div>
+      <div class="paint-colorbox" role="group" {...attr('aria-label', { en: 'Color box', zh: '颜料盒' })} data-js-only>
+        <div class="paint-current">
+          <button type="button" class="paint-bg" data-bg {...attr('title', { en: 'Background colour (the right button and the eraser). Click to swap the two (X).', zh: '背景色（右键和橡皮使用）。单击可交换两种颜色（X）。' })} {...attr('aria-label', { en: 'Background colour: swap the two colours', zh: '背景色：交换两种颜色' })}></button>
+          <button type="button" class="paint-fg" data-fg {...attr('title', { en: 'Foreground colour. Click to choose any colour.', zh: '前景色。单击可以选择任何颜色。' })} {...attr('aria-label', { en: 'Foreground colour: edit', zh: '前景色：编辑' })}></button>
+        </div>
+        <div class="paint-palette" data-palette>
+          {PALETTE.map((c, i) => (
+            <button type="button" class="paint-swatch" data-color={c} style={`--c:${c}`} {...attr('title', { en: `${COLOR_NAMES[i].en}. Right-click (or press and hold) for the background colour; double-click to change it.`, zh: `${COLOR_NAMES[i].zh}。右击（或长按）设为背景色；双击可以更改。` })} {...attr('aria-label', COLOR_NAMES[i])}></button>
+          ))}
+        </div>
+      </div>
+    </div>
+  </Window>
+</Desktop>
+
+<script>
+  import { initPaint } from '../scripts/paint';
+  initPaint();
+  document.addEventListener('astro:page-load', initPaint);
+</script>

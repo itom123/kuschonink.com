@@ -48,10 +48,11 @@ export function driveC() {
     icon(W.theHouse, 'house', { href: '/house/facade', type: PROGRAM }),
     icon({ en: 'About.doc', zh: '关于.doc' }, 'document', { href: '/about', type: { en: 'Document', zh: '文档' } }),
     icon({ en: 'Contact', zh: '联系' }, 'mail', { href: '/contact', type: PROGRAM }),
+    icon({ en: 'Paint', zh: '画图' }, 'paint', { href: '/paint', type: PROGRAM }),
     icon(W.help, 'help', { href: '/help', type: { en: 'Help file', zh: '帮助文件' } }),
     icon({ en: 'Welcome', zh: '欢迎' }, 'welcome', { href: '/', type: PROGRAM }),
   ]);
-  appWindow({ app: 'drive-c', title: 'xiangyin (C:)', icon: 'drive', w: 560, h: 340, body: list, address: 'C:\\', status: [objects(6), { en: 'Double-click an item to open it.', zh: '双击项目即可打开。' }] });
+  appWindow({ app: 'drive-c', title: 'xiangyin (C:)', icon: 'drive', w: 560, h: 340, body: list, address: 'C:\\', status: [objects(7), { en: 'Double-click an item to open it.', zh: '双击项目即可打开。' }] });
   bindIconGroup(list);
 }
 

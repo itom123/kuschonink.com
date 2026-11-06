@@ -9,7 +9,7 @@
     "preview": "wrangler dev",
     "deploy": "astro build && wrangler deploy",
     "check": "astro check",
-    "test": "node --experimental-strip-types --no-warnings worker/contact.test.mts"
+    "test": "node --experimental-strip-types --no-warnings worker/contact.test.mts && node --experimental-strip-types --no-warnings worker/drawing.test.mts && node --experimental-strip-types --no-warnings src/scripts/paint/fill.test.mts"
   },
   "dependencies": {
     "astro": "^7.4.1",

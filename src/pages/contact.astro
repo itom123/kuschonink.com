@@ -44,6 +44,7 @@ const tools: Tool[] = [
         <h2 class="mail-card-title"><Bi t={{ en: 'Contact details', zh: '联系方式' }} /></h2>
         <Blocks blocks={details} />
         <p><strong>Instagram</strong><br /><a href={site.social[0].href} target="_blank" rel="noopener"><Bi t={{ en: 'Follow on Instagram', zh: '在 Instagram 上关注' }} /></a></p>
+        <p><strong><Bi t={{ en: 'Rather draw?', zh: '想画画？' }} /></strong><br /><a href="/paint"><Bi t={{ en: 'Open Paint and send a picture', zh: '打开“画图”，发一幅画' }} /></a></p>
       </aside>
       <div class="mail-stationery doc">
         {rest.map((s) => <Section section={s} />)}

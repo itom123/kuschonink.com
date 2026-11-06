@@ -4,7 +4,9 @@ import { msgbox, openDialog } from './dialogs';
 import { bindIconGroup } from './icons';
 import { navigate } from './router';
 import { settings } from './settings';
+import type { MenuSpec } from './menu';
 import { play } from './sound';
+import { ownMenus } from './winmenus';
 import * as wm from './wm';
 
 export const api = {
@@ -35,6 +37,16 @@ export const api = {
   settings,
   /** Give a list of .icon elements folder behaviour (select, double-click, arrows). */
   bindIcons: (el: HTMLElement) => bindIconGroup(el),
+  /**
+   * A program's own menu bar (Paint's File, Edit, View, Image…): `provider`
+   * gets the menu's name ("file") and returns its items, or null for the
+   * standard ones. Asked each time a menu opens, so items can be ticked or
+   * greyed out as things stand.
+   */
+  menus(el: Element, provider: (name: string) => MenuSpec[] | null) {
+    const w = wm.byEl(el);
+    if (w) ownMenus.set(w.el, provider);
+  },
 };
 
 export type DesktopApi = typeof api;

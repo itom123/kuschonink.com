@@ -156,6 +156,8 @@ export function initContextMenus() {
 
   document.addEventListener('contextmenu', (e) => {
     const t = e.target as Element;
+    // Page content that uses the right button itself (Paint draws with it) has already said so.
+    if (e.defaultPrevented) return;
     if (e.shiftKey || t.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"]')) return;
     const touch = ((e as PointerEvent).pointerType || lastPointerType) === 'touch';
     // On phones, pressing and holding a photo or text keeps the phone's own menu (Save image…).

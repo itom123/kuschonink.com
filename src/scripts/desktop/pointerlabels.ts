@@ -13,4 +13,6 @@ export const POINTER_LABELS: Record<string, { en: string; zh: string }> = {
   nwse: { en: 'Diagonal Resize 1', zh: '沿对角线调整 1' },
   nesw: { en: 'Diagonal Resize 2', zh: '沿对角线调整 2' },
   move: { en: 'Move', zh: '移动' },
+  cross: { en: 'Precision Select', zh: '精确选择' },
+  pen: { en: 'Handwriting', zh: '手写' },
 };

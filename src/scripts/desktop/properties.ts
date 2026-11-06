@@ -139,7 +139,7 @@ function pageRows(d: DesktopData, url: string, title: Text, icon: string): Sheet
   if (path === '/image') rows.push([K.contains, join([projectsN(d.projects.length), images(d.projects.reduce((n, p) => n + p.images, 0))])]);
   if (path === '/house/facade' || path === '/house') rows.push([K.contains, join([floorsN(d.floors.length), roomsN(d.rooms.length)])]);
   if (path === '/help') rows.push([K.contains, topicsN(d.help.length)]);
-  if (path === '/contact') rows.push([K.sendsTo, d.site.name]);
+  if (path === '/contact' || path === '/paint') rows.push([K.sendsTo, d.site.name]);
   const name = page ? bi(page.title, page.titleZh) : title;
   return { title: name, icon: page?.icon ?? icon, name, rows };
 }

@@ -166,6 +166,79 @@ function no(): Canvas {
   return halo(c);
 }
 
+/** Precision Select: a thin cross with an open centre. */
+function cross(): Canvas {
+  const c = new Canvas(32, 32);
+  c.rect(4, 15, 9, 1, 'k').rect(19, 15, 9, 1, 'k');
+  c.rect(15, 4, 1, 9, 'k').rect(15, 19, 1, 9, 'k');
+  c.set(15, 15, 'k');
+  return halo(c);
+}
+
+/** Handwriting (and Paint's pencil): a pencil, its point at the lower left. */
+function pen(): Canvas {
+  const c = new Canvas(32, 32);
+  for (let y = 0; y < 20; y++) {
+    for (let x = 0; x < 20; x++) {
+      const s = x + y - 19, t = x - y;
+      if (Math.abs(s) > 1 || t < -17 || t > 15) continue;
+      if (t <= -15) c.set(x, y, s === 0 ? 'k' : '.');
+      else if (t <= -12) c.set(x, y, Math.abs(s) <= (t + 15) / 2 ? 'g' : '.');
+      else c.set(x, y, t > 11 ? 'g' : 'w');
+    }
+  }
+  return c.outline('k');
+}
+
+// Paint's tools: the bucket, the dropper and the magnifier, as in the tool box.
+const BUCKET = [
+  '......kk......',
+  '.....kwwk.....',
+  '....kw..wk....',
+  '...kkk...wk...',
+  '..kwwwkk..k...',
+  '.kwwwwwwkkk...',
+  'kgkwwwwwwwkk..',
+  'kggkwwwwwwwk..',
+  'kgggkwwwwwwk..',
+  'kggggkwwwwk...',
+  'kgggg.kkwwk...',
+  'kgggg...kk....',
+  'kgggg.........',
+  '.kggk.........',
+  '..kk..........',
+];
+const DROPPER = [
+  '...........kkk.',
+  '..........kkkkk',
+  '..........kkkkk',
+  '.........kkkkkk',
+  '........kwkkkk.',
+  '.......kwwk....',
+  '......kwwk.....',
+  '.....kwwk......',
+  '....kwwk.......',
+  '...kwwk........',
+  '..kwwk.........',
+  '.kwwk..........',
+  '.kwk...........',
+  'kk.............',
+];
+const MAGNIFIER = [
+  '..kkkkk.....',
+  '.kwwwwwk....',
+  'kwwwwwwwk...',
+  'kwwwwwwwk...',
+  'kwwwwwwwk...',
+  'kwwwwwwwk...',
+  'kwwwwwwwk...',
+  '.kwwwwwkk...',
+  '..kkkkkkkk..',
+  '.......kkkk.',
+  '........kkkk',
+  '.........kkk',
+];
+
 function from(rows: string[], extra?: (c: Canvas) => void): Canvas {
   const c = new Canvas(32, 32);
   c.stamp(0, 0, rows);
@@ -186,6 +259,12 @@ export const POINTERS: Record<string, () => Pointer> = {
   nwse: () => ({ label: 'Diagonal Resize 1', rows: arrows('nwse').rows(), hot: [15, 15] }),
   nesw: () => ({ label: 'Diagonal Resize 2', rows: arrows('nesw').rows(), hot: [16, 15] }),
   move: () => ({ label: 'Move', rows: arrows('move').rows(), hot: [15, 15] }),
+  cross: () => ({ label: 'Precision Select', rows: cross().rows(), hot: [15, 15] }),
+  pen: () => ({ label: 'Handwriting', rows: pen().rows(), hot: [1, 18] }),
+  // Paint only (not in Control Panel ▸ Mouse).
+  'paint-fill': () => ({ label: 'Fill With Color', rows: from(BUCKET).rows(), hot: [2, 14] }),
+  'paint-picker': () => ({ label: 'Pick Color', rows: from(DROPPER).rows(), hot: [0, 13] }),
+  'paint-zoom': () => ({ label: 'Magnifier', rows: from(MAGNIFIER).rows(), hot: [4, 4] }),
 };
 
 export const POINTER_NAMES = Object.keys(POINTERS);
