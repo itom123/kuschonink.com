@@ -8,7 +8,7 @@ export interface Settings {
   volume: number;
   /** The click when a page opens in a window. */
   navClick: boolean;
-  /** Pointer trails and their length (number of ghosts). */
+  /** Pointer trails (off to begin with, as in Windows 98) and their length (number of ghosts). */
   trails: boolean;
   trailLength: number;
   /** Show window contents while dragging (otherwise a dotted outline). */
@@ -35,8 +35,8 @@ export const DEFAULTS: Settings = {
   sound: true,
   volume: 0.7,
   navClick: true,
-  trails: true,
-  trailLength: 5,
+  trails: false,
+  trailLength: 3,
   dragFull: false,
   clickStyle: 'double',
   dblClickMs: 500,
