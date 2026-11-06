@@ -48,6 +48,8 @@ function initRows(table: HTMLTableElement) {
     const tr = (e.target as Element).closest<HTMLTableRowElement>('tr[data-href]');
     if (!tr || (e.target as Element).closest('a')) return;
     select(tr);
+    // Folder Options ▸ single-click (and touch screens): one click opens.
+    if (document.documentElement.dataset.click === 'single' || (e as PointerEvent).pointerType === 'touch') open(tr);
   });
   table.tBodies[0].addEventListener('dblclick', (e) => {
     const tr = (e.target as Element).closest<HTMLTableRowElement>('tr[data-href]');

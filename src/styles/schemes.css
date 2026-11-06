@@ -1,0 +1,94 @@
+/* ===== kuschonink 98: colour schemes (Control Panel ▸ Display ▸ Appearance) =====
+   <html data-scheme="standard | contrast | slate">. Schemes change the
+   desktop and the window chrome; pages inside windows keep their own colours.
+   Element rules are wrapped in :where() so they never outweigh a component's
+   own class. */
+
+:root {
+  --title-a: #000080;
+  --title-b: #1084d0;
+  --title-ia: #808080;
+  --title-ib: #b5b5b5;
+  --title-text: #fff;
+  --title-itext: #fff;
+}
+.title-bar { background: linear-gradient(90deg, var(--title-a), var(--title-b)); }
+.title-bar.inactive, .app-window.flash > .title-bar { background: linear-gradient(90deg, var(--title-ia), var(--title-ib)); }
+.title-bar .title-bar-text { color: var(--title-text); }
+.title-bar.inactive .title-bar-text { color: var(--title-itext); }
+.wm-zoom { background: linear-gradient(90deg, var(--title-a), var(--title-b)); }
+.start-banner { background: linear-gradient(0deg, var(--title-a), var(--title-b)); }
+
+/* ---- Slate: blue-grey, quieter than teal ---- */
+html[data-scheme="slate"] {
+  --desktop-bg: #4a6070;
+  --sel: #37505f;
+  --title-a: #2b4150;
+  --title-b: #88a3b4;
+  --title-ia: #7b8389;
+  --title-ib: #b8bdc1;
+}
+
+/* ---- High Contrast White: black on white, solid outlines ---- */
+html[data-scheme="contrast"] {
+  --desktop-bg: #fff;
+  --face: #fff;
+  --hi: #fff;
+  --light: #fff;
+  --shadow: #808080;
+  --dark: #000;
+  --sel: #000;
+  --sel-text: #fff;
+  --tip: #fff;
+  --title-a: #000;
+  --title-b: #000;
+  --title-ia: #fff;
+  --title-ib: #fff;
+  --title-text: #fff;
+  --title-itext: #000;
+  --raised: inset 0 0 0 1px #000;
+  --raised-window: inset 0 0 0 2px #000;
+  --pressed: inset 0 0 0 2px #000;
+  --sunken: inset 0 0 0 1px #000;
+  --thin-up: inset 0 0 0 1px #000;
+  --thin-down: inset 0 0 0 2px #000;
+  --dither: #fff;
+}
+:where(html[data-scheme="contrast"]) .window { background: #fff; box-shadow: inset 0 0 0 2px #000; }
+:where(html[data-scheme="contrast"]) .title-bar.inactive { box-shadow: inset 0 0 0 1px #000; }
+:where(html[data-scheme="contrast"]) button { background: #fff; box-shadow: inset 0 0 0 1px #000; text-shadow: 0 0 #000; }
+:where(html[data-scheme="contrast"]) button.default { box-shadow: inset 0 0 0 2px #000; }
+:where(html[data-scheme="contrast"]) button:not(:disabled):active { box-shadow: inset 0 0 0 3px #000; }
+:where(html[data-scheme="contrast"]) :is(input[type="text"], input[type="email"], input[type="number"], input[type="search"], input[type="password"], input[type="url"], input[type="tel"], textarea, select) {
+  background-color: #fff; box-shadow: inset 0 0 0 1px #000;
+}
+:where(html[data-scheme="contrast"]) :is(input, textarea):read-only { background-color: #fff; }
+:where(html[data-scheme="contrast"]) select:focus { background-color: #000; color: #fff; }
+:where(html[data-scheme="contrast"]) input[type="checkbox"] + label::before { box-shadow: inset 0 0 0 1px #000; }
+:where(html[data-scheme="contrast"]) input[type="radio"] + label::before { background: #fff; border-radius: 50%; box-shadow: inset 0 0 0 1px #000; }
+:where(html[data-scheme="contrast"]) fieldset { border: 1px solid #000; border-image: none; }
+:where(html[data-scheme="contrast"]) legend { background: #fff; }
+:where(html[data-scheme="contrast"]) menu[role="tablist"] > li { background: #fff; box-shadow: inset 1px 1px #000, inset -1px 0 #000; }
+:where(html[data-scheme="contrast"]) .status-bar-field { box-shadow: inset 0 0 0 1px #000; }
+:where(html[data-scheme="contrast"]) table > thead > tr > * { background: #fff; box-shadow: inset 0 0 0 1px #000; }
+:where(html[data-scheme="contrast"]) .wbody { border: 1px solid #000; border-image: none; }
+:where(html[data-scheme="contrast"]) .desktop .icon-label { color: #000; }
+:where(html[data-scheme="contrast"]) .desktop .icon.selected .icon-label { color: #fff; }
+:where(html[data-scheme="contrast"]) .icon:focus-visible .icon-label { outline-color: #000; }
+:where(html[data-scheme="contrast"]) .taskbar { box-shadow: inset 0 2px #000; }
+:where(html[data-scheme="contrast"]) .task[aria-pressed="true"] { background: #000; color: #fff; }
+:where(html[data-scheme="contrast"]) .task[aria-pressed="true"] .ico { filter: drop-shadow(0 0 1px #fff); }
+:where(html[data-scheme="contrast"]) .start-banner span { color: #fff; }
+:where(html[data-scheme="contrast"]) .menu-sep { border-top-color: #000; }
+:where(html[data-scheme="contrast"]) .tooltip { box-shadow: 2px 2px 0 #000; }
+
+/* ---- Windows' own high contrast mode: real borders where 98.css draws shadows ---- */
+@media (forced-colors: active) {
+  .window, .menu.sub, .menu.popup, .start-menu, .taskbar, .task, .start-button, .tb-btn, .status-bar-field, .address-field, .wbody { border: 1px solid CanvasText; }
+  .title-bar { forced-color-adjust: none; background: Highlight; }
+  .title-bar .title-bar-text { color: HighlightText; }
+  .title-bar.inactive { background: Canvas; }
+  .title-bar.inactive .title-bar-text { color: CanvasText; }
+  .icon.selected .icon-label, .menu-item:hover, .menu-item:focus { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+  .ico { forced-color-adjust: none; }
+}

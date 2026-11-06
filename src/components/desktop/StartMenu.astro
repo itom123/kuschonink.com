@@ -39,9 +39,22 @@ const items: MenuItem[] = [
   },
   {
     label: '&Settings', icon: 'control', big: true, jsOnly: true,
-    sub: [{ label: '&Control Panel', cmd: 'control-panel', icon: 'control' }],
+    sub: [
+      { label: '&Control Panel', cmd: 'control-panel', icon: 'control' },
+      { sep: true },
+      { label: '&Display...', cmd: 'display-properties', icon: 'display' },
+      { label: '&Folder Options...', cmd: 'folder-options', icon: 'folder' },
+    ],
+  },
+  {
+    label: '&Find', icon: 'find', big: true, jsOnly: true,
+    sub: [
+      { label: '&Files or Folders...', cmd: 'find', icon: 'find' },
+      { label: '&Rooms in the House...', cmd: 'find-room', icon: 'house' },
+    ],
   },
   { label: '&Help', href: '/help', icon: 'help', big: true },
+  { label: '&Run...', cmd: 'run', icon: 'run', big: true, jsOnly: true },
   { sep: true, jsOnly: true },
   { label: '&Log Off Guest...', cmd: 'logoff', icon: 'keys', big: true, jsOnly: true, attrs: { 'data-logoff': '' } },
   { label: 'Sh&ut Down...', cmd: 'shutdown', icon: 'shutdown', big: true, jsOnly: true },

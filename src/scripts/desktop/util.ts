@@ -48,5 +48,15 @@ export function stored<T>(key: string, fallback: T) {
   };
 }
 
+/** For matching what people type: lower case, no accents or quotes, single spaces. */
+export const normText = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/["“”‘’']/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
 export const siteTitle = () =>
   document.querySelector<HTMLMetaElement>('meta[property="og:site_name"]')?.content ?? 'kuschonink 98';

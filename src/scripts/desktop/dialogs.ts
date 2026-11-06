@@ -71,7 +71,8 @@ export function openDialog(o: DialogOpts): wm.Win {
 export interface MsgOpts {
   title?: string;
   text: string;
-  icon?: 'error' | 'warning' | 'info' | 'question';
+  /** error, warning, info, question, or any other icon name (recycle-full…). */
+  icon?: 'error' | 'warning' | 'info' | 'question' | (string & {});
   buttons?: string[];
   /** Block only this element's window instead of the whole desktop. */
   owner?: Element | null;

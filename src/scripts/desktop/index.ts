@@ -11,16 +11,18 @@ import { initSettings } from './settings';
 import { initStartMenu, remember } from './startmenu';
 import { initTaskbar } from './taskbar';
 import { initTooltips } from './tooltips';
-import { initControlPanel } from './apps/controlpanel';
 import { initMyComputer } from './apps/mycomputer';
+import { initRecycleBin } from './apps/recycle';
 import { initViewer } from './apps/viewer';
 import * as menu from './menu';
 import { session } from './session';
 import { initSound } from './sound';
+import { initScreensaver, startSaver } from './screensaver';
 import { initTrails } from './trails';
 import { initTray } from './tray';
 import { settings } from './settings';
 import { escapeHtml, html } from './util';
+import { explainFocused, initWhatsThis } from './whatsthis';
 import * as wm from './wm';
 
 declare global {
@@ -43,13 +45,44 @@ initStartMenu();
 initMenubars();
 initContextMenus();
 initDesktopIcons();
+initRecycleBin();
 initTooltips();
 initSound();
 initTrails();
 initTray();
-initControlPanel();
 initMyComputer();
 initViewer();
+initScreensaver();
+initWhatsThis();
+
+// Programs loaded the first time they're opened.
+const panel = () => import('./apps/controlpanel');
+const display = () => import('./apps/display');
+commands.register('control-panel', () => panel().then((m) => m.controlPanel()));
+commands.register('mouse-properties', () => panel().then((m) => m.mouseProperties()));
+commands.register('sounds-properties', () => panel().then((m) => m.soundsProperties()));
+const find = () => import('./apps/find');
+commands.register('display-properties', () => display().then((m) => m.displayProperties()));
+commands.register('folder-options', () => display().then((m) => m.folderOptions()));
+commands.register('run', () => import('./apps/run').then((m) => m.runDialog()));
+commands.register('find', () => find().then((m) => m.findWindow()));
+commands.register('saver-now', () => startSaver(settings.get().saver || 'lines', true));
+// Start ▸ Find ▸ Rooms in the House: the floorplan, with its search box ready.
+commands.register('find-room', async () => {
+  await navigate('/house');
+  const input = document.querySelector<HTMLInputElement>('[data-app="house"] .map-search input');
+  input?.focus();
+  input?.select();
+});
+// F3 finds, on the desktop and in folders (elsewhere the browser keeps it).
+addEventListener('keydown', (e) => {
+  if (e.key !== 'F3' || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+  const w = wm.getActive();
+  if ((e.target as Element).closest?.('input, textarea, select, [contenteditable]')) return;
+  if (w && w.app !== 'explorer' && w.app !== 'mycomputer' && w.app !== 'drive-c' && w.app !== 'find') return;
+  e.preventDefault();
+  commands.run('find');
+});
 
 // Views ▾ in a folder's toolbar.
 commands.register('views', (ctx) => {
@@ -104,12 +137,14 @@ document.addEventListener('desktop:login', logOffLabel);
 commands.register('about-k98', () => aboutBox());
 commands.register('help', () => navigate('/help'));
 
-// F1 opens Help (where the browser lets the page have it).
+// F1 opens Help (where the browser lets the page have it). In a dialog, it
+// explains the control that has the focus (What's This?).
 addEventListener('keydown', (e) => {
-  if (e.key === 'F1' && !e.altKey && !e.ctrlKey && !e.metaKey) {
-    e.preventDefault();
-    navigate('/help', { source: 'keyboard' });
-  }
+  if (e.key !== 'F1' || e.altKey || e.ctrlKey || e.metaKey) return;
+  e.preventDefault();
+  const el = document.activeElement;
+  if (el && el !== document.body && el.closest('.prop-window, .v-dialog') && explainFocused(el)) return;
+  navigate('/help', { source: 'keyboard' });
 });
 
 // Once every script on the page has run, tell page content its window is ready.

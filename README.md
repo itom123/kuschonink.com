@@ -13,18 +13,46 @@ npm run preview   # run the built site on the local Workers runtime (wrangler)
 npm run deploy    # build and deploy to Cloudflare Workers
 ```
 
-## Two ways in
+## kuschonink 98
 
-**The house** (`/`, `/house`, `/house/<room>`): the site is the family house, drawn from
-the 2008 renovation plans. The façade (`/`) is the south elevation: the door and
-windows lead inside. The floorplan works like an indoor map: drag to move, scroll
-or pinch to zoom, switch floors with **R / A / 2 / 1**, search with *Search this
-house*, and tick **Blueprint** to see the original drawings. Rooms hold projects,
-About and Contact. Everything is set in Times New Roman.
+The whole site works like a computer from 1998, called **kuschonink 98**. The
+first page of a visit starts up (a short BIOS screen and a splash) and asks the
+visitor to log on: any name works, and there's no password. Then the desktop
+appears with the page they asked for open in a window.
 
-**The simple view** (`/image`, `/image/<slug>`, `/image/all`, `/about`, `/contact`):
-a Windows 98 desktop for anyone who wants to see the work quickly. Every gallery
-is laid flat, so a project is one page. `/image/all` puts every project on one page.
+- **The desktop**: icons for My Computer, Projects, The House, About.doc,
+  Contact, Help, Instagram and the Recycle Bin. Double-click to open; drag to
+  arrange; right-click almost anything for a menu (press and hold on a phone).
+- **Windows** move, resize, minimise and maximise, and each has a button on the
+  taskbar. The **Start menu** reaches every page, plus Find, Run, Help, the
+  Control Panel, Log Off and Shut Down.
+- **Programs**: Projects (`/image`, a folder with thumbnails, list and details
+  views, and a Web View pane), each project (`/image/<slug>`, with an Image
+  Viewer for the photographs), About.doc (`/about`, a document), Contact
+  (`/contact`, a New Message window), The House (`/house/…`, a browser window),
+  Help (`/help`), and Welcome (`/`).
+- **The Control Panel**: Display (wallpaper, screen saver, colour schemes
+  including High Contrast, window effects), Mouse (pointer trails, larger
+  pointers, double-click speed), Sounds, and Folder Options (single or double
+  click). Settings stay in the visitor's browser.
+- Sounds, pointers, icons and screens are made for the site: nothing is taken
+  from Windows.
+
+Every URL is still a real page with its content in the HTML, so search engines,
+link previews and visitors without JavaScript see ordinary pages. How it's
+built, and how to add a program, an icon or a setting:
+[`docs/DESKTOP.md`](docs/DESKTOP.md).
+
+### The House
+
+**The House** (`/house/facade`, `/house`, `/house/<room>`) opens as a program in
+a browser-style window. The site is the family house, drawn from the 2008
+renovation plans. The façade (`/house/facade`) is the south elevation: the door
+and windows lead inside. The floorplan works like an indoor map: drag to move,
+scroll or pinch to zoom, switch floors with **R / A / 2 / 1**, search with
+*Search this house*, and tick **Blueprint** to see the original drawings. Rooms
+hold projects, About and Contact. Inside its window, the House is set in Times
+New Roman.
 
 ### The rules of the house (after Perec)
 
@@ -87,7 +115,7 @@ a sheet of paper.
 - **Unlisted, not secret.** Each piece lives at `/house/drawer/<id>` with
   `noindex` (meta tag and `X-Robots-Tag` in `public/_headers`). Its text is
   fetched only when the drawer is opened, and it's left out of the sitemap,
-  the Index and the simple view. Anyone who opens the drawer can read it.
+  the Index, Find and the Projects folder. Anyone who opens the drawer can read it.
 
 To add a piece, add `src/content/writings/<id>.json` (title, date, object,
 objectLabel, html, references). The rules find it a drawer.
@@ -125,7 +153,8 @@ There's no code in this repo and no cookie banner is needed.
 | --- | --- |
 | `src/content/house.json` | The house: floors, rooms, what's in each room |
 | `src/content/site.json` | Site name, Instagram link, email, phone, contact form fields |
-| `src/content/home.json` | Order of projects (simple view) and site description |
+| `src/content/home.json` | Order of projects and site description |
+| `src/content/help.json` | The Help topics (`/help`) |
 | `src/content/about.json`, `contact.json` | About and Contact |
 | `src/content/projects/*.json` | One file per project |
 | `src/assets/images/` | All photos, grouped by page |
@@ -133,8 +162,10 @@ There's no code in this repo and no cookie banner is needed.
 | `src/lib/house.ts` | Knight's tour, chapter order, inventories |
 | `src/scripts/map.ts` | Map interaction (pan, zoom, floors, search) |
 | `src/components/house/` | Floorplan map and room panel |
-| `src/layouts/House.astro`, `Win98.astro` | The two views |
-| `src/styles/house.css`, `win98.css`, `blocks.css` | Styling (98.css is vendored in `src/styles/vendor/`) |
+| `src/layouts/Desktop.astro` | Every page: the kuschonink 98 desktop with the page in a window |
+| `src/components/desktop/` | Window, taskbar, Start menu, desktop icons, start-up screens |
+| `src/scripts/desktop/` | The desktop shell: windows, menus, sounds, Control Panel… (see [`docs/DESKTOP.md`](docs/DESKTOP.md)) |
+| `src/styles/` | `desktop.css`, `system.css`, `schemes.css` (the computer), `doc.css`, `blocks.css`, `house.css`, `explorer.css`, `apps.css` (what's in the windows); 98.css is vendored in `src/styles/vendor/` |
 | `wrangler.jsonc` | Cloudflare Workers config |
 
 ### Page content format

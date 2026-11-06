@@ -8,6 +8,7 @@ import { showIconProperties } from './properties';
 import { navigate } from './router';
 import { isCompact } from './util';
 import { linkMenu, mailAbout, pageMenu, photoMenu, systemMenu, toolbarsMenu } from './winmenus';
+import { binItemMenu, recycleIconMenu } from './apps/recycle';
 import * as wm from './wm';
 
 type Target = { specs: menu.MenuSpec[]; owner?: HTMLElement | null } | null;
@@ -109,6 +110,8 @@ function targetFor(t: Element): Target {
   const icon = t.closest<HTMLElement>('[data-icon-group] .icon');
   if (icon) {
     if (!icon.classList.contains('selected')) select(icon);
+    if (icon.closest('[data-bin]')) return { specs: binItemMenu(icon), owner: icon };
+    if (icon.dataset.iconId === 'recycle') return { specs: recycleIconMenu(icon), owner: icon };
     return { specs: iconMenu(icon), owner: icon };
   }
   const win = wm.byEl(t);
@@ -139,12 +142,12 @@ function targetFor(t: Element): Target {
   return null;
 }
 
-let lastMenuAt = 0;
+/** When a press-and-hold last opened a menu (the browser's own contextmenu event follows it). */
+let longPressAt = 0;
 let lastPointerType = 'mouse';
 
 function show(target: Target, x: number, y: number, focusFirst = false) {
   if (!target?.specs.length) return;
-  lastMenuAt = performance.now();
   menu.popup(target.specs, x, y, { owner: target.owner ?? null, focusFirst });
 }
 
@@ -157,7 +160,7 @@ export function initContextMenus() {
     const touch = ((e as PointerEvent).pointerType || lastPointerType) === 'touch';
     // On phones, pressing and holding a photo or text keeps the phone's own menu (Save image…).
     if (touch && t.closest('[data-window-body], .sheet-holder')) return;
-    if (performance.now() - lastMenuAt < 600) {
+    if (performance.now() - longPressAt < 800) {
       e.preventDefault();
       return;
     }
@@ -199,6 +202,7 @@ export function initContextMenus() {
       if (!target?.specs.length) return;
       swallowClick = true;
       navigator.vibrate?.(10);
+      longPressAt = performance.now();
       show(target, start.x, start.y);
       start = null;
     }, 550);

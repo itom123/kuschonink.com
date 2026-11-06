@@ -352,6 +352,26 @@ export function bindIconGroup(group: HTMLElement, area: HTMLElement = group) {
   });
 }
 
+/** An icon came back (from the Recycle Bin): give it a free place if the desktop is arranged by hand. */
+export function refreshIconPlaces() {
+  const group = document.getElementById('k98-icons');
+  if (group?.classList.contains('free')) applySaved(group);
+}
+
+/** Restore Default Desktop: forget where icons were dragged; back to the grid. */
+export function resetIconPlaces() {
+  positions.set({});
+  document.documentElement.removeAttribute('data-icons-free');
+  document.getElementById('k98-early-icons')?.remove();
+  const group = document.getElementById('k98-icons');
+  if (!group) return;
+  group.classList.remove('free');
+  group.querySelectorAll<HTMLElement>(':scope > .desk-item').forEach((item) => {
+    item.style.removeProperty('--ix');
+    item.style.removeProperty('--iy');
+  });
+}
+
 export function initDesktopIcons() {
   const group = document.getElementById('k98-icons');
   const area = document.getElementById('k98-desktop');

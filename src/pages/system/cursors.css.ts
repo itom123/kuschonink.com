@@ -33,6 +33,8 @@ ${P},${P} *{cursor:var(--k98c-arrow)}
 ${P} .doc :is(p,li,dd,dt,td,th,h1,h2,h3,h4,figcaption,blockquote,pre,code,em,strong,b,i,small,address,mark),
 ${P} :is(input:not([type]),input[type="text"],input[type="email"],input[type="search"],input[type="url"],input[type="tel"],input[type="number"],textarea,[contenteditable="true"]){cursor:var(--k98c-text)}
 ${P} :is(a[href],a[href] *,area[href],.hotspot,.hotspot *,.welcome-option,.welcome-option *,.drawer,.drawer *,.constraints summary,[data-tab],[data-viewable]){cursor:var(--k98c-hand)}
+${P} :is(.icon,.icon *,.menu-item,.menu-item *,.tool,.tool *,.ql-btn,.ql-btn *){cursor:var(--k98c-arrow)}
+html[data-click="single"]:not([data-pointers="system"]) body.kus98 :is(.icon,.icon *){cursor:var(--k98c-hand)}
 ${P} :is(.room.locked,.room.locked *){cursor:var(--k98c-no)}
 ${P} :is([data-resize="n"],[data-resize="s"]){cursor:var(--k98c-ns)}
 ${P} :is([data-resize="e"],[data-resize="w"]){cursor:var(--k98c-ew)}
@@ -47,6 +49,7 @@ html:is([data-dragging="nw"],[data-dragging="se"]):not([data-pointers="system"])
 html[data-busy="bg"]:not([data-pointers="system"]) body.kus98 *{cursor:var(--k98c-appstarting)!important}
 html[data-busy="wait"]:not([data-pointers="system"]) body.kus98 *,html:is([data-boot="boot"],[data-boot="shutting"]):not([data-pointers="system"]) body.kus98 *{cursor:var(--k98c-wait)!important}
 html[data-help-mode]:not([data-pointers="system"]) body.kus98 *{cursor:var(--k98c-help)!important}
+html[data-saver]:not([data-pointers="none"]) body.kus98 *{cursor:none!important}
 `;
   return new Response(css, { headers: { 'Content-Type': 'text/css; charset=utf-8' } });
 };

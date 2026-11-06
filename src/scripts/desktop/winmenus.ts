@@ -3,6 +3,7 @@
 // pages, links and photographs inside windows.
 import { cleanPath, upOf } from '../../lib/apps';
 import { aboutBox } from './aboutbox';
+import { commands } from './commands';
 import type { MenuSpec } from './menu';
 import { showImageProperties, showPropertiesFor } from './properties';
 import { navigate } from './router';
@@ -122,6 +123,7 @@ export function barMenu(win: wm.Win, name: string): MenuSpec[] {
         );
       }
       items.push({ sep: true }, { label: '&Refresh', key: 'F5', action: () => wm.hooks.nav(win, 'refresh') });
+      if (win.app === 'explorer') items.push({ sep: true }, { label: 'Folder &Options...', action: () => commands.run('folder-options') });
       return items;
     }
     case 'go':

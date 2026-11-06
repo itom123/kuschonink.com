@@ -8,7 +8,7 @@ import { h } from './util';
 
 type Row = [string, string] | 'sep';
 
-interface Sheet { title: string; icon: string; name: string; rows: Row[]; attrs?: string[] }
+export interface Sheet { title: string; icon: string; name: string; rows: Row[]; attrs?: string[] }
 
 function sheet(s: Sheet, owner?: Element | null) {
   const rows = s.rows.map((r) =>
@@ -49,6 +49,9 @@ function sheet(s: Sheet, owner?: Element | null) {
   ok.focus();
   return win;
 }
+
+/** A General property sheet with these facts. */
+export const showSheet = (s: Sheet, owner?: Element | null) => sheet(s, owner);
 
 const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`;
 

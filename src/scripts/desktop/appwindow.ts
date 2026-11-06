@@ -15,6 +15,8 @@ export interface AppWindowOpts {
   toolbar?: Node;
   className?: string;
   bodyClass?: string;
+  /** A pane on the left (Web View). */
+  side?: Node;
 }
 
 export function appWindow(o: AppWindowOpts): wm.Win {
@@ -55,7 +57,10 @@ export function appWindow(o: AppWindowOpts): wm.Win {
               h('div', { class: 'address-field' }, [h('span', { class: `ico ico16 ico-${o.icon}`, 'aria-hidden': 'true' }), h('input', { type: 'text', value: o.address, readonly: '', 'aria-label': 'Address' })]),
             ])
           : null,
-        h('div', { class: 'window-main' }, [h('div', { class: `wbody ${o.bodyClass ?? ''}`.trim(), 'data-window-body': '', tabindex: '-1' }, [o.body])]),
+        h('div', { class: 'window-main' }, [
+          o.side ? h('aside', { class: 'window-side' }, [o.side]) : null,
+          h('div', { class: `wbody ${o.bodyClass ?? ''}`.trim(), 'data-window-body': '', tabindex: '-1' }, [o.body]),
+        ]),
         o.status
           ? h('div', { class: 'status-bar' }, [...o.status.map((s) => h('p', { class: 'status-bar-field' }, s)), h('span', { class: 'grip ico ico-grip', 'data-resize': 'se', 'aria-hidden': 'true' })])
           : null,
@@ -66,16 +71,17 @@ export function appWindow(o: AppWindowOpts): wm.Win {
 }
 
 /** A row of tabs over panels, as in Windows property sheets. */
-export function tabs(names: string[], panels: HTMLElement[]) {
+export function tabs(names: string[], panels: HTMLElement[], o: { start?: number; onShow?: (i: number) => void } = {}) {
   const list = h(
     'menu',
     { role: 'tablist', class: 'prop-tabs' },
-    names.map((n, i) => h('li', { role: 'tab', 'aria-selected': String(i === 0) }, h('a', { href: '#' }, n))),
+    names.map((n, i) => h('li', { role: 'tab', 'aria-selected': String(i === 0), 'data-help': 'Click a tab to see another page of settings.' }, h('a', { href: '#' }, n))),
   );
   const holder = h('div', { class: 'window prop-panel', role: 'tabpanel' }, panels);
   const show = (i: number) => {
     panels.forEach((p, j) => (p.hidden = j !== i));
     list.querySelectorAll('li').forEach((li, j) => li.setAttribute('aria-selected', String(j === i)));
+    o.onShow?.(i);
   };
   list.querySelectorAll('a').forEach((a, i) =>
     a.addEventListener('click', (e) => {
@@ -83,6 +89,6 @@ export function tabs(names: string[], panels: HTMLElement[]) {
       show(i);
     }),
   );
-  show(0);
+  show(o.start ?? 0);
   return [list, holder] as const;
 }

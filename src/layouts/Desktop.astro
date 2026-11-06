@@ -10,6 +10,7 @@ import '../styles/house.css';
 import '../styles/explorer.css';
 import '../styles/apps.css';
 import '../styles/system.css';
+import '../styles/schemes.css';
 import BootScreen from '../components/desktop/BootScreen.astro';
 import DesktopIcons from '../components/desktop/DesktopIcons.astro';
 import Taskbar from '../components/desktop/Taskbar.astro';
@@ -24,14 +25,16 @@ const { seo, image, noindex } = Astro.props;
       (once per browser session; never for search engines and link previews). */}
   <script is:inline slot="head-start">
     (function () {
-      var d = document.documentElement, s = {}, ic = {};
+      var d = document.documentElement, s = {}, ic = {}, bin = [];
       d.classList.add('js');
       try {
         s = JSON.parse(localStorage.getItem('kus98:settings') || '{}') || {};
         ic = JSON.parse(localStorage.getItem('kus98:icons') || '{}') || {};
+        bin = JSON.parse(localStorage.getItem('kus98:bin') || '[]') || [];
       } catch (e) {}
       if (s.scheme) d.setAttribute('data-scheme', s.scheme);
       if (s.pointers) d.setAttribute('data-pointers', s.pointers);
+      if (s.clickStyle) d.setAttribute('data-click', s.clickStyle);
       if (s.alwaysMax) d.setAttribute('data-maxall', '');
       if (s.wallpaper) {
         d.style.setProperty('--wallpaper', 'url("' + String(s.wallpaper).replace(/["\\]/g, '') + '")');
@@ -39,11 +42,13 @@ const { seo, image, noindex } = Astro.props;
         d.style.setProperty('--wallpaper-size', s.wallpaperMode === 'stretch' ? 'cover' : 'auto');
         d.classList.add('has-wallpaper');
       }
-      var css = '';
-      for (var k in ic) if (/^[a-z0-9-]+$/.test(k) && ic[k] && ic[k].length === 2) css += '.desk-item:has(>#icon-' + k + '){--ix:' + (+ic[k][0]) + 'px;--iy:' + (+ic[k][1]) + 'px}';
+      var css = '', k, i;
+      for (k in ic) if (/^[a-z0-9-]+$/.test(k) && ic[k] && ic[k].length === 2) css += '.desk-item:has(>#icon-' + k + '){--ix:' + (+ic[k][0]) + 'px;--iy:' + (+ic[k][1]) + 'px}';
+      if (css) d.setAttribute('data-icons-free', '');
+      for (i = 0; i < bin.length; i++) if (bin[i] && /^[a-z0-9-]+$/.test(bin[i].id)) css += '.desk-item:has(>#icon-' + bin[i].id + '){display:none}';
       if (css) {
-        d.setAttribute('data-icons-free', '');
         var st = document.createElement('style');
+        st.id = 'k98-early-icons';
         st.textContent = css;
         document.head.appendChild(st);
       }

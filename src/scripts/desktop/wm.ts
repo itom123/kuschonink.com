@@ -737,6 +737,15 @@ export function initWM() {
   layer.addEventListener('dblclick', onDblClick);
   addEventListener('keydown', onKey);
   addEventListener('resize', onViewportResize);
+  // Control Panel ▸ Display ▸ "Always maximize windows": maximise what's open now, too.
+  settings.on((s, changed) => {
+    if (!changed.alwaysMax || !s.alwaysMax) return;
+    for (const w of wins) {
+      if (w.dialog || w.el.classList.contains('no-resize')) continue;
+      if (w.state === 'normal') setState(w, 'max');
+      else if (w.state === 'min') w.restore = 'max';
+    }
+  });
   const top = wins[wins.length - 1];
   if (top) focus(top, { history: false });
 }

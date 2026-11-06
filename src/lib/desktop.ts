@@ -26,4 +26,5 @@ export const DESK_ICONS: DeskIcon[] = [
   { id: 'contact', label: 'Contact', icon: 'mail', href: '/contact', tip: 'Write a message.', type: 'Program' },
   { id: 'help', label: 'Help', icon: 'help', href: '/help', tip: 'How to use this computer (F1).', type: 'Help file' },
   { id: 'instagram', label: 'Instagram', icon: 'camera', href: site.social[0].href, external: true, shortcut: true, tip: 'kuschonink on Instagram (opens a new tab).', type: 'Internet Shortcut' },
+  { id: 'recycle', label: 'Recycle Bin', icon: 'recycle', open: 'recycle-bin', tip: 'Icons you delete from the desktop wait here. Open it to put them back.', type: 'System Folder', fixed: true },
 ];

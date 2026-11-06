@@ -59,6 +59,7 @@ const listeners = new Set<(s: Settings, changed: Partial<Settings>) => void>();
 function apply(s: Settings) {
   html.dataset.scheme = s.scheme;
   html.dataset.pointers = s.pointers;
+  html.dataset.click = s.clickStyle;
   html.toggleAttribute('data-maxall', s.alwaysMax);
   if (s.wallpaper) {
     html.style.setProperty('--wallpaper', `url("${s.wallpaper.replace(/"/g, '%22')}")`);

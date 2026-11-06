@@ -132,3 +132,95 @@ html[data-pointers="large"] .trail-ghost[data-kind="text"] { margin: -16px 0 0 -
 .pointer-list li { display: flex; align-items: center; justify-content: space-between; padding: 1px 6px; }
 .pointer-img { width: 32px; height: 32px; background: center / 32px 32px no-repeat; }
 .sound-events { width: 100%; height: auto; padding: 0; background-image: none; }
+
+/* ---- Lists in property sheets (Wallpaper, Sounds) ---- */
+select[size]:not([size="1"]) { height: auto; padding: 0; background-image: none; }
+select[size]:not([size="1"]):focus { background-color: #fff; color: #000; }
+select[size] option:checked { background: var(--sel); color: var(--sel-text); }
+/* A fixed height: the list fills in after the dialog has measured itself. */
+.list-box { width: 100%; height: 98px !important; }
+input.num { width: 56px; }
+.field-row .grow { flex: 1; }
+.prop-buttons button:disabled { pointer-events: none; }
+
+/* ---- Display Properties ---- */
+.monitor { display: flex; flex-direction: column; align-items: center; margin: 2px auto 4px; }
+.mon-case { position: relative; width: 172px; height: 132px; padding: 9px 10px 13px; box-sizing: border-box; background: var(--face); box-shadow: var(--raised-window), 1px 1px 0 var(--dark); }
+.mon-screen { position: relative; width: 100%; height: 100%; box-sizing: border-box; overflow: hidden; border: 2px solid; border-color: var(--shadow) var(--hi) var(--hi) var(--shadow); background: var(--desktop-bg); }
+.mon-screen.mon-black { background: #000 !important; }
+.mon-led { position: absolute; right: 12px; bottom: 4px; width: 7px; height: 3px; background: #00c000; box-shadow: 0 0 2px #00ff00; }
+.mon-neck { width: 54px; height: 7px; background: var(--face); box-shadow: inset -1px 0 var(--dark), inset 1px 0 var(--hi); }
+.mon-foot { width: 128px; height: 9px; background: var(--face); box-shadow: var(--raised); }
+.wp-row { display: grid; gap: 4px; }
+/* Every tab of a property sheet is the same size (the tallest), as in Windows 98. */
+.prop-panel { display: grid; }
+.prop-panel > .prop-page { grid-area: 1 / 1; }
+.prop-panel > .prop-page[hidden] { display: flex !important; visibility: hidden; }
+.fo-art { display: flex; justify-content: center; gap: 24px; padding: 6px 0 2px; }
+
+/* Appearance: a little desktop drawn in the chosen colours */
+.ap-preview { position: relative; height: 156px; overflow: hidden; background: var(--desktop-bg); box-shadow: var(--sunken); }
+.ap-win { position: absolute; padding: 3px; box-sizing: border-box; background: var(--face); box-shadow: var(--raised-window); }
+.ap-back { left: 10px; top: 10px; width: 236px; height: 62px; }
+.ap-front { left: 24px; top: 34px; width: 262px; height: 96px; }
+.ap-msg { left: 128px; top: 92px; width: 176px; height: 56px; }
+.ap-title { display: flex; align-items: center; height: 18px; padding: 0 4px; color: var(--title-text); font-weight: bold; background: linear-gradient(90deg, var(--title-a), var(--title-b)); }
+.ap-title.inactive { color: var(--title-itext); background: linear-gradient(90deg, var(--title-ia), var(--title-ib)); }
+.ap-menu { display: flex; gap: 10px; padding: 3px 4px; }
+.ap-disabled { color: var(--shadow); text-shadow: 1px 1px var(--hi); }
+.ap-sel { padding: 0 3px; background: var(--sel); color: var(--sel-text); }
+.ap-text { height: 36px; margin: 0 1px; padding: 4px; box-sizing: border-box; background: #fff; color: #000; box-shadow: var(--sunken); }
+.ap-msg-body { display: flex; align-items: center; justify-content: space-between; padding: 6px; }
+.ap-ok { padding: 2px 14px; background: var(--face); box-shadow: var(--raised); }
+
+/* ---- Screen savers ---- */
+.screensaver { position: fixed; inset: 0; z-index: 950000; overflow: hidden; background: #000; }
+html[data-saver] .trail-ghost, html[data-saver] .tooltip { display: none; }
+.saver-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.saver-slide { position: absolute; inset: 0; margin: 0; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.4s linear; }
+.saver-slide.on { opacity: 1; }
+.saver-slide img { max-width: 90%; max-height: 86%; object-fit: contain; }
+.saver-slide figcaption { position: absolute; left: 24px; bottom: 18px; color: #a0a0a0; font: 12px var(--ui-font); letter-spacing: 0.5px; }
+.saver-slide.drift-a img { animation: saver-drift-a 11s linear both; }
+.saver-slide.drift-b img { animation: saver-drift-b 11s linear both; }
+@keyframes saver-drift-a { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.06) translate(-1.5%, -1%); } }
+@keyframes saver-drift-b { from { transform: scale(1.06) translate(1.5%, 1%); } to { transform: scale(1) translate(0, 0); } }
+.mon-screen .saver-slide { transition-duration: 0.6s; }
+.mon-screen .saver-slide img { width: 100%; height: 100%; max-width: none; max-height: none; object-fit: cover; }
+@media (prefers-reduced-motion: reduce) { .saver-slide { transition: none; } .saver-slide img { animation: none !important; } }
+
+/* ---- Run ---- */
+.run-body { display: flex; flex-direction: column; gap: 12px; width: min(380px, calc(100vw - 48px)); padding: 12px 12px 10px; box-sizing: border-box; }
+.run-row { display: flex; align-items: flex-start; gap: 12px; }
+.run-row p { margin: 0; padding-top: 2px; line-height: 15px; }
+.run-open { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px; }
+.run-open input { width: 100%; min-width: 0; }
+.run-buttons { display: flex; justify-content: flex-end; gap: 6px; }
+.run-buttons button { min-width: 75px; }
+
+/* ---- Find ---- */
+.find-form { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; flex: none; padding: 6px 8px 8px; box-shadow: inset 0 -1px var(--shadow), inset 0 1px var(--hi); }
+.find-fields { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 6px 8px; min-width: 0; }
+.find-fields :is(input, select) { width: 100%; min-width: 0; }
+.find-actions { display: flex; flex-direction: column; align-items: stretch; gap: 5px; }
+.find-actions button { min-width: 88px; }
+.find-anim { align-self: center; margin-top: 2px; }
+.find-anim.searching { animation: find-look 0.5s steps(4) infinite; }
+@keyframes find-look { 25% { transform: translate(3px, -2px); } 50% { transform: translate(5px, 1px); } 75% { transform: translate(2px, 3px); } }
+.find-body { background: #fff; }
+.find-results { width: 100%; }
+.find-results td { padding: 1px 6px; }
+.find-results tbody tr:focus { outline: 1px dotted #000; outline-offset: -1px; }
+.find-results tbody tr.highlighted { background: var(--sel); color: var(--sel-text); }
+.find-name { display: inline-flex; align-items: center; gap: 4px; }
+@media (max-width: 520px) { .find-form { grid-template-columns: 1fr; } .find-actions { flex-direction: row; flex-wrap: wrap; } .find-anim { display: none; } }
+
+/* ---- Recycle Bin ---- */
+.bin-body { min-height: 100%; }
+.bin-empty { margin: 0; padding: 4px 14px 14px; color: #404040; line-height: 15px; }
+
+/* ---- Folder Options ▸ single-click: icon names underline when pointed at, like links ---- */
+html[data-click="single"] .icon:hover .icon-label { text-decoration: underline; }
+
+/* ---- Always maximize windows: the page's window is full size from the first paint ---- */
+html.js[data-maxall] #k98-windows > .app-window:not([data-win-id]):not(.v-dialog) { left: 0; top: 0; width: 100%; height: 100%; }
