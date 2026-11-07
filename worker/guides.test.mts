@@ -438,20 +438,43 @@ await expectView('member cookie → members-only: the member view', get('/guides
   check('ASSETS throws on /guides → 503 neutral page', (await run(get('/guides'), deps({ assets: () => { throw new Error('boom'); } }))).status === 503);
 }
 
-// ---- The Worker never imports guide content: only access.json, and types ----
+// ---- The Worker never imports guide content: only access.json, types, and guide code that reads none ----
 {
   const { readdirSync, readFileSync } = await import('node:fs');
   const dir = new URL('./', import.meta.url);
+  const IMPORTS = /^\s*(?:import|export)\s+(type\s+)?[^'"]*?from\s+['"]([^'"]+)['"]|\bimport\(\s*['"]([^'"]+)['"]/gm;
+  const isContent = (spec: string) => /content\/guides\//.test(spec) && !/content\/guides\/access\.json$/.test(spec);
+  const name = (u: URL) => u.pathname.split('/').slice(-2).join('/');
+  // A module from src/lib/guides may be bundled only if neither it nor anything
+  // it imports (types aside) reads guide content: load.ts does, check.ts doesn't.
+  const reaches = (file: URL, seen = new Set<string>()): string | null => {
+    if (seen.has(file.href) || file.pathname.endsWith('.json')) return null;
+    seen.add(file.href);
+    const src = readFileSync(file, 'utf8');
+    if (/import\.meta\.glob/.test(src)) return `${name(file)} reads every guide (import.meta.glob)`;
+    for (const m of src.matchAll(IMPORTS)) {
+      const spec = m[2] ?? m[3];
+      if (m[1] || !spec.startsWith('.')) continue;
+      if (isContent(spec)) return `${name(file)} imports ${spec}`;
+      const hit = reaches(new URL(/\.(ts|json)$/.test(spec) ? spec : `${spec}.ts`, file), seen);
+      if (hit) return hit;
+    }
+    return null;
+  };
   const found: string[] = [];
   for (const f of readdirSync(dir).filter((x) => x.endsWith('.ts'))) {
     const src = readFileSync(new URL(f, dir), 'utf8');
-    for (const m of src.matchAll(/^\s*(?:import|export)\s+(type\s+)?[^'"]*?from\s+['"]([^'"]+)['"]|\bimport\(\s*['"]([^'"]+)['"]/gm)) {
+    for (const m of src.matchAll(IMPORTS)) {
       const spec = m[2] ?? m[3];
-      const typeOnly = !!m[1];
-      if ((/content\/guides\//.test(spec) && !/content\/guides\/access\.json$/.test(spec)) || (/lib\/guides\//.test(spec) && !typeOnly)) found.push(`${f}: ${spec}`);
+      if (isContent(spec)) found.push(`${f}: ${spec}`);
+      else if (/lib\/guides\//.test(spec) && !m[1]) {
+        const hit = reaches(new URL(/\.ts$/.test(spec) ? spec : `${spec}.ts`, new URL(f, dir)));
+        if (hit) found.push(`${f}: ${spec} → ${hit}`);
+      }
     }
   }
-  check('worker/*.ts import nothing from a guide (access.json and type-only imports only)', !found.length, found);
+  check('worker/*.ts bundle no guide content (access.json, types, and guide code that reads none)', !found.length, found);
+  check('… and the check would catch the module that loads every guide (load.ts)', reaches(new URL('../src/lib/guides/load.ts', dir)) !== null);
 }
 
 // ---- Log off ----
