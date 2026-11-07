@@ -69,7 +69,12 @@ const FG = join(work, 'field-guide');
   check("download: the tool, the modules it loads (no type-only ones, no tests) and the guides' files", need.every((f) => got.includes(f) && existsSync(join(FG, ...f.split('/')))) && !got.some((f) => /\.test\.|\/types\.ts$|^worker\/(guard|index)\.ts$/.test(f)), got);
   const pkg = existsSync(join(FG, 'package.json')) ? JSON.parse(readFileSync(join(FG, 'package.json'), 'utf8')) : {};
   const repo = JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8'));
-  check("download: package.json (ES modules, sharp at the repository's version) and a script that runs the tool", pkg.type === 'module' && JSON.stringify(pkg.dependencies) === JSON.stringify({ sharp: repo.dependencies.sharp }) && existsSync(join(FG, 'tool')) && readFileSync(join(FG, 'tool'), 'utf8').includes('tool.mts'), pkg);
+  // The copy (scripts/suggestions/routine-repo/) is made on GitHub's runners and cloned in the cloud, so nothing in it names a path of this machine.
+  const here = work.split(/[\\/]/).pop()!;
+  const sh = existsSync(join(FG, 'tool')) ? readFileSync(join(FG, 'tool'), 'utf8') : '';
+  check("download: package.json (ES modules, sharp at the repository's version) and a script that runs the tool wherever the folder is", pkg.type === 'module' && JSON.stringify(pkg.dependencies) === JSON.stringify({ sharp: repo.dependencies.sharp }) && sh.includes('exec node ') && sh.includes('"$(dirname "$0")/scripts/suggestions/tool.mts"') && !sh.includes(here), [pkg, sh]);
+  const mark = existsSync(join(FG, '.download.json')) ? readFileSync(join(FG, '.download.json'), 'utf8') : '{}';
+  check('download: .download.json says which commit, with no path of this machine', JSON.parse(mark).commit === LIVE && !mark.includes(here), mark.slice(0, 300));
   const routine = join('scripts', 'suggestions', 'ROUTINE.md');
   check('download: the instructions are the ROUTINE.md it took, from the same commit', r.out?.instructions === `read ${join(FG, routine)} and follow it` && readFileSync(join(FG, routine)).equals(readFileSync(join(REPO, routine))), r.out?.instructions);
   check("download: a guide's files are the ones the guide check knows", JSON.stringify(DOWNLOADED_FILES) === JSON.stringify(GUIDE_FILES), [DOWNLOADED_FILES, GUIDE_FILES]);
@@ -90,15 +95,16 @@ const FG = join(work, 'field-guide');
   check("download: refuses another commit in a folder it filled, a folder it didn't fill, and a commit that isn't one", other.code === 1 && /already holds/.test(other.text) && stray.code === 1 && /not empty/.test(stray.text) && odd.code === 1 && /not a commit/.test(odd.text) && !existsSync(join(work, 'odd')), [other.text, stray.text, odd.text]);
 }
 {
-  // Claude Code's permission check lets a run download and run code only when the task's prompt asks
-  // for those exact commands (it never sees what the run fetched), so the prompt in GUIDES.md 11.6
-  // must name them as ROUTINE.md writes them.
+  // The task's repository is the copy, which its own workflow makes with download.mjs: Claude Code's
+  // permission check trusts code in the session's own repository, not code a run downloads. The
+  // prompt in GUIDES.md 11.6 names the copy, the tool and npm install as ROUTINE.md runs them.
   const steps = readFileSync(join(REPO, 'scripts', 'suggestions', 'ROUTINE.md'), 'utf8');
   const docs = readFileSync(join(REPO, 'docs', 'GUIDES.md'), 'utf8');
-  const take = /^curl -fsS https:\/\/raw\.githubusercontent\.com\/\S+\/download\.mjs .+$/m.exec(steps)?.[0] ?? '';
-  const install = /npm install --prefix field-guide [^`]+/.exec(steps)?.[0] ?? '';
-  const prompts = docs.split('```text').slice(1).map((b) => b.split('```')[0]!).filter((b) => b.includes('download.mjs'));
-  check('the prompt in GUIDES.md 11.6 (both languages) names the download, the tool and npm install as ROUTINE.md does', take.length > 0 && install.length > 0 && prompts.length === 2 && prompts.every((p) => p.includes(take) && p.includes('field-guide/tool') && p.includes(install)), [take, install, prompts.length]);
+  const sync = readFileSync(join(REPO, 'scripts', 'suggestions', 'routine-repo', '.github', 'workflows', 'sync.yml'), 'utf8');
+  const install = 'npm install --no-audit --no-fund';
+  const prompts = docs.split('```text').slice(1).map((b) => b.split('```')[0]!).filter((b) => b.includes('kuschonink-routine'));
+  check('the prompt in GUIDES.md 11.6 (both languages, the same) names the copy, ./tool and npm install as ROUTINE.md does', prompts.length === 2 && prompts[0] === prompts[1] && prompts.every((p) => p.includes('itom123/kuschonink-routine') && p.includes('./tool') && p.includes(install)) && steps.includes('T=./tool') && steps.includes(`\`${install}\``), prompts.length);
+  check("the copy's workflow takes the files with main's download.mjs every 10 minutes, and pushes them", sync.includes('https://raw.githubusercontent.com/itom123/kuschonink.com/main/scripts/suggestions/download.mjs') && /cron: '\*\/10 \* \* \* \*'/.test(sync) && sync.includes('git push'), sync.slice(0, 200));
 }
 // In the routine, npm install puts sharp in the folder; here a stand-in package hands over this checkout's.
 mkdirSync(join(FG, 'node_modules', 'sharp'), { recursive: true });

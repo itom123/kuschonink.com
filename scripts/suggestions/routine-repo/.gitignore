@@ -1,0 +1,5 @@
+# What the routine makes while it works. None of it is committed.
+node_modules/
+entry.json
+*.jpg
+github.txt
