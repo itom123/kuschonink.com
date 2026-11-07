@@ -110,6 +110,11 @@
       "nameZh": "塞纳河／13区"
     },
     {
+      "id": "south-14e",
+      "name": "South / 14th",
+      "nameZh": "南部／14区"
+    },
+    {
       "id": "west-left-bank",
       "name": "West / Left bank",
       "nameZh": "西部／左岸"
@@ -130,6 +135,11 @@
       "nameZh": "西部／协和广场"
     },
     {
+      "id": "west-16e",
+      "name": "West / 16th",
+      "nameZh": "西部／16区"
+    },
+    {
       "id": "north-clichy",
       "name": "North / Clichy",
       "nameZh": "北部／克利希"
@@ -138,6 +148,11 @@
       "id": "north-barbes",
       "name": "North / Barbès",
       "nameZh": "北部／巴尔贝斯"
+    },
+    {
+      "id": "north-east-19e",
+      "name": "North-east / 19th",
+      "nameZh": "东北部／19区"
     },
     {
       "id": "central",
@@ -218,6 +233,10 @@
         {
           "text": "The Marais is the strongest recommendation cluster: it combines controlled portraiture, staging, documentary work and material experimentation within a relatively compact walk. Choose two or three exhibitions and spend time with them. Add one larger museum on a free day rather than trying to complete the whole map.",
           "textZh": "玛黑区是最值得推荐的片区：在相对紧凑的步行范围内，汇集了严谨控制的肖像、场景编排、纪实作品和材质实验。挑两三个展览，花时间细看。有空闲的一天再加一座大型博物馆，而不是试图把整张地图走完。"
+        },
+        {
+          "text": "On 12–15 November, pair Paris Photo with Polycopies: the photobook boat is a 15-minute walk across the Seine and opens two hours earlier. On the Left Bank, the PhotoSaintGermain shows around Rue de l’Abbaye make a short walk of their own.",
+          "textZh": "11月12日至15日，可以把 Paris Photo 和 Polycopies 放在同一天：摄影书展船过塞纳河步行约15分钟，而且早两小时开门。左岸 Rue de l’Abbaye 一带的 PhotoSaintGermain 展览也可以单独走一小段。"
         }
       ]
     },
@@ -420,6 +439,36 @@
           "leadZh": "Barnor 展",
           "text": "festival page says Tue–Sat, map says Mon–Sat. Do not rely on Monday.",
           "textZh": "摄影节页面写周二至周六，地图写周一至周六。不要指望周一开放。"
+        },
+        {
+          "lead": "Paris Photo",
+          "leadZh": "Paris Photo 博览会",
+          "text": "its pages give both 3 Avenue du Général Eisenhower and Avenue Winston-Churchill; both border the Grand Palais. No talk time is published for the PhotoBook Awards ceremony.",
+          "textZh": "其网页同时写了 3 Avenue du Général Eisenhower 和 Avenue Winston-Churchill，两条街都紧邻大皇宫。摄影书奖颁奖仪式的时间尚未公布。"
+        },
+        {
+          "lead": "Musée de Minéralogie",
+          "leadZh": "矿物博物馆",
+          "text": "PhotoSaintGermain’s English page gives 15 Nov as the start; the museum and the festival’s French page say 5 Nov. Closed 10 and 11 Nov.",
+          "textZh": "PhotoSaintGermain 英文页面写11月15日开展；博物馆和摄影节法文页面都写11月5日。11月10日和11日闭馆。"
+        },
+        {
+          "lead": "Galerie Madé",
+          "leadZh": "Madé 画廊",
+          "text": "the festival lists Tue–Sat, the gallery Wed–Sat by chance or appointment; one poster says 5–8 Nov. This guide follows the festival and press kit (until 28 Nov).",
+          "textZh": "摄影节写周二至周六，画廊写周三至周六，随缘或预约；一张海报写11月5日至8日。本导览采用摄影节和新闻资料的说法（展至11月28日）。"
+        },
+        {
+          "lead": "FUTURES",
+          "leadZh": "FUTURES 展",
+          "text": "its page gives both 8–14 and 9–15 Nov; this guide uses only 9–14 Nov.",
+          "textZh": "其页面同时写了11月8日至14日和11月9日至15日；本导览只采用11月9日至14日。"
+        },
+        {
+          "lead": "Musée de l’Homme",
+          "leadZh": "人类博物馆",
+          "text": "closed 8–11 Nov 2026 by a notice on its home page; the exhibition page doesn’t say so.",
+          "textZh": "首页通知2026年11月8日至11日闭馆；展览页面没有提到。"
         }
       ]
     },
@@ -489,6 +538,14 @@
           "textZh": "MEP 当前开放时间和门票、LE BAL 特别开放时间、Quai 冬季开放信息。"
         },
         {
+          "text": "Press round-ups for Paris Photo week 2026 (Sortir à Paris, PhMuseum, Flo London); every entry taken from them was checked against the venue’s own page on 7 November.",
+          "textZh": "2026年 Paris Photo 周的媒体推荐（Sortir à Paris、PhMuseum、Flo London）；从中选取的每个条目都已在11月7日与场馆自己的网页核对。"
+        },
+        {
+          "text": "Paris Photo visitor information, tickets and talks; the Polycopies programme and meet-ups; the PhotoSaintGermain 2026 itinerary.",
+          "textZh": "Paris Photo 参观信息、门票和讲座；Polycopies 的节目和见面安排；PhotoSaintGermain 2026 路线。"
+        },
+        {
           "text": "Street-level map tiles: Plan IGN v2, IGN / Géoplateforme, under the Etalab 2.0 open licence, fetched through kuschonink.com.",
           "textZh": "街道级地图瓦片：Plan IGN v2，IGN／Géoplateforme，Etalab 2.0 开放许可，经由 kuschonink.com 获取。"
         }
@@ -530,11 +587,31 @@
       "label": "Quai de la Photo winter access",
       "labelZh": "Quai de la Photo 冬季开放信息",
       "url": "https://quaidelaphoto.fr/venez/acces-horaires/"
+    },
+    {
+      "label": "Paris Photo visitor information",
+      "labelZh": "Paris Photo 参观信息",
+      "url": "https://www.parisphoto.com/en-gb/info/Visitor-information.html"
+    },
+    {
+      "label": "Paris Photo talks and events",
+      "labelZh": "Paris Photo 讲座与活动",
+      "url": "https://agenda.parisphoto.com/en"
+    },
+    {
+      "label": "Polycopies (Instagram)",
+      "labelZh": "Polycopies（Instagram）",
+      "url": "https://www.instagram.com/polycopies/"
+    },
+    {
+      "label": "PhotoSaintGermain 2026 itinerary",
+      "labelZh": "PhotoSaintGermain 2026 路线",
+      "url": "https://www.photosaintgermain.com/en/editions/2026/parcours"
     }
   ],
   "credits": {
-    "points": "Points: Photo Days / Camille Gajate, official uMap #1453094",
-    "pointsZh": "点位：Photo Days／Camille Gajate，官方 uMap #1453094",
+    "points": "Points: Photo Days / Camille Gajate, official uMap #1453094; other points from the Base Adresse Nationale",
+    "pointsZh": "点位：Photo Days／Camille Gajate，官方 uMap #1453094；其他点位来自法国国家地址库（BAN）",
     "image": "Published by Photo Days",
     "imageZh": "由 Photo Days 发布"
   },
