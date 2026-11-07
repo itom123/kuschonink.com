@@ -29,6 +29,28 @@
     { "name": "GUIDES_TILE_LIMIT", "namespace_id": "4245", "simple": { "limit": 600, "period": 60 } }
   ],
   "vars": { "CONTACT_TO": "Xiangyin.Tom.Gu@gmail.com" },
+  // Worker Previews: every branch gets its own preview, with only the settings
+  // in this block, never the top-level ones, and never production's secrets.
+  // Previews have their own secrets, set once for all of them with
+  // `npx wrangler preview base-config secret put NAME` (or in the dashboard's
+  // Previews Base): TURNSTILE_SECRET, GUIDES_PASSWORD, GUIDES_PASSWORD_FOTOFILMIC
+  // and GUIDES_COOKIE_SECRET, as strong as production's (a preview serves that
+  // branch's real guides at a public link). So a preview's guide passwords
+  // are not the live site's. Rate limits count apart (their own namespace ids;
+  // GUIDES_TILE_LIMIT is the guide's street-level tiles). Crons and routes
+  // never apply to previews. docs/GUIDES.md section 7.
+  "previews": {
+    "send_email": [
+      { "name": "EMAIL", "destination_address": "Xiangyin.Tom.Gu@gmail.com" }
+    ],
+    "ratelimits": [
+      { "name": "CONTACT_LIMIT", "namespace_id": "5242", "simple": { "limit": 5, "period": 60 } },
+      { "name": "GUIDES_LIMIT", "namespace_id": "5243", "simple": { "limit": 30, "period": 60 } },
+      { "name": "GUIDES_TILE_LIMIT", "namespace_id": "5245", "simple": { "limit": 600, "period": 60 } }
+    ],
+    "vars": { "CONTACT_TO": "Xiangyin.Tom.Gu@gmail.com" },
+    "observability": { "enabled": true }
+  },
   // Secrets, set in the dashboard (never in this file): TURNSTILE_SECRET, and
   // each Field Guide audience's password, named in
   // src/content/guides/access.json: GUIDES_PASSWORD (visitors) and

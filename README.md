@@ -462,8 +462,10 @@ dashboard go to *Workers & Pages → Create → Import a repository*, choose
 - Production branch: `main`
 - Build command: `npm run build`
 - Deploy command: `npx wrangler deploy`
-- Non-production branch deploy command: `npx wrangler versions upload`
-  (this gives every pull request a preview link)
+- Previews: Worker Previews (*Settings → Builds*), Preview command
+  `npx wrangler preview`. Every branch gets its own preview link, with the
+  settings in the `previews` block of `wrangler.jsonc` and its own secrets,
+  never production's ([`docs/GUIDES.md`](docs/GUIDES.md) section 7).
 
 Every push to `main` then deploys automatically.
 
