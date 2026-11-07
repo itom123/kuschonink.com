@@ -1,9 +1,12 @@
 # Field Guide suggestions: what the routine does
 
-This file is the routine's instructions. The routine (a Claude Code scheduled
-task on claude.ai) runs hourly from 08:00 to 22:00 Paris time, and also when
-the owner approves a suggestion on the site. Its saved prompt only says:
-"Follow scripts/suggestions/ROUTINE.md in the repository, on main."
+This file is the routine's instructions. The routine is a Claude Code routine
+on claude.ai: it runs in Anthropic's cloud, never on the owner's computer. It
+runs hourly from 08:00 to 22:00 Paris time, and also when the owner approves a
+suggestion in admin mode (the Worker calls its API trigger). Its saved prompt
+only says: "Follow scripts/suggestions/ROUTINE.md in the repository, on main."
+How it is set up (its environment, network secret, schedule and trigger):
+[`docs/GUIDES.md` section 11.6](../../docs/GUIDES.md#116-云端例程-the-routine-in-claudes-cloud).
 
 ## What you are for
 
@@ -129,11 +132,12 @@ failure: say so in the result and carry on without it), use
 ## At the end
 
 ```bash
-$T log --run $RUN --trigger <scheduled|approved> --outcome <OK|Partial|Failed> \
+$T log --run $RUN --trigger <scheduled|approved|manual> --outcome <OK|Partial|Failed> \
   --pages "<references, one per line>" --details "<one line per suggestion: READY / DUPLICATE / NEEDS CHECK / ERROR and why>"
 ```
 
-Use `approved` when the run was started by the site (the run's text says
-"approved"), `scheduled` otherwise. `Partial` when some suggestions were left
+Use `approved` when the site started the run on an approval (the run's text
+begins "approved:"), `manual` when the owner pressed Run Now ("manual:"), and
+`scheduled` otherwise. `Partial` when some suggestions were left
 as NEEDS CHECK or ERROR. The publisher picks up READY entries within ten
 minutes and writes its own lines in the log.

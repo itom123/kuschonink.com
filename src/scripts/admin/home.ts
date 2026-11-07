@@ -6,6 +6,23 @@ import { adminOff, adminOn, api, forget, whoAmI } from './api';
 import { newProject, uploadPicture } from './site';
 import { kus, pick, setText, type Bi } from './ui';
 
+// The admin cookies need the visitor's leave for cookies (consent.ts), as a
+// guide's log-on does: the Information Bar asks if need be, with its general
+// wording, so the public Cookies dialog never names admin mode. Without the
+// desktop it goes ahead: posting the form is asking for the cookie.
+let asking = false;
+async function cookiesAllowed(): Promise<boolean> {
+  const c = kus()?.consent;
+  if (!c) return true;
+  if (asking) return false; // OK pressed again while the bar waits for an answer
+  asking = true;
+  try {
+    return await c.ask('admin');
+  } finally {
+    asking = false;
+  }
+}
+
 export function initAdminHome() {
   for (const root of document.querySelectorAll<HTMLElement>('[data-adm]:not([data-ready])')) {
     root.dataset.ready = '1';
@@ -51,6 +68,7 @@ export function initAdminHome() {
         (pass.value ? code : pass).focus();
         return;
       }
+      if (!(await cookiesAllowed())) return;
       ok.disabled = true;
       say(AW.checking);
       const r = await api('/login', { password: pass.value, code: c });

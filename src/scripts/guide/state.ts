@@ -1,14 +1,16 @@
 // Field Guide (导览): the program's state, its URL query and its storage.
 // URL keys (non-defaults only): place, day, theme, q, listings=1, area, route,
 // view. A day chosen automatically (today) and the map camera never go in the
-// URL. localStorage kus98:guide = {heat, labels, sort}; sessionStorage
-// kus98:guide:view = {guide, cam, area, scroll}. Log Off clears both.
+// URL. localStorage kus98:guide = {heat, labels, sort} (never "Nearest first");
+// sessionStorage kus98:guide:view = {guide, cam, area, scroll}. Log Off clears both.
 import type { ISODate, Payload } from '../../lib/guides/types';
 import { readStore, writeStore } from './dom';
+import { loadSort, saveSort } from './order';
 
 export type View = 'map' | 'places' | 'routes' | 'days' | 'info';
 export type Detail = 'closed' | 'half' | 'full';
-export type Sort = 'tier' | 'name' | 'zone';
+/** The Places list's order (order.ts): recommended (tier, then ref), name, area, open that day first, nearest first. */
+export type Sort = 'tier' | 'name' | 'zone' | 'open' | 'near';
 export const VIEWS: View[] = ['map', 'places', 'routes', 'days', 'info'];
 
 export interface GdState {
@@ -36,7 +38,7 @@ export interface Prefs { heat?: boolean; labels?: boolean; sort?: Sort }
 export interface Session { guide?: string; cam?: { cx: number; cy: number; s: number }; area?: string; scroll?: Record<string, number> }
 
 export const loadPrefs = () => readStore<Prefs>('local', PREFS) ?? {};
-export const savePrefs = (s: GdState) => writeStore('local', PREFS, { heat: s.heat, labels: s.labels, sort: s.sort } satisfies Prefs);
+export const savePrefs = (s: GdState) => writeStore('local', PREFS, { heat: s.heat, labels: s.labels, sort: saveSort(s.sort) } satisfies Prefs);
 export const loadSession = (slug: string): Session => {
   const s = readStore<Session>('session', SESSION);
   return s && s.guide === slug ? s : {};
@@ -47,7 +49,7 @@ export const clearStorage = () => {
   writeStore('session', SESSION, null);
 };
 
-export function initialState(p: Payload, query: string, prefs: Prefs, today: ISODate, contrast: boolean): GdState {
+export function initialState(p: Payload, query: string, prefs: Prefs, today: ISODate): GdState {
   const u = new URLSearchParams(query);
   const days = p.window?.days ?? [];
   const ids = new Set([...p.items.map((i) => i.id), ...p.places.map((x) => x.id), ...p.listings.filter((l) => !l.item).map((l) => l.id)]);
@@ -70,9 +72,10 @@ export function initialState(p: Payload, query: string, prefs: Prefs, today: ISO
     route: route && p.routes.some((r) => r.id === route) ? route : null,
     view: view && VIEWS.includes(view) && (view !== 'days' || days.length > 0) ? view : null,
     detail: 'closed',
-    heat: prefs.heat ?? !contrast,
+    // On by default in every scheme (red and maroon read on the grey map too); a saved choice wins.
+    heat: prefs.heat ?? true,
     labels: prefs.labels ?? true,
-    sort: prefs.sort === 'name' || prefs.sort === 'zone' ? prefs.sort : 'tier',
+    sort: loadSort(prefs.sort),
   };
 }
 

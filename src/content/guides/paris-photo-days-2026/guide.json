@@ -263,8 +263,8 @@
         {
           "lead": "Map data",
           "leadZh": "地图数据",
-          "text": "Map coordinates: the festival’s published uMap #1453094. Other addresses geocoded through France’s public address service. Basemap: © IGN 2026 / Géoplateforme (Plan IGN); stored as a dated offline snapshot.",
-          "textZh": "地图坐标：摄影节公布的 uMap #1453094。其他地址通过法国公共地址服务进行地理编码。底图：© IGN 2026／Géoplateforme（Plan IGN）；以注明日期的离线快照保存。"
+          "text": "Map coordinates: the festival’s published uMap #1453094. Other addresses geocoded through France’s public address service. Basemap: © IGN 2026 / Géoplateforme (Plan IGN); stored as a dated offline snapshot. Zoomed in, street-level tiles come from the same Plan IGN service through kuschonink.com, so IGN never sees your visit.",
+          "textZh": "地图坐标：摄影节公布的 uMap #1453094。其他地址通过法国公共地址服务进行地理编码。底图：© IGN 2026／Géoplateforme（Plan IGN）；以注明日期的离线快照保存。放大后的街道级瓦片来自同一 Plan IGN 服务，经由 kuschonink.com 转发，IGN 看不到你的访问。"
         }
       ]
     },
@@ -494,6 +494,10 @@
         {
           "text": "MEP current hours and admission, LE BAL special hours, Quai winter access.",
           "textZh": "MEP 当前开放时间和门票、LE BAL 特别开放时间、Quai 冬季开放信息。"
+        },
+        {
+          "text": "Street-level map tiles: Plan IGN v2, IGN / Géoplateforme, under the Etalab 2.0 open licence, fetched through kuschonink.com.",
+          "textZh": "街道级地图瓦片：Plan IGN v2，IGN／Géoplateforme，Etalab 2.0 开放许可，经由 kuschonink.com 获取。"
         }
       ]
     }

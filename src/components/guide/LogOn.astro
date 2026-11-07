@@ -6,16 +6,21 @@
 // this page again and data-gd-state set to wrong | wait | off | denied | error;
 // CSS then shows the matching message below. src/scripts/guide/logon.ts posts
 // with fetch instead and shows the same messages as message boxes.
+// With more than one listed guide, a Guide list above the password picks which
+// guide's box this is: a drop-down list with JavaScript (logon.ts opens the
+// chosen guide's box in the same window), links to each guide's box without.
 import Bi from '../Bi.astro';
-import type { Bi as BiText } from '../../lib/i18n';
+import { text, type Bi as BiText } from '../../lib/i18n';
 import '../../styles/guide-logon.css';
 
 interface Props {
   slug: string;
   title: BiText;
   subtitle: BiText;
+  /** The listed guides to choose from, this one among them (none, or one: no Guide list). Neutral public titles only. */
+  guides?: { slug: string; title: BiText }[];
 }
-const { slug, title, subtitle } = Astro.props;
+const { slug, title, subtitle, guides = [] } = Astro.props;
 const resource = `\\\\XIANGYIN\\GUIDES\\${slug.toUpperCase()}`;
 const id = `gd-logon-${slug}`;
 const zhOr = (b: BiText) => b.zh || b.en;
@@ -36,6 +41,20 @@ const zhOr = (b: BiText) => b.zh || b.en;
         <span class="ico ico-keys gd-logon-keys" aria-hidden="true"></span>
         <div class="gd-logon-fields">
           <p class="gd-logon-intro" id={`${id}-intro`}><Bi t={{ en: 'You must supply a password to open:', zh: '必须提供密码才能打开：' }} /></p>
+          {guides.length > 1 && (
+            <div class="gd-logon-row gd-logon-guide">
+              <label for={`${id}-guide`} id={`${id}-guide-label`}><span data-l="en"><u>G</u>uide:</span><span data-l="zh" lang="zh-Hans">导览(<u>G</u>)：</span></label>
+              {/* No name: it is not sent. The password goes to the guide whose box this is. */}
+              <select id={`${id}-guide`} autocomplete="off" data-gd-guide data-js-only>
+                {guides.map((g) => <option value={g.slug} selected={g.slug === slug} {...text(g.title)}>{g.title.en}</option>)}
+              </select>
+              <ul class="gd-logon-guides" aria-labelledby={`${id}-guide-label`}>
+                {guides.map((g) => (
+                  <li>{g.slug === slug ? <b aria-current="page"><Bi t={g.title} /></b> : <a href={`/guides/${g.slug}`}><Bi t={g.title} /></a>}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div class="gd-logon-row">
             <label for={`${id}-res`}><span data-l="en"><u>R</u>esource:</span><span data-l="zh" lang="zh-Hans">资源(<u>R</u>)：</span></label>
             {/* No name: it is not sent. It tells password managers where the password belongs. */}

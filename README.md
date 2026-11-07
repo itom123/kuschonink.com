@@ -44,6 +44,16 @@ separate, hidden log-on for admin mode, checked on the server
   maximised, toolbars), "Show this screen each time Xiangyin 98 starts" holds
   on every load of the home page, and an unsent Contact message survives a
   reload until it's sent or the tab is closed.
+- **Cookies are asked about first.** After start-up and log-on, a message box,
+  *Cookies on Xiangyin 98*, lists what needs a cookie (a guide's password,
+  staying logged on) and what can do without (this tab's memory, lasting
+  preferences), and what happens without each, then offers **Allow All**,
+  **Necessary Only** or **None**. Nothing is written until the visitor
+  chooses, and a stricter choice removes what it no longer allows. Under None,
+  or after closing the box unanswered, logging on to a guide asks again with a
+  pale yellow Information Bar across the top of the screen. Start ▸ Settings ▸
+  Cookies... changes the choice; bots and link previews never see either. See
+  "Cookies" in [`docs/DESKTOP.md`](docs/DESKTOP.md#cookies-the-visitors-choice).
 - Sounds, pointers, icons and screens are made for the site: nothing is taken
   from Windows. No visible text says "kuschonink"; addresses read `C:\xiangyin\…`.
 
@@ -304,12 +314,23 @@ a document inside the program, at `/guides/<slug>` (`\\XIANGYIN\GUIDES\<SLUG>`
 in the log-on box). The first is `paris-photo-days-2026`. On a computer the window
 shows a list, the map and the details side by side; on a phone it shows one at a
 time, and tapping a pin raises a details sheet. It works without JavaScript as
-one readable page.
+one readable page. Zoomed in past the base picture, the map shows street-level
+tiles from IGN's Plan IGN. The Worker fetches them at
+`/guides/<slug>/tiles/{z}/{x}/{y}.png` (zooms 14 to 19), for logged-on viewers
+only and only inside the box `access.json` gives under `tiles` (in degrees, at
+most 3° each way, containing every base map), so IGN sees the Worker and never
+the visitor. Each visitor may fetch at most 600 tiles from IGN a minute.
 
-**Passwords and audiences.** Before the password, a visitor sees only the
-program's name and each listed guide's neutral public title, then an *Enter
-Network Password* box. The Worker (`worker/guides.ts`, on `/guides/*`) checks the
-password and decides which **audience** it belongs to. Audiences, and which
+**Passwords and audiences.** Before the password, a visitor sees only neutral
+public titles, in an *Enter Network Password* box: `/guides` goes to the first
+listed guide's box, and when more than one guide is listed, its **Guide** list
+opens another guide's box in the same window (without JavaScript, links do), so
+the password goes to the guide chosen. On a computer the box is a small window
+in the middle of the screen; once the password is accepted the same window
+shows the guide, maximised (or as the Field Guide was last left), and Log Off
+turns it back into the small box. The Worker (`worker/guides.ts`, on `/guides`
+and `/guides/*`) checks the password and decides which **audience** it belongs
+to. Audiences, and which
 guides each may open, are in `src/content/guides/access.json`; each audience's
 password is a Cloudflare secret named there (`GUIDES_PASSWORD` for visitors,
 `GUIDES_PASSWORD_FOTOFILMIC` for participants), never in the repo. Each needs
@@ -320,8 +341,13 @@ visitor's audience, so a visitor's HTML and data never hold what's marked for
 someone else. The log-on is a signed `HttpOnly` cookie, `kus98_guides`; pictures
 and base maps are served only with it. A server-only key signs it, so nobody
 can forge one: the secret `GUIDES_COOKIE_SECRET` (recommended: 32 or more
-random characters), or `TURNSTILE_SECRET` when that isn't set. Changing either
-secret logs everyone out. All these secrets go under Workers & Pages →
+random characters), or `TURNSTILE_SECRET` when that isn't set (one under 24
+characters signs together with `TURNSTILE_SECRET`). Changing
+`GUIDES_COOKIE_SECRET` logs everyone out; so does changing `TURNSTILE_SECRET`
+unless `GUIDES_COOKIE_SECRET` has 24 or more characters. Generate one with
+`node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`;
+built-in password generators often give fewer than 24 characters. All these
+secrets go under Workers & Pages →
 kuschonink → Settings → Variables and Secrets, type Secret, not under
 Settings → Build (only the build can see those variables). Without a password set, a guide says it
 isn't open yet. Guide pages are `noindex` and not in the sitemap.
@@ -344,22 +370,29 @@ leak fails the build, and the old version stays live.
 How to edit a guide, add one, add an audience or change a password, in Chinese
 and English: [`docs/GUIDES.md`](docs/GUIDES.md).
 
-- **Code:** pages in `src/pages/guides/` (the home, `[slug]/locked.astro` for the
-  log-on, `[slug]/views/[audience].astro` for each view); types, rules, checks and
+- **Code:** pages in `src/pages/guides/` (`index.astro` is no list: it only names
+  the first listed guide for the Worker's redirect, and says there are no guides
+  yet when none is listed; `[slug]/locked.astro` for the log-on box and its Guide
+  list; `[slug]/views/[audience].astro` for each view); types, rules, checks and
   loading in `src/lib/guides/`; the program and its map in `src/scripts/guide/`
   and `src/components/guide/`; styles in `src/styles/guide*.css`; the gate in
   `worker/guides.ts`.
-- **Tests:** `npm test` runs `src/lib/guides/guides.test.mts` (day rules, time
-  zones, audience filtering, the real data, broken copies) and
-  `worker/guides.test.mts` (the gate: views, cookies, log-on, log-off) and
-  `src/scripts/guide/camera.test.mts` (the map's pan and zoom). The build
-  runs the guard and the Worker's tests as well.
+- **Tests:** `npm test` runs all eleven `*.test.mts` suites, in the order
+  `package.json` lists them. The Field Guide's are `src/lib/guides/guides.test.mts`
+  (day rules, time zones, audience filtering, the real data, broken copies),
+  `worker/guides.test.mts` (the gate: views, cookies, log-on, log-off, tiles) and,
+  in `src/scripts/guide/`, `camera.test.mts` (the map's pan and zoom),
+  `find.test.mts` (Find, and the distances of Where am I?), `heat.test.mts`,
+  `order.test.mts` (Sort by), `pins.test.mts` (how many pins show at each zoom)
+  and `tiles.test.mts` (the street-level tiles). The build runs the guard and
+  the Worker's tests as well.
 
 ### Analytics
 
 Cloudflare Web Analytics is enabled for the kuschonink.com zone with automatic
 setup: Cloudflare injects the beacon into every page as it passes through.
-There's no code in this repo and no cookie banner is needed.
+There's no code in this repo, and the beacon sets no cookies, so it isn't part
+of the Cookies dialog (which covers what the site itself keeps).
 
 ## How the project is organised
 
@@ -431,8 +464,10 @@ dashboard go to *Workers & Pages → Create → Import a repository*, choose
 - Production branch: `main`
 - Build command: `npm run build`
 - Deploy command: `npx wrangler deploy`
-- Non-production branch deploy command: `npx wrangler versions upload`
-  (this gives every pull request a preview link)
+- Previews: Worker Previews (*Settings → Builds*), Preview command
+  `npx wrangler preview`. Every branch gets its own preview link, with the
+  settings in the `previews` block of `wrangler.jsonc` and its own secrets,
+  never production's ([`docs/GUIDES.md`](docs/GUIDES.md) section 7).
 
 Every push to `main` then deploys automatically.
 
@@ -447,7 +482,8 @@ Worker's *Settings → Domains & Routes*. Until then the site is available at
 
 `worker/index.ts` runs only for the paths listed in `assets.run_worker_first`
 (currently `/v1/contact/*`, the contact form and Paint's drawings, and
-`/guides/*`, the Field Guide's gate). Everything else is served as static files.
+`/guides` and `/guides/*`, the Field Guide's gate, which also sends `/guides` to
+the first listed guide). Everything else is served as static files.
 Add a path there and handle it in the Worker to add an API route.
 
 ## Migration notes

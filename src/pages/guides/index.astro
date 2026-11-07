@@ -1,16 +1,22 @@
 ---
-// Field Guide (导览): the program's home, a folder of the listed guides. Public
-// and neutral: only each guide's public title, never what is inside (that is
-// behind each guide's password, see worker/guides.ts).
+// Field Guide (导览): /guides. There is no list of guides to choose from: while
+// any guide is listed (guide.json "listed": true), the Worker sends /guides to
+// the first one's own address (worker/guides.ts), whose log-on box is where a
+// guide is chosen. This page tells the Worker which guide that is
+// (data-gd-first: the slug, nothing else), so the Worker never reads guide
+// content. Otherwise it is only seen when no guide is listed: a neutral window
+// that says so, in the window's own black on white.
 import Desktop from '../../layouts/Desktop.astro';
 import Window from '../../components/desktop/Window.astro';
 import Bi from '../../components/Bi.astro';
 import { site } from '../../lib/content';
-import { attr, seoTitle } from '../../lib/i18n';
+import { seoTitle } from '../../lib/i18n';
 import { guideCards } from '../../lib/guides/load';
 import { W } from '../../lib/guides/words';
 
-const cards = guideCards();
+// The first listed guide, in access.json order. Its link below shows only where
+// no Worker sends the address on (a local preview).
+const first = guideCards()[0]?.slug;
 const seo = {
   ...seoTitle(W.program, site.name),
   description: `Field Guide: city guides on ${site.name}'s desktop. Each guide opens with a password.`,
@@ -25,29 +31,16 @@ const seo = {
     url="/guides"
     title={W.program}
     icon="guide"
-    bodyClass="folder-body gd-home-body"
-    status={[W.guides(cards.length), { en: 'Double-click a guide to open it.', zh: '双击一份导览即可打开。' }]}
+    bodyClass="folder-body"
+    status={first ? undefined : W.guides(0)}
   >
-    <div class="folder-page gd-home" data-gd-home data-view="thumbs">
+    <div class="folder-page" data-gd-first={first}>
       <h1 class="sr-only"><Bi t={W.program} /></h1>
-      <ul class="gd-home-list" {...attr('aria-label', W.program)}>
-        {cards.map((c) => (
-          <li>
-            <a class="icon gd-home-icon" href={`/guides/${c.slug}`} data-icon-id={`guide-${c.slug}`} data-type="Field Guide" draggable="false">
-              <span class="ico ico-guide" aria-hidden="true"><span class="ico ico16 ico-keys gd-lock"></span></span>
-              <span class="icon-label"><Bi t={c.publicTitle} /></span>
-              {(c.publicSubtitle.en || c.publicSubtitle.zh) && <span class="gd-home-sub"><Bi t={c.publicSubtitle} /></span>}
-            </a>
-          </li>
-        ))}
-      </ul>
-      {cards.length === 0 && <p><Bi t={{ en: 'There are no guides here yet.', zh: '这里还没有导览。' }} /></p>}
+      {first ? (
+        <p><a href={`/guides/${first}`}><Bi t={{ en: 'Open Field Guide', zh: '打开导览' }} /></a></p>
+      ) : (
+        <p><Bi t={{ en: 'There are no guides here yet.', zh: '这里还没有导览。' }} /></p>
+      )}
     </div>
   </Window>
 </Desktop>
-
-<script>
-  import { initGuideHome } from '../../scripts/guide/home';
-  initGuideHome();
-  document.addEventListener('astro:page-load', initGuideHome);
-</script>

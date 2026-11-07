@@ -110,6 +110,8 @@ who suggested something go through `MAIL_OUT` (only from
   Ten wrong tries from one place lock it for an hour; too many from everywhere at once lock everyone for an hour (you too).
 - 登录保持 12 小时。cookie 只是一个随机编号（`HttpOnly`、`Secure`），服务器端（Guard）保存会话，所以 **注销** 和 **在所有地方注销** 立即生效。
   A log-on lasts 12 hours. The cookie is only a random id (`HttpOnly`, `Secure`); the session lives on the server (the Guard), so **Log Off** and **Log Off Everywhere** work at once.
+- 管理模式的 cookie 需要访客同意使用 cookie（“全部允许”或“仅必要”）；还没同意时，按“确定”后顶部的信息栏会先问一次（用一般的措辞，公开的 Cookie 对话框里不提管理模式）。
+  Admin mode's cookies need the leave for cookies (Allow All or Necessary Only); without it, OK first asks once with the Information Bar (in its general wording: the public Cookies dialog never names admin mode).
 - 每个管理请求都在服务器上检查：会话、来自本站（`Sec-Fetch-Site: same-origin`、`Origin`）、JSON。别的网站无法借你的浏览器操作。
   Every admin request is checked on the server: the session, that it comes from this site (`Sec-Fetch-Site: same-origin`, `Origin`), JSON. Another site can't act through your browser.
 - 发邮件：浏览器只发“哪一条推荐”和正文；收件地址由服务器从 Notion（Contacts）里查，且只在对方同意时才发。同一封信不会发两次。

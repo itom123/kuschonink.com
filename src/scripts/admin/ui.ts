@@ -10,6 +10,8 @@ export interface Kus {
   play(n: string): void;
   open(url: string, o?: { reload?: boolean }): Promise<void>;
   menus?(el: Element, provider: (name: string) => unknown[] | null): void;
+  /** The visitor's choice about cookies and storage (desktop/consent.ts). */
+  consent?: { allows(kind: 'cookie' | 'tab' | 'lasting'): boolean; ask(feature: string): Promise<boolean> };
 }
 export const kus = () => (window as unknown as { kus98?: Kus }).kus98;
 export const pick = (b: Bi) => (document.documentElement.dataset.lang === 'zh' && b.zh ? b.zh : b.en);

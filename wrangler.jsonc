@@ -4,17 +4,19 @@
   "compatibility_date": "2026-10-01",
   // Static site (dist/) served by Cloudflare. The Worker only runs for the
   // contact form endpoints (worker/contact.ts, worker/drawing.ts) and for the
-  // Field Guide's password gate on /guides/* (worker/guides.ts) and its
-  // suggestions (worker/suggest.ts); the home /guides stays a plain public
-  // page. Its crons publish approved suggestions (worker/publish.ts) and keep
-  // contact details only as long as promised (worker/privacy.ts).
+  // Field Guide on /guides and /guides/* (worker/guides.ts): the password gate,
+  // /guides going straight to the first listed guide, the street-level map
+  // tiles a guide's readers get (Plan IGN, fetched by the Worker and kept at the
+  // edge), and suggestions from inside a guide (worker/suggest.ts). Its crons
+  // publish approved suggestions (worker/publish.ts) and keep contact details
+  // only as long as promised (worker/privacy.ts).
   "main": "worker/index.ts",
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "drop-trailing-slash",
-    "run_worker_first": ["/v1/contact/*", "/guides/*", "/v1/admin/*"]
+    "run_worker_first": ["/v1/contact/*", "/guides", "/guides/*", "/v1/admin/*"]
   },
   // Contact form email: can only ever send to this one verified inbox.
   "send_email": [
@@ -25,14 +27,17 @@
     { "name": "MAIL_OUT", "allowed_sender_addresses": ["noreply@kuschonink.com"] }
   ],
   // At most 5 messages a minute from one visitor; at most 30 Field Guide
-  // password tries a minute from one visitor (a class on one Wi-Fi fits).
+  // password tries a minute from one visitor (a class on one Wi-Fi fits); at
+  // most 600 street-level tiles a minute fetched from IGN for one visitor
+  // (tiles already at the edge are not counted).
   "ratelimits": [
     { "name": "CONTACT_LIMIT", "namespace_id": "4242", "simple": { "limit": 5, "period": 60 } },
     { "name": "GUIDES_LIMIT", "namespace_id": "4243", "simple": { "limit": 30, "period": 60 } },
     // At most 3 suggestions a minute from one visitor (the Guard also counts 10 an hour, and 60 in all).
     { "name": "SUGGEST_LIMIT", "namespace_id": "4244", "simple": { "limit": 3, "period": 60 } },
+    { "name": "GUIDES_TILE_LIMIT", "namespace_id": "4245", "simple": { "limit": 600, "period": 60 } },
     // Admin calls, 60 a minute from one visitor (wrong log-ons are also counted by the Guard).
-    { "name": "ADMIN_LIMIT", "namespace_id": "4245", "simple": { "limit": 60, "period": 60 } }
+    { "name": "ADMIN_LIMIT", "namespace_id": "4246", "simple": { "limit": 60, "period": 60 } }
   ],
   // The Guard (worker/guard.ts): true counters, held keys, admin sessions and
   // locks, in one SQLite Durable Object.
@@ -52,13 +57,54 @@
     "NOTION_CONTACTS": "24e16407-40ea-4a3f-b1a1-a8d3159c36f1",
     "NOTION_LOG": "93ccb58c-07d5-435d-ba01-cef829ea5c5e"
   },
+  // Worker Previews: every branch gets its own preview, with only the settings
+  // in this block, never the top-level ones, and never production's secrets.
+  // Previews have their own secrets, set once for all of them with
+  // `npx wrangler preview base-config secret put NAME` (or in the dashboard's
+  // Previews Base): TURNSTILE_SECRET, GUIDES_PASSWORD, GUIDES_PASSWORD_FOTOFILMIC
+  // and GUIDES_COOKIE_SECRET, with test values. So a preview's guide passwords
+  // are not the live site's. Rate limits count apart (their own namespace ids;
+  // GUIDES_TILE_LIMIT is the guide's street-level tiles). Crons and routes
+  // never apply to previews. docs/GUIDES.md section 7.
+  // Suggestions in a preview: its own Guard (each preview gets its own Durable
+  // Object storage), the test copies of the three Notion databases, and
+  // Turnstile's test keys (they answer for example.com). Its secrets:
+  // NOTION_TOKEN of a Notion integration that sees only those test copies, and
+  // TURNSTILE_SECRET_SUGGEST, a test secret. No GITHUB_REPO and never a
+  // GITHUB_TOKEN: a preview never publishes to the repository. Admin mode in a
+  // preview only with its own ADMIN_PASSWORD and ADMIN_TOTP_SECRET (test
+  // values); it sends no emails (no MAIL_OUT) and never starts the routine
+  // (never ROUTINE_FIRE_URL or ROUTINE_TOKEN).
+  "previews": {
+    "send_email": [
+      { "name": "EMAIL", "destination_address": "Xiangyin.Tom.Gu@gmail.com" }
+    ],
+    "ratelimits": [
+      { "name": "CONTACT_LIMIT", "namespace_id": "5242", "simple": { "limit": 5, "period": 60 } },
+      { "name": "GUIDES_LIMIT", "namespace_id": "5243", "simple": { "limit": 30, "period": 60 } },
+      { "name": "SUGGEST_LIMIT", "namespace_id": "5244", "simple": { "limit": 3, "period": 60 } },
+      { "name": "GUIDES_TILE_LIMIT", "namespace_id": "5245", "simple": { "limit": 600, "period": 60 } },
+      { "name": "ADMIN_LIMIT", "namespace_id": "5246", "simple": { "limit": 60, "period": 60 } }
+    ],
+    "durable_objects": { "bindings": [{ "name": "GUARD", "class_name": "Guard" }] },
+    "vars": {
+      "CONTACT_TO": "Xiangyin.Tom.Gu@gmail.com",
+      "NOTION_SUGGESTIONS": "d2a5fe18-8031-425e-a123-3969fb32fbe7",
+      "NOTION_CONTACTS": "26a774fe-1de2-4760-a1c7-8700b1b62de5",
+      "NOTION_LOG": "652c23d0-b96b-4cee-a9a3-d4708c1207b8",
+      "TURNSTILE_HOSTNAMES": "example.com"
+    },
+    "observability": { "enabled": true }
+  },
   // Secrets, set in the dashboard (never in this file): TURNSTILE_SECRET, and
   // each Field Guide audience's password, named in
   // src/content/guides/access.json: GUIDES_PASSWORD (visitors) and
   // GUIDES_PASSWORD_FOTOFILMIC (participants). Each password needs 6+
   // characters, and the two must differ. GUIDES_COOKIE_SECRET is recommended:
   // 32+ random characters that sign the log-on cookies; without it the Worker
-  // uses TURNSTILE_SECRET. Changing either secret logs everyone out.
+  // uses TURNSTILE_SECRET, and one under 24 characters signs together with
+  // TURNSTILE_SECRET. Changing GUIDES_COOKIE_SECRET logs everyone out; so does
+  // changing TURNSTILE_SECRET unless GUIDES_COOKIE_SECRET has 24+ characters.
   // Field Guide suggestions: NOTION_TOKEN (the site's Notion integration),
   // TURNSTILE_SECRET_SUGGEST (the suggestion form's own Turnstile widget) and
   // GITHUB_TOKEN (fine-grained, this repository only, Contents read/write) for

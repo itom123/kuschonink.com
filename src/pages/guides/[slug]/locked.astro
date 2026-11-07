@@ -2,15 +2,18 @@
 // Field Guide (导览): the log-on page of one guide (dist/guides/<slug>/locked.html).
 // Public: the Worker (worker/guides.ts) serves it at /guides/<slug> to anyone
 // without a valid cookie, so it holds the guide's neutral public title and
-// nothing else from the guide (the build guard scans it). Same window props
+// nothing else from the guide (the build guard scans it), plus, for the Guide
+// list, the other listed guides' neutral public titles. Same window props
 // as the guide itself (views/[audience].astro), so logging on replaces this
-// page in the same window.
+// page in the same window. Until then the window is the size of the box, in
+// the middle of the screen (fit="dialog"; w is the box's width plus the
+// window's edges, h only a first guess: the window is as tall as the box).
 import Desktop from '../../../layouts/Desktop.astro';
 import Window from '../../../components/desktop/Window.astro';
 import LogOn from '../../../components/guide/LogOn.astro';
 import { site } from '../../../lib/content';
 import { seoTitle } from '../../../lib/i18n';
-import { guideSlugs, publicInfo } from '../../../lib/guides/load';
+import { guideCards, guideSlugs, publicInfo } from '../../../lib/guides/load';
 
 export function getStaticPaths() {
   return guideSlugs().map((slug) => ({ params: { slug } }));
@@ -26,6 +29,13 @@ const seo = {
   description: `${name.en}: a Field Guide on Xiangyin 98. Type the password to open it.`,
   descriptionZh: `${name.zh}：Xiangyin 98 上的一份导览。输入密码即可打开。`,
 };
+// The Guide list: every listed guide, in access.json order, when there is more
+// than one and this guide is one of them. An unlisted guide's box has none: its
+// Resource line names it, and it stays apart from the listed ones.
+const cards = guideCards();
+const guides = cards.length > 1 && cards.some((c) => c.slug === slug)
+  ? cards.map((c) => ({ slug: c.slug, title: { en: c.publicTitle.en, zh: c.publicTitle.zh || c.publicTitle.en } }))
+  : [];
 ---
 <Desktop seo={seo} noindex path={`/guides/${slug}`}>
   <Window
@@ -35,10 +45,13 @@ const seo = {
     address={false}
     url={`/guides/${slug}`}
     title={title}
+    fit="dialog"
+    w={454}
+    h={guides.length ? 349 : 320}
     menus={['&File', '&Help']}
     bodyClass="gd-logon-body"
     status={[{ en: 'Type the password to open this guide.', zh: '输入密码以打开这份导览。' }]}
   >
-    <LogOn slug={slug} title={name} subtitle={sub} />
+    <LogOn slug={slug} title={name} subtitle={sub} guides={guides} />
   </Window>
 </Desktop>

@@ -42,6 +42,8 @@ export class Finder {
   private active = -1;
   private uid = Math.random().toString(36).slice(2, 7);
   private announceTimer = 0;
+  /** The last press on the list was a finger or a pen, not a mouse. */
+  private touch = false;
 
   constructor(input: HTMLInputElement, host: HTMLElement, hooks: FinderHooks, signal: AbortSignal) {
     this.input = input;
@@ -49,24 +51,33 @@ export class Finder {
     this.hooks = hooks;
     this.list = h('ul', { class: 'gd-find-list', role: 'listbox', id: `gd-find-${this.uid}`, hidden: true });
     setAttr(this.list, 'aria-label', W.findResults);
-    host.append(this.list);
+    // Straight after the search band, so a screen reader swiping on from the box
+    // reaches the suggestions first. .gd stays the containing block (place()).
+    (input.form ?? input).after(this.list);
     input.setAttribute('role', 'combobox');
     input.setAttribute('aria-autocomplete', 'list');
     input.setAttribute('aria-expanded', 'false');
     input.setAttribute('aria-controls', this.list.id);
 
     const on = { signal };
-    input.addEventListener('input', () => this.update(), on);
+    // While an IME composes, the list follows (Android keyboards compose plain
+    // words too), but says nothing until the words are committed.
+    input.addEventListener('input', (e) => this.update((e as InputEvent).isComposing), on);
+    input.addEventListener('compositionend', () => this.update(), on);
     input.addEventListener('focus', () => { if (this.input.value.trim()) this.update(); }, on);
+    // A tap on the box that still has focus (the phone's keyboard was put away) opens the list again.
+    input.addEventListener('click', () => { if (this.list.hidden && this.input.value.trim()) this.update(); }, on);
     input.addEventListener('blur', () => window.setTimeout(() => { if (document.activeElement !== this.input) this.close(); }, 120), on);
     input.addEventListener('keydown', (e) => this.key(e), on);
     // Keep the keyboard in the box while choosing with the mouse or a finger.
-    this.list.addEventListener('pointerdown', (e) => e.preventDefault(), on);
+    this.list.addEventListener('pointerdown', (e) => { e.preventDefault(); this.touch = e.pointerType !== 'mouse'; }, on);
     this.list.addEventListener('click', (e) => {
       const li = (e.target as Element).closest<HTMLElement>('[data-hit]');
       if (!li) return;
-      if (li.dataset.hit === 'all') return this.all();
-      this.choose(Number(li.dataset.hit), 'pointer');
+      if (li.dataset.hit === 'all') this.all();
+      else this.choose(Number(li.dataset.hit), 'pointer');
+      // On a phone, put the keyboard away so the sheet or the list can be seen.
+      if (this.touch) this.input.blur();
     }, on);
     this.list.addEventListener('pointermove', (e) => {
       const li = (e.target as Element).closest<HTMLElement>('[data-hit]');
@@ -76,6 +87,11 @@ export class Finder {
       const t = e.target as Node;
       if (!this.list.hidden && !this.list.contains(t) && t !== this.input) this.close();
     }, { ...on, capture: true });
+    // The on-screen keyboard, a turned phone or a resized window: fit the list again.
+    const again = () => { if (this.isOpen) this.place(); };
+    window.visualViewport?.addEventListener('resize', again, on);
+    window.visualViewport?.addEventListener('scroll', again, on);
+    window.addEventListener('resize', again, on);
     signal.addEventListener('abort', () => { window.clearTimeout(this.announceTimer); this.list.remove(); }, { once: true });
   }
 
@@ -84,7 +100,11 @@ export class Finder {
   /** Drop the index (the language or the audience's page changed). */
   reset() { this.entries = null; if (this.isOpen) this.update(); }
 
+  /** Fit the open list to the box again (the layout around it changed). */
+  reposition() { if (this.isOpen) this.place(); }
+
   close() {
+    window.clearTimeout(this.announceTimer);
     if (this.list.hidden) return;
     this.list.hidden = true;
     this.active = -1;
@@ -92,15 +112,15 @@ export class Finder {
     this.input.removeAttribute('aria-activedescendant');
   }
 
-  update() {
+  update(composing = false) {
     const q = this.input.value.trim();
     if (!q || !worthShowing(q)) return this.close();
     this.entries ??= this.hooks.entries();
     this.hits = search(this.entries, q);
-    this.render(q);
+    this.render(q, composing);
   }
 
-  private render(q: string) {
+  private render(q: string, composing = false) {
     const ws = words(q);
     const rows: HTMLElement[] = this.hits.slice(0, SHOWN).map((hit, i) => this.row(hit, i, ws));
     if (!rows.length) rows.push(h('li', { class: 'gd-hit gd-hit-none', role: 'option', 'aria-disabled': 'true' }, W.findNone));
@@ -114,6 +134,7 @@ export class Finder {
     this.input.setAttribute('aria-expanded', 'true');
     this.setActive(-1, false);
     window.clearTimeout(this.announceTimer);
+    if (composing) return;
     this.announceTimer = window.setTimeout(() => announce(this.hits.length ? W.findCount(this.hits.length) : W.findNone), 700);
   }
 
@@ -136,9 +157,12 @@ export class Finder {
     ]);
   }
 
-  /** Under the box; as wide as the band on a narrow program. */
+  /** Under the box; as wide as the band on a narrow program; above the on-screen keyboard. */
   private place() {
     const host = this.host.getBoundingClientRect();
+    // A phone's keyboard covers the page without shrinking it: stop at what can be seen.
+    const vv = window.visualViewport;
+    const bottom = vv ? Math.min(host.bottom, vv.offsetTop + vv.height) : host.bottom;
     const box = this.input.getBoundingClientRect();
     const narrow = host.width < 560;
     const left = narrow ? 2 : Math.max(2, box.left - host.left);
@@ -146,7 +170,7 @@ export class Finder {
     this.list.style.left = `${Math.round(left)}px`;
     this.list.style.top = `${Math.round(box.bottom - host.top + 1)}px`;
     this.list.style.width = `${Math.round(width)}px`;
-    this.list.style.maxHeight = `${Math.max(120, Math.round(host.bottom - box.bottom - 8))}px`;
+    this.list.style.maxHeight = `${Math.max(120, Math.round(bottom - box.bottom - 8))}px`;
   }
 
   private options() { return [...this.list.querySelectorAll<HTMLElement>('[data-hit]')]; }
@@ -163,7 +187,8 @@ export class Finder {
   }
 
   private key(e: KeyboardEvent) {
-    if (e.isComposing) return;
+    // Safari sends the Enter that commits a composition after compositionend, as keyCode 229.
+    if (e.isComposing || e.keyCode === 229) return;
     const opts = this.options();
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       if (this.list.hidden) {
@@ -191,7 +216,9 @@ export class Finder {
       // Enter with nothing chosen: the best match, if it stands out; else the whole list.
       const [a, b] = this.hits;
       if (a && (!b || a.score >= b.score * 1.5)) return this.choose(0, 'keyboard');
-      return this.all();
+      // No clear winner: the whole list, unless the list would be empty.
+      if (this.hits.length && this.hooks.shownCount() > 0) return this.all();
+      return;
     }
     if (e.key === 'Tab') this.close();
   }

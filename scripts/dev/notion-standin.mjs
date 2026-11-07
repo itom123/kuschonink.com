@@ -4,8 +4,8 @@
 // Notion. Plain Node ESM, no dependencies.
 //
 // In tests:   const s = standIn(); notion({ token: 't', fetch: s.fetch, base: s.base })
-// As a server: node scripts/dev/notion-standin.mjs [port]   (default 8790)
-//   then put NOTION_API=http://localhost:8790 and NOTION_TOKEN=dev in .dev.vars.
+// As a server: node scripts/dev/notion-standin.mjs [port]   (default 8798)
+//   then put NOTION_API=http://127.0.0.1:8798 and NOTION_TOKEN=dev in .dev.vars.
 //   Data sources are created on first use; GET /_dump shows everything.
 import { createServer } from 'node:http';
 import { resolve } from 'node:path';
@@ -171,7 +171,7 @@ export function standIn(o = {}) {
 
 // ---- As a local server for wrangler dev ----
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
-  const port = Number(process.argv[2] ?? 8790);
+  const port = Number(process.argv[2] ?? 8798);
   const s = standIn({ base: `http://localhost:${port}` });
   createServer(async (req, res) => {
     const chunks = [];

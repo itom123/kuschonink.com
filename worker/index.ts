@@ -1,5 +1,5 @@
 // The site's Worker. Static files are served by Cloudflare directly; only
-// /v1/contact/* and /guides/* run this code: the contact form backend
+// /v1/contact/*, /guides and /guides/* run this code: the contact form backend
 // (worker/contact.ts), Paint's "Send to Xiangyin" (worker/drawing.ts), the
 // Field Guide's password gate (worker/guides.ts) and its suggestions
 // (worker/suggest.ts), and admin mode on /v1/admin/* (worker/admin.ts).
@@ -39,10 +39,12 @@ interface Env {
   CONTACT_LIMIT: RateLimit;
   /** Turnstile secret key (set in the dashboard as a secret). Signs Field Guide cookies when GUIDES_COOKIE_SECRET isn't set. */
   TURNSTILE_SECRET?: string;
-  /** Signs the Field Guide's log-on cookies (a secret, 32+ random characters); without it, or when it is under 24 characters, TURNSTILE_SECRET does. */
+  /** Signs the Field Guide's log-on cookies (a secret, 32+ random characters); without it TURNSTILE_SECRET does, and under 24 characters it signs together with TURNSTILE_SECRET. */
   GUIDES_COOKIE_SECRET?: string;
   /** Rate limiting binding: Field Guide password tries per minute per visitor. */
   GUIDES_LIMIT: RateLimit;
+  /** Rate limiting binding: street-level tiles fetched from IGN per minute per visitor. Optional: without it (a preview) every tile is allowed. */
+  GUIDES_TILE_LIMIT?: RateLimit;
   // Each Field Guide audience's password is a secret, set in the dashboard,
   // named in access.json ("secret": GUIDES_PASSWORD, GUIDES_PASSWORD_…).
 
@@ -64,7 +66,7 @@ interface Env {
   NOTION_LOG?: string;
   /** Fine-grained token for this repository, Contents read/write (a secret): the publisher's commits. */
   GITHUB_TOKEN?: string;
-  /** "owner/name". */
+  /** "owner/name". Only production names one (wrangler.jsonc vars), so a preview never publishes, even with a token. */
   GITHUB_REPO?: string;
   /** Only for wrangler dev: a GitHub stand-in. */
   GITHUB_API?: string;
@@ -115,17 +117,40 @@ const depsFor = (env: Env): Deps => ({
   log: (...args) => console.error(...args),
 });
 
+let saidShortKey = false;
+
+/**
+ * The key that signs guide cookies: GUIDES_COOKIE_SECRET when it is long
+ * enough, else TURNSTILE_SECRET. A short GUIDES_COOKIE_SECRET must not close
+ * every guide, but it still counts: it is signed in together with the
+ * Turnstile secret, so setting or changing it still logs everyone out.
+ */
+function cookieSecretOf(env: Pick<Env, 'GUIDES_COOKIE_SECRET' | 'TURNSTILE_SECRET'>): string | undefined {
+  const own = env.GUIDES_COOKIE_SECRET?.trim() ?? '';
+  if (own.length >= MIN_PEPPER) return own;
+  if (own && !saidShortKey) {
+    saidShortKey = true; // once per isolate; the name only, never the value
+    console.error(`guides: GUIDES_COOKIE_SECRET is under ${MIN_PEPPER} characters, so it signs together with TURNSTILE_SECRET`);
+  }
+  const t = env.TURNSTILE_SECRET?.trim() ?? '';
+  if (t.length < MIN_PEPPER) return undefined;
+  return own ? `${t}\n${own}` : t;
+}
+
 const guidesDeps = (env: Env): GuidesDeps => ({
   access: access as AccessFile,
   secret: (name) => {
     const v = (env as unknown as Record<string, unknown>)[name];
     return typeof v === 'string' ? v : undefined;
   },
-  // The dedicated key when it is long enough, else the Turnstile secret: a
-  // short GUIDES_COOKIE_SECRET must not close every guide.
-  cookieSecret: () => [env.GUIDES_COOKIE_SECRET, env.TURNSTILE_SECRET].find((s) => (s?.trim().length ?? 0) >= MIN_PEPPER),
+  cookieSecret: () => cookieSecretOf(env),
   assets: (r) => env.ASSETS.fetch(r),
   allow: async (key) => (await env.GUIDES_LIMIT.limit({ key })).success,
+  // Tiles fetched from IGN per visitor; no binding (a preview) means no limit.
+  allowTile: env.GUIDES_TILE_LIMIT ? async (key) => (await env.GUIDES_TILE_LIMIT!.limit({ key })).success : undefined,
+  // Street-level tiles: the Worker asks IGN and keeps the answer at the edge; the visitor never talks to IGN.
+  fetch: (url, init) => fetch(url, init as RequestInit),
+  cache: (caches as unknown as { default?: GuidesDeps['cache'] }).default,
   now: () => Date.now(),
   log: (...args) => console.error(...args),
   suggest: (req, slug) => handleSuggest(req, slug, suggestDeps(env)),
@@ -144,7 +169,8 @@ function notionOf(env: Env) {
   };
 }
 
-const githubOf = (env: Env) => (env.GITHUB_TOKEN ? github({ token: env.GITHUB_TOKEN, repo: env.GITHUB_REPO || 'itom123/kuschonink.com', fetch: (i, o) => fetch(i, o), base: env.GITHUB_API }) : null);
+/** GitHub, when it is set up: a token and the repository's name (a preview has no name, so no publishing). */
+const githubOf = (env: Env) => (env.GITHUB_TOKEN && env.GITHUB_REPO ? github({ token: env.GITHUB_TOKEN, repo: env.GITHUB_REPO, fetch: (i, o) => fetch(i, o), base: env.GITHUB_API }) : null);
 
 function suggestDeps(env: Env): SuggestDeps {
   const n = notionOf(env);
@@ -185,7 +211,7 @@ async function runPublisher(env: Env, trigger: 'scheduled' | 'manual') {
   const gh = githubOf(env);
   if (!n || !gh) return null;
   return publish(
-    { notion: n.api, db: n.db, gh, repoUrl: `https://github.com/${env.GITHUB_REPO || 'itom123/kuschonink.com'}`, guard: guardOf(env), access: access as AccessFile, download, now: () => Date.now(), log: (...a) => console.error(...a) },
+    { notion: n.api, db: n.db, gh, repoUrl: `https://github.com/${env.GITHUB_REPO}`, guard: guardOf(env), access: access as AccessFile, download, now: () => Date.now(), log: (...a) => console.error(...a) },
     trigger,
   );
 }

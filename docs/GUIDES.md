@@ -26,11 +26,18 @@ directly.
 `kuschonink.com/guides/<名字>`，第一份是 `paris-photo-days-2026`。
 
 - 没有密码时，只能看到程序名“导览”和每份导览的中性标题，看不到任何地点或日程。
+- 没有选导览的中间页。从桌面图标、“开始 ▸ 程序 ▸ 导览”、“运行”或“查找”打开“导览”，
+  或者直接输入 `kuschonink.com/guides`（有没有 JavaScript 都一样），都会直接进入第一份列出的导览
+  （`guide.json` 里 `"listed": true`，按 `access.json` 里的顺序）：没登录时是密码对话框，已登录就是导览本身。
+  有不止一份导览时，在密码对话框里选择要看哪一份。一份都没列出时，`/guides` 只显示“这里还没有导览”。
 - 输入密码后，服务器（Cloudflare Worker）决定你属于哪一类读者（audience），给你那一类读者的版本。
   “访客”（visitor）看到公开内容；“学员”（fotofilmic）看到访客的全部内容，另加只给学员的内容。
 - 导览页面不进搜索引擎（`noindex`，不在 sitemap 里）。
 - 内容全部是仓库里的 JSON 文件。改了 `main` 上的文件，大约一分钟后网站就更新。
   数据有错时构建会失败，网站保持原样，不会坏掉。
+- **地点的排序**：地点列表上方的“排序方式”默认是“推荐”（A、B、C 级依次排，同级按编号）。另外还有“名称”、“区域”（按导览里片区的顺序）、“当天开放的优先”（先在“日期”框里选定一天）和“离我最近”（先按“我在哪里？”）。选了别的排序后会出现“默认”按钮，单击即可恢复推荐顺序。“查看 ▸ 排序方式”菜单里是同样几种排序。排序只调整每一组之内的次序（参考点、当天闭馆的地点和官方条目各自是一组）。选择会记在这台设备上，“离我最近”除外。
+- **我在哪里？**：只有按下按钮时，浏览器才会询问位置。之后地图上会出现一个红色的圆点，并显示“实时位置”标签，旁边有“停止”按钮。再按一次按钮、单击“停止”，或者刷新页面、注销、关闭窗口，都会关掉它；刷新之后它是关着的。位置只留在设备上，从不发送出去。浏览器不允许时，导览会说明怎样开启。
+- **街道地图**：放大到底图放不下细节时，街道级的地图瓦片由 Worker 从 IGN（Plan IGN）代为取得，地址是 `/guides/<名字>/tiles/{z}/{x}/{y}.png`，缩放级别 14 至 19，只给已登录的读者。范围由 `access.json` 的 `tiles` 决定（见第 10 节）。IGN 只看到 Worker，看不到访客。每位访客每分钟从 IGN 取图最多 600 块（已在缓存里的不算），超出的瓦片返回 429。
 
 **Field Guide (导览)** is a program on the Xiangyin 98 desktop for city guides
 behind a password: a map, recommended places in three tiers (A, B, C), routes,
@@ -39,6 +46,13 @@ dates and texts. A guide lives at `kuschonink.com/guides/<slug>`; the first is
 
 - Without a password, people see only the program's name and each guide's
   neutral public title. No places, no dates.
+- There is no page for choosing a guide. The desktop icon, Start ▸ Programs ▸
+  Field Guide, Run, Find and typing `kuschonink.com/guides` (with or
+  without JavaScript) all go straight to the first listed guide
+  (`"listed": true` in `guide.json`, in `access.json` order): its password box,
+  or the guide itself once logged on. With more than one guide, people choose
+  theirs in the password box. With none listed, `/guides` only says there are
+  no guides yet.
 - With a password, the server (the Cloudflare Worker) works out which
   **audience** the visitor belongs to and serves that audience's version.
   Visitors (`visitor`) see the public content. Participants (`fotofilmic`) see
@@ -47,6 +61,28 @@ dates and texts. A guide lives at `kuschonink.com/guides/<slug>`; the first is
 - Everything is JSON in this repo. A change on `main` is live in about a
   minute. If the data has a mistake, the build fails and the site stays as it
   was.
+- **Sorting the places.** The Places list has a **Sort by** box above it.
+  **Recommended** (the default) lists the A places, then B and C, each in number
+  order; **Name** sorts by name; **Area** follows the guide's own order of areas;
+  **Open that day first** needs a day chosen in the **When** box; **Nearest
+  first** needs **Where am I?**. Once another order is in use, a **Default**
+  button goes back to Recommended. **View ▸ Sort By** has the same orders.
+  Sorting only changes the order inside each group (reference points, places
+  closed that day and official entries each stay together), and the choice is
+  remembered on this device, except Nearest first.
+- **Where am I?** The browser asks for your position only when you press the
+  button. A red dot then follows you on the map, with a **Live location** chip
+  that has a **Stop** button. Pressing the button again, pressing **Stop**, or a
+  refresh, log off or closed window turns it off, and it stays off after a
+  refresh. Your position stays on your device and is never sent anywhere. If the
+  browser refuses, the guide says how to allow it.
+- **Street-level tiles.** Once you zoom in past the base picture, street tiles
+  from Plan IGN take over. The Worker fetches them at
+  `/guides/<slug>/tiles/{z}/{x}/{y}.png` for zooms 14 to 19, only for logged-on
+  viewers and only inside the box that `access.json` gives under `tiles`
+  (section 10). IGN sees the Worker, never the visitor. Each visitor may fetch at
+  most 600 tiles from IGN a minute (cached tiles don't count); beyond that a tile
+  answers 429.
 
 ---
 
@@ -313,11 +349,11 @@ both when the site is built.
 ## 5. 新建一份导览 Adding a new guide
 
 1. 复制整个文件夹 `src/content/guides/paris-photo-days-2026/`，改名，比如 `lisbon-2027`（小写，连字符）。
-2. 改 `guide.json`：标题、`public`（中性的公开标题，不写人名、地点或团体名）、`listed`（是否在首页列出）、
+2. 改 `guide.json`：标题、`public`（中性的公开标题，不写人名、地点或团体名）、`listed`（是否在密码对话框里供人选择）、
    `city`、`timezone`（如 `"Europe/Lisbon"`）、`checked`、日期、分级、主题、片区、`texts`、`sensitive`。
 3. 清空 `items.json`、`places.json`、`events.json`、`routes.json`、`listings.json` 里的旧内容，再填新的。
    每个文件都要留着，列表可以是空的。没有日期的导览（比如咖啡馆）不写 `window`，就没有日期筛选。
-4. 在 `access.json` 的 `guides` 里加一行：`"lisbon-2027": ["visitor"]`。
+4. 在 `access.json` 的 `guides` 里加一行：`"lisbon-2027": ["visitor"]`。顺序有用：打开“导览”时进入的是排在最前面的那份列出的导览。要街道级地图的话，再在 `tiles` 里加一行，范围要包住每一张底图（第 10 节）。
 5. 建 `public/guides/lisbon-2027/img/` 和 `map/`。
 6. **底图**：目前还没有自动生成底图的工具。请让 Claude 做（说明城市和范围），它会生成底图图片和 `map.json`。
    底图的中心不要正对任何只给部分读者看的地点（比如工作地点）：访客也拿得到底图，看得出它的中心。构建会检查这一点（`is too close to the centre of map view`）；要偏开，就裁掉一边，再在 `map.json` 里改 `originX`/`originY` 和 `width`/`height`。
@@ -325,13 +361,16 @@ both when the site is built.
 1. Copy the whole folder `src/content/guides/paris-photo-days-2026/` and
    rename it, for example `lisbon-2027` (lower case, with hyphens).
 2. Edit `guide.json`: the title, `public` (a neutral public title: no people,
-   venues or group names), `listed` (shown on the home list or not), `city`,
+   venues or group names), `listed` (offered in the password box or not), `city`,
    `timezone` (e.g. `"Europe/Lisbon"`), `checked`, the dates, tiers, themes,
    zones, `texts` and `sensitive`.
 3. Empty `items.json`, `places.json`, `events.json`, `routes.json` and
    `listings.json`, then fill them. Keep every file, even with an empty list.
    A guide without dates (cafés, say) has no `window`, so no day filter.
 4. Add a line to `guides` in `access.json`: `"lisbon-2027": ["visitor"]`.
+   Its place matters: Field Guide opens the first listed guide in that list.
+   For street-level tiles, add a line to `tiles` as well, with a box that holds
+   every base map (section 10).
 5. Create `public/guides/lisbon-2027/img/` and `map/`.
 6. **Base maps**: there's no base-map tool yet. Ask Claude (name the city and
    the area); it makes the images and `map.json`.
@@ -374,7 +413,8 @@ both when the site is built.
 - `GUIDES_PASSWORD_FOTOFILMIC`：学员的密码；
 - `GUIDES_COOKIE_SECRET`（建议设置）：给登录 cookie 签名的密钥，这样别人伪造不了登录状态。
   用 32 个以上的随机字符，比如让密码管理器生成一个；不用记住它，也不要告诉别人。
-  没设的话，Worker 用已有的 `TURNSTILE_SECRET` 签名。
+  没设的话，Worker 用已有的 `TURNSTILE_SECRET` 签名；少于 24 个字符时，两个一起签名。
+  （苹果和 Chrome 自动生成的密码往往不够长。）
 
 每类读者的密码叫什么名字，写在 `access.json` 里。
 
@@ -385,10 +425,16 @@ both when the site is built.
 - 每个密码至少 6 个字符，两类读者的密码必须不一样。不分大小写，多余的空格和全角字符都不算。
   （如果两类读者用了同一个密码，进去的是权限低的那一类。）
 - 改了某类读者的密码，这一类读者都要重新输入；其他读者不受影响。
-- 改了签名用的密钥（`GUIDES_COOKIE_SECRET`，没设它时是 `TURNSTILE_SECRET`），所有人都要重新输入密码。
+- 改了签名用的密钥（`GUIDES_COOKIE_SECRET`，没设它时是 `TURNSTILE_SECRET`；它少于 24 个字符时两个都算），所有人都要重新输入密码。
   第一次设置 `GUIDES_COOKIE_SECRET` 也一样。
-- **只在没有比正式版更新的 PR 预览时修改 secret。** 在控制台改 secret，会把“最新上传的版本”部署上线；
-  如果最新的是某个 PR 的预览，那个预览就成了正式网站。先合并或关闭打开的 PR，等 `main` 部署完再改。
+- **PR 预览有自己的 secret，不用正式网站的。** 每个分支的预览（Worker Previews）只用 `wrangler.jsonc`
+  里 `previews` 部分的设置，加上预览自己的 secret，所以**预览里的导览密码和正式网站的不一样**，除非你把它们设成一样。
+  在自己电脑上设置一次，以后新建的预览都会用：
+  `npx wrangler preview base-config secret put GUIDES_PASSWORD`（`GUIDES_PASSWORD_FOTOFILMIC`、
+  `GUIDES_COOKIE_SECRET`、`TURNSTILE_SECRET` 同理；也可以在控制台的 Previews Base 里设置）。
+  已经存在的预览要单独改：`npx wrangler preview secret put 名字 --name <分支名>`。密码永远不写进仓库。
+- 在控制台改正式网站的 secret，不会再把哪个预览部署上线。（如果 **Settings → Builds** 里还显示
+  “Set up Worker Previews”，说明还没切换，旧规则仍然有效：只在没有比正式版更新的 PR 预览时修改 secret。）
 - 没设密码时，导览显示“尚未开放”，不会泄漏内容。
 - 微信内置浏览器有自己的 cookie，在微信里打开时会再问一次密码。
 - “记住此密码”保留 30 天；不勾的话，关掉浏览器就要重新输入（最长 12 小时）。
@@ -401,7 +447,9 @@ Passwords and keys **never** go in the repo. They are all Cloudflare secrets:
   cookies, so nobody can forge one. Use 32 or more random characters, for
   example from a password manager; you never need to remember it, and nobody
   else needs it. Without it, the Worker signs with the existing
-  `TURNSTILE_SECRET`.
+  `TURNSTILE_SECRET`; under 24 characters, it signs together with
+  `TURNSTILE_SECRET`. (Apple's and Chrome's generated passwords are
+  usually too short.)
 
 `access.json` names each audience's password secret.
 
@@ -417,12 +465,23 @@ variables, not the Worker.
 - Changing an audience's password logs that audience out; the others stay
   logged on.
 - Changing the signing key (`GUIDES_COOKIE_SECRET`, or `TURNSTILE_SECRET`
-  while that isn't set) logs everyone out. So does setting
+  while that isn't set; both, while it is under 24 characters) logs everyone
+  out. So does setting
   `GUIDES_COOKIE_SECRET` for the first time.
-- **Change secrets only when no PR preview is newer than production.** A
-  secret edit in the dashboard deploys the *latest uploaded* version; if
-  that's a PR preview, the preview becomes the live site. Merge or close open
-  PRs first, and wait for `main` to deploy.
+- **PR previews have their own secrets, never production's.** Each branch's
+  preview (Worker Previews) gets only the settings in the `previews` block of
+  `wrangler.jsonc`, plus the previews' own secrets. So **a preview's guide
+  passwords are not the live site's**, unless you set them the same. Set them
+  once on your own computer, for every new preview:
+  `npx wrangler preview base-config secret put GUIDES_PASSWORD` (likewise
+  `GUIDES_PASSWORD_FOTOFILMIC`, `GUIDES_COOKIE_SECRET`, `TURNSTILE_SECRET`;
+  or in the dashboard's Previews Base). To change a preview that already
+  exists: `npx wrangler preview secret put NAME --name <branch>`. Passwords
+  never go in the repo.
+- Changing a production secret in the dashboard no longer puts a preview
+  live. (If **Settings → Builds** still shows "Set up Worker Previews", the
+  switch hasn't been made and the old rule holds: change secrets only when
+  no PR preview is newer than production.)
 - With no password set, the guide says it isn't open yet. Nothing leaks.
 - WeChat's built-in browser keeps its own cookies, so it asks again.
 - *Save this password* keeps you logged on for 30 days; without it, until the
@@ -472,6 +531,18 @@ The site doesn't break: when a build fails, the live site stays as it was.
 | `Unexpected token`, `Expected ','` | JSON 格式错：少了逗号、引号或括号 Broken JSON: a missing comma, quote or bracket | 看日志给的行号 Look at the line number given |
 | `contains guide text`, `contains sensitive.public words`, `doesn't include` | 不该公开的文字或词出现在公开页面，或别的读者的版本里 Private text or a private word reached a public page or another audience's view | 加 `audience`，或从公开标题里拿掉 Add `audience`, or take it out of the public title |
 | `missing, or its case differs`, `is over 1 MB`, `should be a file name` | 图片不存在、大小写不对、太大，或文件名不对 A picture missing, in the wrong case, too big, or badly named | 检查文件名，压缩图片 Check the file name; shrink it |
+| `is not a guide in "guides"` | `access.json` 的 `tiles` 里写了一个不在 `guides` 里的导览名 A guide named in `tiles` that isn't in `guides` | 改正导览名，或删掉这一行 Fix the name, or remove the line |
+| `should be [west, south, east, north] in degrees` | 瓦片范围不是四个数字 A tile box that isn't four numbers | 写成 `[西, 南, 东, 北]`，单位是度 Write `[west, south, east, north]`, in degrees |
+| `must be between -180 and 180`, `must be between -85.06 and 85.06` | 经度或纬度超出范围，多半是位数写错，或经纬度写反 A longitude or latitude out of range, often a slip or swapped numbers | 检查数字，经度在前 Check the numbers: longitude first |
+| `should be less than east`, `should be less than north` | 西边的数字比东边大，或南边比北边大 West and east, or south and north, are the wrong way round | 按 `[西, 南, 东, 北]` 的顺序改 Put them in the order `[west, south, east, north]` |
+| `spans more than 3°` | 瓦片范围东西或南北超过 3°：瓦片只为一个地区而设 A tile box more than 3° each way: tiles are for one region | 只框住大区底图的范围 Cover the region view's area, no more |
+| `reaches outside the tile bounds` | 某张底图伸到瓦片范围之外，放大后瓦片会在它的边缘停下 A base map reaches outside the tile box, so zoomed-in tiles stop at its edge | 扩大 `tiles` 里的范围，或裁小这张底图 Widen the box in `tiles`, or crop the base map |
+| `is next to`, `which not every reader sees` | 用 `[经度, 纬度]` 写的地图中心，离一个只给部分读者看的地点太近。写成地点的编号，每类读者就有各自的中心 A map centre written as a point lies near a place only some readers see | 把 `centre` 写成那个地点的编号，如 `"W"` Write `centre` as that place's id, e.g. `"W"` |
+| `placeholders such as {items} work only in the title` | 占位符只能用在标题、副标题和说明文字里，别处会原样显示 Placeholders work only in the title, subtitle and texts; elsewhere they show as written | 直接写出数字 Write the number out |
+| `write {items} without spaces` | 占位符的花括号里有空格，如 `{ items }` A placeholder with spaces inside its braces | 写成 `{items}` Write it without spaces |
+| `px but` (the guard) | 底图图片的像素大小和 `map.json` 里的 `width`、`height` 不一样，图钉会跑位 A base map's pixel size differs from `width` and `height` in `map.json`, so its pins would move | 改 `map.json` 的 `width`、`height`（和 `originX`、`originY`），或重新裁图 Fix `width`, `height` (and `originX`, `originY`) in `map.json`, or crop the picture to match |
+| `its size in pixels can't be read` (the guard) | 读不出底图的像素大小，文件可能坏了，或不是图片 The pixel size of a base map can't be read: the file may be damaged or not a picture | 重新导出为 JPEG、PNG 或 WebP Export it again as JPEG, PNG or WebP |
+| `not a Field Guide file` | 导览文件夹里有一个不认识的 `.json` 文件 A `.json` file in a guide's folder that the Field Guide doesn't use | 删掉它，或改成已知的文件名 Delete it, or rename it to a known file name |
 | `there is no folder`, `not in access.json` | `access.json` 和文件夹对不上 `access.json` and the folders disagree | 两边一起改 Change both |
 
 ---
@@ -514,6 +585,7 @@ below). Any file may have a `_comment`, which is never shown.
 | `audiences[].secret` | Cloudflare secret 的名字（不是密码） | The Cloudflare secret's name (never the password) |
 | `audiences[].includes?` | 也能看到哪些读者的内容 | Audiences whose content this one also sees |
 | `guides` | 导览名 → 能打开它的读者 | Guide slug → the audiences that may open it |
+| `tiles?` | 导览名 → 街道级地图瓦片的范围 `[西, 南, 东, 北]`（度），一般就是大区底图的范围；写了才有瓦片。只写数字，不写地点。东西、南北各跨不超过 3°，并且要包住这份导览的每一张底图 | Guide slug → the area of its street-level tiles, `[west, south, east, north]` in degrees (usually the region view's area); without it the guide has no tiles. Numbers only, never a place. Each side spans at most 3°, and the box must hold every base map |
 
 ### `guide.json`
 
@@ -521,7 +593,7 @@ below). Any file may have a `_comment`, which is never shown.
 | --- | --- | --- |
 | `title`/`titleZh?`, `subtitle?`/`subtitleZh?` | 打开后显示的完整标题 | The full title, once open |
 | `public` | `{ title, titleZh?, subtitle?, subtitleZh? }`：输入密码前显示的中性标题 | The neutral title shown before the password |
-| `listed` | 是否在导览首页列出 | Shown on the Field Guide's home list |
+| `listed` | 是否在密码对话框里供人选择；排在最前面（按 `access.json` 的顺序）的那份，就是打开“导览”时进入的导览 | Offered in the password box's choice of guides; the first listed one (in `access.json` order) is where Field Guide opens |
 | `city`/`cityZh?` | 城市 | The city |
 | `timezone` | 时区（IANA），如 `Europe/Paris`；“今天”按它算 | IANA time zone; "today" follows it |
 | `timezoneLabel?`/`timezoneLabelZh?` | 给人看的时区说明 | The time zone as people read it |
@@ -707,7 +779,7 @@ Once only. Cloudflare secrets (never in the repo):
 
 - `wrangler.jsonc` 的 `vars`：三个 Notion 数据源的编号（`NOTION_SUGGESTIONS`、`NOTION_CONTACTS`、`NOTION_LOG`）。为空时推荐改用邮件。
 - `src/content/guides/suggest.json`：Turnstile 的公开站点密钥（不是 secret）。为空时正式网站上不能推荐；本机和预览用 Cloudflare 的测试密钥。
-- 云端例程的环境：完全联网（要打开画廊网站）；例程自己的 Notion 集成（只共享 Suggestions 和日志，不共享 Contacts），作为 `api.notion.com` 的网络 secret；不要连接器。
+- 云端例程：见 [11.6](#116-云端例程-the-routine-in-claudes-cloud)。
 
 - `vars` in `wrangler.jsonc`: the three Notion data-source ids
   (`NOTION_SUGGESTIONS`, `NOTION_CONTACTS`, `NOTION_LOG`). Empty: suggestions
@@ -715,20 +787,25 @@ Once only. Cloudflare secrets (never in the repo):
 - `src/content/guides/suggest.json`: the Turnstile widget's public site key
   (not a secret). Empty: no suggestions on the live site; `wrangler dev` and
   previews use Cloudflare's test key.
-- The routine's environment: full network access (for gallery sites); the
-  routine's own Notion integration (shared with Suggestions and the log only,
-  never Contacts) as a network secret for `api.notion.com`; no connectors.
+- The cloud routine: see [11.6](#116-云端例程-the-routine-in-claudes-cloud).
 
-Worker Previews (PR previews) get test values, never the real ones, in the
-dashboard's Preview settings: made-up guide passwords and cookie secret,
-`TURNSTILE_SECRET_SUGGEST=1x0000000000000000000000000000000AA` with
-`TURNSTILE_HOSTNAMES=example.com`, no `GITHUB_TOKEN`, and a test Notion
-integration shared only with the page "Field Guide suggestions (kuschonink) ·
-test copies", whose databases are:
+PR previews (Worker Previews, section 7) never get the real ones. The
+`previews` block in `wrangler.jsonc` already gives them the test copies of the
+databases (below) and accepts Turnstile's test keys
+(`TURNSTILE_HOSTNAMES=example.com`). Their two secrets, set once on your own
+computer with `npx wrangler preview base-config secret put NAME`:
+`NOTION_TOKEN`, from a test Notion integration shared only with the page
+"Field Guide suggestions (kuschonink) · test copies", and
+`TURNSTILE_SECRET_SUGGEST` set to Cloudflare's test secret
+`1x0000000000000000000000000000000AA`. Never a `GITHUB_TOKEN`: a preview names
+no repository, so it never publishes.
 
-预览（PR 预览）只用测试值：在控制台的 Preview 设置里，用编出来的导览密码和 cookie
-密钥、Turnstile 测试密钥、不设 `GITHUB_TOKEN`，以及一个只共享给“test copies”页面的测试
-Notion 集成：
+PR 预览（Worker Previews，见第 7 节）从不用正式的值。`wrangler.jsonc` 的 `previews` 部分已经让它们用下面的测试数据库，
+并接受 Turnstile 的测试密钥（`TURNSTILE_HOSTNAMES=example.com`）。它们的两个 secret 在自己电脑上用
+`npx wrangler preview base-config secret put 名字` 设置一次：`NOTION_TOKEN`（一个只共享给
+“Field Guide suggestions (kuschonink) · test copies”页面的测试 Notion 集成），以及
+`TURNSTILE_SECRET_SUGGEST`，设成 Cloudflare 的测试密钥 `1x0000000000000000000000000000000AA`。
+永远不给预览 `GITHUB_TOKEN`：预览没有仓库名，不会发布。
 
 | Var | Test data source |
 | --- | --- |
@@ -739,7 +816,7 @@ Notion 集成：
 ### 11.5 本机测试 Trying it locally
 
 ```bash
-node scripts/dev/notion-standin.mjs 8790
+node scripts/dev/notion-standin.mjs 8798
 ```
 
 `.dev.vars`（不进仓库 gitignored）里加：
@@ -748,7 +825,7 @@ Add to `.dev.vars` (gitignored):
 
 ```ini
 NOTION_TOKEN=dev
-NOTION_API=http://localhost:8790
+NOTION_API=http://127.0.0.1:8798
 NOTION_SUGGESTIONS=ds-suggestions
 NOTION_CONTACTS=ds-contacts
 NOTION_LOG=ds-log
@@ -756,7 +833,57 @@ TURNSTILE_SECRET_SUGGEST=1x0000000000000000000000000000000AA
 TURNSTILE_HOSTNAMES=example.com,localhost
 ```
 
-然后 `npm run build` 和 `npm run preview`，登录一份导览，用 **文件 ▸ 推荐地点…**。`http://localhost:8790/_dump` 显示存下了什么。
+然后 `npm run build` 和 `npm run preview`，登录一份导览，用 **文件 ▸ 推荐地点…**。`http://127.0.0.1:8798/_dump` 显示存下了什么。
 
 Then `npm run build` and `npm run preview`, log on to a guide and use **File ▸
-Suggest a Place…**. `http://localhost:8790/_dump` shows what was kept.
+Suggest a Place…**. `http://127.0.0.1:8798/_dump` shows what was kept.
+
+### 11.6 云端例程 The routine in Claude's cloud
+
+推荐流程**不需要你的电脑开着**：收推荐、批准和拒绝、发布（每 10 分钟）和到期删除联系方式（每天）都在 Cloudflare
+的 Worker 里；核对和补全由 Claude Code 的云端例程（routine）在 Anthropic 的服务器上完成。例程只读仓库、只写 Notion。
+
+在 claude.ai 上设置一次（在 `main` 合并了推荐功能之后）：
+
+1. **Notion**：新建一个集成“Field Guide routine”，只共享 **Suggestions** 和 **处理日志** 两个数据库（**不要**共享
+   Contacts），复制它的令牌。
+2. **环境**（claude.ai/code → Environments → New）：网络访问选 **Full**（要打开画廊网站和地理编码服务）；加一个
+   **network secret**：主机 `api.notion.com`，值是上一步的令牌（会话本身看不到它）；不需要环境变量（数据库编号在
+   `wrangler.jsonc` 里）；setup script 可以写 `npm ci --no-audit --no-fund`（不写也行，例程每次会自己装）。
+3. **例程**（claude.ai/code → Routines → New）：仓库 `itom123/kuschonink.com`，分支 `main`，用上面的环境；
+   **去掉所有连接器**；时间：每天 08:00–22:00（Europe/Paris）每小时一次，如果只能选“每小时”也可以（没事可做时
+   会立刻结束，不记日志）；提示词：
+   `Follow scripts/suggestions/ROUTINE.md in the repository, on main. If this run was started with a text, it says why (approved: …, or manual: …).`
+4. **API 触发器**：在例程里加一个 API trigger，把它的地址和令牌存成 Cloudflare secret `ROUTINE_FIRE_URL` 和
+   `ROUTINE_TOKEN`（在切换到 Worker Previews 之后再存，见第 7 节）。管理模式的“收录”和“立即运行”用它。
+5. 试一次：在例程里 **Run now**，看它的会话记录；Notion 的处理日志只在真的处理了推荐时才有新的一行。
+
+Nothing here needs your computer to be on: taking suggestions, approving and
+refusing, publishing (every 10 minutes) and deleting contact details when due
+(daily) all happen in the Cloudflare Worker; checking and completing them is
+a Claude Code routine on Anthropic's servers. The routine only reads the
+repository and only writes to Notion.
+
+Set it up once on claude.ai (after the suggestions are merged into `main`):
+
+1. **Notion**: a new integration, "Field Guide routine", shared with only the
+   **Suggestions** database and the **Processing log** (**not** Contacts).
+   Copy its token.
+2. **Environment** (claude.ai/code → Environments → New): network access
+   **Full** (for gallery sites and the geocoders); one **network secret** for
+   the host `api.notion.com`, with the token from step 1 (the session never
+   sees it); no environment variables (the database ids are in
+   `wrangler.jsonc`); setup script `npm ci --no-audit --no-fund` (optional:
+   the routine installs them itself).
+3. **Routine** (claude.ai/code → Routines → New): repository
+   `itom123/kuschonink.com`, branch `main`, the environment above, **no
+   connectors**; hourly from 08:00 to 22:00 (Europe/Paris), or simply hourly
+   if that is all the schedule offers (a run with nothing to do stops at once
+   and logs nothing); prompt:
+   `Follow scripts/suggestions/ROUTINE.md in the repository, on main. If this run was started with a text, it says why (approved: …, or manual: …).`
+4. **API trigger**: add one to the routine, and save its address and token as
+   the Cloudflare secrets `ROUTINE_FIRE_URL` and `ROUTINE_TOKEN` (after the
+   switch to Worker Previews, see section 7). Admin mode's Approve and Run Now
+   use it.
+5. Try it: **Run now** in the routine, and read its session. The Processing
+   log only gets a line when a suggestion was actually handled.
