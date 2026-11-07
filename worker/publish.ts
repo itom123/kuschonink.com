@@ -237,6 +237,12 @@ export async function publish(deps: PublishDeps, trigger: LogEntry['trigger'] = 
         report.errors.push(`${slug}: ${(e as Error).message}`);
       }
     }
+    try {
+      await reconcile(deps, trigger, report);
+    } catch (e) {
+      deps.log('publish: could not compare Notion with main', (e as Error).message);
+      report.errors.push((e as Error).message);
+    }
   } catch (e) {
     deps.log('publish: failed', (e as Error).message);
     report.errors.push((e as Error).message);
@@ -308,7 +314,12 @@ async function publishBatch(deps: PublishDeps, slug: string, rows: SuggestionRow
       const named = (id: string) => problems.filter((p) => p.includes(` › ${id} `) || p.endsWith(` › ${id}`) || p.includes(` › ${id}:`));
       const mine = [...ids].filter(([, id]) => named(id).length);
       if (!mine.length) throw new Error(`publish: ${slug} fails its check without any new entry: ${problems.slice(0, 3).join(' | ')}`);
-      for (const [pageId, id] of mine) excluded.set(pageId, { status: 'ERROR', why: `The guide's check refused it:\n${named(id).slice(0, 4).join('\n')}` });
+      for (const [pageId, id] of mine) {
+        const why = named(id);
+        // A second copy of a show or a suggestion the guide already has is the owner's call, not a fault.
+        const twice = why.every((p) => /: (looks like the same show as|is the same suggestion as) /.test(p));
+        excluded.set(pageId, { status: twice ? 'NEEDS CHECK' : 'ERROR', why: `The guide's check refused it:\n${why.slice(0, 4).join('\n')}` });
+      }
       again = true;
       return null;
     }
@@ -354,6 +365,29 @@ async function publishBatch(deps: PublishDeps, slug: string, rows: SuggestionRow
     });
   }
   await addLog(deps, { run: `Publish ${slug}`, trigger, actor: 'publisher', pages: kept.map((r) => `${r.reference} ${r.name}`).join('\n'), outcome: excluded.size ? 'Partial' : 'OK', commit: done.url, details: [...excluded.values()].map((x) => x.why).join('\n') });
+}
+
+/**
+ * PUBLISHED pages whose entry main no longer has: a merge that dropped it, a
+ * hand edit. They become NEEDS CHECK, so that Notion and the guide never
+ * quietly disagree. To take an entry out on purpose, set its suggestion to
+ * REFUSED (or anything but PUBLISHED) as well.
+ */
+async function reconcile(deps: PublishDeps, trigger: LogEntry['trigger'], report: PublishReport) {
+  const rows = (await deps.notion.queryAll(deps.db.suggestions, { filter: isStatus('PUBLISHED') }, 1000)).map((p) => readSuggestion(p, deps.access));
+  const bySlug = new Map<string, SuggestionRow[]>();
+  for (const r of rows) if (Object.hasOwn(deps.access.guides, r.guide)) bySlug.set(r.guide, [...(bySlug.get(r.guide) ?? []), r]);
+  for (const [slug, list] of bySlug) {
+    const at = await deps.gh.file(`${guideDir(slug)}/items.json`);
+    if (!at) continue; // no guide on main: nothing to compare with (the check of READY pages says so)
+    const refs = new Set(((JSON.parse(at.text) as ItemsFile).items ?? []).map((i) => i.suggested?.ref).filter(Boolean));
+    const gone = list.filter((r) => !refs.has(r.id));
+    for (const r of gone) {
+      await mark(deps, r, 'NEEDS CHECK', `Published${r.itemId ? ` as ${r.itemId}` : ''}, but its entry is no longer in the guide on main (a later commit took it out). Put it back, or set this suggestion to REFUSED if that was on purpose.`);
+      report.needsCheck.push(r.reference);
+    }
+    if (gone.length) await addLog(deps, { run: `Check ${slug} against Notion`, trigger, actor: 'publisher', outcome: 'Partial', pages: gone.map((r) => `${r.reference} ${r.name}`).join('\n'), details: `${gone.length} published ${gone.length === 1 ? 'entry is' : 'entries are'} no longer on main: now NEEDS CHECK.` });
+  }
 }
 
 /**

@@ -67,9 +67,14 @@ function world(o: { ghFetch?: (g: ReturnType<typeof githubStandIn>) => typeof fe
     now: () => now,
     log: (...a) => logs.push(a.map(String).join(' ')),
   };
+  // Each suggestion is a show of its own (a title and artists of its own), unless a test gives them:
+  // the guide's check refuses the same show twice.
+  const SHOWS = [['Winter Light', 'Ana Silva / Bo Chen'], ['Night Harbour', 'Chloé Martin'], ['Paper Gardens', 'Dev Patel'], ['Salt and Iron', 'Eun-ji Kim'], ['Glass Rooms', 'Farid Haddad'], ['Low Tide', 'Greta Lund'], ['Field Notes', 'Hiro Tanaka'], ['Quiet Streets', 'Inès Moreau'], ['Red Desert', 'Jonas Weber'], ['Open Sky', 'Kai Novak']];
+  let made = 0;
   async function ready(patch: Partial<typeof entry> | Record<string, unknown> = {}, o2: { tier?: string; showTo?: string; picture?: Buffer | null; name?: string } = {}) {
+    const [subtitle, by] = SHOWS[made++ % SHOWS.length]!;
     const page = await n.createPage('ds-s', suggestionProps({ ...form, name: o2.name ?? form.name }, { reference: `S-${String(s.pages.size).padStart(4, 'A')}`, submission: `u${s.pages.size}`, audience: 'visitor', fingerprint: '', duplicate: '' }));
-    const props: Record<string, unknown> = { [S.status]: P.select('READY'), [S.entry]: P.text(JSON.stringify({ ...entry, ...patch })), [S.tier]: P.select(o2.tier ?? 'C'), [S.showTo]: P.select(o2.showTo ?? 'Everyone') };
+    const props: Record<string, unknown> = { [S.status]: P.select('READY'), [S.entry]: P.text(JSON.stringify({ ...entry, subtitle, by, ...patch })), [S.tier]: P.select(o2.tier ?? 'C'), [S.showTo]: P.select(o2.showTo ?? 'Everyone') };
     if (o2.picture !== null) props[S.webPicture] = P.files([{ id: await n.uploadFile('web.jpg', 'image/jpeg', o2.picture ?? pic640), name: 'web.jpg' }]);
     await n.updatePage(page.id, props as never);
     return page.id;
@@ -129,6 +134,30 @@ check('nextId: one more than the highest in the tier', nextId([{ id: 'C1', tier:
   const moved = w.items().find((i) => i.suggested?.ref === id);
   const all = w.g.files({ bytes: true });
   check(`a tier change: a new id (${NEXT_B}), the picture moves with it, ${NEXT_C} never comes back`, moved?.id === NEXT_B && moved.image?.file === `${NEXT_B}.jpg` && !!all[`public/guides/${SLUG}/img/${NEXT_B}.jpg`] && !all[`public/guides/${SLUG}/img/${NEXT_C}.jpg`] && !w.items().some((i) => i.id === NEXT_C), moved);
+}
+
+// ---- The same show twice, and Notion against main ----
+{
+  const w = world();
+  const a = await w.ready();
+  await publish(w.deps);
+  const first = w.items().find((i) => i.suggested?.ref === a);
+  const b = await w.ready({ subtitle: entry.subtitle, by: entry.by }, { name: entry.name }); // the same show as a
+  const r = await publish(w.deps);
+  const rb = await w.row(b);
+  check('the same show suggested again: NEEDS CHECK, not published, and the guide still publishes', rb.status === 'NEEDS CHECK' && rb.result.includes(`the same show as "${first?.id}"`) && w.items().filter((i) => i.name === entry.name).length === 1 && !r.errors.length, { status: rb.status, result: rb.result, errors: r.errors });
+
+  // The first goes live; then a later commit on main drops its entry (say, a merge from an old branch).
+  w.g.checks.set(w.g.head(), [{ name: 'Workers Builds: kuschonink', status: 'completed', conclusion: 'success', html_url: 'https://dash', output: { title: 'Success' } }]);
+  await publish(w.deps);
+  check('… the first: PUBLISHED', (await w.row(a)).status === 'PUBLISHED');
+  w.g.moveMain(`${DIR}/items.json`, `${JSON.stringify({ items: w.items().filter((i) => i.suggested?.ref !== a) }, null, 2)}\n`);
+  const r2 = await publish(w.deps);
+  const ra = await w.row(a);
+  const logged = [...w.s.pages.values()].some((p: { parent: { data_source_id: string }; properties: unknown }) => p.parent.data_source_id === 'ds-log' && JSON.stringify(p.properties).includes('against Notion'));
+  check('PUBLISHED but no longer on main: NEEDS CHECK, said in the result and the log', ra.status === 'NEEDS CHECK' && ra.result.includes('no longer in the guide on main') && r2.needsCheck.includes(ra.reference) && logged, { status: ra.status, result: ra.result, logged });
+  const r3 = await publish(w.deps);
+  check('… once: the next run leaves it be', !r3.needsCheck.includes(ra.reference) && (await w.row(a)).status === 'NEEDS CHECK', r3);
 }
 
 // ---- A suggestion sent under the guide's old address (access.json "moved") ----

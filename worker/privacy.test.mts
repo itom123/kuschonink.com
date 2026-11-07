@@ -46,5 +46,18 @@ async function world(now: number) {
   check('a guide without dates: contacts older than a year go', w.live('ds-c').length === 0 && r.guides.includes('cafes'), r);
 }
 
+{
+  // A guide's old address (access.json "moved"): pages sent under it keep that name in Notion, and go too.
+  const moved = { ...access, moved: { 'old-dated': 'dated-guide' } } as unknown as AccessFile;
+  const s = standIn({ token: 'nt', start: Date.UTC(2026, 10, 9) });
+  const n = notion({ token: 'nt', fetch: s.fetch, base: s.base, wait: async () => {} });
+  await n.createPage('ds-c', { [C.reference]: P.title('S-OLD1'), [C.guide]: P.select('old-dated'), [C.email]: P.email('b@example.com') });
+  await n.createPage('ds-s', { [S.name]: P.title('Y'), [S.guide]: P.select('old-dated'), [S.creditAs]: P.text('Bo Chen') });
+  const deps: PrivacyDeps = { notion: n, db: { contacts: 'ds-c', suggestions: 'ds-s', log: 'ds-log' }, gh: github({ token: 'gh', repo: 'itom123/kuschonink.com', fetch: g.fetch, base: g.base }), access: moved, now: () => Date.UTC(2027, 1, 14), log: () => {} };
+  const live = (ds: string) => [...s.pages.values()].filter((p: { parent: { data_source_id: string }; in_trash: boolean }) => p.parent.data_source_id === ds && !p.in_trash);
+  const r = await privacySweep(deps);
+  check("a guide's old address: contacts and credit names sent under it go too", r.contacts === 1 && live('ds-c').length === 0 && r.credits === 1 && R.text(live('ds-s')[0], S.creditAs) === '', r);
+}
+
 console.log(fails ? `${fails} FAILED` : 'all passed');
 if (fails) process.exitCode = 1;

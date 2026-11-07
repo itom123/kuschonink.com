@@ -5,6 +5,7 @@
 import type { AccessFile } from './types';
 import { WEEKDAYS, isISODate, project } from './core.ts';
 import { citySlug } from './address.ts';
+import { compare, itemKnown } from './dedupe.ts';
 
 export const GUIDE_FILES = ['guide', 'items', 'places', 'events', 'routes', 'listings', 'map'] as const;
 export type GuideFileName = (typeof GUIDE_FILES)[number];
@@ -638,6 +639,27 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
   {
     const c = ctx('items');
     dupes(c, items, 'id', (id) => ({ id, path: 'id' }));
+    // A suggestion is published once, and a show is listed once. A second copy (a branch made before
+    // the publisher added it, a hand-made entry) fails here: in the build, the publisher and admin edits.
+    const byRef = new Map<string, string>();
+    items.forEach((x, i) => {
+      const ref = O(O(x).suggested).ref;
+      if (!isStr(ref)) return;
+      const first = byRef.get(ref);
+      if (first === undefined) byRef.set(ref, idOf(x, i));
+      else say(c, { id: idOf(x, i), path: 'suggested.ref' }, `is the same suggestion as ${q(first)} (${ref}). A suggestion is published once: keep one of them.`);
+    });
+    const shows = items.map((x, i) => itemKnown(O(x), idOf(x, i)));
+    for (let b = 1; b < shows.length; b++) {
+      for (let a = 0; a < b; a++) {
+        const m = compare(shows[b]!, shows[a]!);
+        if (m?.match !== 'same-show') continue;
+        // Both are named, so that the publisher puts aside whichever of the two is new.
+        const tail = `(${m.why.join(', ')}). Keep one entry, or make the difference clear (venue, show, dates).`;
+        say(c, { id: shows[b]!.id, path: '' }, `looks like the same show as ${q(shows[a]!.id)} ${tail}`);
+        say(c, { id: shows[a]!.id, path: '' }, `looks like the same show as ${q(shows[b]!.id)} ${tail}`);
+      }
+    }
     const linked = new Map<string, string>();
     items.forEach((x, i) => {
       const r = O(x);
