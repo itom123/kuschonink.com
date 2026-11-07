@@ -1,0 +1,37 @@
+# The routine's copy of the Field Guide suggestions tool: see README.md.
+# Every 10 minutes it takes the files of the commit kuschonink.com runs, with
+# that repository's own downloader, and commits them here when they changed.
+# Its source is in itom123/kuschonink.com: scripts/suggestions/routine-repo/.
+name: Sync
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: sync
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Take the files of the commit the site runs
+        run: |
+          curl -fsS https://raw.githubusercontent.com/itom123/kuschonink.com/main/scripts/suggestions/download.mjs -o "$RUNNER_TEMP/download.mjs"
+          node "$RUNNER_TEMP/download.mjs" "$RUNNER_TEMP/tree" > "$RUNNER_TEMP/took.json"
+          node -e 'const t = require(process.argv[1]); console.log(`${t.commit} (${t.why}): ${t.files.length} files`)' "$RUNNER_TEMP/took.json"
+      - name: Commit them when they changed
+        run: |
+          find . -mindepth 1 -maxdepth 1 ! -name .git ! -name .github ! -name README.md ! -name .gitignore -exec rm -rf {} +
+          cp -a "$RUNNER_TEMP/tree/." .
+          git add -A
+          if git diff --cached --quiet; then echo 'No change.'; exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit -q -m "Files from kuschonink.com $(node -p 'require(process.argv[1]).commit' "$RUNNER_TEMP/took.json")"
+          git push

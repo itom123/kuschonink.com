@@ -721,7 +721,7 @@ Notion and you decide.
 
 1. 推荐者填写向导：是什么、时间地点、链接和图片、关于自己（可不填）、确认发送。服务器（`worker/suggest.ts`）核对来源、登录、内容、频率和反垃圾验证，清除图片里的位置等信息，然后在 Notion 的 **Suggestions** 里新建一条（状态 `NEW`），并给你发一封通知邮件。Notion 出问题时，整条推荐改用邮件发给你，不会丢失。
 2. 你在 Notion 里（或网站的管理界面里）把状态改成 **APPROVED**（收录）或 **REFUSED**（不收录）。收录前可以设 **Tier**（A/B/C，默认 C）、**Show to**（`Everyone`，或某一类读者，如 `fotofilmic`）和 **Owner notes**（给云端例程的说明）。
-3. 云端例程（Claude Code 的定时任务，每天 08:00–22:00 巴黎时间每小时一次，你在网站上批准时也会立即运行一次）按 [`scripts/suggestions/ROUTINE.md`](../scripts/suggestions/ROUTINE.md) 处理每条 `APPROVED`：核对官网、补全链接和开放时间、定位、查重，写好条目，把状态改成 `READY`（或 `DUPLICATE`、`NEEDS CHECK`、`ERROR`）。**例程不能改仓库**（它的任务不挂仓库，见 11.6）：它读的是陌生人写的文字和外部网页，可能被误导。
+3. 云端例程（Claude Code 的定时任务，每天 08:00–22:00 巴黎时间每小时一次，你在网站上批准时也会立即运行一次）按 [`scripts/suggestions/ROUTINE.md`](../scripts/suggestions/ROUTINE.md) 处理每条 `APPROVED`：核对官网、补全链接和开放时间、定位、查重，写好条目，把状态改成 `READY`（或 `DUPLICATE`、`NEEDS CHECK`、`ERROR`）。**例程不能改仓库**（它的任务只挂工具的副本，从来不挂这个仓库，见 11.6）：它读的是陌生人写的文字和外部网页，可能被误导。
 4. 网站自己的代码（发布器，`worker/publish.ts`，每 10 分钟一次）把 `READY` 的条目再检查一遍（只能用已知字段、通过构建时的同一套检查、不能含某类读者不该看到的词），然后提交到 `main`：只改这份导览的 `items.json` 和 `img/` 里的图片。状态变成 `PUBLISHING`；网站换上这次提交的构建后（通常一两分钟）变成 `PUBLISHED`。构建失败，或者 45 分钟后网站还没换上，发布器会自动撤回这次提交，状态变成 `ERROR`。
 
 1. The sender goes through the wizard: what it is, when and where, links and
@@ -740,7 +740,8 @@ Notion and you decide.
    each `APPROVED` page: it checks the venue's own pages, fills in links and
    hours, finds the place on the map, looks for duplicates, writes the entry,
    and sets `READY` (or `DUPLICATE`, `NEEDS CHECK`, `ERROR`). **The routine
-   can't change the repository** (its task has none attached: see 11.6): it
+   can't change the repository** (its task has only the tool's copy
+   attached, never this repository: see 11.6): it
    reads strangers' text and other sites, so it could be misled.
 4. The site's own code (the publisher, `worker/publish.ts`, every ten minutes)
    checks each `READY` entry again (known fields only, the build's own checks,
@@ -897,76 +898,73 @@ Suggest a Place…**. `http://127.0.0.1:8798/_dump` shows what was kept.
 
 推荐流程**不需要你的电脑开着**：收推荐、批准和拒绝、发布（每 10 分钟）和到期删除联系方式（每天）都在 Cloudflare
 的 Worker 里；核对和补全由 Claude Code 的云端定时任务（scheduled task，以前叫 routine，下面称“例程”）在 Anthropic
-的服务器上完成。这个任务**不挂仓库**：每次运行都从 raw.githubusercontent.com 下载它需要的文件，所以它根本推不了
-GitHub，只能写 Notion（见下面的“安全”）。
+的服务器上完成。这个任务**只挂一个仓库：工具的副本 `itom123/kuschonink-routine`**，从来不挂这个仓库；副本由它自己的
+GitHub Action 每 10 分钟从这个仓库更新。所以例程推不了这个仓库，只能写 Notion（见下面的“安全”）。
 
-在 claude.ai 上设置一次：
+设置一次：
 
 1. **Notion**：新建一个内部集成“Field Guide routine”，权限和上面一样（Read、Update、Insert content，不要评论权限，
    No user information）。在 **Suggestions** 和 **处理日志** 两个数据库各自的 ••• ▸ Connections 里分别连接它；
    **不要**连接它们所在的页面（那个页面里还有 Contacts）。复制它的令牌。
-2. **环境**：在 claude.ai/code 输入框下面的环境菜单里，点一个环境的齿轮 ▸ **Edit cloud environment**（或新建一个）：
-   - **Network access** 选 **Full**（要打开画廊网站和地理编码服务，还要从 raw.githubusercontent.com 下载仓库里的文件、
-     从 kuschonink.com 读网站当前的版本号、从 npm 装 sharp）；
+2. **工具的副本**：公开仓库 `itom123/kuschonink-routine`。里面只有 `scripts/suggestions/download.mjs` 取的文件（工具、工具
+   引用的模块、各份导览的文件、`package.json` 和 ROUTINE.md），都来自网站当前运行的那个提交；`.download.json` 写着是哪个提交。
+   它的工作流每 10 分钟运行一次，有变化才提交；一条规则（ruleset）只让这个工作流（GitHub Actions）往里推送。不要手改副本：
+   下一次同步会把它覆盖。要重建的话：新建这个公开仓库，放进这个仓库 `scripts/suggestions/routine-repo/` 里的三样东西
+   （`README.md`、`.gitignore`、`.github/workflows/sync.yml`），加上规则（所有分支：Restrict creations、Restrict updates、
+   Restrict deletions、Block force pushes；Bypass list 只有 GitHub Actions），然后在 Actions ▸ Sync ▸ **Run workflow** 运行一次。
+3. **环境**：在 claude.ai/code 输入框下面的环境菜单里，点一个环境的齿轮 ▸ **Edit cloud environment**（或新建一个）：
+   - **Network access** 选 **Full**（要打开画廊网站和地理编码服务，还要从 kuschonink.com 读网站当前的版本号、从 npm 装 sharp）；
    - **Network secrets** ▸ **Add secret**：Secret type 用 **Bearer**，主机 `api.notion.com`，Header name `Authorization`、
-     Prefix `Bearer`（默认就是），Value 填上一步的令牌 ▸ **Add**；最后 **Save changes**。会话本身看不到这个令牌。
+     Prefix `Bearer`（默认就是），Value 填第 1 步的令牌 ▸ **Add**；最后 **Save changes**。会话本身看不到这个令牌。
      网络 secret 要 Pro、Max、Ultra、Team 或 Enterprise 套餐，而且是 Anthropic 托管的环境。
-   - **Setup script** 留空（例程每次自己下载、安装需要的东西）。不需要环境变量（数据库编号在下载下来的 `wrangler.jsonc`
-     里），**也绝不要放 GitHub 令牌**（`GH_TOKEN`、`GITHUB_TOKEN`）。
-3. **定时任务**：[claude.ai/code/routines](https://claude.ai/code/routines) ▸ **New task**（有的账号显示 Routines 和
+   - **Setup script** 留空。不需要环境变量（数据库编号在副本的 `wrangler.jsonc` 里），**也绝不要放 GitHub 令牌**
+     （`GH_TOKEN`、`GITHUB_TOKEN`）。
+4. **定时任务**：[claude.ai/code/routines](https://claude.ai/code/routines) ▸ **New task**（有的账号显示 Routines 和
    **New routine**，或者打开一整页的表单）：
    - 名字，比如 `Field Guide suggestions`；提示词照抄：
 
      ```text
-     Process the approved suggestions for my Field Guide (kuschonink.com). No repository is attached to this task, on purpose. The code is mine, in my public repository itom123/kuschonink.com, and I'm asking you to download it and run it.
-
-     First, from the working directory, run exactly this command. It downloads my suggestions tool into field-guide, from the commit my live site runs, and prints what it took:
-     curl -fsS https://raw.githubusercontent.com/itom123/kuschonink.com/main/scripts/suggestions/download.mjs -o download.mjs && NODE_USE_ENV_PROXY=1 node --no-warnings download.mjs field-guide
-
-     Then read field-guide/scripts/suggestions/ROUTINE.md and follow it. It has you run the tool that command downloaded, field-guide/tool, whose commands (list, claim, show, match, geocode, check, picture, web-picture, ready, mark, log) read and update the suggestions in my Notion; run npm install --prefix field-guide --no-audit --no-fund for sharp; and check once with curl that api.github.com refuses my repository. I'm asking for all of those too.
+     Process the approved suggestions for my Field Guide (kuschonink.com). The repository attached to this task, itom123/kuschonink-routine, is my own copy of my suggestions tool and my guides' files, which its GitHub Action takes from my site's repository, itom123/kuschonink.com. Read scripts/suggestions/ROUTINE.md in it and follow it: it has you run npm install --no-audit --no-fund (for sharp) and the tool, ./tool, whose commands (list, claim, show, match, geocode, check, picture, web-picture, ready, mark, log) read and update the suggestions in my Notion, and check once with curl that api.github.com refuses itom123/kuschonink.com. Never commit, push, open pull requests or attach another repository.
 
      If this run was started with a text, it says why (approved: …, or manual: …).
      ```
 
-     提示词为什么把命令写全：Claude Code 的自动模式（auto mode）会检查例程要执行的每条命令，但它看不到运行中读到的内容（比如下载下来的
-     ROUTINE.md）；只有提示词本身写明了那条命令，它才允许下载并运行代码（2026 年 11 月 7 日，旧提示词的一次运行就因此被拒：
-     “Code from External”）。所以提示词里的下载命令、工具和 npm install 要跟 ROUTINE.md 里写的一字不差（`npm test` 会检查）；
-     改了 ROUTINE.md 里的这几条命令，也要改任务的提示词。
+     为什么要副本：Claude Code 的自动模式（auto mode）会检查例程要执行的每条命令。它信任会话自己的仓库里的代码，却拒绝运行下载来的
+     代码，提示词写明了那条命令也一样（2026 年 11 月 7 日，不挂仓库、自己下载工具的几次运行都被拒：“Code from External”）。
+     副本让例程把工具当成自己的仓库，又不用挂这个仓库。
 
-   - **Trigger**：先选 **API**，再点 **+** 加一个 **Schedule**（先选每小时，下面再改）。不挂仓库时，是 API 触发器让它成为
-     Claude Code 任务（在云端环境里运行，能执行命令）；只有时间表的话，对话框建的是 claude.ai 的聊天任务。
-   - **仓库：一个都不选**（Repository 留空；已经选了就删掉）。
-   - **Cloud environment**：第 2 步的环境。如果不选仓库就看不到这一项，改用 Claude 桌面应用：Code ▸ Scheduled ▸
-     New task ▸ Cloud，在提示词的输入框里选环境。
+   - **Trigger**：**API** 和 **Schedule** 都要（先选每小时，下面再改）。管理模式的“收录”和“立即运行”用 API 触发器。
+   - **仓库：只选 `itom123/kuschonink-routine`**，**永远不要**选 `itom123/kuschonink.com`。
+   - **Cloud environment**：第 3 步的环境。
    - **Connectors**：全部去掉。
-   - **Create**。弹出的 **API token** 只显示这一次：复制下来，第 4 步用。
+   - **Create**。弹出的 **API token** 只显示这一次：复制下来，第 5 步用。
 
    时间：预设只有每小时、每天、每周，没有“几点到几点”。建好后在任务名旁边的菜单 ▸ **Edit** 里选 **Custom**，填
    `CRON_TZ=Europe/Paris 7 8-22 * * *`（巴黎时间 8:07 到 22:07，每小时一次）。框里原来有别的 `CRON_TZ=` 就改成
    `Europe/Paris`；不接受这个前缀的话写 UTC 时间：冬令时 `7 7-21 * * *`，夏令时 `7 6-20 * * *`。没事可做的运行会立刻结束，不记日志。
-4. **API 触发器**：任务菜单 ▸ **Edit** ▸ **Trigger** 那一行的 API 面板 ▸ 复制 **Fire URL**（建任务时没复制令牌的话，在这里
+5. **API 触发器**：任务菜单 ▸ **Edit** ▸ **Trigger** 那一行的 API 面板 ▸ 复制 **Fire URL**（建任务时没复制令牌的话，在这里
    **Generate token**，同样只显示一次；以后换令牌用 **Regenerate**，不要删：删掉令牌就删掉了 API 触发器）。把两者存成
    Cloudflare secret `ROUTINE_FIRE_URL` 和 `ROUTINE_TOKEN`，只给正式网站、不给预览（在切换到 Worker Previews 之后再存，
    见第 7 节）。管理模式的“收录”和“立即运行”用它。**Run now** 和 API 触发合计每个任务每小时最多 30 次。
-5. 试一次：在任务里 **Run now**，看它的会话记录。应该看到：没有克隆任何仓库；下载命令把网站当前运行的提交（`commit`）的
-   文件下载到工作目录里的 `field-guide`；GitHub 的检查得到 403（“… is not enabled for this session”）；然后列出待处理的推荐。
-   带文字触发的运行（管理模式的“收录”和“立即运行”）会在第二条消息里收到那段文字，于是再查一遍队列，这时下载会说 `reused`。
-   要是有命令被权限检查拒绝（“denied by the Claude Code auto mode classifier”），对照提示词和 ROUTINE.md 里的命令。Notion 的
-   处理日志只在真的处理了推荐，或者例程因为能读到仓库而停下时，才有新的一行。
+6. 试一次：在任务里 **Run now**，看它的会话记录。应该看到：只克隆了 `kuschonink-routine`；`.download.json` 的 `commit`
+   是网站当前运行的提交（刚部署完的十分钟里可能还是上一个）；GitHub 对 `itom123/kuschonink.com` 的检查得到 403
+   （“… is not enabled for this session”）；然后列出待处理的推荐。带文字触发的运行（管理模式的“收录”和“立即运行”）会在
+   第二条消息里收到那段文字，于是再查一遍队列。要是有命令被权限检查拒绝（“denied by the Claude Code auto mode classifier”），
+   会话记录里写着是哪一条。Notion 的处理日志只在真的处理了推荐，或者例程因为能读到这个仓库而停下时，才有新的一行。
 
 安全：
 
 - 触发时带的文字（`approved: …`、`manual: …`）会被包在 `<routine-fire-payload>` 里、标成不可信的数据；提示词只把它
   当作说明，所以没关系。
-- **不挂仓库，就推不了**：会话里所有发往 GitHub 的请求都经过 Anthropic 的 GitHub 代理，它只为任务挂着的仓库办事。对别的
-  仓库，公开的也一样，API 请求和源码压缩包都回 403（“… is not enabled for this session”），会话里也没有可以推送的克隆。
-  所以不管读到什么，例程都推不了、也开不了 PR。（网络 secret 也从来不会加到发往 GitHub 的请求上。）每次运行在处理之前都先
-  检查这个 403；如果 GitHub 反而回了内容，它什么都不处理，在处理日志里记一条 `Failed`：把仓库从任务上去掉。永远不要给这个
-  任务挂仓库，也不要给它的环境 GitHub 令牌。
-- **它读什么**：提示词从 `main` 取 `scripts/suggestions/download.mjs` 并运行它；它从 raw.githubusercontent.com 下载工具、
-  工具引用的模块、各份导览的 JSON 和 ROUTINE.md，全部来自同一个提交：网站当前运行的那个（页面里的版本号，发布器也认它；网站
-  没给就用 `main`）。例程接着读下载下来的 ROUTINE.md。所以例程的检查就是发布器的检查，说明也和工具是同一个版本。仓库是公开的；
-  raw.githubusercontent.com 只提供已经提交的文件。
+- **这个仓库从来不挂，就推不了它**：会话里所有发往 GitHub 的请求都经过 Anthropic 的 GitHub 代理，它只为任务挂着的仓库
+  （这里只有副本）办事。对别的仓库，公开的也一样，API 请求和源码压缩包都回 403（“… is not enabled for this session”）。
+  （网络 secret 也从来不会加到发往 GitHub 的请求上。）每次运行在处理之前都先检查这个仓库的 403；如果 GitHub 反而回了内容，
+  它什么都不处理，在处理日志里记一条 `Failed`：把这个仓库从任务上去掉。永远不要给任务挂这个仓库，也不要给它的环境 GitHub
+  令牌。代理的 403 里提到会话可以申请挂仓库（`add_repo`）；文档没说定时任务能不能不经你同意这样做，ROUTINE.md 不许例程这样做。
+- **副本也改不了**：副本的规则只让它自己的工作流推送，每次同步又从这个仓库重写一遍。
+- **它读什么**：副本，也就是 download.mjs 从 raw.githubusercontent.com 取的文件，全部来自同一个提交：网站当前运行的那个
+  （页面里的版本号，发布器也认它；网站没给就用 `main`），最多晚 10 分钟。所以例程的检查就是发布器的检查，说明也和工具是
+  同一个版本。
 - **被误导的例程还能做什么**：只能写例程的集成连接的两个数据库（Suggestions 和处理日志，读不到 Contacts）。`READY` 的条目
   还要通过发布器的检查才会进导览，而且只改那份导览的 `items.json` 和 `img/`。
 
@@ -974,69 +972,71 @@ Nothing here needs your computer to be on: taking suggestions, approving and
 refusing, publishing (every 10 minutes) and deleting contact details when due
 (daily) all happen in the Cloudflare Worker; checking and completing them is
 a Claude Code scheduled task (formerly a routine; "the routine" below) on
-Anthropic's servers. The task has **no repository attached**: each run
-downloads the files it needs from raw.githubusercontent.com, so it has no way
-to push to GitHub; it only writes to Notion (see Safety below).
+Anthropic's servers. The task has **one repository attached: the tool's copy,
+`itom123/kuschonink-routine`**, never this repository. The copy's own GitHub
+Action refreshes it from this repository every 10 minutes. So the routine has
+no way to push to this repository; it only writes to Notion (see Safety below).
 
-Set it up once on claude.ai:
+Set it up once:
 
 1. **Notion**: a new internal integration, "Field Guide routine", with the
    same capabilities (Read, Update and Insert content; no comments, No user
    information). Connect it to the **Suggestions** database and to the
    **Processing log**, each on its own (••• ▸ Connections on each), **never**
    to the page that holds them: that page also holds Contacts. Copy its token.
-2. **Environment**: in the environment menu under the message box at
+2. **The tool's copy**: the public repository `itom123/kuschonink-routine`. It
+   holds only what `scripts/suggestions/download.mjs` takes (the tool, the
+   modules it imports, the guides' files, `package.json` and ROUTINE.md), all
+   from the commit the live site runs; `.download.json` says which. Its
+   workflow runs every 10 minutes and commits when something changed, and a
+   ruleset lets only that workflow (GitHub Actions) push there. Don't edit
+   the copy: the next sync overwrites it. To make it again: create that
+   public repository with the three files in this repository's
+   `scripts/suggestions/routine-repo/` (`README.md`, `.gitignore`,
+   `.github/workflows/sync.yml`), add the ruleset (all branches: Restrict
+   creations, Restrict updates, Restrict deletions, Block force pushes; only
+   GitHub Actions in the bypass list), and run the workflow once (Actions ▸
+   Sync ▸ **Run workflow**).
+3. **Environment**: in the environment menu under the message box at
    claude.ai/code, the gear on an environment ▸ **Edit cloud environment**
    (or add a new one):
    - **Network access**: **Full** (for gallery sites and the geocoders, and
-     to download the repository's files from raw.githubusercontent.com, read
-     the live site's build id from kuschonink.com and install sharp from
-     npm);
+     to read the live site's build id from kuschonink.com and install sharp
+     from npm);
    - **Network secrets** ▸ **Add secret**: Secret type **Bearer**, host
      `api.notion.com`, Header name `Authorization` and Prefix `Bearer` (the
      defaults), Value the token from step 1 ▸ **Add**; then **Save changes**.
      The session never sees the token. Network secrets need a Pro, Max,
      Ultra, Team or Enterprise plan and an Anthropic-hosted environment.
-   - **Setup script**: leave it empty (the routine downloads and installs
-     what it needs itself). No environment variables (the database ids come
-     with the downloaded `wrangler.jsonc`), and **never a GitHub token**
-     (`GH_TOKEN`, `GITHUB_TOKEN`).
-3. **Scheduled task**: [claude.ai/code/routines](https://claude.ai/code/routines)
+   - **Setup script**: leave it empty. No environment variables (the
+     database ids come with the copy's `wrangler.jsonc`), and **never a
+     GitHub token** (`GH_TOKEN`, `GITHUB_TOKEN`).
+4. **Scheduled task**: [claude.ai/code/routines](https://claude.ai/code/routines)
    ▸ **New task** (some accounts say Routines and **New routine**, or open a
    full-page form):
    - A name, such as `Field Guide suggestions`, and this prompt, as it is:
 
      ```text
-     Process the approved suggestions for my Field Guide (kuschonink.com). No repository is attached to this task, on purpose. The code is mine, in my public repository itom123/kuschonink.com, and I'm asking you to download it and run it.
-
-     First, from the working directory, run exactly this command. It downloads my suggestions tool into field-guide, from the commit my live site runs, and prints what it took:
-     curl -fsS https://raw.githubusercontent.com/itom123/kuschonink.com/main/scripts/suggestions/download.mjs -o download.mjs && NODE_USE_ENV_PROXY=1 node --no-warnings download.mjs field-guide
-
-     Then read field-guide/scripts/suggestions/ROUTINE.md and follow it. It has you run the tool that command downloaded, field-guide/tool, whose commands (list, claim, show, match, geocode, check, picture, web-picture, ready, mark, log) read and update the suggestions in my Notion; run npm install --prefix field-guide --no-audit --no-fund for sharp; and check once with curl that api.github.com refuses my repository. I'm asking for all of those too.
+     Process the approved suggestions for my Field Guide (kuschonink.com). The repository attached to this task, itom123/kuschonink-routine, is my own copy of my suggestions tool and my guides' files, which its GitHub Action takes from my site's repository, itom123/kuschonink.com. Read scripts/suggestions/ROUTINE.md in it and follow it: it has you run npm install --no-audit --no-fund (for sharp) and the tool, ./tool, whose commands (list, claim, show, match, geocode, check, picture, web-picture, ready, mark, log) read and update the suggestions in my Notion, and check once with curl that api.github.com refuses itom123/kuschonink.com. Never commit, push, open pull requests or attach another repository.
 
      If this run was started with a text, it says why (approved: …, or manual: …).
      ```
 
-     Why the prompt spells out commands: Claude Code's auto mode checks
-     each command a run makes, but never sees what the run read (such as
-     the downloaded ROUTINE.md). It lets a run download and run code only
-     when the prompt itself names that command: on 7 Nov 2026 a run under
-     the old prompt was refused ("Code from External"). So the prompt names
-     the download command, the tool and npm install exactly as ROUTINE.md
-     writes them (`npm test` checks this). If those commands change in
-     ROUTINE.md, change the task's prompt too.
+     Why a copy: Claude Code's auto mode checks each command a run makes.
+     It trusts code in the session's own repository, but it refuses to run
+     code the run downloaded, even when the prompt names the exact command
+     (on 7 Nov 2026, every run that downloaded the tool itself, with no
+     repository attached, was refused: "Code from External"). The copy gives
+     the routine the tool as its own repository without attaching this one.
 
-   - **Trigger**: **API** first, then **+** ▸ **Schedule** (hourly for now,
-     changed below). With no repository, the API trigger is what makes this a
-     Claude Code task, which runs in a cloud environment and can run
-     commands; with a schedule alone, the dialog makes a claude.ai chat task.
-   - **Repository: none.** Leave it empty, and remove one if it is selected.
-   - **Cloud environment**: the one from step 2. If it doesn't show without
-     a repository, use the Claude desktop app instead (Code ▸ Scheduled ▸
-     New task ▸ Cloud), where the environment is chosen in the prompt box.
+   - **Trigger**: both **API** and **Schedule** (hourly for now, changed
+     below). Admin mode's Approve and Run Now use the API trigger.
+   - **Repository: `itom123/kuschonink-routine` only.** Never
+     `itom123/kuschonink.com`.
+   - **Cloud environment**: the one from step 3.
    - **Connectors**: remove them all.
    - **Create**. The **API token** it then shows is shown only once: copy it
-     for step 4.
+     for step 5.
 
    Schedule: the presets are hourly, daily or weekly, with no window of
    hours. Once it exists, open the menu next to its name ▸ **Edit**, pick
@@ -1045,7 +1045,7 @@ Set it up once on claude.ai:
    `CRON_TZ=`, change it to `Europe/Paris`; if it won't take the prefix,
    write the hours in UTC: `7 7-21 * * *` in winter, `7 6-20 * * *` in
    summer. A run with nothing to do stops at once and logs nothing.
-4. **API trigger**: the task's menu ▸ **Edit** ▸ the API panel in the
+5. **API trigger**: the task's menu ▸ **Edit** ▸ the API panel in the
    **Trigger** row ▸ copy the **Fire URL** (and **Generate token** there if
    you didn't copy one at **Create**; it too is shown once. To change the
    token later, use **Regenerate**: deleting it deletes the API trigger).
@@ -1053,40 +1053,41 @@ Set it up once on claude.ai:
    `ROUTINE_TOKEN`, for the live site only, never for previews (after the
    switch to Worker Previews, see section 7). Admin mode's Approve and Run
    Now use it. **Run now** and API fires share 30 an hour per task.
-5. Try it: **Run now** on the task, and read its session. It should clone no
-   repository, download the files of the commit the live site runs
-   (`commit`) into `field-guide` in the working directory, get a 403 from
-   GitHub ("… is not enabled for this session"), then list the queue. A run
-   started with a text (admin mode's Approve and Run Now) gets the text as a
-   second message and goes through the queue again; the download then says
-   `reused`. If the permission check refused a command ("denied by the
-   Claude Code auto mode classifier"), compare the prompt's commands with
-   ROUTINE.md's. The Processing log only gets a line when a suggestion was
-   handled, or when a run stopped because it could reach the repository.
+6. Try it: **Run now** on the task, and read its session. It should clone
+   only `kuschonink-routine`, find in `.download.json` the commit the live
+   site runs (or the one before, in the 10 minutes after a deploy), get a 403
+   from GitHub for `itom123/kuschonink.com` ("… is not enabled for this
+   session"), then list the queue. A run started with a text (admin mode's
+   Approve and Run Now) gets the text as a second message and goes through
+   the queue again. If the permission check refused a command ("denied by
+   the Claude Code auto mode classifier"), the session says which. The
+   Processing log only gets a line when a suggestion was handled, or when a
+   run stopped because it could reach this repository.
 
 Safety:
 
 - The text a run is started with (`approved: …`, `manual: …`) arrives wrapped
   in a `<routine-fire-payload>` block marked as untrusted data. The prompt
   only takes it as information, so that's fine.
-- **No repository, so no pushes.** Every GitHub request from the session
-  goes through Anthropic's GitHub proxy, which only serves the repositories
-  attached to the task. For any other, even a public one, API requests and
-  source archives get a 403 ("… is not enabled for this session"), and the
-  session has no clone to push from. So whatever it reads, a run can't push
-  or open a pull request. (Network secrets are never added to GitHub requests
-  either.) Every run checks for that 403 before it looks at the queue; if
-  GitHub answers instead, it processes nothing and logs `Failed`: take the
-  repository off the task. Never attach the repository to this task, and
-  never give its environment a GitHub token.
-- **What a run reads**: `scripts/suggestions/download.mjs` from `main` (its
-  prompt runs it), then, through it, the tool, the modules it imports, the
-  guides' JSON and ROUTINE.md from raw.githubusercontent.com, all from one
-  commit: the one the live site runs (the build id in its pages, which the
-  publisher also goes by), or `main` if the site gives none. The run then
-  reads that ROUTINE.md. So the routine's checks are the publisher's own,
-  and its instructions go with its tool. The repository is public, and
-  raw.githubusercontent.com only serves committed files.
+- **This repository is never attached, so no pushes to it.** Every GitHub
+  request from the session goes through Anthropic's GitHub proxy, which only
+  serves the repositories attached to the task: here, only the copy. For any
+  other, even a public one, API requests and source archives get a 403 ("…
+  is not enabled for this session"). (Network secrets are never added to
+  GitHub requests either.) Every run checks for this repository's 403 before
+  it looks at the queue; if GitHub answers instead, it processes nothing and
+  logs `Failed`: take this repository off the task. Never attach it to the
+  task, and never give the task's environment a GitHub token. The proxy's 403
+  says a session can ask for a repository to be attached (`add_repo`); the
+  docs don't say whether a scheduled task can do that without you, and
+  ROUTINE.md forbids it.
+- **The copy can't be changed by a run either**: its ruleset lets only its
+  own workflow push, and every sync rewrites it from this repository.
+- **What a run reads**: the copy, that is, the files download.mjs takes from
+  raw.githubusercontent.com, all from one commit: the one the live site runs
+  (the build id in its pages, which the publisher also goes by), or `main` if
+  the site gives none, at most 10 minutes behind. So the routine's checks are
+  the publisher's own, and its instructions go with its tool.
 - **What a misled run could still do**: write to the two databases the
   routine's integration is connected to (Suggestions and the Processing log;
   never Contacts). A `READY` entry still has to pass the publisher's checks
