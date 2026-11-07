@@ -13,7 +13,7 @@
 import type { Bi, LonLat, MapView, Payload, RouteMode, TierId } from '../../lib/guides/types';
 import { metresPerPixel, project } from '../../lib/guides/core.ts';
 import * as K from './camera.ts';
-import { cluster, compareIds, dressCluster, dressPin, makeCluster, makePin, priority, type Cluster } from './pins.ts';
+import { cluster, compareIds, densityRadius, dressCluster, dressPin, makeCluster, makePin, priority, sameSpot, type Cluster } from './pins.ts';
 import { LABEL_GAP, makeMeasure, placeLabels, type Box, type Side } from './labels.ts';
 import { drawRoute, makeRouteSvg } from './route.ts';
 import { cellSize, heatPixels, readRamp, type RGB } from './heat.ts';
@@ -104,6 +104,8 @@ export class GuideMap {
   private heatAt = 0;
   private colours: RGB[] | null = null;
   private heatR: number;
+  /** Ground metres per world unit (a zoom-14 pixel), for the density cap. */
+  private mpp14 = 1;
   /** Where am I?: in world units, with the accuracy as a radius. */
   private me: { x: number; y: number; r: number } | null = null;
   private meEl: HTMLElement | null = null;
@@ -135,6 +137,7 @@ export class GuideMap {
     this.area = this.views[0];
     const lat = payload.centre[1];
     this.heatR = payload.heatRadius / metresPerPixel(lat, 14);
+    this.mpp14 = metresPerPixel(lat, 14);
 
     root.querySelectorAll<HTMLElement>('.gd-base[data-view]').forEach((b) => this.bases.set(b.dataset.view!, b));
     for (const v of this.views) if (this.bases.has(v.id)) this.dressBase(this.bases.get(v.id)!, v);
@@ -307,8 +310,13 @@ export class GuideMap {
    * view can.
    */
   private fitCluster(ids: string[]) {
-    const box = K.bbox(ids.map((id) => this.pins.get(id)).filter((r): r is PinRec => !!r));
+    const recs = ids.map((id) => this.pins.get(id)).filter((r): r is PinRec => !!r);
+    const box = K.bbox(recs);
     if (!box) return;
+    // Shows at one place stay together even at the closest zoom of the finest
+    // map: list them at once instead of zooming (pins.ts sameSpot).
+    const deepest = Math.max(...this.levels.map((v) => v.max));
+    if (recs.length > 1 && sameSpot(recs, deepest, this.radius(this.vp(), deepest))) return this.hooks.onCluster?.(ids);
     const vp = this.vp(), l = this.limits();
     const here = K.fit(box, vp, this.free, 48, this.bounds(), l, l.max);
     const d = here.s >= l.max * 0.98 ? K.deeper(this.levels, this.area.id, box) : null;
@@ -751,12 +759,20 @@ export class GuideMap {
     return r.p.id === this.selected || r.p.kind === 'place' || r.p.step != null;
   }
 
+  /** How close pins may be before they cluster, at a scale (pins.ts densityRadius: wider zoomed out, and on phones). */
+  private radius(vp: K.Vp, s = this.c.s) {
+    return densityRadius(14 + Math.log2(s), this.mpp14 / s, coarse() || vp.w < 600);
+  }
+
   private doCluster(vp: K.Vp) {
-    const pts = this.order.filter((r) => r.shown).map((r) => {
-      const p = K.toScreen(this.c, vp, r.x, r.y);
-      return { id: r.p.id, x: p.x, y: p.y, pr: priority(r.p, r.p.id === this.selected, r.p.step != null), lone: this.isLone(r) };
-    }).filter((p) => p.x > -40 && p.y > -40 && p.x < vp.w + 40 && p.y < vp.h + 40);
-    const groups = cluster(pts, coarse() ? 26 : 14);
+    const r = this.radius(vp);
+    // Pins a little beyond the edge take part too, so panning doesn't reshuffle them.
+    const m = Math.max(40, r);
+    const pts = this.order.filter((q) => q.shown).map((q) => {
+      const p = K.toScreen(this.c, vp, q.x, q.y);
+      return { id: q.p.id, x: p.x, y: p.y, pr: priority(q.p, q.p.id === this.selected, q.p.step != null), lone: this.isLone(q) };
+    }).filter((p) => p.x > -m && p.y > -m && p.x < vp.w + m && p.y < vp.h + m);
+    const groups = cluster(pts, r);
     this.clusteredAt = { s: this.c.s, t: performance.now() };
     const next = new Set<string>();
     groups.forEach((g) => g.ids.forEach((id) => next.add(id)));

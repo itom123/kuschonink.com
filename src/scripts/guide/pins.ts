@@ -44,6 +44,57 @@ export function cluster(pts: Pt[], r: number): Cluster[] {
   return out;
 }
 
+/**
+ * Map density: how far apart shows must be on the ground, in metres, before
+ * they fold into one cluster. That caps the shows per km² at about
+ * (1000 / d)²: few when the whole city is in view, more as you zoom in, no
+ * cap at street level. Phones (a touch screen or a narrow window) keep them
+ * further apart. Between the zooms listed, in proportion.
+ */
+export const SPACING: Record<'desktop' | 'phone', [zoom: number, metres: number][]> = {
+  desktop: [[11, 1200], [12, 600], [13, 250], [14, 100], [15, 0]],
+  phone: [[11, 2000], [12, 1000], [13, 450], [14, 180], [15, 60], [16, 0]],
+};
+/** The smallest cluster radius in screen pixels: about a pin, or a fingertip. */
+export const BASE_R = { desktop: 14, phone: 26 };
+
+/** The ground spacing at zoom z (halfway between two zooms: the geometric middle; to nothing at the end). */
+export function spacingAt(z: number, phone: boolean): number {
+  const t = SPACING[phone ? 'phone' : 'desktop'];
+  // Further out than the table: the same distance on screen (it only gets wider on the ground).
+  if (z <= t[0][0]) return t[0][1] * Math.pow(2, t[0][0] - z);
+  for (let i = 1; i < t.length; i++) {
+    const [z0, d0] = t[i - 1];
+    const [z1, d1] = t[i];
+    if (z > z1) continue;
+    const f = (z - z0) / (z1 - z0);
+    return d1 === 0 ? d0 * (1 - f) : d0 * Math.pow(d1 / d0, f);
+  }
+  return 0;
+}
+
+/**
+ * The cluster radius in screen pixels at map zoom z (as on slippy maps:
+ * fractional), where a screen pixel is `metresPerPx` on the ground. The zoom
+ * is taken in half steps, so pins don't come and go during a pinch.
+ */
+export function densityRadius(z: number, metresPerPx: number, phone: boolean): number {
+  const zq = Math.floor(z * 2) / 2;
+  const mpp = metresPerPx * Math.pow(2, z - zq); // a pixel at the half step
+  return Math.round(Math.max(BASE_R[phone ? 'phone' : 'desktop'], spacingAt(zq, phone) / mpp));
+}
+
+/**
+ * Shows at one place (a venue with several): still one cluster even at the
+ * closest zoom, so a tap should list them rather than zoom. Points in world
+ * units; `scale` is screen pixels per world unit at the closest zoom.
+ */
+export function sameSpot(pts: { x: number; y: number }[], scale: number, radius: number): boolean {
+  let far = 0;
+  for (const a of pts) for (const b of pts) far = Math.max(far, Math.hypot(a.x - b.x, a.y - b.y));
+  return far * scale < radius;
+}
+
 /** Natural order for keyboard moves: places, then A1 A2 … A10, B…, C…, then listings. */
 export function compareIds(a: PinLike, b: PinLike) {
   const rank = (p: PinLike) => (p.kind === 'place' ? 0 : p.kind === 'item' ? 1 : 2);
