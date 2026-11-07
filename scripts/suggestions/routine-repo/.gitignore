@@ -1,5 +1,7 @@
-# What the routine makes while it works. None of it is committed.
+# What the routine makes while it works. None of it is committed (a cloud
+# session's Stop hook asks to commit untracked files, and the routine never does).
 node_modules/
+package-lock.json
 entry.json
 *.jpg
 github.txt

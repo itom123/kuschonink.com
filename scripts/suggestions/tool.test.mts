@@ -105,6 +105,11 @@ const FG = join(work, 'field-guide');
   const prompts = docs.split('```text').slice(1).map((b) => b.split('```')[0]!).filter((b) => b.includes('kuschonink-routine'));
   check('the prompt in GUIDES.md 11.6 (both languages, the same) names the copy, ./tool and npm install as ROUTINE.md does', prompts.length === 2 && prompts[0] === prompts[1] && prompts.every((p) => p.includes('itom123/kuschonink-routine') && p.includes('./tool') && p.includes(install)) && steps.includes('T=./tool') && steps.includes(`\`${install}\``), prompts.length);
   check("the copy's workflow takes the files with main's download.mjs every 10 minutes, and pushes them", sync.includes('https://raw.githubusercontent.com/itom123/kuschonink.com/main/scripts/suggestions/download.mjs') && /cron: '\*\/10 \* \* \* \*'/.test(sync) && sync.includes('git push'), sync.slice(0, 200));
+  // The routine runs whatever lands in the copy, so only the copy's deploy key may push there (its
+  // ruleset), the actions are pinned to commits, and the copy's own files come from here too.
+  const uses = [...sync.matchAll(/^\s*- uses: (\S+)/gm)].map((m) => m[1]!);
+  const routineRepo = ['README.md', '.gitignore', join('.github', 'workflows', 'sync.yml')];
+  check("the copy's workflow: actions pinned to commits, pushes with the deploy key, a read-only token, its own files from routine-repo/, a monthly .synced", uses.length === 2 && uses.every((u) => /@[0-9a-f]{40}$/.test(u)) && sync.includes('ssh-key: ${{ secrets.SYNC_DEPLOY_KEY }}') && /permissions:\s+contents: read/.test(sync) && sync.includes('scripts/suggestions/routine-repo/$f') && ['README.md', '.gitignore', '.github/workflows/sync.yml'].every((f) => sync.includes(f)) && routineRepo.every((f) => existsSync(join(REPO, 'scripts', 'suggestions', 'routine-repo', f))) && sync.includes('date -u +%Y-%m > "$RUNNER_TEMP/tree/.synced"') && readFileSync(join(REPO, 'scripts', 'suggestions', 'routine-repo', '.gitignore'), 'utf8').includes('package-lock.json'), uses);
 }
 // In the routine, npm install puts sharp in the folder; here a stand-in package hands over this checkout's.
 mkdirSync(join(FG, 'node_modules', 'sharp'), { recursive: true });
