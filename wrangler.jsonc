@@ -63,8 +63,9 @@
   // `npx wrangler preview base-config secret put NAME` (or in the dashboard's
   // Previews Base): TURNSTILE_SECRET, GUIDES_PASSWORD, GUIDES_PASSWORD_FOTOFILMIC
   // and GUIDES_COOKIE_SECRET, as strong as production's (a preview serves that
-  // branch's real guides at a public link). So a preview's guide passwords
-  // are not the live site's. Rate limits count apart (their own namespace ids;
+  // branch's real guides at a public link) but never the same: every pushed
+  // branch gets them, a cloud session's claude/... branch too. So a preview's
+  // guide passwords are not the live site's. Rate limits count apart (their own namespace ids;
   // GUIDES_TILE_LIMIT is the guide's street-level tiles). Crons and routes
   // never apply to previews. docs/GUIDES.md section 7.
   // Suggestions in a preview: its own Guard (each preview gets its own Durable
