@@ -36,7 +36,7 @@ const LOCK_S = 600;
 const BATCH = 10;
 
 /** The item fields an entry may set. Everything else is the publisher's. */
-const ENTRY_KEYS = new Set([
+export const ENTRY_KEYS = new Set([
   'name', 'short', 'subtitle', 'by', 'zone', 'themes', 'why', 'whyZh', 'address', 'hours', 'hoursZh', 'start', 'end', 'open',
   'holiday', 'access', 'exceptions', 'minutes', 'price', 'priceZh', 'note', 'noteZh', 'sourceUrl', 'links', 'listing', 'coordinates', 'image',
 ]);
@@ -78,10 +78,10 @@ export interface PublishReport {
   errors: string[];
 }
 
-const guideDir = (slug: string) => `src/content/guides/${slug}`;
-const imgPath = (slug: string, id: string) => `public/guides/${slug}/img/${id}.jpg`;
+export const guideDir = (slug: string) => `src/content/guides/${slug}`;
+export const imgPath = (slug: string, id: string) => `public/guides/${slug}/img/${id}.jpg`;
 const shaOf = (commitUrl: string) => /\/commit\/([0-9a-f]{40})$/.exec(commitUrl)?.[1] ?? '';
-const stringify = (v: unknown) => `${JSON.stringify(v, null, 2)}\n`;
+export const stringify = (v: unknown) => `${JSON.stringify(v, null, 2)}\n`;
 
 /** An audience and everything it includes. */
 function closure(access: AccessFile, id: string): Set<string> {
@@ -130,7 +130,7 @@ export function nextId(items: ItemRecord[], tier: TierId): string {
 }
 
 /** Point routes and events at a renamed item. */
-function renameRefs(raw: RawGuide, from: string, to: string): GuideFileChange[] {
+export function renameRefs(raw: RawGuide, from: string, to: string): GuideFileChange[] {
   const out: GuideFileChange[] = [];
   const routes = raw.routes as { routes?: { stops: string[] }[] } | undefined;
   if (routes?.routes?.some((r) => r.stops.includes(from))) {
@@ -144,7 +144,7 @@ function renameRefs(raw: RawGuide, from: string, to: string): GuideFileChange[] 
   }
   return out;
 }
-type GuideFileChange = 'routes' | 'events';
+export type GuideFileChange = 'routes' | 'events';
 
 export type Built = { ok: true; item: ItemRecord; picture: Uint8Array | null; note: string } | { ok: false; status: 'NEEDS CHECK' | 'ERROR'; why: string };
 
@@ -194,7 +194,7 @@ export async function buildItem(row: SuggestionRow, slug: string, guide: { timez
 
 const FILES = ['guide', 'items', 'places', 'events', 'routes', 'listings', 'map'] as const;
 
-async function readGuide(read: (p: string) => Promise<FileAt | null>, slug: string): Promise<RawGuide> {
+export async function readGuide(read: (p: string) => Promise<FileAt | null>, slug: string): Promise<RawGuide> {
   const raw: RawGuide = {};
   for (const f of FILES) {
     const at = await read(`${guideDir(slug)}/${f}.json`);

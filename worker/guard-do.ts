@@ -14,6 +14,7 @@ export class Guard extends DurableObject {
 
   hit(key: string, limit: number, windowS: number) { return this.core.hit(key, limit, windowS); }
   claim(key: string, ttlS: number, value?: string) { return this.core.claim(key, ttlS, value); }
+  held(key: string) { return this.core.held(key); }
   settle(key: string, value: string, ttlS: number) { return this.core.settle(key, value, ttlS); }
   release(key: string) { return this.core.release(key); }
   sessionCreate(ttlS: number) { return this.core.sessionCreate(ttlS); }

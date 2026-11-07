@@ -1,4 +1,7 @@
-// Who is logged on. Xiangyin 98 has no accounts: any name, no password.
+// Who is logged on. Xiangyin 98 has no accounts and no passwords: everyone is
+// Guest, whatever the log-on box once said. The site's owner can be
+// Administrator through the separate, hidden admin log-on (/admin, checked on
+// the server: worker/admin.ts); kus98_admin_ui only says that happened.
 // "Logged on" is a cookie, so new tabs see it (sessionStorage wouldn't). It
 // runs out AWAY_MINUTES after the last page of the site was open: every open
 // page renews it each minute and as it goes, so the computer stays on while a
@@ -8,25 +11,24 @@
 //
 // The cookie is written only with the visitor's leave (consent.ts: "Allow All"
 // or "Necessary Only"); without it, this page stays logged on, and the next
-// one starts up again. The name typed is kept only with "Allow All".
-import { consent, keepAgain } from './consent';
+// one starts up again. No name is kept: there is only Guest.
+import { consent } from './consent';
 import { html } from './util';
 
 const COOKIE = 'kus98_session';
+const GUEST = 'Guest';
 /** Away (no page of the site open) longer than this, and the next visit starts up again. */
 export const AWAY_MINUTES = 30;
 
 const secure = () => (location.protocol === 'https:' ? '; Secure' : '');
-const write = (name: string) => {
+const write = () => {
   if (!consent.allows('cookie')) return;
-  document.cookie = `${COOKIE}=${encodeURIComponent(name)}; path=/; max-age=${AWAY_MINUTES * 60}; SameSite=Lax${secure()}`;
+  document.cookie = `${COOKIE}=${GUEST}; path=/; max-age=${AWAY_MINUTES * 60}; SameSite=Lax${secure()}`;
 };
 // Logged on in this page: Log Off and Shut Down end it, so renewing stops.
 let on = false;
-// The name last logged on with in this page, for when nothing may keep it.
-let last = '';
 
-const clean = (name: string) => name.replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, 32);
+const isAdmin = () => /(?:^|;\s*)kus98_admin_ui=1/.test(document.cookie);
 
 function cookieValue() {
   const c = document.cookie.split(/;\s*/).find((x) => x.startsWith(`${COOKIE}=`));
@@ -38,50 +40,25 @@ function cookieValue() {
   }
 }
 
-function storedUser() {
-  try {
-    return localStorage.getItem('kus98:user') ?? '';
-  } catch {
-    return '';
-  }
-}
-
-// The name for the next log-on box is lasting: typed before "Allow All" (the
-// first visit logs on before the Cookies dialog asks), it's kept once given,
-// as stored() values are (util.ts).
-let unsaved = false;
-function keepUser(n: string) {
-  unsaved = !consent.allows('lasting');
-  if (unsaved) return;
-  try {
-    localStorage.setItem('kus98:user', n);
-  } catch { /* ignore */ }
-}
-consent.on((level, was, here) => {
-  if (!consent.allows('lasting')) return;
-  if (unsaved) keepUser(last);
-  else if (keepAgain(level, was, here)) {
-    const n = last || cookieValue();
-    if (n) keepUser(n);
-  }
-});
-
 export const session = {
   loggedOn: () => cookieValue() !== null,
-  /** The name typed at log-on ("Guest" when none). */
+  /** Guest, or Administrator in admin mode. */
   user(): string {
-    return cookieValue() || last || storedUser();
+    return isAdmin() ? 'Administrator' : GUEST;
   },
-  /** The name to prefill in the log-on box. */
+  /** What the log-on box shows: always Guest. */
   lastUser(): string {
-    return last || storedUser() || 'Guest';
+    return GUEST;
   },
-  logOn(name: string) {
-    const n = clean(name) || 'Guest';
-    last = n;
-    write(n);
+  /** Log on as Guest (the box's name can't be changed, and nothing typed elsewhere counts). */
+  logOn(_name?: string) {
+    write();
     on = true;
-    keepUser(n);
+    // Names typed before everyone was Guest. Removing needs no leave.
+    try {
+      localStorage.removeItem('kus98:user');
+    } catch { /* ignore */ }
+    const n = session.user();
     document.querySelectorAll('[data-username]').forEach((el) => (el.textContent = n));
     return n;
   },
@@ -95,7 +72,7 @@ export const session = {
     // guide's link, whose cookie may still wait for the visitor's leave).
     on = cookieValue() !== null || !html.dataset.boot;
     const renew = () => {
-      if (on) write(cookieValue() || session.lastUser());
+      if (on) write();
     };
     renew();
     setInterval(renew, 60_000);

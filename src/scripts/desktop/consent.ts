@@ -35,7 +35,7 @@ export const PAINT_DB = 'kus98-paint';
 /**
  * Allow All chosen in this page after a choice that kept nothing lasting:
  * what the page still shows is written again, since that choice removed it
- * (stored() in util.ts, lang.ts, session.ts, Paint's tools). Another tab
+ * (stored() in util.ts, lang.ts, Paint's tools). Another tab
  * writes only what was set there meanwhile, so its older copy doesn't win.
  */
 export const keepAgain = (level: Level | null, was: Level | null, here: boolean) => here && level === 'all' && was !== 'all';

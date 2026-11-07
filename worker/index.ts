@@ -2,7 +2,8 @@
 // /v1/contact/*, /guides and /guides/* run this code: the contact form backend
 // (worker/contact.ts), Paint's "Send to Xiangyin" (worker/drawing.ts), the
 // Field Guide's password gate (worker/guides.ts) and its suggestions
-// (worker/suggest.ts). Two crons: the publisher every ten minutes
+// (worker/suggest.ts), and admin mode on /v1/admin/* (worker/admin.ts).
+// Two crons: the publisher every ten minutes
 // (worker/publish.ts) and, daily, the Guard's tidy-up and the privacy
 // clean-up (worker/privacy.ts).
 import { EmailMessage } from 'cloudflare:email';
@@ -10,6 +11,7 @@ import { EmailMessage } from 'cloudflare:email';
 // (no guide content). Wrangler bundles the JSON into the Worker.
 import access from '../src/content/guides/access.json';
 import type { AccessFile } from '../src/lib/guides/types';
+import { ADMIN_PREFIX, adminSession, handleAdmin, type AdminDeps, type OutMail } from './admin';
 import { CONTACT_PATH, handleContact, type Deps, type EmailOut, type TurnstileResult } from './contact';
 import { DRAWING_PATH, handleDrawing } from './drawing';
 import { guideAudience, handleGuides, isGuidesPath, limitKey, MIN_PEPPER, type GuidesDeps } from './guides';
@@ -19,6 +21,7 @@ import { buildMime, forBinding } from './mime';
 import { notion } from './notion';
 import { privacySweep } from './privacy';
 import { publish } from './publish';
+import { routineTrigger } from './routine';
 import { handleSuggest, type SuggestDeps } from './suggest';
 
 // The Durable Object class must be exported from the Worker's main module.
@@ -68,6 +71,17 @@ interface Env {
   GITHUB_REPO?: string;
   /** Only for wrangler dev: a GitHub stand-in. */
   GITHUB_API?: string;
+
+  /** Admin log-on: a password of 16+ characters and an authenticator key (base32), both secrets. */
+  ADMIN_PASSWORD?: string;
+  ADMIN_TOTP_SECRET?: string;
+  /** Rate limiting binding: admin calls per minute per visitor. */
+  ADMIN_LIMIT: RateLimit;
+  /** send_email binding that may write to anyone, but only from noreply@kuschonink.com (emails to submitters). */
+  MAIL_OUT?: { send(message: unknown): Promise<unknown> };
+  /** The routine's API trigger (https://api.anthropic.com/v1/claude_code/routines/trig_…/fire) and its token (secrets). */
+  ROUTINE_FIRE_URL?: string;
+  ROUTINE_TOKEN?: string;
 }
 
 async function siteverify(secret: string, token: string, ip: string | null): Promise<TurnstileResult> {
@@ -141,6 +155,7 @@ const guidesDeps = (env: Env): GuidesDeps => ({
   now: () => Date.now(),
   log: (...args) => console.error(...args),
   suggest: (req, slug) => handleSuggest(req, slug, suggestDeps(env)),
+  isAdmin: (req) => adminSession(req, guardOf(env)),
 });
 
 /** The one Guard, in Western Europe (most visitors and the owner are there). */
@@ -161,7 +176,8 @@ const githubOf = (env: Env) => (env.GITHUB_TOKEN && env.GITHUB_REPO ? github({ t
 function suggestDeps(env: Env): SuggestDeps {
   const n = notionOf(env);
   return {
-    audienceFor: (req, slug) => guideAudience(req, slug, guidesDeps(env)),
+    // A guide's own cookie, or the admin's session (sent by "admin").
+    audienceFor: async (req, slug) => (await guideAudience(req, slug, guidesDeps(env))) ?? ((await adminSession(req, guardOf(env))) ? 'admin' : null),
     guard: guardOf(env),
     notion: n?.api ?? null,
     db: { suggestions: n?.db.suggestions ?? '', contacts: n?.db.contacts ?? '' },
@@ -216,6 +232,33 @@ async function runPublisher(env: Env, trigger: 'scheduled' | 'manual') {
   );
 }
 
+/** The routine's trigger: only Anthropic's routine endpoint, with its own token (worker/routine.ts). */
+function routineOf(env: Env): AdminDeps['fireRoutine'] {
+  return routineTrigger({ url: env.ROUTINE_FIRE_URL, token: env.ROUTINE_TOKEN, fetch: (i, o) => fetch(i, o) });
+}
+
+function adminDeps(env: Env): AdminDeps {
+  const n = notionOf(env);
+  return {
+    password: () => env.ADMIN_PASSWORD,
+    totpSecret: () => env.ADMIN_TOTP_SECRET,
+    guard: guardOf(env),
+    allow: async (key) => (await env.ADMIN_LIMIT.limit({ key })).success,
+    visitor: limitKey,
+    access: access as AccessFile,
+    notion: n?.api ?? null,
+    db: n?.db ?? { suggestions: '', contacts: '', log: '' },
+    mail: env.MAIL_OUT ? (m: OutMail) => env.MAIL_OUT!.send({ to: m.to, from: m.from, replyTo: m.replyTo, subject: m.subject, text: m.text, html: m.html }) : null,
+    fireRoutine: routineOf(env),
+    publish: n && githubOf(env) ? () => runPublisher(env, 'manual') : null,
+    gh: githubOf(env),
+    liveBuild: () => liveBuild(env),
+    repoUrl: `https://github.com/${env.GITHUB_REPO || 'itom123/kuschonink.com'}`,
+    now: () => Date.now(),
+    log: (...args) => console.error(...args),
+  };
+}
+
 const DAILY = '17 3 * * *';
 
 export default {
@@ -224,6 +267,7 @@ export default {
     if (url.pathname === CONTACT_PATH) return handleContact(request, depsFor(env));
     if (url.pathname === DRAWING_PATH) return handleDrawing(request, depsFor(env));
     if (isGuidesPath(url.pathname)) return handleGuides(request, guidesDeps(env));
+    if (url.pathname.startsWith(`${ADMIN_PREFIX}/`)) return handleAdmin(request, adminDeps(env));
     return env.ASSETS.fetch(request);
   },
 

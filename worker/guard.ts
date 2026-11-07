@@ -28,6 +28,7 @@ export interface SessionCheck { ok: boolean; exp: number }
 export interface GuardApi {
   hit(key: string, limit: number, windowS: number): Promise<Hit>;
   claim(key: string, ttlS: number, value?: string): Promise<Claim>;
+  held(key: string): Promise<string | null>;
   settle(key: string, value: string, ttlS: number): Promise<void>;
   release(key: string): Promise<void>;
   sessionCreate(ttlS: number): Promise<{ id: string; exp: number }>;
@@ -84,6 +85,13 @@ export class GuardCore implements GuardApi {
     if (held && held.exp > now) return { fresh: false, value: held.v };
     await this.store.put<Held>(k, { v: value, exp: now + ttlS * 1000 });
     return { fresh: true, value };
+  }
+
+  /** What a key holds now, or null when nothing (or only something expired) is held. */
+  async held(key: string): Promise<string | null> {
+    this.check(key, 1);
+    const h = await this.store.get<Held>(`k:${key}`);
+    return h && h.exp > this.now() ? h.v : null;
   }
 
   /** Change what a held key says (e.g. "pending" → the reference, or "sent"), and how long it is held. */

@@ -71,7 +71,7 @@ export async function startUp() {
   await logOn();
 }
 
-/** The log-on box. OK or Cancel both log on (Cancel as the last name used), as in Windows 98. */
+/** The log-on box. OK or Cancel both log on, as Guest (everyone is), as in Windows 98. */
 export function logOn(): Promise<string> {
   html.dataset.boot = 'login';
   shield(true);
@@ -79,7 +79,9 @@ export function logOn(): Promise<string> {
   const form = b.querySelector<HTMLFormElement>('[data-login-form]')!;
   const name = b.querySelector<HTMLInputElement>('#login-name')!;
   const pass = b.querySelector<HTMLInputElement>('#login-pass')!;
+  // Everyone is Guest: the name can't be changed (admin has its own log-on, /admin).
   name.value = session.lastUser();
+  name.readOnly = true;
   pass.value = '';
   // The password box only ever shows stars and keeps nothing.
   pass.oninput = () => (pass.value = '*'.repeat(pass.value.length));
@@ -91,36 +93,37 @@ export function logOn(): Promise<string> {
     }
   });
   return new Promise((resolve) => {
-    const done = (user: string) => {
+    // Every way out logs on as Guest: nothing typed counts (session.ts).
+    const done = () => {
       form.onsubmit = null;
       removeEventListener('keydown', esc, true);
-      resolve(finish(user));
+      resolve(finish());
     };
     const esc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        done(session.lastUser());
+        done();
       }
     };
     addEventListener('keydown', esc, true);
     form.onsubmit = (e) => {
       e.preventDefault();
-      done(name.value);
+      done();
     };
     b.querySelectorAll<HTMLElement>('[data-login="cancel"]').forEach((btn) => {
       btn.onclick = (e) => {
         e.preventDefault();
-        done(session.lastUser());
+        done();
       };
     });
     const help = b.querySelector<HTMLElement>('[data-login-help]');
-    if (help) help.onclick = () => tipFor(help, tr({ en: 'There is no account and no password. Type any name (or none) and press OK.', zh: '没有帐户，也没有密码。键入任意名称（或者不填），然后按“确定”。' }), 6000);
+    if (help) help.onclick = () => tipFor(help, tr({ en: 'There is no account and no password: everyone logs on as Guest. Press OK.', zh: '没有帐户，也没有密码：每个人都以 Guest 身份登录。请按“确定”。' }), 6000);
   });
 }
 
-function finish(user: string) {
+function finish() {
   unlockAudio();
-  const n = session.logOn(user);
+  const n = session.logOn();
   delete html.dataset.boot;
   box().dataset.step = 'bios';
   shield(false);
@@ -173,6 +176,12 @@ export async function logOff() {
     sound: false,
   });
   if (r !== 'Yes') return;
+  // Administrator logs off from admin mode too (the server ends the session).
+  if (html.hasAttribute('data-admin')) {
+    await fetch('/v1/admin/logout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}', credentials: 'same-origin' }).catch(() => {});
+    document.cookie = 'kus98_admin_ui=; path=/; max-age=0; SameSite=Lax';
+    html.removeAttribute('data-admin');
+  }
   play('logoff');
   closeAll();
   session.logOff();
