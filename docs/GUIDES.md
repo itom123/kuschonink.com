@@ -954,7 +954,10 @@ GitHub Action 每 10 分钟从这个仓库更新。所以例程推不了这个�
    里的那四样东西，下一次同步就会带过去。副本的 `.claude/settings.json` 让例程照写的 `./tool …` 和 `npm ci --no-audit --no-fund`
    直接运行，拒绝 `git push`、`git commit`、`git remote` 和 `gh`；每次同步还写一份 `package-lock.json`，让例程的 `npm ci` 装的
    正是锁定的 sharp。`.synced` 每月变一次，让副本不会 60 天没有提交（那样 GitHub 会关掉公开仓库的定时
-   工作流）；要是还是关了，在 Actions ▸ Sync ▸ **Enable workflow** 重新打开。要重建的话：新建这个公开仓库，放进那四样东西（用你自己的 GitHub 账号提交：GitHub 按最后改过定时那一行的账号来跑定时任务，
+   工作流）；要是还是关了，在 Actions ▸ Sync ▸ **Enable workflow** 重新打开。要是工作流开着，定时却从来不跑（Actions 里
+   只有手动运行的记录），那是最后改定时那一行的提交出自没有副本权限的账号，关掉再打开也没用：在这个仓库里改一下那一行的值，
+   等网站运行了那个提交，再手动运行一次工作流（Actions ▸ Sync ▸ **Run workflow**）；同步会用你的账号提交这个改动，之后定时就照常运行。
+   要重建的话：新建这个公开仓库，放进那四样东西（用你自己的 GitHub 账号提交：GitHub 按最后改过定时那一行的账号来跑定时任务，
    没有这个仓库权限的账号改的，定时可能永远不跑）；
    生成一对 SSH 密钥，公钥加成可写的部署密钥（Settings ▸ Deploy keys，勾选 Allow write access），私钥存成 Actions secret
    `SYNC_DEPLOY_KEY`，不在别处留副本；加上规则（所有分支：Restrict creations、Restrict updates、Restrict deletions、Block
@@ -1056,7 +1059,13 @@ Set it up once:
    the sharp locked there. `.synced` changes once a month, so that the
    copy never goes 60 days without a commit (GitHub then turns a public
    repository's scheduled workflows off); if it was turned off anyway, turn
-   it back on in Actions ▸ Sync ▸ **Enable workflow**. To make it again:
+   it back on in Actions ▸ Sync ▸ **Enable workflow**. If the workflow is on
+   but its schedule never runs (Actions lists only runs started by hand), the
+   last change to its cron line was committed by an account without access
+   to the copy, and turning it off and on doesn't help: change that line's
+   value here and, once the site runs that commit, run the workflow once by
+   hand (Actions ▸ Sync ▸ **Run workflow**); the sync commits the change as
+   you, and the schedule runs from then on. To make it again:
    create that public repository with the four files, committed as your own
    GitHub account (GitHub runs a schedule for the account that last changed
    its cron line, and one changed by an account without access to the

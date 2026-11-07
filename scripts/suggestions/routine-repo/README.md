@@ -31,3 +31,10 @@ kuschonink.com; the next sync brings them here.
 commit: GitHub turns a public repository's scheduled workflows off after that.
 If the workflow was turned off anyway, turn it back on in Actions ▸ Sync ▸
 Enable workflow (or `gh workflow enable sync.yml -R itom123/kuschonink-routine`).
+
+If the workflow is on but its schedule never runs (Actions lists only runs
+started by hand), the last change to its cron line was committed by an account
+without access to this repository, and turning the workflow off and on doesn't
+help. Change the line's value in kuschonink.com; once the site runs that
+commit, run the workflow once by hand (Actions ▸ Sync ▸ Run workflow). The
+sync commits the change as the owner, and the schedule runs from then on.

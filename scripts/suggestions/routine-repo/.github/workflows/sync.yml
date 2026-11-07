@@ -8,10 +8,11 @@ name: Sync
 on:
   schedule:
     # Every 10 minutes, off the busy minute :00. GitHub runs a schedule for the
-    # account that last changed this line, so the sync's commits are credited to
-    # the owner (below): commits by an account without access to the copy left
-    # it never running.
-    - cron: '3,13,23,33,43,53 * * * *'
+    # account that wrote the last commit changing this line, so the sync's
+    # commits are credited to the owner (below). Commits by accounts without
+    # access to the copy left it never running, and turning the workflow off
+    # and on doesn't help: only a new value here, committed as the owner, does.
+    - cron: '4,14,24,34,44,54 * * * *'
   workflow_dispatch:
 permissions:
   contents: read
