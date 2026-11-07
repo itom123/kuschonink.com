@@ -4,7 +4,11 @@
    styled by doc.css. */
 
 :root {
-  --taskbar-h: 30px;
+  /* The taskbar's own height, and the space it takes: on an iPad or iPhone the
+     home indicator's strip (the safe area) comes under the bar, so windows and
+     the desktop stop above both and the bar's buttons keep their full height. */
+  --taskbar-bar: 30px;
+  --taskbar-h: calc(var(--taskbar-bar) + env(safe-area-inset-bottom, 0px));
   --desktop-bg: #008080;
   --face: #c0c0c0;
   --hi: #ffffff;
@@ -24,7 +28,7 @@
   --dither: repeating-conic-gradient(var(--hi) 0 25%, var(--face) 0 50%) 0 0 / 2px 2px;
 }
 @media (pointer: coarse) {
-  :root { --taskbar-h: 40px; }
+  :root { --taskbar-bar: 40px; }
 }
 
 html { height: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
