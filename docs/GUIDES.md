@@ -25,6 +25,10 @@ directly.
 `kuschonink.com/guides/<名字>`，第一份是 `paris-photo-days-2026`。
 
 - 没有密码时，只能看到程序名“导览”和每份导览的中性标题，看不到任何地点或日程。
+- 没有选导览的中间页。从桌面图标、“开始 ▸ 程序 ▸ 导览”、“运行”、“查找”或帮助打开“导览”，
+  或者直接输入 `kuschonink.com/guides`（有没有 JavaScript 都一样），都会直接进入第一份列出的导览
+  （`guide.json` 里 `"listed": true`，按 `access.json` 里的顺序）：没登录时是密码对话框，已登录就是导览本身。
+  有不止一份导览时，在密码对话框里选择要看哪一份。一份都没列出时，`/guides` 只显示“这里还没有导览”。
 - 输入密码后，服务器（Cloudflare Worker）决定你属于哪一类读者（audience），给你那一类读者的版本。
   “访客”（visitor）看到公开内容；“学员”（fotofilmic）看到访客的全部内容，另加只给学员的内容。
 - 导览页面不进搜索引擎（`noindex`，不在 sitemap 里）。
@@ -38,6 +42,13 @@ dates and texts. A guide lives at `kuschonink.com/guides/<slug>`; the first is
 
 - Without a password, people see only the program's name and each guide's
   neutral public title. No places, no dates.
+- There is no page for choosing a guide. The desktop icon, Start ▸ Programs ▸
+  Field Guide, Run, Find, Help and typing `kuschonink.com/guides` (with or
+  without JavaScript) all go straight to the first listed guide
+  (`"listed": true` in `guide.json`, in `access.json` order): its password box,
+  or the guide itself once logged on. With more than one guide, people choose
+  theirs in the password box. With none listed, `/guides` only says there are
+  no guides yet.
 - With a password, the server (the Cloudflare Worker) works out which
   **audience** the visitor belongs to and serves that audience's version.
   Visitors (`visitor`) see the public content. Participants (`fotofilmic`) see
@@ -312,11 +323,11 @@ both when the site is built.
 ## 5. 新建一份导览 Adding a new guide
 
 1. 复制整个文件夹 `src/content/guides/paris-photo-days-2026/`，改名，比如 `lisbon-2027`（小写，连字符）。
-2. 改 `guide.json`：标题、`public`（中性的公开标题，不写人名、地点或团体名）、`listed`（是否在首页列出）、
+2. 改 `guide.json`：标题、`public`（中性的公开标题，不写人名、地点或团体名）、`listed`（是否在密码对话框里供人选择）、
    `city`、`timezone`（如 `"Europe/Lisbon"`）、`checked`、日期、分级、主题、片区、`texts`、`sensitive`。
 3. 清空 `items.json`、`places.json`、`events.json`、`routes.json`、`listings.json` 里的旧内容，再填新的。
    每个文件都要留着，列表可以是空的。没有日期的导览（比如咖啡馆）不写 `window`，就没有日期筛选。
-4. 在 `access.json` 的 `guides` 里加一行：`"lisbon-2027": ["visitor"]`。
+4. 在 `access.json` 的 `guides` 里加一行：`"lisbon-2027": ["visitor"]`。顺序有用：打开“导览”时进入的是排在最前面的那份列出的导览。
 5. 建 `public/guides/lisbon-2027/img/` 和 `map/`。
 6. **底图**：目前还没有自动生成底图的工具。请让 Claude 做（说明城市和范围），它会生成底图图片和 `map.json`。
    底图的中心不要正对任何只给部分读者看的地点（比如工作地点）：访客也拿得到底图，看得出它的中心。构建会检查这一点（`is too close to the centre of map view`）；要偏开，就裁掉一边，再在 `map.json` 里改 `originX`/`originY` 和 `width`/`height`。
@@ -324,13 +335,14 @@ both when the site is built.
 1. Copy the whole folder `src/content/guides/paris-photo-days-2026/` and
    rename it, for example `lisbon-2027` (lower case, with hyphens).
 2. Edit `guide.json`: the title, `public` (a neutral public title: no people,
-   venues or group names), `listed` (shown on the home list or not), `city`,
+   venues or group names), `listed` (offered in the password box or not), `city`,
    `timezone` (e.g. `"Europe/Lisbon"`), `checked`, the dates, tiers, themes,
    zones, `texts` and `sensitive`.
 3. Empty `items.json`, `places.json`, `events.json`, `routes.json` and
    `listings.json`, then fill them. Keep every file, even with an empty list.
    A guide without dates (cafés, say) has no `window`, so no day filter.
 4. Add a line to `guides` in `access.json`: `"lisbon-2027": ["visitor"]`.
+   Its place matters: Field Guide opens the first listed guide in that list.
 5. Create `public/guides/lisbon-2027/img/` and `map/`.
 6. **Base maps**: there's no base-map tool yet. Ask Claude (name the city and
    the area); it makes the images and `map.json`.
@@ -373,7 +385,8 @@ both when the site is built.
 - `GUIDES_PASSWORD_FOTOFILMIC`：学员的密码；
 - `GUIDES_COOKIE_SECRET`（建议设置）：给登录 cookie 签名的密钥，这样别人伪造不了登录状态。
   用 32 个以上的随机字符，比如让密码管理器生成一个；不用记住它，也不要告诉别人。
-  没设的话，Worker 用已有的 `TURNSTILE_SECRET` 签名。
+  没设的话，Worker 用已有的 `TURNSTILE_SECRET` 签名；少于 24 个字符时，两个一起签名。
+  （苹果和 Chrome 自动生成的密码往往不够长。）
 
 每类读者的密码叫什么名字，写在 `access.json` 里。
 
@@ -384,7 +397,7 @@ both when the site is built.
 - 每个密码至少 6 个字符，两类读者的密码必须不一样。不分大小写，多余的空格和全角字符都不算。
   （如果两类读者用了同一个密码，进去的是权限低的那一类。）
 - 改了某类读者的密码，这一类读者都要重新输入；其他读者不受影响。
-- 改了签名用的密钥（`GUIDES_COOKIE_SECRET`，没设它时是 `TURNSTILE_SECRET`），所有人都要重新输入密码。
+- 改了签名用的密钥（`GUIDES_COOKIE_SECRET`，没设它时是 `TURNSTILE_SECRET`；它少于 24 个字符时两个都算），所有人都要重新输入密码。
   第一次设置 `GUIDES_COOKIE_SECRET` 也一样。
 - **只在没有比正式版更新的 PR 预览时修改 secret。** 在控制台改 secret，会把“最新上传的版本”部署上线；
   如果最新的是某个 PR 的预览，那个预览就成了正式网站。先合并或关闭打开的 PR，等 `main` 部署完再改。
@@ -400,7 +413,9 @@ Passwords and keys **never** go in the repo. They are all Cloudflare secrets:
   cookies, so nobody can forge one. Use 32 or more random characters, for
   example from a password manager; you never need to remember it, and nobody
   else needs it. Without it, the Worker signs with the existing
-  `TURNSTILE_SECRET`.
+  `TURNSTILE_SECRET`; under 24 characters, it signs together with
+  `TURNSTILE_SECRET`. (Apple's and Chrome's generated passwords are
+  usually too short.)
 
 `access.json` names each audience's password secret.
 
@@ -416,7 +431,8 @@ variables, not the Worker.
 - Changing an audience's password logs that audience out; the others stay
   logged on.
 - Changing the signing key (`GUIDES_COOKIE_SECRET`, or `TURNSTILE_SECRET`
-  while that isn't set) logs everyone out. So does setting
+  while that isn't set; both, while it is under 24 characters) logs everyone
+  out. So does setting
   `GUIDES_COOKIE_SECRET` for the first time.
 - **Change secrets only when no PR preview is newer than production.** A
   secret edit in the dashboard deploys the *latest uploaded* version; if
@@ -513,6 +529,7 @@ below). Any file may have a `_comment`, which is never shown.
 | `audiences[].secret` | Cloudflare secret 的名字（不是密码） | The Cloudflare secret's name (never the password) |
 | `audiences[].includes?` | 也能看到哪些读者的内容 | Audiences whose content this one also sees |
 | `guides` | 导览名 → 能打开它的读者 | Guide slug → the audiences that may open it |
+| `tiles?` | 导览名 → 街道级地图瓦片的范围 `[西, 南, 东, 北]`（度），一般就是大区底图的范围；写了才有瓦片。只写数字，不写地点 | Guide slug → the area of its street-level tiles, `[west, south, east, north]` in degrees (usually the region view's area); without it the guide has no tiles. Numbers only, never a place |
 
 ### `guide.json`
 
@@ -520,7 +537,7 @@ below). Any file may have a `_comment`, which is never shown.
 | --- | --- | --- |
 | `title`/`titleZh?`, `subtitle?`/`subtitleZh?` | 打开后显示的完整标题 | The full title, once open |
 | `public` | `{ title, titleZh?, subtitle?, subtitleZh? }`：输入密码前显示的中性标题 | The neutral title shown before the password |
-| `listed` | 是否在导览首页列出 | Shown on the Field Guide's home list |
+| `listed` | 是否在密码对话框里供人选择；排在最前面（按 `access.json` 的顺序）的那份，就是打开“导览”时进入的导览 | Offered in the password box's choice of guides; the first listed one (in `access.json` order) is where Field Guide opens |
 | `city`/`cityZh?` | 城市 | The city |
 | `timezone` | 时区（IANA），如 `Europe/Paris`；“今天”按它算 | IANA time zone; "today" follows it |
 | `timezoneLabel?`/`timezoneLabelZh?` | 给人看的时区说明 | The time zone as people read it |

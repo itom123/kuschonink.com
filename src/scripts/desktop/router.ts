@@ -1,14 +1,19 @@
 // Opens pages inside windows. Every URL is a real page; with JavaScript a
 // click fetches that page and shows its window on the desktop instead of
 // loading a new document. Anything unusual falls back to a normal page load.
-import { addressFor, addressToPath, appFor, cleanPath, keepsQuery, upOf } from '../../lib/apps';
+import { addressFor, addressToPath, appFor, cleanPath, keepsQuery, upOf, type AppId } from '../../lib/apps';
 import { msgbox } from './dialogs';
 import { settings } from './settings';
 import { play } from './sound';
 import * as wm from './wm';
 import { emit, html } from './util';
 
-interface Page { html: string; status: number }
+interface Page {
+  html: string;
+  status: number;
+  /** Where a redirect led, when it led to another page (the Field Guide's /guides goes to a guide): its path and its own query. */
+  url?: string;
+}
 export interface NavOpts {
   /** The element that was clicked: a link inside a window opens in that window. */
   from?: Element | null;
@@ -88,12 +93,17 @@ async function fetchPage(url: URL, reload = false, signal?: AbortSignal): Promis
       // second navigation stops the first, and then waits for the same page).
       signal: reload ? signal : undefined,
     });
-    if (new URL(res.url).origin !== location.origin) throw new Error('cross-origin');
+    const end = new URL(res.url);
+    if (end.origin !== location.origin) throw new Error('cross-origin');
     if (!(res.headers.get('content-type') ?? '').includes('text/html')) throw new Error('not-html');
-    const page = { html: await res.text(), status: res.status };
+    const page: Page = { html: await res.text(), status: res.status };
+    // Redirected to another page, not just to another spelling of this one (/image/ → /image).
+    const to = cleanPath(end.pathname);
+    if (res.redirected && (to !== key || end.search)) page.url = to + end.search;
     if (/no-store/i.test(res.headers.get('cache-control') ?? '')) {
       cache.delete(key);
       noStore.add(key);
+      if (page.url) noStore.add(to);
     } else if (res.ok) {
       noStore.delete(key);
       cache.set(key, page);
@@ -237,32 +247,48 @@ export function notFound(what: string, owner?: Element | null) {
   });
 }
 
+/** A window already showing this page comes forward, and follows the query or #hash. */
+function bringForward(win: wm.Win, url: URL, app: AppId, o: NavOpts) {
+  const target = cleanPath(url.pathname) + (keepsQuery(app) ? url.search : '');
+  if (wm.urlOf(win) !== target) {
+    wm.setUrl(win, target);
+    emit(win.el, 'desktop:content', { url: target, same: true });
+  }
+  wm.focus(win, { history: false });
+  if (url.hash) scrollToHash(win, url.hash);
+  writeHistory(url, o.history ?? 'push', app);
+  wm.syncTitle(win);
+}
+
+const shows = (win: wm.Win, path: string) => cleanPath(wm.urlOf(win).split('?')[0]) === path;
+
+/**
+ * Where a redirected page landed: its path, its own query or else the one asked
+ * for (pages are fetched without it; the Worker keeps it), and the #hash asked for.
+ */
+function landed(asked: URL, to: string): URL {
+  const u = new URL(to, location.origin);
+  if (!u.search) u.search = asked.search;
+  u.hash = asked.hash;
+  return u;
+}
+
 /** Open a site page in its program's window. */
 export async function navigate(input: string | URL, o: NavOpts = {}): Promise<void> {
-  const url = new URL(input, location.href);
-  if (url.origin !== location.origin) {
-    window.open(url.href, '_blank', 'noopener');
+  const asked = new URL(input, location.href);
+  if (asked.origin !== location.origin) {
+    window.open(asked.href, '_blank', 'noopener');
     return;
   }
-  const path = cleanPath(url.pathname);
-  const app = appFor(path);
+  const askedPath = cleanPath(asked.pathname);
+  // The program asked for owns this navigation (its sequence, its Stop button), wherever a redirect leads.
+  const app = appFor(askedPath);
   const fromWin = wm.byEl(o.from ?? null);
-  let win = fromWin && fromWin.app === app && !fromWin.dialog ? fromWin : wm.find(app);
-  const target = path + (keepsQuery(app) ? url.search : '');
+  const winOf = (a: AppId) => (fromWin && fromWin.app === a && !fromWin.dialog ? fromWin : wm.find(a));
+  let win = winOf(app);
   const winHistory = o.winHistory ?? true;
 
-  if (win && !o.reload && cleanPath(wm.urlOf(win).split('?')[0]) === path) {
-    // Already showing this page: bring it forward (and follow the query or #hash).
-    if (wm.urlOf(win) !== target) {
-      wm.setUrl(win, target);
-      emit(win.el, 'desktop:content', { url: target, same: true });
-    }
-    wm.focus(win, { history: false });
-    if (url.hash) scrollToHash(win, url.hash);
-    writeHistory(url, o.history ?? 'push', app);
-    wm.syncTitle(win);
-    return;
-  }
+  if (win && !o.reload && shows(win, askedPath)) return bringForward(win, asked, app, o);
 
   const seq = (seqs.get(app) ?? 0) + 1;
   seqs.set(app, seq);
@@ -271,19 +297,20 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
   controllers.set(app, ctrl);
   if (settings.get().navClick && o.source !== 'script') play('click');
   let busy = false;
+  const busyWin = win;
   const busyTimer = setTimeout(() => {
     busy = true;
-    setBusy(win, true);
+    setBusy(busyWin, true);
   }, 120);
   const done = () => {
     clearTimeout(busyTimer);
-    if (busy) setBusy(win, false);
+    if (busy) setBusy(busyWin, false);
     busy = false;
   };
 
   let page: Page;
   try {
-    page = await fetchPage(url, o.reload, ctrl.signal);
+    page = await fetchPage(asked, o.reload, ctrl.signal);
   } catch (err) {
     done();
     if ((err as Error).name === 'AbortError' || seqs.get(app) !== seq || o.restore) return;
@@ -292,19 +319,35 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
         title: 'Xiangyin 98',
         icon: 'error',
         text: {
-          en: `Xiangyin 98 cannot open ${addressFor(path)}.\n\nCheck your Internet connection, then try again.`,
-          zh: `Xiangyin 98 无法打开 ${addressFor(path)}。\n\n请检查你的 Internet 连接，然后再试一次。`,
+          en: `Xiangyin 98 cannot open ${addressFor(askedPath)}.\n\nCheck your Internet connection, then try again.`,
+          zh: `Xiangyin 98 无法打开 ${addressFor(askedPath)}。\n\n请检查你的 Internet 连接，然后再试一次。`,
         },
         owner: win?.el,
       });
       return;
     }
-    location.assign(url.href);
+    location.assign(asked.href);
     return;
   } finally {
     if (controllers.get(app) === ctrl) controllers.delete(app);
   }
   if (seqs.get(app) !== seq) return done();
+
+  // Redirected (the Field Guide's /guides goes to its first guide): from here on the
+  // window, its address and history follow the page it landed on, not the one asked for.
+  const url = page.url ? landed(asked, page.url) : asked;
+  const path = cleanPath(url.pathname);
+  const dest = appFor(path);
+  const target = path + (keepsQuery(dest) ? url.search : '');
+  if (page.url) {
+    win = winOf(dest);
+    if (win && !o.reload && shows(win, path)) {
+      done();
+      // It comes forward as it was left (a guide keeps its place, day and filters in its
+      // query), unless the address asked for, or the redirect, carried a query of its own.
+      return bringForward(win, url.search ? url : new URL(wm.urlOf(win) + url.hash, location.origin), dest, o);
+    }
+  }
 
   const doc = new DOMParser().parseFromString(page.html, 'text/html');
   doc.querySelectorAll('noscript').forEach((n) => n.remove());
@@ -323,7 +366,7 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
   await mergeHead(doc);
   if (seqs.get(app) !== seq) return done();
 
-  writeHistory(url, o.history ?? 'push', app);
+  writeHistory(url, o.history ?? 'push', dest);
   const scripts = [...doc.querySelectorAll<HTMLScriptElement>('script')].filter(isExecutable);
   incoming.querySelectorAll<HTMLScriptElement>('script').forEach((s) => {
     if (isExecutable(s)) s.remove();
@@ -349,7 +392,7 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
   emit(win.el, 'desktop:content', { url: target });
   document.dispatchEvent(new Event('astro:page-load'));
   const titles = wm.titlesOf(win);
-  emit(document, 'desktop:navigate', { url: target, app, title: titles.en, titleZh: titles.zh, icon: win.el.dataset.icon ?? 'document', docTitle, restored: !!o.restore });
+  emit(document, 'desktop:navigate', { url: target, app: dest, title: titles.en, titleZh: titles.zh, icon: win.el.dataset.icon ?? 'document', docTitle, restored: !!o.restore });
   wm.focus(win, { history: false });
   if (o.source === 'keyboard') {
     const h1 = win.el.querySelector<HTMLElement>('[data-window-body] h1');

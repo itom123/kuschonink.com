@@ -34,13 +34,16 @@ const W = {
   zoomIn: { en: 'Zoom in', zh: '放大' },
   zoomOut: { en: 'Zoom out', zh: '缩小' },
   whole: { en: 'Whole map', zh: '全图' },
-  me: { en: 'Where am I? Shows you on the map, and the nearest places', zh: '我在哪里？在地图上标出你和离你最近的地点' },
+  // A toggle (aria-pressed): app.ts swaps the title to "press to stop" while it follows you (words.ts meButton/meButtonOn).
+  me: { en: 'Where am I? Follows you live on the map and lists the nearest places', zh: '我在哪里？在地图上实时跟随你，并列出离你最近的地点' },
   heat: { en: 'Heat map', zh: '热力图' },
   area: other ? { en: `Show ${other.name.en}`, zh: `显示${other.name.zh || other.name.en}` } : null,
   legend: { en: 'Legend', zh: '图例' },
   walking: { en: 'Walking route', zh: '步行路线' },
   transit: { en: 'Public transport route', zh: '公共交通路线' },
   heatKey: { en: 'Heat: more recommended places nearby', zh: '热力：附近推荐地点越多越热' },
+  heatLess: { en: 'less', zh: '少' },
+  heatMore: { en: 'more', zh: '多' },
   noJs: { en: 'The interactive map needs JavaScript; everything else is below.', zh: '交互地图需要 JavaScript；其余内容都在下方。' },
 };
 const credit = [view.map.attribution, view.credits.points.en].filter(Boolean).join(' · ');
@@ -74,7 +77,7 @@ const creditZh = [view.map.attribution, view.credits.points.zh || view.credits.p
 
   <div class="gd-mapui" data-js-only>
     <div class="gd-mapui-zoom">
-      <button type="button" data-cmd="gd-locate" {...attr('aria-label', W.me)} {...attr('title', W.me)}><span class="ico ico20 ico-tb-locate" aria-hidden="true"></span></button>
+      <button type="button" data-cmd="gd-locate" aria-pressed="false" {...attr('aria-label', W.me)} {...attr('title', W.me)}><span class="ico ico20 ico-tb-locate" aria-hidden="true"></span></button>
       <button type="button" data-gd-zoom="in" {...attr('aria-label', W.zoomIn)} {...attr('title', W.zoomIn)}><span class="ico ico20 ico-tb-zoomin" aria-hidden="true"></span></button>
       <button type="button" data-gd-zoom="out" {...attr('aria-label', W.zoomOut)} {...attr('title', W.zoomOut)}><span class="ico ico20 ico-tb-zoomout" aria-hidden="true"></span></button>
       <button type="button" data-gd-zoom="home" {...attr('aria-label', W.whole)} {...attr('title', W.whole)}><span class="ico ico20 ico-tb-fit" aria-hidden="true"></span></button>
@@ -106,6 +109,8 @@ const creditZh = [view.map.attribution, view.credits.points.zh || view.credits.p
         </>
       )}
       <li data-js-only class="gd-key-heat"><span class="gd-heat-swatch" aria-hidden="true"></span> <Bi t={W.heatKey} /></li>
+      {/* The ramp's key, light to dark; the line above already says it in words. */}
+      <li data-js-only class="gd-key-heat gd-key-ramp" aria-hidden="true"><Bi t={W.heatLess} /> <span class="gd-heat-ramp"></span> <Bi t={W.heatMore} /></li>
     </ul>
   </details>
 

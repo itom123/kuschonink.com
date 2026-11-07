@@ -2,7 +2,9 @@
 //
 // - Each program's window, as it was last left: where and how big, maximised
 //   or not, and the bars it shows (View ▸ Toolbars, Status Bar), the way
-//   Windows 98 remembers folder windows. localStorage, so it lasts.
+//   Windows 98 remembers folder windows. localStorage, so it lasts. Not while
+//   it shows a dialog-sized page (the Field Guide's log-on box): that always
+//   opens in the middle, and the program's place is kept for its other pages.
 // - The desktop, for a refresh: the pages open in windows, front to back,
 //   minimised or not, how far down each one was read, and each one's Back and
 //   Forward. sessionStorage: this tab only, gone when the tab is closed, and put
@@ -22,7 +24,7 @@ function keep(app: string, patch: wm.Place) {
 
 /** View ▸ Toolbars or Status Bar was used: the program keeps showing (or hiding) them. */
 export function rememberBars(win: wm.Win) {
-  if (!win.dialog) keep(win.app, { bars: win.el.dataset.hide ?? '' });
+  if (!win.dialog && !wm.dialogSized(win)) keep(win.app, { bars: win.el.dataset.hide ?? '' });
 }
 
 // ---- The desktop, for a refresh ----
@@ -60,20 +62,27 @@ function snapshot(): Desk {
   const active = wm.getActive();
   const wins = wm.list().filter(wm.isPage).map((w): Saved => {
     const from = Math.max(0, w.hist.length - 30);
-    return {
+    const s: Saved = {
       app: w.app,
       url: wm.urlOf(w),
       state: w.state,
+      z: Number(w.el.style.zIndex) || 0,
+      scroll: Math.round(bodyOf(w)?.scrollTop ?? 0),
+      hist: w.hist.slice(from),
+      hi: Math.max(0, w.hi - from),
+    };
+    // A dialog-sized page has no place to put back: after the refresh it opens in the
+    // middle again, or, if the page is now the full one (logged on meanwhile), where
+    // the program was last left (wm.ts adopt).
+    if (wm.dialogSized(w)) return s;
+    return {
+      ...s,
       x: Math.round(w.x),
       y: Math.round(w.y),
       w: Math.round(w.w),
       h: Math.round(w.h),
       max: w.state === 'max' || (w.state === 'min' && w.restore === 'max'),
       bars: w.el.dataset.hide ?? '',
-      z: Number(w.el.style.zIndex) || 0,
-      scroll: Math.round(bodyOf(w)?.scrollTop ?? 0),
-      hist: w.hist.slice(from),
-      hi: Math.max(0, w.hi - from),
     };
   });
   return { v: 1, wins, active: active && wm.isPage(active) ? active.app : null };
@@ -100,8 +109,9 @@ function saveSoon() {
 /** A window was moved, sized, maximised, minimised or restored. */
 function onResize(e: Event) {
   const win = wm.byEl(e.target as Element);
-  // On a phone every window fills the screen: there's no place to remember.
-  if (win && ready && !win.dialog && !isCompact()) {
+  // On a phone every window fills the screen: there's no place to remember. Nor is
+  // there for a dialog-sized page: the program's place is for its other pages.
+  if (win && ready && !win.dialog && !wm.dialogSized(win) && !isCompact()) {
     const p: wm.Place = { x: Math.round(win.x), y: Math.round(win.y), w: Math.round(win.w), h: Math.round(win.h) };
     // With "Always maximize windows" on, that setting decides, not the window.
     if (!settings.get().alwaysMax) p.max = win.state === 'max' || (win.state === 'min' && win.restore === 'max');

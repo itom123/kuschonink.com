@@ -9,7 +9,7 @@
     "preview": "wrangler dev",
     "deploy": "npm run build && wrangler deploy",
     "check": "astro check",
-    "test": "node --experimental-strip-types --no-warnings worker/contact.test.mts && node --experimental-strip-types --no-warnings worker/drawing.test.mts && node --experimental-strip-types --no-warnings src/scripts/paint/fill.test.mts && node --experimental-strip-types --no-warnings src/lib/guides/guides.test.mts && node --experimental-strip-types --no-warnings worker/guides.test.mts && node --experimental-strip-types --no-warnings src/scripts/guide/camera.test.mts && node --experimental-strip-types --no-warnings src/scripts/guide/find.test.mts"
+    "test": "node --experimental-strip-types --no-warnings worker/contact.test.mts && node --experimental-strip-types --no-warnings worker/drawing.test.mts && node --experimental-strip-types --no-warnings src/scripts/paint/fill.test.mts && node --experimental-strip-types --no-warnings src/lib/guides/guides.test.mts && node --experimental-strip-types --no-warnings worker/guides.test.mts && node --experimental-strip-types --no-warnings src/scripts/guide/camera.test.mts && node --experimental-strip-types --no-warnings src/scripts/guide/find.test.mts && node --experimental-strip-types --no-warnings src/scripts/guide/heat.test.mts && node --experimental-strip-types --no-warnings src/scripts/guide/order.test.mts && node --experimental-strip-types --no-warnings src/scripts/guide/tiles.test.mts"
   },
   "dependencies": {
     "astro": "^7.4.1",

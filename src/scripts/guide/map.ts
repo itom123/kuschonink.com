@@ -3,19 +3,31 @@
 // GuideMap.astro: the base image and the pin links stay, their %-positions
 // give way to transforms. World units are z14 global pixels (core.ts project()).
 //
-// Layers inside .gd-stage: base images (one per map view, the extra ones
-// loaded when first shown, under a white wash) → heat canvas → route SVG →
-// pins (role=group, one roving tab stop) → labels (aria-hidden).
+// Layers inside .gd-stage: base images (one per map view, coarser ones first,
+// the extra ones loaded when first wanted, under a white wash) → street-level
+// tiles (tiles.ts, over the finest view once past its 1:1) → heat canvas →
+// route SVG → pins (role=group, one roving tab stop) → labels (aria-hidden).
+// The views zoom as one map with levels of detail (camera.ts zoomAcross):
+// zooming switches between them on the fly, and while a view shows beyond its
+// own map (an overhang) the coarser one is drawn round it.
 import type { Bi, LonLat, MapView, Payload, RouteMode, TierId } from '../../lib/guides/types';
 import { metresPerPixel, project } from '../../lib/guides/core.ts';
 import * as K from './camera.ts';
 import { cluster, compareIds, dressCluster, dressPin, makeCluster, makePin, priority, type Cluster } from './pins.ts';
 import { LABEL_GAP, makeMeasure, placeLabels, type Box, type Side } from './labels.ts';
 import { drawRoute, makeRouteSvg } from './route.ts';
-import { attenuation, heatPixels, parseColour, type RGB } from './heat.ts';
+import { cellSize, heatPixels, readRamp, type RGB } from './heat.ts';
+import { TileLayer } from './tiles.ts';
 
 export interface MapPin { id: string; kind: 'item' | 'place' | 'listing'; tier?: TierId; letter?: string; coordinates: LonLat; short: string; aria: Bi; visible: boolean; dim?: boolean; hollow?: boolean; label?: boolean; step?: number }
-export interface MapHooks { onSelect(id: string, how: 'pointer' | 'keyboard'): void; onCluster?(ids: string[]): void; onCamera?(c: { cx: number; cy: number; s: number }): void }
+export interface MapHooks {
+  onSelect(id: string, how: 'pointer' | 'keyboard'): void;
+  onCluster?(ids: string[]): void;
+  /** The camera settled, in map view `area`. */
+  onCamera?(c: { cx: number; cy: number; s: number }, area: string): void;
+  /** Zooming switched the map view by itself (no flight): the program's area follows. */
+  onArea?(id: string): void;
+}
 
 type Cam = K.Cam;
 interface PinRec { p: MapPin; el: HTMLAnchorElement; x: number; y: number; shown: boolean }
@@ -23,6 +35,10 @@ interface LabelRec { el: HTMLElement; key: string; dx: number; dy: number }
 
 /** Map views are drawn up to 3 screen px per image pixel. */
 const MAX_ZOOM = 3;
+/** With street-level tiles the finest view goes on to 16 screen px per z14 px: z18 tiles at 1:1, z19 on a 2× screen. */
+const TILE_ZOOM = 16;
+/** Tiles show once that view's own picture is magnified past 1:1 (tiles.ts picks the tile zoom from there). */
+const TILES_FROM = 1;
 /** "Whole map" comes no closer than this. */
 const HOME_CAP = 1.6;
 /** Heat cells: 2×2 CSS px. */
@@ -53,8 +69,17 @@ export class GuideMap {
   private off = new AbortController();
 
   private views: MapView[];
+  /** The views as the camera sees them (same order). */
+  private levels: K.Level[];
   private area: MapView;
+  /** While the view shows beyond its own map: where the camera may go, and the coarser view drawn round it. */
+  private soft: K.Soft | null = null;
+  /** The view shown before the last switch: it stays up until the new view's picture has come. */
+  private prev: string | null = null;
   private bases = new Map<string, HTMLElement>();
+  /** Street-level tiles over the finest view, when the guide has them (payload.tiles). */
+  private tiles: TileLayer | null = null;
+  private tileView: MapView | null = null;
   private c: Cam = { cx: 0, cy: 0, s: 1 };
   private placed = false;
   /** A selection asked for before the map had a size: resize() places the camera on it. */
@@ -77,7 +102,7 @@ export class GuideMap {
   private heat: { x: number; y: number; w: number }[] | null = null;
   private heatDrawn: { c: Cam; w: number; h: number } | null = null;
   private heatAt = 0;
-  private colours: { lo: RGB; hi: RGB } | null = null;
+  private colours: RGB[] | null = null;
   private heatR: number;
   /** Where am I?: in world units, with the accuracy as a radius. */
   private me: { x: number; y: number; r: number } | null = null;
@@ -104,12 +129,16 @@ export class GuideMap {
     this.stage = root.querySelector<HTMLElement>('.gd-stage')!;
     this.pinsEl = root.querySelector<HTMLElement>('.gd-pins')!;
     this.views = payload.map.views;
+    // Tiles go over the finest view (the city plan), which may then come closer than its own picture.
+    this.tileView = payload.tiles && this.views.length ? this.views.reduce((a, v) => (v.z > a.z ? v : a)) : null;
+    this.levels = this.views.map((v) => ({ id: v.id, z: v.z, b: boundsOf(v), max: this.maxFor(v) }));
     this.area = this.views[0];
     const lat = payload.centre[1];
     this.heatR = payload.heatRadius / metresPerPixel(lat, 14);
 
     root.querySelectorAll<HTMLElement>('.gd-base[data-view]').forEach((b) => this.bases.set(b.dataset.view!, b));
     for (const v of this.views) if (this.bases.has(v.id)) this.dressBase(this.bases.get(v.id)!, v);
+    for (const b of this.bases.values()) this.watch(b.querySelector('img'));
 
     // Layers the server doesn't render.
     this.heatCanvas = document.createElement('canvas');
@@ -123,6 +152,10 @@ export class GuideMap {
     this.labelsEl.setAttribute('aria-hidden', 'true');
     this.pinsEl.before(this.heatCanvas, this.routeSvg);
     this.pinsEl.after(this.labelsEl);
+    if (payload.tiles && this.tileView) {
+      this.tiles = new TileLayer(payload.tiles);
+      this.heatCanvas.before(this.tiles.el); // above every base picture, below the heat
+    }
     if (!this.heatCtx) root.querySelectorAll<HTMLButtonElement>('[data-cmd="gd-heat"]').forEach((b) => { b.disabled = true; });
 
     // The server's pins, then the payload's items and places as the first pin list.
@@ -207,7 +240,7 @@ export class GuideMap {
       }
       const l = this.limits();
       const s = Math.min(l.max, Math.max(this.c.s, 1.2 / factor(this.area)));
-      this.flyTo(K.centreIn(r.x, r.y, s, vp, this.free));
+      this.flyTo(K.centreIn(r.x, r.y, s, vp, this.free), 450, true);
     } else this.keepInView(r);
   }
 
@@ -225,34 +258,13 @@ export class GuideMap {
     if (this.heat) this.drawHeat();
   }
 
+  /** Show map view `viewId` when asked (the Area button and menu): with `fly`, a flight to its whole map. */
   setArea(viewId: string, o: { fly?: boolean } = {}) {
     const v = this.views.find((x) => x.id === viewId);
+    // A switch the map made itself while zooming has already happened: no flight.
     if (!v || v === this.area) return;
-    this.area = v;
-    let base = this.bases.get(v.id);
-    if (!base) {
-      // Load the other map only when it is first wanted.
-      base = document.createElement('div');
-      base.className = 'gd-base';
-      base.dataset.view = v.id;
-      const img = document.createElement('img');
-      img.alt = '';
-      img.decoding = 'async';
-      img.draggable = false;
-      img.width = v.width;
-      img.height = v.height;
-      img.src = v.src;
-      base.append(img);
-      const last = [...this.bases.values()].pop();
-      if (last) last.after(base);
-      else this.stage.prepend(base);
-      this.bases.set(v.id, base);
-      this.dressBase(base, v);
-    }
-    for (const [id, b] of this.bases) b.hidden = id !== v.id;
-    this.root.dataset.area = v.id;
-    this.syncButtons();
-    this.refreshShown();
+    this.soft = null;
+    this.switchTo(v);
     if (o.fly) this.home();
     else {
       this.c = this.clamp(this.c);
@@ -272,12 +284,13 @@ export class GuideMap {
   }
 
   zoomBy(f: number) {
+    this.interrupt();
     const vp = this.vp(), fr = K.freeRect(vp, this.free);
-    this.flyTo(K.zoomAt(this.c, f, fr.x + fr.w / 2, fr.y + fr.h / 2, vp, this.bounds(), this.limits()), 250);
+    this.zoomTo(this.zoomStep(f, fr.x + fr.w / 2, fr.y + fr.h / 2), 250);
   }
 
   home() {
-    this.flyTo(this.homeCam());
+    this.flyTo(this.homeCam(), 450, true);
   }
 
   fitTo(ids: string[]) {
@@ -285,7 +298,26 @@ export class GuideMap {
     const box = K.bbox(pts);
     if (!box) return;
     const l = this.limits();
-    this.flyTo(K.fit(box, this.vp(), this.free, 48, this.bounds(), l, l.max));
+    this.flyTo(K.fit(box, this.vp(), this.free, 48, this.bounds(), l, l.max), 450, true);
+  }
+
+  /**
+   * A cluster: zoom in until its pins come apart, on into a finer view that
+   * holds them all when this one can't come close enough; the list when no
+   * view can.
+   */
+  private fitCluster(ids: string[]) {
+    const box = K.bbox(ids.map((id) => this.pins.get(id)).filter((r): r is PinRec => !!r));
+    if (!box) return;
+    const vp = this.vp(), l = this.limits();
+    const here = K.fit(box, vp, this.free, 48, this.bounds(), l, l.max);
+    const d = here.s >= l.max * 0.98 ? K.deeper(this.levels, this.area.id, box) : null;
+    if (d) {
+      const dl = K.limitsFor(d.b, vp, d.max);
+      return this.zoomTo({ id: d.id, cam: K.fit(box, vp, this.free, 48, d.b, dl, dl.max), soft: null, load: [] }, 450);
+    }
+    if (this.c.s >= l.max * 0.98) this.hooks.onCluster?.(ids);
+    else this.flyTo(here, 450, true);
   }
 
   camera() {
@@ -295,6 +327,10 @@ export class GuideMap {
   setCamera(c: { cx: number; cy: number; s: number }) {
     cancelAnimationFrame(this.anim);
     this.flying = false;
+    // A camera kept from an overhang comes back with the coarser map round it.
+    this.soft = Number.isFinite(c.s) && c.s > 0 && Number.isFinite(c.cx) && Number.isFinite(c.cy) ? K.softFor(this.levels, this.area.id, c, this.vp()) : null;
+    if (this.soft) this.base(this.soft.under);
+    this.showBases();
     this.c = this.clamp(c);
     this.placed = true;
     this.settle();
@@ -308,12 +344,19 @@ export class GuideMap {
     this.pendingFly = false;
     if (r) {
       this.placed = true;
+      this.soft = null;
       const l = this.limits();
       this.c = this.clamp(K.centreIn(r.x, r.y, Math.min(l.max, 1.2 / factor(this.area)), vp, this.free));
     } else if (!this.placed) {
       this.placed = true;
+      this.soft = null;
       this.c = this.homeCam();
-    } else this.c = this.clamp(this.c);
+    } else {
+      // An overhang is worked out again for the new size, so the camera stays where it is.
+      if (this.soft) this.soft = K.softFor(this.levels, this.area.id, this.c, vp);
+      this.c = this.clamp(this.c);
+    }
+    this.showBases();
     this.heatDrawn = null;
     this.settle();
   }
@@ -356,7 +399,7 @@ export class GuideMap {
     const box = K.bbox(pts);
     if (!box) return;
     const l = this.limits();
-    this.flyTo(K.fit(box, this.vp(), this.free, 48, this.bounds(), l, Math.min(l.max, 2 / factor(this.area))));
+    this.flyTo(K.fit(box, this.vp(), this.free, 48, this.bounds(), l, Math.min(l.max, 2 / factor(this.area))), 450, true);
   }
 
   destroy() {
@@ -367,6 +410,7 @@ export class GuideMap {
     clearTimeout(this.wheelTimer);
     this.ro?.disconnect();
     this.unsub?.();
+    this.tiles?.destroy();
   }
 
   // ---------------------------------------------------------------- camera
@@ -378,10 +422,16 @@ export class GuideMap {
     return boundsOf(this.area);
   }
   private limits() {
-    return K.limitsFor(this.bounds(), this.vp(), MAX_ZOOM / factor(this.area));
+    return K.limitsFor(this.bounds(), this.vp(), this.maxFor(this.area));
   }
+  /** How close a view may come: 3 screen px per picture pixel, or TILE_ZOOM where street-level tiles take over. */
+  private maxFor(v: MapView) {
+    return v === this.tileView ? TILE_ZOOM : MAX_ZOOM / factor(v);
+  }
+  /** Keep the camera on the view's map, or within its overhang while it has one. */
   private clamp(c: Cam) {
-    return K.clamp(c, this.bounds(), this.vp(), this.limits());
+    const o = this.soft;
+    return o ? K.clamp(c, o.box, this.vp(), { min: o.min, max: this.limits().max }) : K.clamp(c, this.bounds(), this.vp(), this.limits());
   }
   private homeCam(): Cam {
     const b = this.bounds();
@@ -392,15 +442,158 @@ export class GuideMap {
     return K.home(centre, pts, this.vp(), this.free, 32, b, this.limits(), HOME_CAP / factor(this.area));
   }
 
+  // ---------------------------------------------------------------- zooming across views
+
+  /** One zoom step by f about viewport point (px, py), from the current camera, across the views. */
+  private zoomStep(f: number, px: number, py: number) {
+    return K.zoomAcross(this.levels, this.area.id, this.c, f, px, py, this.vp(), this.soft);
+  }
+
+  /**
+   * Go to a zoom step's camera, at once or in a flight of `ms`. When it crosses
+   * into another view, the map switches there and then (no flight home) and
+   * tells the program, after the switch so its setArea finds nothing to do.
+   */
+  private zoomTo(z: K.Across, ms?: number) {
+    for (const id of z.load) this.base(id);
+    const v = this.views.find((x) => x.id === z.id) ?? this.area;
+    const switched = v !== this.area;
+    if (switched) this.switchTo(v);
+    if (ms == null) {
+      this.c = z.cam;
+      this.soft = z.soft;
+      this.showBases();
+    } else {
+      // A flight keeps the overhang its first frames need; settle() narrows it when it lands.
+      this.soft = z.soft ?? K.softFor(this.levels, v.id, this.c, this.vp());
+      this.showBases();
+      this.flyTo(z.cam, ms, !z.soft);
+    }
+    if (!switched) return;
+    this.layout();
+    this.hooks.onArea?.(v.id);
+  }
+
+  /** Make view v the one shown: pins, the red dot and the Area button follow; the camera stays. */
+  private switchTo(v: MapView) {
+    this.prev = this.area.id;
+    this.area = v;
+    this.base(v.id);
+    this.root.dataset.area = v.id;
+    this.heatDrawn = null;
+    this.showBases();
+    this.syncButtons();
+    this.refreshShown();
+  }
+
+  /** A gesture takes over from a flight: the camera stays where the flight had got to. */
+  private interrupt() {
+    if (!this.flying) return;
+    cancelAnimationFrame(this.anim);
+    this.flying = false;
+    const soft = K.softFor(this.levels, this.area.id, this.c, this.vp());
+    if (soft || this.soft) {
+      this.soft = soft;
+      this.showBases();
+    }
+  }
+
+  /** A view's base picture, made (and its image asked for) when first wanted; coarser views go beneath finer ones. */
+  private base(id: string) {
+    let b = this.bases.get(id);
+    const v = this.views.find((x) => x.id === id);
+    if (b || !v) return b ?? null;
+    b = document.createElement('div');
+    b.className = 'gd-base';
+    b.dataset.view = v.id;
+    b.hidden = true;
+    const img = document.createElement('img');
+    img.alt = '';
+    img.decoding = 'async';
+    img.draggable = false;
+    img.width = v.width;
+    img.height = v.height;
+    img.src = v.src;
+    // Only now: an <img> without a src counts as complete, and would never be watched.
+    this.watch(img);
+    b.append(img);
+    const all = [...this.stage.querySelectorAll<HTMLElement>(':scope > .gd-base[data-view]')];
+    const finer = all.find((x) => (this.views.find((w) => w.id === x.dataset.view)?.z ?? 0) > v.z);
+    if (finer) finer.before(b);
+    else if (all.length) all[all.length - 1].after(b);
+    else this.stage.prepend(b);
+    this.bases.set(v.id, b);
+    this.dressBase(b, v);
+    // showBases() decides when it shows (and places it then).
+    b.hidden = true;
+    return b;
+  }
+
+  /** Show the pictures again once one has come (or failed). */
+  private watch(img: HTMLImageElement | null) {
+    if (!img || img.complete) return;
+    const done = () => { this.showBases(); this.render(); };
+    img.addEventListener('load', done, { once: true, signal: this.off.signal });
+    img.addEventListener('error', done, { once: true, signal: this.off.signal });
+  }
+
+  /** Which base pictures show: the view's own; the coarser one round an overhang; the old one until the new picture has come. */
+  private showBases() {
+    const ready = (id: string) => { const img = this.bases.get(id)?.querySelector('img'); return !img || img.complete; };
+    const keep = !ready(this.area.id) ? this.prev : null;
+    let shown = false;
+    for (const [id, b] of this.bases) {
+      const on = id === this.area.id || id === keep || (id === this.soft?.under && ready(id));
+      if (b.hidden === !on) continue;
+      b.hidden = !on;
+      if (on) shown = true;
+    }
+    // Placed at once, so a picture never shows a frame at an old place.
+    if (shown) this.placeBases();
+  }
+
+  /** Base pictures: one transform each, for those showing. */
+  private placeBases() {
+    const vp = this.vp();
+    if (!vp.w || !vp.h) return;
+    this.views.forEach((v, i) => {
+      const el = this.bases.get(v.id);
+      if (!el || el.hidden) return;
+      const b = this.levels[i].b;
+      const p = K.toScreen(this.c, vp, b.x, b.y);
+      el.style.transform = `translate3d(${p.x.toFixed(2)}px, ${p.y.toFixed(2)}px, 0) scale(${(this.c.s * factor(v)).toFixed(5)})`;
+    });
+  }
+
+  /**
+   * Street-level tiles over the finest view once its picture is magnified past
+   * 1:1, placed with the same maths as the pictures; while a gesture or flight
+   * is going no new tile zoom starts (tiles.ts). The picture's white wash gives
+   * way to the layer's own ([data-tiled] in guide-map.css).
+   */
+  private placeTiles(vp: K.Vp) {
+    const t = this.tiles, v = this.tileView;
+    if (!t || !v) return;
+    const on = this.area === v && this.c.s * factor(v) > TILES_FROM && t.update(this.c, vp, boundsOf(v), window.devicePixelRatio || 1, !this.live());
+    if (!on) t.hide();
+    this.root.toggleAttribute('data-tiles', on);
+    // Only this view's own picture gives up its wash: a coarser map round an overhang keeps its own.
+    this.bases.get(v.id)?.toggleAttribute('data-tiled', on);
+  }
+
   private live() {
     return this.pointers.size > 0 || this.flying || this.wheeling;
   }
 
-  /** House's eased flight (zoom geometric); instant under reduced motion. */
-  private flyTo(target: Cam, ms = 450) {
+  /**
+   * House's eased flight (zoom geometric); instant under reduced motion. With
+   * `own`, the target is kept on the view's own map, not in an overhang the
+   * flight starts from (which only its first frames need).
+   */
+  private flyTo(target: Cam, ms = 450, own = false) {
     cancelAnimationFrame(this.anim);
     const from = { ...this.c };
-    const to = this.clamp(target);
+    const to = own ? K.clamp(target, this.bounds(), this.vp(), this.limits()) : this.clamp(target);
     this.target = to;
     this.placed = true;
     if (ms === 0 || reduced() || (Math.abs(from.cx - to.cx) < 0.01 && Math.abs(from.cy - to.cy) < 0.01 && Math.abs(from.s - to.s) < 1e-4)) {
@@ -453,10 +646,15 @@ export class GuideMap {
   /** Re-cluster, re-place labels, redraw heat, then paint. */
   private settle() {
     if (this.off.signal.aborted) return;
+    // An overhang narrows to what the camera still shows, and goes once the view's own map covers it.
+    const soft = K.relax(this.soft, this.levels, this.area.id, this.c, this.vp());
+    const gone = !!this.soft && !soft;
+    this.soft = soft;
+    if (gone) this.showBases();
     this.layout(false);
     this.drawHeat();
     this.paint();
-    this.hooks.onCamera?.(this.camera());
+    this.hooks.onCamera?.(this.camera(), this.area.id);
   }
 
   /** Clusters and labels for the current camera. */
@@ -474,13 +672,9 @@ export class GuideMap {
     const vp = this.vp();
     if (!vp.w || !vp.h) return;
     const c = this.c;
-    // Base map: one transform per image.
-    const base = this.bases.get(this.area.id);
-    if (base) {
-      const b = this.bounds(), f = factor(this.area);
-      const p = K.toScreen(c, vp, b.x, b.y);
-      base.style.transform = `translate3d(${p.x.toFixed(2)}px, ${p.y.toFixed(2)}px, 0) scale(${(c.s * f).toFixed(5)})`;
-    }
+    // Base maps: one transform per picture showing.
+    this.placeBases();
+    this.placeTiles(vp);
     // Pins, clusters and labels keep their size: only their place changes.
     for (const r of this.order) {
       if (!r.shown) continue;
@@ -608,7 +802,8 @@ export class GuideMap {
       if (b.width && b.height) obstacles.push({ x: b.left - vr.left - 2, y: b.top - vr.top - 2, w: b.width + 4, h: b.height + 4 });
     });
     const fr = K.freeRect(vp, this.free);
-    const idOnly = this.c.s * factor(this.area) < 0.7;
+    // Zoomed out by the world's scale, not the picture's, so labels don't change when zooming switches views.
+    const idOnly = this.c.s < 0.7;
     const want = shown.filter((r) => r.p.label || r.p.id === this.selected || r.p.step != null);
     const text = new Map<string, { id: string; rest: string; w: number }>();
     const items = want.map((r) => {
@@ -673,12 +868,9 @@ export class GuideMap {
 
   // ---------------------------------------------------------------- heat
 
+  /** The heat ramp (--gd-heat-1 …, light to dark), read again when the scheme changes. */
   private readColours() {
-    const css = getComputedStyle(this.root);
-    this.colours = {
-      lo: parseColour(css.getPropertyValue('--gd-heat-lo'), [255, 255, 0]),
-      hi: parseColour(css.getPropertyValue('--gd-heat-hi'), [255, 0, 0]),
-    };
+    this.colours = readRamp(getComputedStyle(this.root));
     return this.colours;
   }
 
@@ -686,23 +878,25 @@ export class GuideMap {
     const ctx = this.heatCtx;
     const vp = this.vp();
     if (!this.heat || !ctx || !vp.w || !vp.h) return;
-    const { lo, hi } = this.colours ?? this.readColours();
+    const ramp = this.colours ?? this.readColours();
+    // Coarser cells close up, so the ramp's steps can be told apart.
+    const cell = cellSize(this.c.s, CELL);
     const ox = Math.round(vp.w * OVER), oy = Math.round(vp.h * OVER);
-    const cols = Math.ceil((vp.w + 2 * ox) / CELL), rows = Math.ceil((vp.h + 2 * oy) / CELL);
+    const cols = Math.ceil((vp.w + 2 * ox) / cell), rows = Math.ceil((vp.h + 2 * oy) / cell);
     const cv = this.heatCanvas;
     if (cv.width !== cols || cv.height !== rows) { cv.width = cols; cv.height = rows; }
-    cv.style.width = `${cols * CELL}px`;
-    cv.style.height = `${rows * CELL}px`;
-    cv.style.left = `${(vp.w - cols * CELL) / 2}px`;
-    cv.style.top = `${(vp.h - rows * CELL) / 2}px`;
+    cv.style.width = `${cols * cell}px`;
+    cv.style.height = `${rows * cell}px`;
+    cv.style.left = `${(vp.w - cols * cell) / 2}px`;
+    cv.style.top = `${(vp.h - rows * cell) / 2}px`;
     cv.style.transform = '';
-    const left = (vp.w - cols * CELL) / 2, top = (vp.h - rows * CELL) / 2;
+    const left = (vp.w - cols * cell) / 2, top = (vp.h - rows * cell) / 2;
     const pts = this.heat.map((h) => {
       const p = K.toScreen(this.c, vp, h.x, h.y);
-      return { x: (p.x - left) / CELL, y: (p.y - top) / CELL, w: h.w };
+      return { x: (p.x - left) / cell, y: (p.y - top) / cell, w: h.w };
     });
     const img = ctx.createImageData(cols, rows);
-    heatPixels(img.data, cols, rows, pts, (this.heatR * this.c.s) / CELL, lo, hi, attenuation(this.c.s));
+    heatPixels(img.data, cols, rows, pts, (this.heatR * this.c.s) / cell, ramp, this.c.s);
     ctx.putImageData(img, 0, 0);
     this.heatDrawn = { c: { ...this.c }, w: vp.w, h: vp.h };
     this.heatAt = performance.now();
@@ -744,8 +938,7 @@ export class GuideMap {
       this.lastPointer = e.pointerType;
       this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       this.moved = 0;
-      cancelAnimationFrame(this.anim);
-      this.flying = false;
+      this.interrupt();
       if (this.pointers.size === 2) {
         const [a, b] = [...this.pointers.values()];
         this.pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
@@ -771,9 +964,9 @@ export class GuideMap {
         const d = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
         if (this.pinch.d) {
           const r = vpEl.getBoundingClientRect();
-          let c = K.zoomAt(this.c, d / this.pinch.d, mx - r.left, my - r.top, this.vp(), this.bounds(), this.limits());
-          c = this.clamp({ ...c, cx: c.cx - (mx - this.pinch.x) / c.s, cy: c.cy - (my - this.pinch.y) / c.s });
-          this.c = c;
+          this.zoomTo(this.zoomStep(d / this.pinch.d, mx - r.left, my - r.top));
+          const c = this.c;
+          this.c = this.clamp({ ...c, cx: c.cx - (mx - this.pinch.x) / c.s, cy: c.cy - (my - this.pinch.y) / c.s });
           this.render();
         }
         this.pinch = { d, x: mx, y: my };
@@ -787,7 +980,8 @@ export class GuideMap {
         const t = performance.now(), q = at(e);
         if (t - this.lastTap.t < 300 && Math.hypot(q.x - this.lastTap.x, q.y - this.lastTap.y) < 20) {
           this.lastTap.t = 0;
-          this.flyTo(K.zoomAt(this.c, 2, q.x, q.y, this.vp(), this.bounds(), this.limits()), 250);
+          this.interrupt();
+          this.zoomTo(this.zoomStep(2, q.x, q.y), 250);
         } else this.lastTap = { t, x: q.x, y: q.y };
       }
       end(e);
@@ -808,7 +1002,8 @@ export class GuideMap {
       if (this.lastPointer !== 'mouse' || (e.target as Element).closest('.gd-pin, .gd-cluster')) return;
       e.preventDefault();
       const q = at(e);
-      this.flyTo(K.zoomAt(this.c, 2, q.x, q.y, this.vp(), this.bounds(), this.limits()), 250);
+      this.interrupt();
+      this.zoomTo(this.zoomStep(2, q.x, q.y), 250);
     }, { signal });
 
     vpEl.addEventListener('wheel', (e) => {
@@ -816,11 +1011,10 @@ export class GuideMap {
       this.wheeling = true;
       clearTimeout(this.wheelTimer);
       this.wheelTimer = window.setTimeout(() => { this.wheeling = false; this.settle(); }, 150);
-      cancelAnimationFrame(this.anim);
-      this.flying = false;
+      this.interrupt();
       const q = at(e);
       const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
-      this.c = K.zoomAt(this.c, Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.001)), q.x, q.y, this.vp(), this.bounds(), this.limits());
+      this.zoomTo(this.zoomStep(Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.001)), q.x, q.y));
       this.render();
     }, { passive: false, signal });
 
@@ -848,9 +1042,7 @@ export class GuideMap {
       const cl = t.closest<HTMLButtonElement>('.gd-cluster');
       if (cl) {
         e.preventDefault();
-        const ids = (cl.dataset.ids ?? '').split(' ').filter(Boolean);
-        if (this.c.s >= this.limits().max * 0.98) this.hooks.onCluster?.(ids);
-        else this.fitTo(ids);
+        this.fitCluster((cl.dataset.ids ?? '').split(' ').filter(Boolean));
         return;
       }
       const a = t.closest<HTMLAnchorElement>('a.gd-pin[data-id]');

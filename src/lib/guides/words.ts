@@ -39,6 +39,15 @@ export const W = {
   day: b('Day', '日期'),
   area: b('Area', '区域'),
   status: b('Status', '状态'),
+  // Places: "Sort by:" ("&" marks the access key, as in the menus).
+  sortBy: b('&Sort by:', '排序方式(&S)：'),
+  sortTier: b('Recommended (default)', '推荐（默认）'),
+  sortName: b('Name', '名称'),
+  sortZone: b('Area', '区域'),
+  sortOpen: b('Open that day first', '当天开放的优先'),
+  sortNear: b('Nearest first', '离我最近'),
+  sortDefault: b('Default', '默认'),
+  sortDefaultTip: b('Back to the default order', '恢复默认顺序'),
   ourPlaces: b('Reference points', '参考地点'),
   noRoute: b('No route', '无路线'),
   showOnMap: b('Show on map', '在地图上显示'),
@@ -78,7 +87,7 @@ export const W = {
   checked: b('Checked', '核实于'),
   sources: b('Sources and credits', '资料来源与致谢'),
   unofficial: b('Unofficial guide: not a publication of any festival, venue or organiser.', '非官方导览：并非任何活动、场馆或主办方的出版物。'),
-  noLocation: b('Where am I? asks your browser for your location only when you press it. The guide uses it only on your device, to show you on the map and the places nearest to you, and never sends it anywhere.', '只有在你按下“我在哪里？”时，本导览才会向浏览器请求你的位置。位置只在你的设备上使用，用来在地图上标出你和离你最近的地点，不会发送到任何地方。'),
+  noLocation: b('Where am I? asks your browser for your location only when you press it, then follows you until you stop it or leave the page. Your location stays on your device and is never sent anywhere.', '只有在你按下“我在哪里？”时，本导览才会向浏览器请求你的位置，并持续跟随，直到你将其停止或离开页面。你的位置只留在你的设备上，不会发送到任何地方。'),
   logOffTitle: b('Log off', '注销'),
   logOffText: b('Lock this guide again on this device, for example to use another password.', '在这台设备上重新锁定本导览，例如为了换用另一个密码。'),
   logOffBtn: b('Log Off', '注销'),
@@ -124,12 +133,25 @@ export const W = {
   nearNote: (day: Bi | null) => day
     ? b(`Open on ${day.en}, by straight-line distance. Walking times are rough.`, `${day.zh || day.en}开放，按直线距离排列。步行时间仅供参考。`)
     : b('By straight-line distance. Walking times are rough.', '按直线距离排列。步行时间仅供参考。'),
-  nearNone: b('Nothing shown on the map is open near you on that day.', '那天你附近没有地图上显示的开放地点。'),
+  nearNone: (day: Bi | null, filtered: boolean) => filtered
+    ? b('Nothing on the map matches Find or the topic. Clear them to see the nearest places.', '地图上没有符合“查找”或主题的地点。清除它们即可看到最近的地点。')
+    : day ? b(`Nothing on the map is open on ${day.en}.`, `${day.zh || day.en}地图上没有开放的地点。`)
+    : b('Nothing is shown on the map.', '地图上没有显示任何地点。'),
   walk: (min: number) => b(`about ${min} min on foot`, `步行约 ${min} 分钟`),
   accuracy: (m: number) => b(`Accurate to about ${m} m`, `精度约 ${m} 米`),
-  nearStatus: (n: number) => b(`You are on the map. The ${n} nearest are listed.`, `你在地图上。已列出最近的 ${n} 个。`),
-  outside: (d: Bi) => b(`You are about ${d.en} from the area this map covers.`, `你距离本地图覆盖的范围约 ${d.zh || d.en}。`),
-  locDenied: b('Your browser did not share your location. To use Where am I?, allow location for this site in the browser’s settings, then try again.', '浏览器没有提供你的位置。如要使用“我在哪里？”，请在浏览器设置中允许本网站获取位置，然后再试一次。'),
+  nearStatus: (n: number) => n === 0 ? b('You are on the map. Nothing near you is shown.', '你在地图上。附近没有显示的地点。')
+    : n === 1 ? b('You are on the map. The nearest place is listed.', '你在地图上。已列出最近的地点。')
+    : b(`You are on the map. The ${n} nearest are listed.`, `你在地图上。已列出最近的 ${n} 个。`),
+  outside: (d: Bi) => b(`You are about ${d.en} from the area the map covers.`, `你距离地图覆盖的范围约 ${d.zh || d.en}。`),
+  leftMap: (name: Bi) => b(`You have left this map. Showing ${name.en}.`, `你已离开这张地图。正在显示${name.zh || name.en}。`),
+  locPrompt: b("Allow location in your browser's prompt...", '请在浏览器的提示中允许获取位置...'),
+  live: b('Live location', '实时位置'),
+  liveCentre: b('Live location: show me on the map', '实时位置：在地图上显示我'),
+  liveStop: b('Stop', '停止'),
+  liveOff: b('Live location is off.', '实时位置已关闭。'),
+  meButton: b('Where am I? Follows you live on the map and lists the nearest places', '我在哪里？在地图上实时跟随你，并列出离你最近的地点'),
+  meButtonOn: b('Live location is on. Press to stop', '实时位置已开启。按下即可停止'),
+  locDenied: b('Your browser is not sharing your location with this site. To use Where am I?, allow location for this site, then press it again. In Chrome, click the icon at the left of the address bar. On an iPhone, also check Settings > Privacy & Security > Location Services.', '浏览器没有向本网站提供你的位置。如要使用“我在哪里？”，请允许本网站获取位置，然后再按一次。在 Chrome 中，点按地址栏左侧的图标。在 iPhone 上，还请检查“设置 > 隐私与安全性 > 定位服务”。'),
   locFailed: b('Your location could not be found. Try again in a moment, or outdoors.', '无法确定你的位置。请稍后再试，或到室外再试。'),
   locUnsupported: b('This browser cannot share your location.', '此浏览器无法提供你的位置。'),
   stopLocating: b('Stop showing my location', '不再显示我的位置'),

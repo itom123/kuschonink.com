@@ -59,7 +59,8 @@ html.js .gd-mapwrap { position: absolute; inset: 0; box-shadow: var(--sunken); p
 .gd-x { min-width: 0 !important; width: 18px; height: 16px; padding: 0 !important; position: relative; }
 .gd-x::before, .gd-x::after { content: ""; position: absolute; left: 4px; top: 7px; width: 8px; height: 2px; background: #000; transform: rotate(45deg); }
 .gd-x::after { transform: rotate(-45deg); }
-.gd-pane-body, .gd-details-body { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; }
+/* Pinching still zooms and a wide table still swipes sideways (no pan-y here). */
+.gd-pane-body, .gd-details-body { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; touch-action: pan-x pan-y pinch-zoom; }
 .gd-scope { flex: none; margin: 0; padding: 3px 6px; border-bottom: 1px solid #c0c0c0; }
 
 /* One pane shows at a time (data-view on .gd). */
@@ -94,31 +95,49 @@ html.js .gd[data-layout="compact"]:not([data-view="map"]) .gd-sheet-map { displa
   .gd-sheet-size { display: none; }
 }
 
-/* ---- Places: an Explorer details table ---- */
-table.gd-table { width: 100%; border-collapse: collapse; white-space: normal; }
-table.gd-table th { position: sticky; top: 0; z-index: 1; padding: 0; text-align: left; font: 11px var(--ui-font); background: var(--face); }
-.gd-sort { display: block; width: 100%; min-width: 0 !important; min-height: 0 !important; padding: 1px 6px !important; text-align: left; box-shadow: var(--raised); }
-/* Touch: the sheet's and panes' small buttons and the column heads get 32px targets. */
+/* ---- Places: one list at every width (panes.ts, order.ts) ----
+   "Sort by:" under the pane bar does what the column heads did. The table has
+   two columns, the ref and the rest (name; artist and title; the day and the
+   area), and is never wider than its pane. */
+.gd-sortbar { flex: none; display: flex; align-items: center; gap: 4px; margin: 0; padding: 3px 4px 3px 6px; border-bottom: 1px solid #c0c0c0; }
+.gd-sort-field { flex: 1; display: flex; align-items: center; gap: 4px; min-width: 0; }
+.gd-sort-label { flex: none; white-space: nowrap; }
+.gd-sort-field select { flex: 1; width: 100%; min-width: 0; height: var(--gd-ctl); box-sizing: border-box; font: 11px var(--ui-font); }
+.gd-sort-default { flex: none; min-width: 0 !important; height: var(--gd-ctl); padding: 0 8px !important; }
+table.gd-table { width: 100%; table-layout: fixed; border-collapse: collapse; white-space: normal; }
+.gd-c-ref { width: 52px; }
+/* The column heads are for screen readers only. */
+table.gd-table > thead > tr > th { height: 0; padding: 0; border: 0; box-shadow: none; background: none; position: static; }
+/* Touch: the sheet's and panes' small buttons get 32px targets, Sort by: and its button 36px. */
 @media (pointer: coarse) {
   .gd-x { width: 32px; height: 32px; }
   .gd-x::before, .gd-x::after { left: 12px; top: 15px; }
   .gd-sheet-size, .gd-sheet-map { height: 32px; }
-  .gd-sort { min-height: 32px !important; }
+  .gd-sortbar { padding: 4px 6px; }
+  .gd-sort-field select, .gd-sort-default { height: 36px; }
 }
-th[aria-sort="ascending"] .gd-sort::after { content: " ▲"; font-size: 8px; }
-table.gd-table th:not([data-gd-sort]) { padding: 2px 6px; box-shadow: var(--raised); }
-table.gd-table td { padding: 2px 6px; height: calc(var(--gd-row) - 6px); vertical-align: middle; font: 11px Tahoma, Verdana, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+table.gd-table td { padding: 3px 6px; height: calc(var(--gd-row) - 6px); vertical-align: top; font: 11px Tahoma, Verdana, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 14px; }
 table.gd-table tr[data-gd-row] { cursor: default; }
-.gd-col-ref { white-space: nowrap; }
+.gd-col-ref { white-space: nowrap; overflow: hidden; line-height: 16px; }
 .gd-col-ref .ico { vertical-align: -3px; }
-.gd-row-name { display: block; color: #000; font-weight: bold; text-decoration: none; overflow: hidden; text-overflow: ellipsis; }
-.gd-row-sub { display: block; color: #404040; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 32em; }
+/* Long words break rather than push the pane sideways. */
+table.gd-table .gd-col-main { overflow-wrap: break-word; overflow-wrap: anywhere; }
+.gd-row-name { display: block; color: #000; font-weight: bold; text-decoration: none; line-height: 16px; }
+/* The artist and title: two lines at most. */
+table.gd-table .gd-row-sub { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; color: #404040; }
+/* The opening days (or the chosen day's status) · the area, on one line. */
+table.gd-table .gd-row-meta { display: block; margin-top: 1px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #404040; }
+.gd-dot { margin: 0 4px; }
+.gd-row-day:empty + .gd-dot { display: none; }
+.gd-row-meta .gd-sq { display: inline-block; margin-right: 4px; vertical-align: -1px; }
+table.gd-table tr.gd-shut:not(.highlighted) td, table.gd-table tr.gd-shut:not(.highlighted) :is(.gd-row-sub, .gd-row-meta) { color: #808080; }
+table.gd-table tr.gd-shut:not(.highlighted) .gd-row-name { color: #606060; }
 table.gd-table tr.highlighted td { background: var(--sel); color: var(--sel-text); }
-table.gd-table tr.highlighted .gd-row-name, table.gd-table tr.highlighted .gd-row-sub { color: var(--sel-text); }
-table.gd-table tr.gd-shut td { color: #808080; }
-table.gd-table tr.gd-shut .gd-row-name { color: #606060; }
-tr.gd-group th { padding: 4px 6px 2px; font: bold 11px var(--ui-font); background: #fff; box-shadow: none; border-bottom: 1px solid #808080; position: static; }
-@container gd (max-width: 420px) { .gd-col-area { display: none; } }
+table.gd-table tr.highlighted :is(.gd-row-name, .gd-row-sub, .gd-row-meta) { color: var(--sel-text); }
+tr.gd-group th { padding: 4px 6px 2px; text-align: left; font: bold 11px var(--ui-font); background: #fff; box-shadow: none; border-bottom: 1px solid #808080; position: static; }
+/* Sorting needs the program: not on paper, nor when it failed to start. */
+.gd.gd-failed .gd-sortbar { display: none; }
+@media print { .gd-sortbar { display: none !important; } }
 .gd-empty { margin: 12px; }
 .gd-empty[hidden], tbody[hidden], tr[hidden] { display: none; }
 
@@ -133,6 +152,13 @@ tr.gd-group th { padding: 4px 6px 2px; font: bold 11px var(--ui-font); backgroun
 .gd-routes { list-style: none; margin: 0; padding: 0; }
 .gd-route-pick { margin: 6px 0; font: 11px var(--ui-font); }
 .gd-route-pick label { font: 13px/1.3 Tahoma, Verdana, var(--ui-font); }
+/* Touch: the route radios and the official-entries checkbox are their labels (98.css hides the inputs), so pad them to 24px+ targets. */
+@media (pointer: coarse) {
+  .gd-route-pick { margin: 0; }
+  .gd-route-pick label, .gd-scope label { display: inline-flex; padding: 10px 8px 10px 0; }
+  .gd-route-pick label::before { top: 10px; }
+  .gd-route-pick label::after { top: 14px; }
+}
 .gd-route-card { margin: 0 0 12px 22px; }
 html.js .gd-route-card { display: none; }
 html.js .gd-routeitem.is-open .gd-route-card { display: block; }
@@ -209,15 +235,30 @@ html:not(.js) #gd-info { order: 4; }
 html:not(.js) .gd-pane, html:not(.js) .gd-details { display: block; background: #fff; border: 1px solid #808080; }
 html:not(.js) .gd-pane-body, html:not(.js) .gd-details-body { overflow: visible; }
 html:not(.js) .gd-article { border-bottom: 1px solid #c0c0c0; }
-.gd.gd-failed .gd-article { display: block; }
+/* The program failed to start (index.ts adds .gd-failed; html still has .js):
+   the same one column, so these must beat the html.js layout rules. */
+html.js .gd-body:has(.gd-failed) { overflow: auto !important; }
+html.js .gd.gd-failed { height: auto; container-type: inline-size; }
+html.js .gd.gd-failed .gd-main { display: flex !important; flex-direction: column; gap: 12px; }
+html.js .gd.gd-failed .gd-mapwrap { display: none; }
+html.js .gd.gd-failed :is(.gd-pane, .gd-details) { display: block !important; position: static !important; height: auto !important; border: 1px solid #808080; box-shadow: none; }
+html.js .gd.gd-failed #gd-places { order: 0; }
+html.js .gd.gd-failed .gd-details { order: 1; }
+html.js .gd.gd-failed #gd-routes { order: 2; }
+html.js .gd.gd-failed #gd-days { order: 3; }
+html.js .gd.gd-failed #gd-info { order: 4; }
+html.js .gd.gd-failed :is(.gd-pane-body, .gd-details-body) { overflow: visible; }
+html.js .gd.gd-failed .gd-article:not([hidden]) { display: block !important; border-bottom: 1px solid #c0c0c0; }
 
 /* ---- High Contrast ---- */
 :where(html[data-scheme="contrast"]) .gd-pane, :where(html[data-scheme="contrast"]) .gd-details, :where(html[data-scheme="contrast"]) .gd-mapwrap { box-shadow: inset 0 0 0 1px #000; }
 :where(html[data-scheme="contrast"]) .gd-filters { box-shadow: inset 0 -1px #000; }
-:where(html[data-scheme="contrast"]) .gd-sort, :where(html[data-scheme="contrast"]) table.gd-table th:not([data-gd-sort]) { box-shadow: inset 0 0 0 1px #000; background: #fff; }
+:where(html[data-scheme="contrast"]) .gd-sortbar { border-bottom-color: #000; }
+:where(html[data-scheme="contrast"]) table.gd-table :is(.gd-row-sub, .gd-row-meta) { color: #000; }
 :where(html[data-scheme="contrast"]) .gd-day h3 { box-shadow: inset 0 -1px #000; background: #fff; }
 :where(html[data-scheme="contrast"]) .gd-day.is-today { background: #fff; outline: 2px solid #000; }
-:where(html[data-scheme="contrast"]) table.gd-table tr.gd-shut td { color: #000; text-decoration: line-through; }
+:where(html[data-scheme="contrast"]) table.gd-table tr.gd-shut td { text-decoration: line-through; }
+:where(html[data-scheme="contrast"]) table.gd-table tr.gd-shut:not(.highlighted) :is(td, .gd-row-name, .gd-row-sub, .gd-row-meta) { color: #000; }
 :where(html[data-scheme="contrast"]) .gd-caution, :where(html[data-scheme="contrast"]) .gd-note { background: #fff; }
 @media (forced-colors: active) {
   .gd-sq { forced-color-adjust: none; }
@@ -234,7 +275,7 @@ html:not(.js) .gd-article { border-bottom: 1px solid #c0c0c0; }
   html.js .gd-article, .gd-article { display: block !important; break-inside: avoid; border-bottom: 1px solid #808080; }
   html.js .gd-route-card { display: block !important; }
   .gd-photo img { max-height: 50mm; }
-  .gd-group-list { display: none !important; }
+  html.js .gd-group-list, .gd-group-list { display: none !important; }
   .gd-day.is-today { background: none; }
 }
 /* ---- Find's drop-down: an AutoComplete list under the box (find.ts) ---- */
@@ -258,6 +299,8 @@ html.js .gd { position: relative; }
 .gd-hit-all, .gd-hit-none { padding-left: 29px; }
 .gd-hit-all { border-top: 1px solid #808080; }
 .gd-hit-none { color: #808080; }
+/* High Contrast: the grey lines go black. After the rules above, which it must beat at equal weight. */
+:where(html[data-scheme="contrast"]) :is(.gd-hit-sub, .gd-hit-day, .gd-hit-none) { color: #000; }
 @media (pointer: coarse) { .gd-hit { min-height: 44px; } }
 
 /* ---- Where am I?: the nearest places, in the details panel ---- */

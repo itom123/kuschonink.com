@@ -4,9 +4,9 @@
 // its own and asks the desktop (window.kus98) for menus, dialogs and opening.
 // Every text a guide names comes from the payload or the server-rendered page.
 import type { Bi, DayStatus, ISODate, Payload } from '../../lib/guides/types';
-import { dayLabel, dayStatus, normalise, todayIn } from '../../lib/guides/core';
+import { dayLabel, dayStatus, normalise, project, todayIn } from '../../lib/guides/core';
 import { timeSpan, W } from '../../lib/guides/words';
-import { copyText, message, setText, tr } from './dom';
+import { copyText, h, message, setAttr, setText, tr } from './dom';
 import { GuideMap, type MapPin } from './map';
 import { DaysPane, PlacesPane, RoutesPane } from './panes';
 import { Details } from './details';
@@ -14,7 +14,8 @@ import { Sheet } from './sheet';
 import { menuProvider } from './menus';
 import { Finder, type Entry } from './find';
 import { field, score, words } from './match.ts';
-import { distance, distanceText, follow, nearest, walkMinutes, type Fix, type LocateError } from './locate.ts';
+import { distance, distanceText, follow, nearest, offMaps, permission, walkMinutes, type Fix, type LocateError } from './locate.ts';
+import { centreIn } from './camera';
 import {
   clearStorage, initialState, loadPrefs, loadSession, savePrefs, saveSession, Store, toQuery,
   type GdState, type Session, type View,
@@ -45,13 +46,13 @@ export class GuideApp {
   private readonly fields: HTMLElement[];
   private readonly sheet: Sheet;
   readonly details: Details;
-  private readonly places: PlacesPane;
+  /** Public for View ▸ Sort By (menus.ts). */
+  readonly places: PlacesPane;
   private readonly routes: RoutesPane;
   private readonly daysPane: DaysPane;
   private readonly items = new Map<string, Item>();
   private readonly names = new Map<string, string>();
   readonly labels: { items: Bi; listings: Bi; title: Bi };
-  private readonly contrast: boolean;
   private session: Session;
   private hintTimer = 0;
   private urlTimer = 0;
@@ -68,6 +69,19 @@ export class GuideApp {
   private fix: Fix | null = null;
   private stopFollow: (() => void) | null = null;
   private nearOpen = false;
+  /** Each start gets a number, so a late answer from an old one is ignored. */
+  private locRun = 0;
+  /** Where the keyboard was when Where am I? was pressed. */
+  private locBy: HTMLElement | null = null;
+  /** The status bar's hint while waiting for the first position. */
+  private locHint: Bi | null = null;
+  /** Whether the last position was on the map being shown (to notice you walking off it). */
+  private meAt: { area: string; on: boolean } | null = null;
+  /** The nearest list as last drawn: its order and where you were. */
+  private nearKey = '';
+  private nearAt: Fix['coordinates'] | null = null;
+  /** The insets last sent to map.setFree(), as "right bottom". */
+  private freeKey = '';
 
   constructor(root: HTMLElement) {
     this.root = root;
@@ -81,14 +95,13 @@ export class GuideApp {
     this.labels = { items: biData(root, 'items'), listings: biData(root, 'listings'), title: biData(root, 'title') };
     this.fields = [...this.win.querySelectorAll<HTMLElement>(':scope > [data-window-inner] > .status-bar > .status-bar-field')];
     if (this.fields[1]) { this.fields[1].setAttribute('role', 'status'); this.fields[1].setAttribute('aria-live', 'polite'); }
-    this.contrast = document.documentElement.dataset.scheme === 'contrast';
     this.today = todayIn(this.p.timezone);
     this.session = loadSession(this.slug);
 
     const url = this.win === root ? location.pathname + location.search : (this.win.dataset.url ?? '');
     let query = url.includes('?') ? url.slice(url.indexOf('?')) : '';
     if (!query && location.pathname.replace(/\.html$/, '') === `/guides/${this.slug}`) query = location.search;
-    this.store = new Store(initialState(this.p, query, loadPrefs(), this.today, this.contrast));
+    this.store = new Store(initialState(this.p, query, loadPrefs(), this.today));
 
     this.sheet = new Sheet(root, root.querySelector<HTMLElement>('[data-gd-details]')!);
     this.details = new Details(root);
@@ -116,14 +129,19 @@ export class GuideApp {
       this.map = new GuideMap(el, this.p, {
         onSelect: (id, how) => this.select(id, how, 'map'),
         onCluster: (ids) => {
+          // The members take the box the nearest list used: the next position mustn't redraw over them.
+          this.nearOpen = false;
           this.details.showCluster(ids, (id) => this.names.get(id) ?? '');
           this.store.set({ place: null, detail: 'half' });
           this.openDetails('map');
         },
-        onCamera: (c) => {
+        // The camera is kept with its map view, so a restore can't pair it with another.
+        onCamera: (c, area) => {
           clearTimeout(this.camTimer);
-          this.camTimer = window.setTimeout(() => this.keepSession({ cam: c }), 400);
+          this.camTimer = window.setTimeout(() => this.keepSession({ cam: c, area }), 400);
         },
+        // Zooming switched the view by itself: the area, the URL and View ▸ Area follow (no flight).
+        onArea: (id) => this.store.set({ area: id }),
       }, this.ac.signal);
       const s = this.store.get();
       if (s.area) this.map.setArea(s.area);
@@ -131,6 +149,8 @@ export class GuideApp {
     } catch (e) {
       console.error('Field Guide: the map could not start', e);
       this.map = null;
+      // Without a map there is nothing to show you on.
+      this.root.querySelectorAll<HTMLButtonElement>('[data-cmd="gd-locate"]').forEach((b) => { b.disabled = true; });
     }
   }
 
@@ -183,7 +203,10 @@ export class GuideApp {
         fields: [field(10, r.name), field(4, ...stops.map((id) => this.names.get(id))), field(1, root.querySelector(`[data-gd-route="${CSS.escape(r.id)}"]`)?.textContent)] });
     }
     for (const e of this.p.events) {
-      const when = dayLabel(e.date), time = timeSpan(e.start, e.end), at = e.place ? this.names.get(e.place) ?? '' : '';
+      // An event over several days shows its first and last day.
+      const first = dayLabel(e.date), last = e.until && e.until !== e.date ? dayLabel(e.until) : null;
+      const when = last ? { en: `${first.en} – ${last.en}`, zh: `${first.zh}至${last.zh}` } : first;
+      const time = timeSpan(e.start, e.end), at = e.place ? this.names.get(e.place) ?? '' : '';
       const line = (d: string) => [d, time, at].filter(Boolean).join(' - ');
       out.push({ kind: 'event', id: e.id, name: e.title, sub: { en: line(when.en), zh: line(when.zh) }, icon: 'ico20 ico-tb-days',
         fields: [field(10, e.title), field(5, when), field(4, at)] });
@@ -203,6 +226,19 @@ export class GuideApp {
     let n = this.p.items.filter((i) => this.matchItem(i.id, q)).length;
     if (s.listings) n += this.p.listings.filter((l) => this.matchListing(l.id, q)).length;
     return n;
+  }
+
+  /** The box's text into the state after a short typing pause. */
+  private queueQ(t: HTMLInputElement) {
+    clearTimeout(this.qTimer);
+    this.qTimer = window.setTimeout(() => {
+      this.store.set({ q: t.value.slice(0, 80) });
+      // Wide map view: the list pane comes up, and the drop-down stays open over it.
+      if (this.wide && this.view() === 'map' && t.value.trim()) {
+        this.setView('places', 'pointer', true);
+        this.finder?.reposition();
+      }
+    }, 150);
   }
 
   /** The box's text into the state now, not after the typing pause. */
@@ -240,7 +276,14 @@ export class GuideApp {
         this.clearQ();
         const ev = this.p.events.find((x) => x.id === e.id);
         if (!ev) return;
-        if (this.p.window?.days.includes(ev.date)) this.setDay(ev.date);
+        // A day the event is on: keep the chosen one (and today's roll-over), else
+        // today if it falls inside the event, else its first day.
+        const end = ev.until ?? ev.date, on = (d: string) => ev.date <= d && d <= end;
+        const days = this.p.window?.days ?? [], cur = this.store.get().day;
+        if (cur === 'any' || !on(cur)) {
+          const d = on(this.today) && days.includes(this.today) ? this.today : ev.date;
+          if (days.includes(d)) this.setDay(d);
+        }
         if (ev.place && this.details.has(ev.place)) {
           if (!this.wide) this.setView('map');
           this.select(ev.place, how, this.wide ? 'list' : 'map');
@@ -260,37 +303,70 @@ export class GuideApp {
     if (this.view() !== 'places') this.setView('places');
   }
 
-  // ---- Where am I? (./locate.ts): only when asked, kept in memory, never sent ----
+  // ---- Where am I? (./locate.ts): only when asked, followed live, kept in memory, never sent ----
+  /** The map's button is a toggle: the first press follows you, the next one stops. */
+  toggleLocate(how: How = 'pointer') {
+    if (this.locating) return this.stopLocating(true);
+    this.whereAmI(how);
+  }
+
+  /** Start following you (View > Where Am I?); while following, show you and the nearest again. */
   whereAmI(how: How = 'pointer') {
-    if (this.fix && this.stopFollow) return this.showNear(how, true);
-    this.stopLocating();
-    this.say(W.locating);
+    if (!this.map) return;
+    if (this.locating) {
+      if (this.fix) this.showMeAgain(how);
+      return;
+    }
+    const run = ++this.locRun;
+    this.locBy = document.activeElement as HTMLElement | null;
+    if (how === 'keyboard') this.returnFocus = this.locBy;
+    // Straight from the click (a user gesture), so the browser shows its own prompt.
     this.stopFollow = follow((f) => this.onFix(f, how), (err) => this.onLocError(err));
+    this.syncLocate();
+    this.waitHint(W.locating);
+    // Blocked already: say how to allow it now. Asking: point at the browser's prompt.
+    void permission().then((st) => {
+      if (run !== this.locRun || this.fix || !this.stopFollow) return;
+      if (st === 'denied') this.onLocError('denied');
+      else if (st === 'prompt') this.waitHint(W.locPrompt);
+    });
   }
 
   private onFix(f: Fix, how: How) {
     const first = !this.fix;
     this.fix = f;
     const view = this.map ? this.map.setMe(f) : null;
-    if (!first) {
-      if (this.nearOpen && !this.store.get().place) this.renderNear();
+    const area = this.store.get().area;
+    if (first) {
+      this.locHint = null;
+      if (!view) {
+        const off = distanceText(offMaps(f.coordinates, this.p.map.views));
+        this.stopLocating();
+        void message({ title: W.whereAmI, text: W.outside(off), icon: 'info', owner: this.win });
+        return;
+      }
+      this.meAt = { area: view, on: true };
+      if (view !== area) this.store.set({ area: view });
+      this.syncLocate();
+      this.showNear(how, true);
       return;
     }
-    if (!view) {
-      const off = distanceText(distance(f.coordinates, this.p.centre));
-      this.stopLocating();
-      this.say();
-      void message({ title: W.whereAmI, text: W.outside(off), icon: 'info', owner: this.win });
-      return;
+    // Later positions move the dot only; the camera stays where you put it.
+    const on = view === area;
+    const left = this.meAt?.area === area && this.meAt.on && !on;
+    this.meAt = { area, on };
+    if (left) {
+      // You walked off the map on screen: show the one you are on, or say how far away it is.
+      const v = this.p.map.views.find((x) => x.id === view);
+      if (v) { this.store.set({ area: v.id }); this.meAt = { area: v.id, on: true }; this.flash(W.leftMap(v.name)); }
+      else this.flash(W.outside(distanceText(offMaps(f.coordinates, this.p.map.views))));
     }
-    if (view !== this.store.get().area) this.store.set({ area: view });
-    this.showNear(how, true);
+    if (this.nearOpen && !this.store.get().place) this.renderNear('fix');
   }
 
   private onLocError(err: LocateError) {
     const had = !!this.fix;
     if (err === 'denied' || !had) this.stopLocating();
-    this.say();
     if (had && err !== 'denied') return;
     const text = err === 'denied' ? W.locDenied : err === 'unsupported' ? W.locUnsupported : W.locFailed;
     void message({ title: W.whereAmI, text, icon: err === 'denied' ? 'warning' : 'info', owner: this.win });
@@ -298,20 +374,107 @@ export class GuideApp {
 
   get locating() { return !!this.stopFollow; }
 
-  /** Stop following the position and take the dot (and the list) away. */
-  stopLocating() {
+  /** Stop following you: the watch, the dot, the chip and the list all go. byUser: say so. */
+  stopLocating(byUser = false) {
+    const was = this.locating;
+    this.locRun++;
     this.stopFollow?.();
     this.stopFollow = null;
     this.fix = null;
+    this.locHint = null;
+    this.meAt = null;
+    this.nearKey = '';
+    this.nearAt = null;
     this.map?.setMe(null);
+    this.syncLocate();
     if (this.nearOpen) {
       this.nearOpen = false;
       if (!this.store.get().place) this.closeDetails();
     }
+    // "Nearest first" needs a position: the Places list goes back to the default order.
+    if (this.store.get().sort === 'near') this.store.set({ sort: 'tier' });
+    if (byUser && was) this.flash(W.liveOff);
+    else this.say();
+  }
+
+  /** Already following: back to you, with the nearest list, after checking which map holds you. */
+  private showMeAgain(how: How) {
+    const f = this.fix;
+    if (!f) return;
+    const view = this.map ? this.map.setMe(f) : null;
+    if (!view) return this.flash(W.outside(distanceText(offMaps(f.coordinates, this.p.map.views))));
+    if (view !== this.store.get().area) this.store.set({ area: view });
+    this.meAt = { area: view, on: true };
+    this.locBy = document.activeElement as HTMLElement | null;
+    if (how === 'keyboard') this.returnFocus = this.locBy;
+    this.showNear(how, true);
+  }
+
+  /** The chip's label: the map comes back to you, at your zoom or closer, above the sheet. */
+  private recentre() {
+    const f = this.fix, m = this.map;
+    if (!f || !m) return;
+    const view = m.setMe(f);
+    if (!view) return this.flash(W.outside(distanceText(offMaps(f.coordinates, this.p.map.views))));
+    if (view !== this.store.get().area) this.store.set({ area: view });
+    this.meAt = { area: view, on: true };
+    const vp = this.root.querySelector<HTMLElement>('[data-gd-map] .gd-viewport');
+    if (!vp?.clientWidth) return;
+    const p = project(f.coordinates, 14);
+    m.setCamera(centreIn(p.x, p.y, Math.max(m.camera().s, 2), { w: vp.clientWidth, h: vp.clientHeight }, this.sheet.covers(this.wide)));
+  }
+
+  /** The button's pressed state, and the live chip on the map while there is a dot to follow. */
+  private syncLocate() {
+    const on = this.locating, live = on && !!this.fix;
+    const btns = [...this.root.querySelectorAll<HTMLElement>('[data-cmd="gd-locate"]')];
+    for (const b of btns) {
+      b.setAttribute('aria-pressed', String(on));
+      setAttr(b, 'title', on ? W.meButtonOn : W.meButton);
+    }
+    const map = this.root.querySelector<HTMLElement>('[data-gd-map]');
+    if (!map) return;
+    map.toggleAttribute('data-live', live);
+    let chip = map.querySelector<HTMLElement>('[data-gd-live]');
+    if (live && !chip) {
+      chip = h('div', { class: 'gd-live', 'data-gd-live': true }, [
+        h('button', { type: 'button', class: 'gd-live-me', 'data-gd-live-me': true, 'aria-label': W.liveCentre, title: W.liveCentre },
+          [W.live, h('span', { class: 'gd-live-dot', 'aria-hidden': 'true' }, '●')]),
+        h('button', { type: 'button', class: 'gd-live-stop', 'data-gd-me-stop': true, 'aria-label': W.stopLocating, title: W.stopLocating }, W.liveStop),
+      ]);
+      // Before the map's buttons, legend and credits, so they always paint over it.
+      const ui = map.querySelector('.gd-mapui');
+      if (ui) ui.before(chip);
+      else map.append(chip);
+    }
+    if (!chip) return;
+    // Stop pressed on the chip: the keyboard goes to the map's button, not to nowhere.
+    if (!live && chip.contains(document.activeElement)) btns.find((b) => b.getClientRects().length)?.focus({ preventScroll: true });
+    chip.hidden = !live;
+  }
+
+  /** A hint that stays in the status bar while waiting for the browser, and is read out once. */
+  private waitHint(t: Bi) {
+    this.locHint = t;
+    clearTimeout(this.hintTimer);
+    this.say();
+    const live = document.getElementById('k98-announcer');
+    if (live) { live.textContent = ''; setTimeout(() => (live.textContent = tr(t)), 60); }
+  }
+
+  /**
+   * A phone's half sheet can leave too short a strip for the map's button
+   * column (and the live chip above it): then the buttons go in a row
+   * (guide-map.css, [data-short]). Called with every sendFree().
+   */
+  private shortMap(bottom: number) {
+    const el = this.root.querySelector<HTMLElement>('[data-gd-map]');
+    if (el) el.toggleAttribute('data-short', el.clientHeight > 0 && el.clientHeight - bottom < 210);
   }
 
   private showNear(how: How, fly: boolean) {
-    if (!this.fix) return;
+    const f = this.fix;
+    if (!f) return;
     if (!this.wide && this.view() !== 'map') this.setView('map');
     const ids = this.renderNear();
     this.nearOpen = true;
@@ -320,15 +483,22 @@ export class GuideApp {
     // Frame you and the nearest once the sheet is open, so it doesn't cover the dot.
     if (fly) requestAnimationFrame(() => {
       if (this.ac.signal.aborted) return;
-      this.map?.setFree(this.sheet.covers(this.wide));
+      this.sendFree();
       this.map?.fitMe(ids.slice(0, 3));
     });
-    this.flash({ en: `${W.nearStatus(ids.length).en} ${W.accuracy(Math.round(this.fix.accuracy)).en}.`, zh: `${W.nearStatus(ids.length).zh}${W.accuracy(Math.round(this.fix.accuracy)).zh}。` });
-    if (how === 'keyboard') this.details.focusList();
+    const n = W.nearStatus(ids.length), a = W.accuracy(Math.round(f.accuracy));
+    this.flash({ en: `${n.en} ${a.en}.`, zh: `${n.zh}${a.zh}。` });
+    // The keyboard goes to the list only if it hasn't moved on while the browser looked for you.
+    const at = document.activeElement;
+    if (how === 'keyboard' && (!at || at === document.body || at === this.locBy)) this.details.focusList();
   }
 
-  /** The nearest few that the map shows and that are open on the chosen day, closest first. */
-  private renderNear(): string[] {
+  /**
+   * The nearest few that the map shows and that are open on the chosen day,
+   * closest first. 'fix' (a new position) redraws only when the order changes
+   * or you have moved about 15 m; 'fix' and 'filter' keep the list's scroll and focus.
+   */
+  private renderNear(refresh: false | 'fix' | 'filter' = false): string[] {
     const f = this.fix;
     if (!f) return [];
     const s = this.store.get();
@@ -337,11 +507,15 @@ export class GuideApp {
       ...(s.listings ? this.p.listings.filter((l) => this.matchListing(l.id)) : []),
     ];
     const near = nearest(f.coordinates, shown.map((x) => ({ id: x.id, coordinates: x.coordinates })), 5);
+    const key = near.map((x) => x.id).join(' ');
+    if (refresh === 'fix' && key === this.nearKey && this.nearAt && distance(this.nearAt, f.coordinates) < 15) return near.map((x) => x.id);
+    this.nearKey = key;
+    this.nearAt = f.coordinates;
     const day = s.day === 'any' ? null : dayLabel(s.day);
     this.details.showNear({
       title: W.nearYou,
       note: W.nearNote(day),
-      empty: W.nearNone,
+      empty: W.nearNone(day, !!s.q.trim() || !!s.theme),
       stop: W.stopLocating,
       rows: near.map(({ id, m }) => {
         const it = this.items.get(id);
@@ -354,7 +528,7 @@ export class GuideApp {
           line: { en: [d.en, w.en, st?.en].filter(Boolean).join(' - '), zh: [d.zh, w.zh, st ? st.zh || st.en : ''].filter(Boolean).join(' - ') },
         };
       }),
-    });
+    }, refresh !== false);
     return near.map((x) => x.id);
   }
 
@@ -421,15 +595,21 @@ export class GuideApp {
         if (kind === 'listing') return { match: this.matchListing(id), visitable: true, cell: null };
         if (kind === 'place') return { match: true, visitable: true, cell: null };
         const st = this.status(id)!;
-        return { match: this.matchItem(id), visitable: st.visitable, cell: day ? st.short : null };
-      }, day, (n) => (day ? { en: `Closed on ${day.en} (${n})`, zh: `${day.zh}不开放（${n}）` } : { en: '', zh: '' })) ?? this.counts;
+        return { match: this.matchItem(id), visitable: st.visitable, cell: day ? st.short : null, code: st.code };
+      }, day, (n) => (day ? { en: `Closed on ${day.en} (${n})`, zh: `${day.zh}不开放（${n}）` } : { en: '', zh: '' }), {
+        // "Nearest first": straight lines from the last position, read when the list sorts.
+        metres: (id) => { const c = this.coords(id); return this.fix && c ? distance(this.fix.coordinates, c) : null; },
+        located: () => !!this.fix,
+        pick: (sort) => this.store.set({ sort }),
+      }) ?? this.counts;
       this.routes.render(s, (id) => (s.day === 'any' ? null : this.status(id)?.short ?? null));
       this.daysPane.render(s, this.today);
       this.details.fillStatus((id) => this.status(id));
       this.drawMap(changed, first);
       // The nearest list follows the day, the topic and the box.
-      if (this.nearOpen && this.fix && !s.place) this.renderNear();
+      if (this.nearOpen && this.fix && !s.place) this.renderNear('filter');
     }
+    // Asked for (Area button, menu, URL): a flight to that map. A switch made by zooming is already done, so setArea does nothing.
     if (changed.has('area') && !first) this.map?.setArea(s.area, { fly: true });
     if (changed.has('place') || first) {
       if (s.place) this.details.show(s.place);
@@ -439,7 +619,7 @@ export class GuideApp {
     if (changed.has('heat') || filters || first) this.drawHeat();
     if (changed.has('detail') || changed.has('view') || first) {
       this.sheet.set(s.detail);
-      requestAnimationFrame(() => this.map?.setFree(this.sheet.covers(this.wide)));
+      requestAnimationFrame(() => this.sendFree());
     }
     this.syncInert();
     this.pressTools();
@@ -528,6 +708,7 @@ export class GuideApp {
       let t: Bi = matchMedia('(pointer: coarse)').matches ? W.hintTouch : W.hint;
       const r = this.p.routes.find((x) => x.id === s.route);
       if (hint) t = hint;
+      else if (this.locHint) t = this.locHint;
       else if (s.place) t = { en: `${s.place} - ${this.names.get(s.place) ?? ''}`, zh: `${s.place} - ${this.names.get(s.place) ?? ''}` };
       else if (r) t = { en: `${r.name.en} - ${this.routeStops().length} stops`, zh: `${r.name.zh || r.name.en} - ${this.routeStops().length} 站` };
       setText(f0, t);
@@ -600,16 +781,24 @@ export class GuideApp {
   }
 
   closeDetails() {
+    const inSheet = this.sheet.el.contains(document.activeElement);
     this.nearOpen = false;
     this.store.set({ place: null, detail: 'closed' });
     this.details.show(null);
     const back = this.returnFocus;
     this.returnFocus = null;
-    if (back?.isConnected) back.focus({ preventScroll: true });
+    // Back where the keyboard came from. If that has gone or hides in the closed
+    // sheet (a row of the nearest list), the map's Where am I? button, else the map.
+    const can = (el: HTMLElement | null | undefined): el is HTMLElement => !!el?.isConnected && el.getClientRects().length > 0 && !el.closest('[inert]');
+    if (can(back)) back.focus({ preventScroll: true });
+    else if (inSheet) {
+      const to = [this.root.querySelector<HTMLElement>('[data-cmd="gd-locate"]'), this.root.querySelector<HTMLElement>('[data-gd-map] .gd-viewport')].find(can);
+      to?.focus({ preventScroll: true });
+    }
   }
 
-  setView(v: View, how: How = 'pointer') {
-    this.finder?.close();
+  setView(v: View, how: How = 'pointer', keepFind = false) {
+    if (!keepFind) this.finder?.close();
     const cur = this.view();
     // Wide: pressing the open pane's button again closes the bar (as in IE).
     const next: View = this.wide && v === cur && v !== 'map' ? 'map' : v;
@@ -698,18 +887,22 @@ export class GuideApp {
 
   help() {
     const k = kus();
+    if (k) this.saveScroll();
     if (k) void k.open('/help#guides');
     else location.href = '/help#guides';
   }
 
   home() {
     const k = kus();
+    if (k) this.saveScroll();
     if (k) void k.open('/guides');
     else location.href = '/guides';
   }
 
   refresh() {
     const k = kus();
+    // The window swaps before destroy() runs, so save the pane scroll while the panes are still here.
+    if (k) this.saveScroll();
     if (k) void k.open(this.win.dataset.url ?? this.pageUrl(), { reload: true });
     else location.reload();
   }
@@ -747,6 +940,16 @@ export class GuideApp {
     this.root.querySelector<HTMLInputElement>('[data-gd-q]')?.focus();
   }
 
+  /** Tell the map how much of it the sheet covers; with onlyChange, skip it when nothing moved. */
+  private sendFree(onlyChange = false) {
+    const free = this.sheet.covers(this.wide);
+    const key = `${free.right ?? 0} ${free.bottom ?? 0}`;
+    this.shortMap(free.bottom ?? 0);
+    if (!this.map || (onlyChange && key === this.freeKey)) return;
+    this.freeKey = key;
+    this.map.setFree(free);
+  }
+
   // ---- Session (camera, area, pane scroll) ----
   private keepSession(patch: Partial<Session>) {
     this.session = { ...this.session, ...patch, guide: this.slug };
@@ -754,7 +957,9 @@ export class GuideApp {
   }
   private saveScroll() {
     const scroll: Record<string, number> = { ...(this.session.scroll ?? {}) };
-    for (const b of this.root.querySelectorAll<HTMLElement>('[data-gd-pane] .gd-pane-body')) scroll[b.closest<HTMLElement>('[data-gd-pane]')!.dataset.gdPane!] = b.scrollTop;
+    // A hidden pane reads 0: keep what was saved for it before.
+    for (const b of this.root.querySelectorAll<HTMLElement>('[data-gd-pane] .gd-pane-body'))
+      if (b.getClientRects().length) scroll[b.closest<HTMLElement>('[data-gd-pane]')!.dataset.gdPane!] = b.scrollTop;
     this.keepSession({ scroll, area: this.store.get().area });
   }
   private restoreScroll() {
@@ -794,10 +999,12 @@ export class GuideApp {
     }, { signal });
     // The view links act as toggle buttons, so Space presses them too.
     this.win.addEventListener('keydown', (e) => {
-      if (e.key !== ' ' || e.defaultPrevented) return;
+      if (e.key !== ' ' || e.defaultPrevented || e.altKey) return;
       const a = (e.target as Element).closest<HTMLAnchorElement>('.toolbar a.tool[href^="#gd-"]');
       if (!a || !this.win.contains(a)) return;
       e.preventDefault();
+      // Held down, Space presses once, as on a native button.
+      if (e.repeat) return;
       this.setView(a.getAttribute('href')!.slice(4) as View, 'keyboard');
     }, { signal });
 
@@ -814,8 +1021,6 @@ export class GuideApp {
       }
       const row = t.closest<HTMLTableRowElement>('tr[data-gd-row]');
       if (row && !t.closest('a, button, summary')) return this.select(row.dataset.gdRow!, how, 'list');
-      const th = t.closest<HTMLElement>('th[data-gd-sort]');
-      if (th) return this.store.set({ sort: th.dataset.gdSort as GdState['sort'] });
       const theme = t.closest<HTMLElement>('[data-gd-theme]');
       if (theme) {
         e.preventDefault();
@@ -824,8 +1029,9 @@ export class GuideApp {
         if (!this.wide) this.setView('places');
         return;
       }
-      if (t.closest('[data-cmd="gd-locate"]')) return this.whereAmI(how);
-      if (t.closest('[data-gd-me-stop]')) return this.stopLocating();
+      if (t.closest('[data-cmd="gd-locate"]')) return this.toggleLocate(how);
+      if (t.closest('[data-gd-me-stop]')) return this.stopLocating(true);
+      if (t.closest('[data-gd-live-me]')) return this.recentre();
       // The map's own Heat and Area buttons (the same as on the View menu).
       if (t.closest('[data-cmd="gd-heat"]')) return this.store.set({ heat: !this.store.get().heat });
       const ar = t.closest<HTMLElement>('[data-cmd="gd-area"]');
@@ -871,10 +1077,13 @@ export class GuideApp {
       const t = e.target as HTMLInputElement;
       if (!t.matches('[data-gd-q]')) return;
       clearTimeout(this.qTimer);
-      this.qTimer = window.setTimeout(() => {
-        this.store.set({ q: t.value.slice(0, 80) });
-        if (this.wide && this.view() === 'map' && t.value.trim()) this.setView('places');
-      }, 150);
+      // Pinyin still being composed is not yet the words: wait for compositionend.
+      if ((e as InputEvent).isComposing) return;
+      this.queueQ(t);
+    }, { signal });
+    root.addEventListener('compositionend', (e) => {
+      const t = e.target as HTMLInputElement;
+      if (t.matches?.('[data-gd-q]')) this.queueQ(t);
     }, { signal });
     root.querySelector('[data-gd-filters]')?.addEventListener('submit', (e) => e.preventDefault(), { signal });
 
@@ -911,10 +1120,11 @@ export class GuideApp {
     // Layout follows the program's own size.
     const ro = new ResizeObserver(() => {
       const wide = root.clientWidth >= WIDE;
-      // The sheet's size and the drawer follow every resize (a phone turning, say).
+      // The sheet's size and the drawer follow every resize (a phone turning, say),
+      // but only a change: setFree() flies back to the selected place.
       requestAnimationFrame(() => {
         if (signal.aborted) return;
-        this.map?.setFree(this.sheet.covers(this.wide));
+        this.sendFree(true);
         this.syncInert();
       });
       if (wide === this.wide) return;
@@ -952,13 +1162,14 @@ export class GuideApp {
       if (signal.aborted) return;
       if (!(e as CustomEvent).detail?.same) return;
       const u = this.win.dataset.url ?? '';
-      const st = initialState(this.p, u.includes('?') ? u.slice(u.indexOf('?')) : '', loadPrefs(), this.today, this.contrast);
+      const st = initialState(this.p, u.includes('?') ? u.slice(u.indexOf('?')) : '', loadPrefs(), this.today);
       this.store.set({ place: st.place, day: st.day, dayAuto: st.dayAuto, theme: st.theme, q: st.q, listings: st.listings, area: st.area, route: st.route, view: st.view, detail: st.place ? (this.wide ? 'half' : 'full') : 'closed' });
       this.syncControls();
     }, { signal });
 
     window.addEventListener('pagehide', () => this.saveScroll(), { signal });
-    this.win.addEventListener('desktop:close', () => this.destroy(), { once: true });
+    // On the signal too: the window outlives a swapped page, and must not keep this instance alive.
+    this.win.addEventListener('desktop:close', () => this.destroy(), { once: true, signal });
     // Once torn down, this instance no longer answers for the window's menus.
     const menus = menuProvider(this);
     kus()?.menus?.(this.win, (n) => (this.ac.signal.aborted ? null : menus(n)));
@@ -980,6 +1191,8 @@ export class GuideApp {
       this.focusFind();
     } else if (e.key === 'Escape') {
       const q = t.closest?.('[data-gd-q]') as HTMLInputElement | null;
+      // Esc while an IME composes cancels the candidate only, not the whole box.
+      if (q && (e.isComposing || e.keyCode === 229)) return;
       if (q && q.value) {
         e.preventDefault();
         q.value = '';

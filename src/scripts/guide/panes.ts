@@ -1,10 +1,11 @@
 // Field Guide (导览): the server-rendered panes, kept in step with the state.
-// Places: sort, Day column, the "Closed on <day>" group, theme and Find,
-// listings on or off, the selected row. Routes: the radio and each stop's
-// status. Days: today and past days, in the guide's own time zone.
-import type { Bi, ISODate } from '../../lib/guides/types';
-import { dayLabel } from '../../lib/guides/core';
-import { setText } from './dom';
+// Places: "Sort by:" and its Default button (the orders are order.ts), each
+// row's day, the "Closed on <day>" group, theme and Find, listings on or off,
+// the selected row. Routes: the radio and each stop's status. Days: today and
+// past days, in the guide's own time zone.
+import type { Bi, ISODate, StatusCode } from '../../lib/guides/types';
+import { bi, h, setText } from './dom';
+import { DEFAULT_SORT, sortInUse, sortRows } from './order';
 import type { GdState, Sort } from './state';
 
 export interface RowInfo {
@@ -12,60 +13,112 @@ export interface RowInfo {
   match: boolean;
   /** Open (or worth going) on the chosen day. */
   visitable: boolean;
-  /** Day column text; null keeps the server's weekly pattern. */
+  /** The row's day text; null keeps the server's weekly pattern. */
   cell: Bi | null;
+  /** The chosen day's status: its square in the row, and "Open that day first". */
+  code?: StatusCode;
 }
 
-const TIER_ORDER: Record<string, number> = { A: 0, B: 1, C: 2 };
-const num = (id: string) => Number(id.replace(/^\D+/, '')) || 0;
+/** What the Places pane asks the program; it comes with each render. */
+export interface PlacesHooks {
+  /** Straight-line metres from the visitor to a row; null without a position. */
+  metres(id: string): number | null;
+  /** Where am I? has a position now. */
+  located(): boolean;
+  /** An order picked in the pane (the select, its Default button) or on View ▸ Sort By. */
+  pick(sort: Sort): void;
+}
 
 export class PlacesPane {
   private readonly table: HTMLTableElement | null;
+  private readonly body: HTMLElement | null;
   private readonly items: HTMLTableSectionElement | null;
   private readonly closed: HTMLTableSectionElement | null;
   private readonly closedHead: HTMLElement | null;
   private readonly listings: HTMLTableSectionElement | null;
   private readonly empty: HTMLElement | null;
-  private readonly dayHead: HTMLElement | null;
+  private readonly sortSel: HTMLSelectElement | null;
+  private readonly sortDefault: HTMLElement | null;
   private readonly rows = new Map<string, HTMLTableRowElement>();
+  private readonly names = new Map<string, string>();
   private readonly cells = new Map<string, HTMLElement>();
   private readonly week = new Map<string, Node[]>();
+  private hooks: PlacesHooks | null = null;
+  private last: GdState | null = null;
+  private used: Sort | null = null;
 
   constructor(root: HTMLElement) {
     this.table = root.querySelector('[data-gd-table]');
+    this.body = this.table?.closest<HTMLElement>('.gd-pane-body') ?? null;
     this.items = root.querySelector('tbody[data-gd-group="items"]');
     this.closed = root.querySelector('tbody[data-gd-group="closed"]');
     this.closedHead = root.querySelector('[data-gd-closed-head]');
     this.listings = root.querySelector('tbody[data-gd-group="listings"]');
     this.empty = root.querySelector('[data-gd-empty]');
-    this.dayHead = root.querySelector('[data-gd-dayhead]');
+    this.sortSel = root.querySelector('[data-gd-sort-select]');
+    this.sortDefault = root.querySelector('[data-gd-sort-default]');
     for (const tr of root.querySelectorAll<HTMLTableRowElement>('tr[data-gd-row]')) {
-      this.rows.set(tr.dataset.gdRow!, tr);
+      const id = tr.dataset.gdRow!;
+      this.rows.set(id, tr);
+      this.names.set(id, tr.querySelector('.gd-row-name')?.textContent ?? '');
       const c = tr.querySelector<HTMLElement>('[data-gd-cell]');
       if (c) {
-        this.cells.set(tr.dataset.gdRow!, c);
-        this.week.set(tr.dataset.gdRow!, [...c.childNodes].map((n) => n.cloneNode(true)));
+        this.cells.set(id, c);
+        this.week.set(id, [...c.childNodes].map((n) => n.cloneNode(true)));
       }
     }
+    const sel = this.sortSel;
+    if (sel) {
+      // The greyed options follow the day and the position whenever the select is used.
+      for (const ev of ['focus', 'pointerdown', 'keydown']) sel.addEventListener(ev, () => this.syncOptions());
+      sel.addEventListener('change', () => this.pick(sel.value as Sort));
+    }
+    this.sortDefault?.addEventListener('click', () => {
+      this.pick(DEFAULT_SORT);
+      // The button hides itself, so the focus moves to the select.
+      sel?.focus();
+    });
   }
 
   ids(kind?: string) { return [...this.rows.values()].filter((r) => !kind || r.dataset.kind === kind).map((r) => r.dataset.gdRow!); }
   query(id: string) { return this.rows.get(id)?.dataset.q ?? ''; }
 
-  render(s: GdState, info: (id: string, kind: string) => RowInfo, dayName: Bi | null, closedLabel: (n: number) => Bi) {
+  /** The order the list uses: the chosen one, or the default while that can't apply. */
+  inUse(s: GdState): Sort { return sortInUse(s.sort, s.day !== 'any', !!this.hooks?.located()); }
+
+  /** Open that day first needs a chosen day; Nearest first needs a position. */
+  can(sort: Sort, s = this.last): boolean {
+    if (sort === 'open') return !!s && s.day !== 'any';
+    if (sort === 'near') return !!this.hooks?.located();
+    return true;
+  }
+
+  /** Choose an order: the select, its Default button, View ▸ Sort By. */
+  pick(sort: Sort) {
+    this.hooks?.pick(this.can(sort) ? sort : DEFAULT_SORT);
+    // A greyed choice changes nothing: show the order in use again.
+    if (this.last) this.syncSort(this.inUse(this.last));
+  }
+
+  render(s: GdState, info: (id: string, kind: string) => RowInfo, dayName: Bi | null, closedLabel: (n: number) => Bi, hooks?: PlacesHooks) {
     if (!this.table) return;
-    if (this.dayHead) setText(this.dayHead, dayName ? dayLabel(s.day as ISODate) : { en: 'Days', zh: '日期' });
-    // Header sort state.
-    for (const th of this.table.querySelectorAll<HTMLElement>('th[data-gd-sort]')) th.setAttribute('aria-sort', th.dataset.gdSort === s.sort ? 'ascending' : 'none');
-    const sorted = this.sorted(s.sort);
-    let open = 0, shut = 0, shown = 0;
-    for (const tr of sorted) {
+    if (hooks) this.hooks = hooks;
+    this.last = s;
+    const use = this.inUse(s);
+    this.syncSort(use);
+    const metres = use === 'near' ? this.hooks?.metres : undefined;
+    const list = [...this.rows.values()].filter((tr) => tr.dataset.kind !== 'place').map((tr) => {
       const id = tr.dataset.gdRow!;
+      const r = info(id, tr.dataset.kind!);
+      return { id, tr, r, name: this.names.get(id) ?? '', tier: tr.dataset.tier, zone: tr.dataset.zi ? Number(tr.dataset.zi) : undefined, code: r.code, m: metres ? metres(id) : null };
+    });
+    let open = 0, shut = 0, shown = 0;
+    for (const { id, tr, r } of sortRows(list, use)) {
       const kind = tr.dataset.kind!;
-      const r = info(id, kind);
       const cell = this.cells.get(id);
       if (cell) {
-        if (r.cell) setText(cell, r.cell);
+        // A chosen day: its status with the details panel's coloured square.
+        if (r.cell) cell.replaceChildren(h('span', { class: 'gd-sq', 'data-code': r.code ?? '', 'aria-hidden': 'true' }), bi(r.cell));
         else cell.replaceChildren(...(this.week.get(id) ?? []).map((n) => n.cloneNode(true)));
       }
       tr.hidden = !r.match || (kind === 'listing' && !s.listings);
@@ -81,7 +134,25 @@ export class PlacesPane {
     if (this.listings) this.listings.hidden = !s.listings;
     if (this.empty) this.empty.hidden = shown > 0;
     this.select(s.place);
+    // A new order is read from its top (or from the selected row).
+    if (this.used && this.used !== use) {
+      if (s.place && this.rows.has(s.place)) this.reveal(s.place);
+      else if (this.body) this.body.scrollTop = 0;
+    }
+    this.used = use;
     return { open, shut, shown };
+  }
+
+  /** The select shows the order in use; Default shows only away from the default. */
+  private syncSort(use: Sort) {
+    this.syncOptions();
+    if (this.sortSel) this.sortSel.value = use;
+    if (this.sortDefault) this.sortDefault.hidden = use === DEFAULT_SORT;
+  }
+
+  private syncOptions() {
+    if (!this.sortSel) return;
+    for (const o of this.sortSel.options) o.disabled = !this.can(o.value as Sort);
   }
 
   select(id: string | null) {
@@ -95,19 +166,6 @@ export class PlacesPane {
 
   reveal(id: string) {
     this.rows.get(id)?.scrollIntoView({ block: 'nearest' });
-  }
-
-  private sorted(sort: Sort) {
-    const list = [...this.rows.values()].filter((r) => r.dataset.kind !== 'place');
-    const name = (r: HTMLElement) => r.querySelector('.gd-row-name')?.textContent ?? '';
-    return list.sort((a, b) => {
-      const ka = a.dataset.kind === 'listing' ? 1 : 0, kb = b.dataset.kind === 'listing' ? 1 : 0;
-      if (ka !== kb) return ka - kb;
-      if (sort === 'name') return name(a).localeCompare(name(b));
-      if (sort === 'zone') return (a.dataset.zone ?? '').localeCompare(b.dataset.zone ?? '') || name(a).localeCompare(name(b));
-      const ta = TIER_ORDER[a.dataset.tier ?? ''] ?? 9, tb = TIER_ORDER[b.dataset.tier ?? ''] ?? 9;
-      return ta - tb || num(a.dataset.gdRow!) - num(b.dataset.gdRow!);
-    });
   }
 }
 

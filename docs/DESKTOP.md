@@ -44,7 +44,7 @@ Ground rules:
 | `src/styles/schemes.css` | Colour schemes (Standard, High Contrast White, Slate) |
 | `src/lib/guides/` | Field Guide: the shapes of a guide (`types.ts`), day rules, dates and map maths safe for the browser (`core.ts`), the interface's words, the checks, and the server-only loader that builds each audience's view and its browser data |
 | `src/scripts/guide/` | Field Guide in the browser: the window, panes, details sheet, menus, the map engine (camera, pins, labels, routes, heat) and the log-on box. It imports only `types.ts`, `core.ts` and `words.ts`, never guide content |
-| `worker/guides.ts` | The Field Guide's password gate: the log-on and log-off, the signed cookie, and which audience's page (and pictures) a request gets |
+| `worker/guides.ts` | The Field Guide's password gate: the log-on and log-off, the signed cookie, and which audience's page (and pictures) a request gets. It also sends `/guides` to the first listed guide, whose log-on box has the Guide list |
 
 ### The shell: `src/scripts/desktop/`
 
@@ -84,6 +84,16 @@ from `src/scripts/guide/`.
   isn't rebuilt (the house map).
 - `[data-cmd="…"]` buttons: `minimize`, `maximize`, `close`, `back`, `forward`,
   `up`, `home`, `refresh`, `stop`, plus any registered command.
+- `[data-fit="dialog"]` (`Window`'s `fit="dialog"`): the page is a dialog box
+  in its program's window, the Field Guide's log-on box. On a computer the
+  window opens in the middle, `w` wide and as tall as what it holds, whatever
+  the program's remembered place or "Always maximize windows" say. It can't be
+  sized or maximised (`no-resize`, Maximize greyed out) and nothing remembers
+  its place. When the window moves on to a page without it (logging on), it
+  takes the program's remembered place, or else opens as that page does
+  (maximised, for the Field Guide); back to one with it (Log Off), it is the
+  small box in the middle again (`wm.swap`). On a phone it fills the screen like
+  every window. Its CSS is in `guide-logon.css`.
 
 Without JavaScript, the window is an ordinary page: the close button links to
 `/`, and minimise and maximise are hidden.
@@ -191,7 +201,7 @@ Kept in this browser only.
 | | `kus98:user` | The last log-on name |
 | | `kus98:run` | What was typed in Run |
 | | `kus98:paint` | Paint: the tool in hand, colours, custom colours, tool options |
-| | `kus98:windows` | Each program's window as it was last left: place and size, maximised, the bars hidden with View ▸ Toolbars and Status Bar |
+| | `kus98:windows` | Each program's window as it was last left: place and size, maximised, the bars hidden with View ▸ Toolbars and Status Bar. Not written while the window shows a dialog-sized page (`data-fit="dialog"`) |
 | | `kus98:guide` | Field Guide: heat map and labels on or off, how the Places table is sorted (`{heat, labels, sort}`). Log Off clears it |
 | IndexedDB | `kus98-paint` | Paint: the picture being drawn (a PNG), until File ▸ New |
 | | `lang` | The language chosen with the 中/EN switch |
@@ -209,8 +219,11 @@ was). Only a reload or Back/Forward does this: typing the address again, a
 link from elsewhere, a new tab, or start-up and log-on in a new browser session
 starts afresh with the page asked for.
 A program's window opens where it was last left (`kus98:windows`), as Windows 98
-does for folders; dialog boxes always open in the middle, and on a phone every
-window fills the screen anyway.
+does for folders; dialog boxes, and dialog-sized pages such as the Field
+Guide's log-on box, always open in the middle, and on a phone every window
+fills the screen anyway. A refresh keeps no place for a dialog-sized page
+either: it comes back in the middle, or, if the page is the guide by then
+(logged on in another tab), where the Field Guide was last left.
 
 **Welcome.** "Show this screen each time Xiangyin 98 starts" decides at
 log-on (`boot.ts`) and at every load of the home page: unticked, `/` shows the
@@ -271,6 +284,9 @@ to a handler with injected services, like `worker/guides.ts`. Build every
 locked version as its own page under a path the Worker serves only internally
 (`views/<audience>`), plus a neutral log-on page; both use the same `Window`
 props (app, variant, url, title, icon), so unlocking swaps the window in place.
+Give the log-on page `fit="dialog"` and the box's width (`w`): until the
+password is accepted it is a small window in the middle, the locked page then
+fills the window as the program's own pages do, and Log Off brings the box back.
 Send both with `Cache-Control: private, no-store` and `Vary: Cookie`: the
 router never caches such a page, so a log-on or log-off is never hidden by a
 copy it fetched before. The log-on form posts without JavaScript (a 303 back to

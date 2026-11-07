@@ -108,6 +108,13 @@ export function titlesOf(win: Win) {
 /** The browser tab's title for a window's page, in the language showing. */
 export const pageTitle = (win: Win) => (lang() === 'zh' && win.docTitleZh) || win.docTitle;
 export const isPage = (win: Win) => !!win.el.dataset.url && !win.dialog;
+/**
+ * The window shows a dialog-sized page ([data-fit="dialog"], the Field Guide's
+ * log-on box): it opens in the middle as a dialog box would, is never
+ * maximised, and its place isn't remembered. The program's other pages open
+ * as they were left.
+ */
+export const dialogSized = (win: Win) => !win.dialog && win.el.dataset.fit === 'dialog';
 const zOf = (win: Win) => Number(win.el.style.zIndex) || 0;
 
 function area() {
@@ -123,6 +130,25 @@ function place(win: Win) {
 }
 
 const num = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+
+/** A size a page's window sets in its style attribute (--w, --h), or 0. */
+const sizeIn = (el: HTMLElement, prop: '--w' | '--h') => parseFloat(el.style.getPropertyValue(prop)) || 0;
+
+/** A dialog-sized window is as tall as what it holds (guide-logon.css), which can change: measure it. */
+function heightNow(win: Win) {
+  if (dialogSized(win) && win.el.offsetHeight) win.h = win.el.offsetHeight;
+  return win.h;
+}
+
+/** Put a dialog-sized window in the middle of the screen, as tall as what it holds. */
+function centreSized(win: Win) {
+  place(win);
+  const a = area();
+  heightNow(win);
+  win.x = (a.w - win.w) / 2;
+  win.y = Math.max(8, (a.h - win.h) / 2);
+  place(win);
+}
 
 /** Size and put a window as it was left, kept within this screen, with the bars it showed. */
 function fitPlace(win: Win, p: Place) {
@@ -170,7 +196,8 @@ function adopt(el: HTMLElement, o: OpenOpts = {}): Win {
   const cs = getComputedStyle(el);
   const w = Math.max(MIN_W, Math.min(parseFloat(cs.getPropertyValue('--w')) || info?.w || 420, a.w - 16));
   const h = Math.max(MIN_H, Math.min(parseFloat(cs.getPropertyValue('--h')) || info?.h || 300, a.h - 16));
-  const pos = (!o.center && cascadeFrom(o.near, w, h)) || { x: (a.w - w) / 2, y: Math.max(8, (a.h - h) / 2) };
+  const sized = !o.dialog && el.dataset.fit === 'dialog';
+  const pos = (!o.center && !sized && cascadeFrom(o.near, w, h)) || { x: (a.w - w) / 2, y: Math.max(8, (a.h - h) / 2) };
   const win: Win = {
     id: nextId++,
     el,
@@ -195,15 +222,18 @@ function adopt(el: HTMLElement, o: OpenOpts = {}): Win {
   el.dataset.winId = String(win.id);
   addHandles(el);
   wins.push(win);
-  // A program's window opens where it was last left (dialog boxes always open in the middle).
-  const p = o.dialog ? null : (o.at ?? hooks.place(app));
+  // A program's window opens where it was last left (dialog boxes, and dialog-sized
+  // pages, always open in the middle). A refresh puts it back exactly, unless it
+  // showed a dialog-sized page then: that left no place (memory.ts).
+  const p = o.dialog || sized ? null : num(o.at?.w) ? o.at : hooks.place(app);
   if (p) fitPlace(win, p);
   place(win);
   const wasMax = typeof p?.max === 'boolean' ? p.max : el.dataset.state === 'max';
-  const max = !o.dialog && (o.state === 'max' || wasMax || settings.get().alwaysMax);
+  const max = !o.dialog && !sized && (o.state === 'max' || wasMax || settings.get().alwaysMax);
   win.state = max ? 'max' : 'normal';
   if (max) win.restore = 'max';
   el.dataset.state = win.state;
+  if (sized) centreSized(win);
   updateMaxButton(win);
   updateNav(win);
   if (o.owner) {
@@ -226,7 +256,7 @@ function fit(win: Win) {
   win.el.classList.remove('auto-size');
   if (owner && owner.state === 'normal') {
     win.x = clamp(owner.x + (owner.w - win.w) / 2, 4, a.w - win.w - 4);
-    win.y = clamp(owner.y + Math.min(80, (owner.h - win.h) / 2), 4, a.h - win.h - 4);
+    win.y = clamp(owner.y + Math.min(80, (heightNow(owner) - win.h) / 2), 4, a.h - win.h - 4);
   } else {
     win.x = (a.w - win.w) / 2;
     win.y = Math.max(8, (a.h - win.h) / 2.4);
@@ -254,8 +284,10 @@ function centerRect(win: Win) {
 }
 
 function updateMaxButton(win: Win) {
-  const b = win.el.querySelector<HTMLElement>(':scope > .title-bar [data-cmd="maximize"]');
+  const b = win.el.querySelector<HTMLButtonElement>(':scope > .title-bar [data-cmd="maximize"]');
   if (!b) return;
+  // A window that can't be sized can't be maximised either (toggleMax): greyed out, as Windows 98 does.
+  b.disabled = win.el.classList.contains('no-resize');
   // Both languages, so the 中/EN switch (lang.ts) swaps in the right word.
   const label = win.state === 'max' ? { en: 'Restore', zh: '还原' } : { en: 'Maximize', zh: '最大化' };
   for (const a of ['aria-label', 'title']) {
@@ -279,7 +311,7 @@ function rectFor(win: Win, state: WinState): Rect | null {
     return t ? t.getBoundingClientRect() : null;
   }
   if (state === 'max' || isCompact()) return { left: L.left, top: L.top, width: L.width, height: L.height };
-  return { left: L.left + win.x, top: L.top + win.y, width: win.w, height: win.h };
+  return { left: L.left + win.x, top: L.top + win.y, width: win.w, height: heightNow(win) };
 }
 
 /** The caption "zoom": a title bar flying between two places. */
@@ -407,7 +439,8 @@ export function restore(win: Win) {
 
 /** Put an open window back as it was left (a refresh): place, size, maximised, bars. */
 export function setPlace(win: Win, p: Place) {
-  if (win.dialog) return;
+  // A dialog-sized page stays as it opened, in the middle, whatever its program's window was.
+  if (win.dialog || dialogSized(win)) return;
   fitPlace(win, p);
   place(win);
   if (typeof p.max === 'boolean' && win.state !== 'min') setState(win, p.max || settings.get().alwaysMax ? 'max' : 'normal', false);
@@ -496,7 +529,8 @@ export function minimizeAll() {
 
 export function arrange(how: 'cascade' | 'tile-h' | 'tile-v') {
   const a = area();
-  const ws = wins.filter((w) => w.state !== 'min' && !w.dialog).sort((x, y) => zOf(x) - zOf(y));
+  // Dialog-sized pages stay where they are, like dialog boxes.
+  const ws = wins.filter((w) => w.state !== 'min' && !w.dialog && !dialogSized(w)).sort((x, y) => zOf(x) - zOf(y));
   if (!ws.length) return;
   ws.forEach((w, i) => {
     if (w.state === 'max') setState(w, 'normal', false);
@@ -539,7 +573,8 @@ export function swap(win: Win, incoming: HTMLElement, url: string, docTitle: str
   if (oldInner.inert) adopted.inert = true;
   oldInner.replaceWith(adopted);
   win.keep = live;
-  for (const attr of ['data-icon', 'data-alt-href', 'data-home']) {
+  const wasSized = dialogSized(win);
+  for (const attr of ['data-icon', 'data-alt-href', 'data-home', 'data-fit']) {
     const v = incoming.getAttribute(attr);
     if (v == null) win.el.removeAttribute(attr);
     else win.el.setAttribute(attr, v);
@@ -562,8 +597,56 @@ export function swap(win: Win, incoming: HTMLElement, url: string, docTitle: str
     win.hist[win.hi] = url;
   }
   if (active !== win) win.el.querySelector(':scope > .title-bar')?.classList.add('inactive');
+  // To or from a dialog-sized page (logging on to a guide, or off): the window changes size.
+  if (dialogSized(win)) toSized(win, incoming, wasSized);
+  else if (wasSized) toFull(win, incoming);
   updateNav(win);
   emit(document, 'wm:change');
+}
+
+/**
+ * The window now shows a dialog-sized page: normal, the page's width, in the
+ * middle. From another one (a guide chosen in the log-on box's Guide list) it
+ * stays where it was, only as tall as the new box.
+ */
+function toSized(win: Win, incoming: HTMLElement, stay = false) {
+  win.w = Math.max(MIN_W, Math.min(sizeIn(incoming, '--w') || win.w, area().w - 16));
+  // The box shows all its bars (the ones hidden were the program's other pages').
+  delete win.el.dataset.hide;
+  win.restore = 'normal';
+  const wasMax = win.state === 'max';
+  if (wasMax) setState(win, 'normal', false);
+  if (stay) {
+    place(win);
+    heightNow(win);
+    Object.assign(win, clampMove(win));
+    place(win);
+  } else centreSized(win);
+  updateMaxButton(win);
+  if (!wasMax) emit(win.el, 'desktop:resize');
+}
+
+/**
+ * The window leaves a dialog-sized page for a full one: where the program's
+ * window was last left, or else as the page opens (maximised, for the Field
+ * Guide), as a window opening it would be.
+ */
+function toFull(win: Win, incoming: HTMLElement) {
+  const a = area();
+  const info = APPS[win.app as AppId];
+  win.w = Math.max(MIN_W, Math.min(sizeIn(incoming, '--w') || info?.w || 420, a.w - 16));
+  win.h = Math.max(MIN_H, Math.min(sizeIn(incoming, '--h') || info?.h || 300, a.h - 16));
+  win.x = (a.w - win.w) / 2;
+  win.y = Math.max(8, (a.h - win.h) / 2);
+  const p = hooks.place(win.app);
+  if (p) fitPlace(win, p);
+  place(win);
+  const wasMax = typeof p?.max === 'boolean' ? p.max : incoming.dataset.state === 'max';
+  const state: WinState = wasMax || settings.get().alwaysMax ? 'max' : 'normal';
+  updateMaxButton(win);
+  if (win.state === 'min') win.restore = state;
+  else if (win.state !== state) return setState(win, state, false);
+  emit(win.el, 'desktop:resize');
 }
 
 /** Update the address bar of a window (house map pans, etc.). */
@@ -612,7 +695,7 @@ function resized(s: Geom, dir: string, dx: number, dy: number): Geom {
 function drag(win: Win, e: PointerEvent, mode: string) {
   const sx = e.clientX;
   const sy = e.clientY;
-  const start: Geom = { x: win.x, y: win.y, w: win.w, h: win.h };
+  const start: Geom = { x: win.x, y: win.y, w: win.w, h: heightNow(win) };
   const full = settings.get().dragFull || e.pointerType === 'touch';
   let moved = false;
   let g = start;
@@ -666,7 +749,7 @@ function drag(win: Win, e: PointerEvent, mode: string) {
 export function keyboardMove(win: Win, mode: 'move' | 'size') {
   if (win.state !== 'normal') return;
   const L = layer.getBoundingClientRect();
-  let g: Geom = { x: win.x, y: win.y, w: win.w, h: win.h };
+  let g: Geom = { x: win.x, y: win.y, w: win.w, h: heightNow(win) };
   const outline = document.createElement('div');
   outline.className = 'wm-outline';
   document.body.appendChild(outline);

@@ -48,6 +48,12 @@ export interface AccessFile {
   audiences: AudienceRecord[];
   /** Guide slug → the audiences that may open it. */
   guides: Record<string, string[]>;
+  /**
+   * Guide slug → the area whose street-level tiles the Worker proxies for it,
+   * [west, south, east, north] in degrees (usually the region view's area).
+   * Content-free: no names, no places. Without it a guide has no tiles.
+   */
+  tiles?: Record<string, [number, number, number, number]>;
 }
 export interface AudienceRecord {
   id: string;
@@ -400,7 +406,15 @@ export interface GuideView {
   routes: Route[];
   listings: { source: ListingsFile['source']; records: Listing[] };
   map: { views: MapView[]; attribution: string };
+  /** Street-level tiles behind the password, when access.json declares bounds for the guide. */
+  tiles?: TileSource;
 }
+
+/**
+ * Where the browser gets street-level tiles: the Worker's proxy for this guide
+ * ("/guides/<slug>/tiles/{z}/{x}/{y}.png") and the Web-Mercator zooms it serves.
+ */
+export interface TileSource { url: string; min: number; max: number }
 
 /** A listed guide on the Field Guide's home page (no password needed: neutral only). */
 export interface GuideCard {
@@ -425,6 +439,8 @@ export interface Payload {
   centre: LonLat;
   heatRadius: number;
   map: { views: MapView[] };
+  /** Street-level tiles, when the guide has them (the map shows them once zoomed past the city picture's 1:1). */
+  tiles?: TileSource;
   items: (DayRule & { id: string; tier: TierId; name: string; short: string; address: string; zone: string; themes: string[]; coordinates: LonLat; label: boolean; listing?: string })[];
   places: { id: string; label: Bi; name: string; short: string; address: string; coordinates: LonLat }[];
   listings: { id: string; name: string; category: string; coordinates: LonLat; start?: ISODate; end?: ISODate; item?: string }[];

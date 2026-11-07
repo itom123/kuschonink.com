@@ -4,15 +4,16 @@
   "compatibility_date": "2026-10-01",
   // Static site (dist/) served by Cloudflare. The Worker only runs for the
   // contact form endpoints (worker/contact.ts, worker/drawing.ts) and for the
-  // Field Guide's password gate on /guides/* (worker/guides.ts); the home
-  // /guides stays a plain public page.
+  // Field Guide on /guides and /guides/* (worker/guides.ts): the password gate,
+  // /guides going straight to the first listed guide, and the street-level map
+  // tiles a guide's readers get (Plan IGN, fetched by the Worker and kept at the edge).
   "main": "worker/index.ts",
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "drop-trailing-slash",
-    "run_worker_first": ["/v1/contact/*", "/guides/*"]
+    "run_worker_first": ["/v1/contact/*", "/guides", "/guides/*"]
   },
   // Contact form email: can only ever send to this one verified inbox.
   "send_email": [
@@ -31,7 +32,9 @@
   // GUIDES_PASSWORD_FOTOFILMIC (participants). Each password needs 6+
   // characters, and the two must differ. GUIDES_COOKIE_SECRET is recommended:
   // 32+ random characters that sign the log-on cookies; without it the Worker
-  // uses TURNSTILE_SECRET. Changing either secret logs everyone out. No
-  // "secrets.required": it would limit what wrangler dev reads from .dev.vars.
+  // uses TURNSTILE_SECRET, and one under 24 characters signs together with
+  // TURNSTILE_SECRET. Changing GUIDES_COOKIE_SECRET logs everyone out; so does
+  // changing TURNSTILE_SECRET unless GUIDES_COOKIE_SECRET has 24+ characters.
+  // No "secrets.required": it would limit what wrangler dev reads from .dev.vars.
   "observability": { "enabled": true }
 }
