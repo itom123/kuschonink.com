@@ -188,8 +188,8 @@
     {
       "id": "festival",
       "source": "NOS EXPOSITIONS",
-      "name": "Photo Days exhibitions",
-      "nameZh": "Photo Days 展览"
+      "name": "Festival exhibitions",
+      "nameZh": "摄影节展览"
     }
   ],
   "labels": {
@@ -203,8 +203,8 @@
     "byZh": "艺术家",
     "listing": "Official map entry",
     "listingZh": "官方地图条目",
-    "listings": "Official Photo Days map",
-    "listingsZh": "Photo Days 官方地图"
+    "listings": "Other listings",
+    "listingsZh": "其他条目"
   },
   "texts": {
     "about": {
@@ -363,8 +363,8 @@
       ]
     },
     "listings": {
-      "heading": "All {listings} entries in the official Photo Days map",
-      "headingZh": "Photo Days 官方地图全部 {listings} 个条目",
+      "heading": "Other listings: all {listings} entries of the Photo Days map",
+      "headingZh": "其他条目：Photo Days 地图全部 {listings} 个条目",
       "paras": [
         {
           "text": "Includes suburban venues, appointment-only visits, fairs and events after 15 November. These remain in the directory for completeness, not in the recommendation heat. Venue-level records may contain several exhibitions. Same-building programmes are kept separate. Individual festival pages were retrieved; detailed corrections below prioritise venue websites where checked.",
