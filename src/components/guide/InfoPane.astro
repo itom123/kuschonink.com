@@ -1,0 +1,54 @@
+---
+// Field Guide: the Info pane. The guide's own text sections (already filtered
+// for the audience), its links, then sources and credits, "Unofficial guide",
+// and a log-off form that works without JS (File ▸ Log Off… does it with JS).
+import Bi from '../Bi.astro';
+import { attr } from '../../lib/i18n';
+import { W, fullDate } from '../../lib/guides/words';
+import type { Bi as BiT, GuideView } from '../../lib/guides/types';
+
+interface Props { view: GuideView }
+const { view } = Astro.props;
+const has = (t?: BiT) => !!t && !!(t.en || t.zh);
+const src = view.listings.source;
+---
+<section class="gd-pane" id="gd-info" data-gd-pane="info" tabindex="-1" {...attr('aria-label', W.info)}>
+  <div class="gd-pane-bar">
+    <h2><Bi t={W.info} /></h2>
+    <button type="button" class="gd-x" data-gd-close-pane data-js-only {...attr('aria-label', W.close)} {...attr('title', W.close)}></button>
+  </div>
+  <div class="gd-pane-body gd-doc">
+    <h2 class="gd-title"><Bi t={view.title} /></h2>
+    {has(view.subtitle) && <p class="gd-subtitle"><Bi t={view.subtitle} /></p>}
+    {view.texts.map((s) => (
+      <section class="gd-text" id={`gd-text-${s.id}`}>
+        <h3><Bi t={s.heading} /></h3>
+        {s.paras.map((p) => <p><Bi t={p} /></p>)}
+        {s.items.length > 0 && <ul>{s.items.map((i) => <li>{has(i.lead) && <b><Bi t={i.lead} /> </b>}<Bi t={i.text} /></li>)}</ul>}
+      </section>
+    ))}
+    {view.links.length > 0 && (
+      <section class="gd-text">
+        <h3><Bi t={W.links} /></h3>
+        <ul>{view.links.map((l) => <li><a href={l.url} target="_blank" rel="noopener"><Bi t={l.label} /></a></li>)}</ul>
+      </section>
+    )}
+    <section class="gd-text" id="gd-sources">
+      <h3><Bi t={W.sources} /></h3>
+      <ul>
+        <li><Bi t={W.checked} />: <Bi t={fullDate(view.checked)} /></li>
+        {has(view.credits.points) && <li><Bi t={view.credits.points} /></li>}
+        {view.listings.records.length > 0 && <li><Bi t={view.labels.listings} />: {src.url ? <a href={src.url} target="_blank" rel="noopener">{src.name}</a> : src.name}{src.credit && <> - {src.credit}</>} (<Bi t={W.checked} />{' '}<Bi t={fullDate(src.checked)} />)</li>}
+        {has(view.credits.image) && <li><Bi t={view.credits.image} /></li>}
+        {view.credits.basemap && <li>{view.credits.basemap}</li>}
+      </ul>
+      <p><b><Bi t={W.unofficial} /></b></p>
+      <p><Bi t={W.noLocation} /></p>
+    </section>
+    <form class="gd-logoff" method="post" action={`/guides/${view.slug}/logout`} data-gd-logoff>
+      <h3><Bi t={W.logOffTitle} /></h3>
+      <p><Bi t={W.logOffText} /></p>
+      <p><Bi t={W.loggedOnAs(view.audienceLabel)} /> <button type="submit"><Bi t={W.logOffBtn} /></button></p>
+    </form>
+  </div>
+</section>

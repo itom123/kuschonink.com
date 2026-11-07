@@ -30,8 +30,12 @@ export const api = {
       try { history.replaceState(history.state, '', url); } catch { /* ignore */ }
     }
   },
-  /** Open a site page in its window. */
-  open: (url: string) => navigate(url),
+  /**
+   * Open a site page in its window. `reload` fetches it afresh into the same
+   * window (after a log-on or log-off), replacing the history entry.
+   */
+  open: (url: string, o?: { reload?: boolean }) =>
+    navigate(url, o?.reload ? { reload: true, history: 'replace', winHistory: false, source: 'script' } : {}),
   play,
   /** Visitor settings (Control Panel). */
   settings,

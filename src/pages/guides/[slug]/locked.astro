@@ -1,0 +1,44 @@
+---
+// Field Guide (导览): the log-on page of one guide (dist/guides/<slug>/locked.html).
+// Public: the Worker (worker/guides.ts) serves it at /guides/<slug> to anyone
+// without a valid cookie, so it holds the guide's neutral public title and
+// nothing else from the guide (the build guard scans it). Same window props
+// as the guide itself (views/[audience].astro), so logging on replaces this
+// page in the same window.
+import Desktop from '../../../layouts/Desktop.astro';
+import Window from '../../../components/desktop/Window.astro';
+import LogOn from '../../../components/guide/LogOn.astro';
+import { site } from '../../../lib/content';
+import { seoTitle } from '../../../lib/i18n';
+import { guideSlugs, publicInfo } from '../../../lib/guides/load';
+
+export function getStaticPaths() {
+  return guideSlugs().map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params as { slug: string };
+const card = publicInfo(slug);
+const name = { en: card.publicTitle.en, zh: card.publicTitle.zh || card.publicTitle.en };
+const sub = { en: card.publicSubtitle?.en ?? '', zh: card.publicSubtitle?.zh || card.publicSubtitle?.en || '' };
+const title = { en: `${name.en} - Field Guide`, zh: `${name.zh} - 导览` };
+const seo = {
+  ...seoTitle(title, site.name),
+  description: `${name.en}: a Field Guide on Xiangyin 98. Type the password to open it.`,
+  descriptionZh: `${name.zh}：Xiangyin 98 上的一份导览。输入密码即可打开。`,
+};
+---
+<Desktop seo={seo} noindex path={`/guides/${slug}`}>
+  <Window
+    app="guide"
+    variant="guide"
+    icon="guide"
+    address={false}
+    url={`/guides/${slug}`}
+    title={title}
+    menus={['&File', '&Help']}
+    bodyClass="gd-logon-body"
+    status={[{ en: 'Type the password to open this guide.', zh: '输入密码以打开这份导览。' }]}
+  >
+    <LogOn slug={slug} title={name} subtitle={sub} />
+  </Window>
+</Desktop>

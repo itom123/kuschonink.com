@@ -1,0 +1,203 @@
+/* Field Guide (导览): the map. Markup in src/components/guide/GuideMap.astro,
+   the engine in src/scripts/guide/map.ts. Without JS: the city picture in an
+   aspect-ratio box with %-positioned pin links, then the legend and credits.
+   With JS (html.js): the map fills its box; pins and labels sit in screen
+   space and never scale with the map. House style: Times labels on white
+   plates with a 1px black border, no radius, no blurred shadows. */
+
+.gd-map {
+  --gd-heat-lo: #ffff00;
+  --gd-heat-hi: #ff0000;
+  --gd-route: #000080;
+  --gd-route-casing: #ffffff;
+  --gd-desk: #808080;
+  --gd-hit: 4px;
+  position: relative;
+  color: #000;
+}
+@media (pointer: coarse) { .gd-map { --gd-hit: 8px; } }
+:where(html[data-scheme="contrast"]) .gd-map { --gd-heat-lo: #808080; --gd-heat-hi: #000000; --gd-route: #000000; }
+
+/* ---- The map box ---- */
+.gd-viewport { position: relative; overflow: hidden; background: var(--gd-desk); touch-action: manipulation; }
+.gd-stage { position: relative; width: 100%; }
+.gd-base { position: absolute; inset: 0; }
+.gd-base[hidden] { display: none; }
+.gd-base img { display: block; width: 100%; height: 100%; max-width: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
+/* The base map is muted by a plain white wash, not by processing the picture. */
+.gd-base::after { content: ""; position: absolute; inset: 0; background: rgba(255, 255, 255, 0.35); pointer-events: none; }
+:where(html[data-scheme="contrast"]) .gd-base img { filter: grayscale(1) contrast(1.1); }
+.gd-map-note { margin: 4px 0; font: 13px/1.3 "Times New Roman", Times, serif; }
+
+html.js .gd-map { width: 100%; height: 100%; min-height: 200px; overflow: hidden; background: var(--gd-desk); }
+html.js .gd-viewport {
+  position: absolute; inset: 0; outline: none;
+  touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+html.js .gd-viewport:focus-visible { outline: 1px dotted #000; outline-offset: -3px; box-shadow: inset 0 0 0 1px #fff; }
+html.js .gd-stage { position: absolute; inset: 0; aspect-ratio: auto !important; }
+html.js .gd-base { inset: auto; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+/* Until the engine has placed everything (and anyway after 2 s, if it never does). */
+html.js .gd-viewport:not([data-ready]) .gd-stage { visibility: hidden; animation: gd-show 0s 2s forwards; }
+@keyframes gd-show { to { visibility: visible; } }
+
+html:not([data-pointers="system"]) body.kus98 :is(.gd-viewport.dragging, .gd-viewport.dragging *) { cursor: var(--k98c-move); }
+
+/* ---- Where am I?: a red dot that keeps its size, and a ring as wide as the browser's doubt ---- */
+.gd-me { position: absolute; left: 0; top: 0; z-index: 4; width: 0; height: 0; pointer-events: none; will-change: transform; }
+.gd-me[hidden] { display: none; }
+.gd-me > .ico { position: absolute; left: -8px; top: -8px; }
+.gd-me-ring { position: absolute; left: 0; top: 0; box-sizing: border-box; transform: translate(-50%, -50%); border: 1px solid #ff0000; border-radius: 50%; background: rgba(255, 0, 0, 0.08); }
+.gd-me-ring[hidden] { display: none; }
+:where(html[data-scheme="contrast"]) .gd-me-ring { border-color: #000; background: none; }
+@media (forced-colors: active) { .gd-me-ring { border-color: CanvasText; background: none; } }
+html.js .gd-mapui-zoom [data-cmd="gd-locate"] { margin-bottom: 6px; }
+
+/* ---- Pins: 16px pixel icons, or letter plates for places ---- */
+.gd-pins { position: absolute; inset: 0; z-index: 3; }
+.gd-pin {
+  position: absolute; z-index: 2; display: block; width: 16px; height: 16px; margin: -8px 0 0 -8px;
+  color: #000; text-decoration: none; outline: none;
+  -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; -webkit-user-drag: none;
+}
+.gd-pin[hidden] { display: none; }
+/* The hit area: 24px with a mouse, 32px for a finger. */
+.gd-pin::before { content: ""; position: absolute; inset: calc(-1 * var(--gd-hit)); }
+.gd-pin > .ico, .gd-pin > .gd-plate { position: absolute; left: 0; top: 0; }
+.gd-plate {
+  display: inline-block; box-sizing: border-box; width: 16px; height: 16px; vertical-align: middle;
+  background: #fff; color: #000; border: 1px solid #000; text-align: center;
+  font: bold 12px/14px "Times New Roman", Times, serif;
+}
+.gd-pin[data-kind="listing"] { z-index: 1; }
+.gd-pin[data-tier="C"] { z-index: 2; }
+.gd-pin[data-tier="B"] { z-index: 3; }
+.gd-pin[data-tier="A"] { z-index: 4; }
+.gd-pin[data-step] { z-index: 5; }
+.gd-pin[data-kind="place"] { z-index: 6; }
+.gd-pin.is-selected { z-index: 7; }
+.gd-pin:focus { z-index: 8; }
+.gd-pin.is-dim { opacity: 0.35; }
+.gd-pin.is-hollow { opacity: 0.45; filter: grayscale(1); }
+.gd-pin.in-cluster:not(:focus) { opacity: 0; pointer-events: none; }
+
+/* Selected: the Win98 selected-icon look (a dithered --sel mask), a square ring, an inverted plate. */
+.gd-pin.is-selected { box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--sel), 0 0 0 4px #fff; }
+.gd-pin.is-selected .ico::after {
+  content: ""; position: absolute; inset: 0;
+  background: repeating-conic-gradient(var(--sel) 0 25%, transparent 0 50%) 0 0 / 2px 2px;
+  -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat;
+}
+.gd-pin.is-selected .gd-plate { background: var(--sel); color: var(--sel-text); }
+.gd-pin:focus-visible { outline: 1px dotted #000; outline-offset: 5px; }
+
+/* Route stops: the step number in a small box at the top left. */
+.gd-pin[data-step]::after {
+  content: attr(data-step); position: absolute; left: -10px; top: -10px;
+  box-sizing: border-box; min-width: 13px; height: 13px; padding: 0 2px;
+  background: #fff; color: #000; border: 1px solid #000; text-align: center;
+  font: bold 11px/11px "Times New Roman", Times, serif;
+}
+
+/* No-JS labels (the engine draws its own). */
+.gd-pin-label {
+  position: absolute; left: 20px; top: -1px; white-space: nowrap; pointer-events: none;
+  padding: 0 3px; background: rgba(255, 255, 255, 0.9); border: 1px solid #000;
+  font: 13px/15px "Times New Roman", Times, serif;
+}
+html.js .gd-pin-label { display: none; }
+html.js .gd-pin { left: 0; top: 0; will-change: transform; }
+
+/* ---- Clusters: the top pin's glyph and a count badge ---- */
+.gd-cluster {
+  position: absolute; left: 0; top: 0; z-index: 4; box-sizing: border-box;
+  width: 16px; height: 16px; min-width: 0; min-height: 0; margin: -8px 0 0 -8px; padding: 0;
+  background: none; border: 0; box-shadow: none; color: #000; cursor: pointer;
+  -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+}
+.gd-cluster[hidden] { display: none; }
+.gd-cluster::before { content: ""; position: absolute; inset: calc(-1 * var(--gd-hit)); }
+.gd-cluster > .ico, .gd-cluster > .gd-plate { position: absolute; left: 0; top: 0; }
+.gd-count {
+  position: absolute; left: 10px; top: -8px; box-sizing: border-box; min-width: 13px; height: 13px; padding: 0 2px;
+  background: #fff; color: #000; border: 1px solid #000; text-align: center;
+  font: bold 11px/11px "Times New Roman", Times, serif;
+}
+.gd-cluster:focus-visible { outline: 1px dotted #000; outline-offset: 5px; }
+
+/* ---- Labels ---- */
+.gd-labels { position: absolute; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; }
+.gd-label {
+  position: absolute; left: 0; top: 0; box-sizing: border-box; height: 17px; padding: 0 3px;
+  overflow: hidden; white-space: nowrap; will-change: transform;
+  background: rgba(255, 255, 255, 0.9); color: #000; border: 1px solid #000;
+  font: 13px/15px "Times New Roman", Times, serif;
+}
+.gd-label.is-selected { background: var(--sel); color: var(--sel-text); }
+
+/* ---- Route: navy on a white casing; dashed walking, dotted transit ---- */
+.gd-route { position: absolute; left: 0; top: 0; z-index: 2; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.gd-route polyline { fill: none; stroke-linejoin: miter; stroke-linecap: butt; }
+.gd-route-casing { stroke: var(--gd-route-casing); stroke-width: 5px; }
+.gd-route-line { stroke: var(--gd-route); stroke-width: 3px; }
+.gd-route[data-mode="walking"] .gd-route-line { stroke-dasharray: 8 4; }
+.gd-route[data-mode="transit"] .gd-route-line { stroke-dasharray: 3 4; }
+
+/* ---- Heat: half-resolution dither, shown pixelated ---- */
+.gd-heat { position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; image-rendering: crisp-edges; image-rendering: pixelated; will-change: transform; }
+.gd-heat[hidden] { display: none; }
+.gd-heat-swatch {
+  display: inline-block; box-sizing: border-box; width: 16px; height: 16px; vertical-align: middle; border: 1px solid #000;
+  background: repeating-conic-gradient(var(--gd-heat-hi) 0 25%, var(--gd-heat-lo) 0 50%) 0 0 / 4px 4px;
+}
+
+/* ---- Map buttons: 34×34 with the raised bevel ---- */
+html.js .gd-mapui-zoom { position: absolute; z-index: 5; right: calc(var(--gd-free-right, 0px) + 12px); bottom: calc(var(--gd-free-bottom, 0px) + 30px); display: flex; flex-direction: column; }
+html.js .gd-mapui-layers { position: absolute; z-index: 5; left: 12px; bottom: calc(var(--gd-free-bottom, 0px) + 30px); display: flex; }
+.gd-mapui button {
+  box-sizing: border-box; width: 34px; height: 34px; min-width: 0; min-height: 0; padding: 0;
+  display: grid; place-items: center; border: 0;
+  background: var(--face); color: #000; box-shadow: var(--raised); text-shadow: none;
+}
+.gd-mapui button:not(:disabled):active { box-shadow: var(--pressed); }
+.gd-mapui button[aria-pressed="true"] { box-shadow: var(--pressed); background: var(--dither); }
+.gd-mapui button[aria-pressed="true"] > * { transform: translate(1px, 1px); }
+.gd-mapui button:disabled > * { filter: grayscale(1) opacity(0.45); }
+.gd-mapui button:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
+:where(html[data-scheme="contrast"]) .gd-mapui button { background: #fff; box-shadow: inset 0 0 0 1px #000; }
+:where(html[data-scheme="contrast"]) .gd-mapui button[aria-pressed="true"],
+:where(html[data-scheme="contrast"]) .gd-mapui button:not(:disabled):active { background: #fff; box-shadow: inset 0 0 0 3px #000; }
+/* Low windows: the two groups go in one row. */
+@media (max-height: 320px) { html.js .gd-mapui-zoom { flex-direction: row; } }
+
+/* ---- Legend plate ---- */
+.gd-legend { margin: 6px 0; padding: 2px 6px 4px; background: #fff; color: #000; border: 1px solid #000; font: 13px/1.35 "Times New Roman", Times, serif; }
+.gd-legend summary { cursor: pointer; font-weight: bold; }
+.gd-legend ul { list-style: none; margin: 2px 0 0; padding: 0; }
+.gd-legend li { display: flex; align-items: center; gap: 5px; min-height: 18px; }
+.gd-legend li > .ico, .gd-legend li > .gd-plate, .gd-legend li > .gd-heat-swatch, .gd-legend li > .gd-key-route { flex: none; }
+.gd-key-route { display: inline-block; width: 24px; height: 5px; background: #fff; position: relative; }
+.gd-key-route::after { content: ""; position: absolute; left: 0; right: 0; top: 1px; border-top: 3px dashed var(--gd-route); }
+.gd-key-route[data-mode="transit"]::after { border-top-style: dotted; }
+html.js .gd-legend { position: absolute; z-index: 5; left: 12px; top: 12px; margin: 0; max-width: min(260px, calc(100% - 80px)); max-height: calc(100% - 24px - var(--gd-free-bottom, 0px)); overflow: auto; }
+.gd-legend:not([open]) { padding-bottom: 2px; }
+.gd-map:not([data-heat]) .gd-key-heat { display: none; }
+
+/* ---- Attribution ---- */
+.gd-attrib { margin: 2px 0; padding: 1px 4px; font: 10px/1.25 Tahoma, Verdana, sans-serif; color: #000; background: rgba(255, 255, 255, 0.85); }
+html.js .gd-attrib { position: absolute; z-index: 5; right: var(--gd-free-right, 0px); bottom: var(--gd-free-bottom, 0px); margin: 0; max-width: calc(100% - 24px); text-align: right; }
+
+/* ---- High Contrast and forced colours ---- */
+:where(html[data-scheme="contrast"]) .gd-label { background: #fff; color: #000; }
+:where(html[data-scheme="contrast"]) .gd-label.is-selected { background: #000; color: #fff; }
+@media (forced-colors: active) {
+  .gd-pin, .gd-pin .ico, .gd-cluster, .gd-heat, .gd-heat-swatch, .gd-base img { forced-color-adjust: none; }
+  .gd-label, .gd-plate, .gd-count, .gd-legend, .gd-attrib, .gd-pin-label {
+    forced-color-adjust: none; background: Canvas; color: CanvasText; border-color: CanvasText;
+  }
+  .gd-label.is-selected, .gd-pin.is-selected .gd-plate { background: Highlight; color: HighlightText; }
+  .gd-pin.is-selected { box-shadow: none; outline: 2px solid Highlight; outline-offset: 2px; }
+  .gd-mapui button { border: 1px solid ButtonText; }
+  .gd-route-line { stroke: CanvasText; }
+  .gd-route-casing { stroke: Canvas; }
+}

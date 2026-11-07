@@ -10,6 +10,9 @@ import '../styles/house.css';
 import '../styles/explorer.css';
 import '../styles/apps.css';
 import '../styles/paint.css';
+import '../styles/guide-map.css';
+import '../styles/guide.css';
+import '../styles/guide-logon.css';
 import '../styles/system.css';
 import '../styles/schemes.css';
 import BootScreen from '../components/desktop/BootScreen.astro';
@@ -18,10 +21,10 @@ import Taskbar from '../components/desktop/Taskbar.astro';
 import { BUILD_ID } from '../lib/build';
 import type { Seo } from '../lib/types';
 
-interface Props { seo: Seo; image?: string; noindex?: boolean }
-const { seo, image, noindex } = Astro.props;
+interface Props { seo: Seo; image?: string; noindex?: boolean; path?: string }
+const { seo, image, noindex, path } = Astro.props;
 ---
-<Base seo={seo} image={image} noindex={noindex} bodyClass="kus98">
+<Base seo={seo} image={image} noindex={noindex} path={path} bodyClass="kus98">
   {/* Before first paint: settings, saved icon places, and whether to start up
       (once per browser session; never for search engines and link previews). */}
   <script is:inline slot="head-start">
@@ -75,6 +78,14 @@ const { seo, image, noindex } = Astro.props;
         document.head.appendChild(ws);
       }
       var bot = navigator.webdriver || /bot|crawl|spider|slurp|lighthouse|pagespeed|headless|preview|facebookexternalhit|embedly|whatsapp|telegram|discord|slack/i.test(navigator.userAgent);
+      // A visit that starts at a guide's link (/guides/<slug>) skips start-up, as bots do, and
+      // counts as started, so the next page in this session doesn't start up either: logged on
+      // under the last name typed, or Guest (the cookie session.ts sets).
+      if (location.pathname.indexOf('/guides/') === 0 && !/(?:^|;\s*)kus98_session=/.test(document.cookie)) {
+        var who = 'Guest';
+        try { who = localStorage.getItem('kus98:user') || 'Guest'; } catch (e) {}
+        document.cookie = 'kus98_session=' + encodeURIComponent(who) + '; path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+      }
       if (!bot && !/(?:^|;\s*)kus98_session=/.test(document.cookie)) d.setAttribute('data-boot', 'boot');
       setTimeout(function () { if (!window.__kus98) d.removeAttribute('data-boot'); }, 10000);
       // The home page without Welcome: "Show this screen each time Xiangyin 98 starts" is

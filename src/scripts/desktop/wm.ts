@@ -810,7 +810,12 @@ function onViewportResize() {
 export function initWM() {
   layer = document.getElementById('k98-windows')!;
   const meta = (n: string) => document.head.querySelector<HTMLMetaElement>(`meta[name="${n}"]`)?.content;
-  for (const el of layer.querySelectorAll<HTMLElement>(':scope > [data-window]')) adopt(el, { docTitle: meta('title-en') || document.title, docTitleZh: meta('title-zh') });
+  for (const el of layer.querySelectorAll<HTMLElement>(':scope > [data-window]')) {
+    const win = adopt(el, { docTitle: meta('title-en') || document.title, docTitleZh: meta('title-zh') });
+    // A fresh load of /guides/<slug>?place=… keeps its query in the window's address (the server page has none).
+    const u = el.dataset.url;
+    if (el.dataset.app === 'guide' && location.search && u && u === cleanPath(location.pathname)) setUrl(win, u + location.search);
+  }
   document.addEventListener('pointerdown', onPointerDownCapture, true);
   layer.addEventListener('pointerdown', onPointerDown);
   layer.addEventListener('click', onClick);

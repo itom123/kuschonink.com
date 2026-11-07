@@ -1,0 +1,84 @@
+---
+// Field Guide: the Places pane, an Explorer details table. Column names come
+// from the guide (labels.item). JS sorts it, fills the Day column, moves the
+// places closed on the chosen day into their own group and filters by theme
+// and Find (src/scripts/guide/panes.ts). Without JS it lists everything.
+import Bi from '../Bi.astro';
+import { attr } from '../../lib/i18n';
+import { normalise } from '../../lib/guides/core';
+import { W, weekPattern } from '../../lib/guides/words';
+import type { Bi as BiT, GuideView } from '../../lib/guides/types';
+
+interface Props { view: GuideView }
+const { view } = Astro.props;
+const zone = (id: string) => view.zones.find((z) => z.id === id)?.name ?? { en: id, zh: '' };
+const theme = (id: string) => view.themes.find((t) => t.id === id)?.name ?? { en: id, zh: '' };
+const category = (id: string) => view.categories.find((c) => c.id === id)?.name ?? { en: id, zh: '' };
+const both = (t: BiT) => `${t.en} ${t.zh}`;
+const q = (...parts: string[]) => normalise(parts.filter(Boolean).join(' '));
+const loose = view.listings.records.filter((r) => !r.item);
+const hasDays = !!view.window;
+---
+<section class="gd-pane" id="gd-places" data-gd-pane="places" tabindex="-1" {...attr('aria-label', view.labels.items)}>
+  <div class="gd-pane-bar">
+    <h2><Bi t={view.labels.items} /></h2>
+    <button type="button" class="gd-x" data-gd-close-pane data-js-only {...attr('aria-label', W.close)} {...attr('title', W.close)}></button>
+  </div>
+  {loose.length > 0 && (
+    <p class="gd-scope" data-js-only>
+      <input type="checkbox" id="gd-listings" data-gd-listings />
+      <label for="gd-listings"><Bi t={{ en: `${W.showListings.en} ${view.labels.listings.en} (${loose.length})`, zh: `${W.showListings.zh}${view.labels.listings.zh || view.labels.listings.en}（${loose.length}）` }} /></label>
+    </p>
+  )}
+  <div class="gd-pane-body">
+    <table class="interactive details gd-table" data-gd-table>
+      <thead>
+        <tr>
+          <th scope="col" data-gd-sort="tier" aria-sort="ascending"><button type="button" class="gd-sort"><Bi t={W.ref} /></button></th>
+          <th scope="col" data-gd-sort="name" aria-sort="none"><button type="button" class="gd-sort"><Bi t={view.labels.item} /></button></th>
+          {hasDays && <th scope="col" class="gd-col-day" data-gd-dayhead><Bi t={W.day} /></th>}
+          <th scope="col" class="gd-col-area" data-gd-sort="zone" aria-sort="none"><button type="button" class="gd-sort"><Bi t={W.area} /></button></th>
+        </tr>
+      </thead>
+      {view.places.length > 0 && (
+        <tbody data-gd-group="places">
+          {view.places.map((p) => (
+            <tr data-gd-row={p.id} data-kind="place" data-q={q(p.id, p.name, p.short, p.address, both(p.label))}>
+              <td><span class="gd-plate" aria-hidden="true">{p.id}</span></td>
+              <td><a href={`#gd-item-${p.id}`} data-gd-sel={p.id} class="gd-row-name">{p.name}</a><span class="gd-row-sub"><Bi t={p.label} /></span></td>
+              {hasDays && <td class="gd-col-day"></td>}
+              <td class="gd-col-area"></td>
+            </tr>
+          ))}
+        </tbody>
+      )}
+      <tbody data-gd-group="items">
+        {view.items.map((it) => (
+          <tr data-gd-row={it.id} data-kind="item" data-tier={it.tier} data-zone={it.zone} data-q={q(it.id, it.name, it.short, it.subtitle, it.by, it.address, both(zone(it.zone)), ...it.themes.map((t) => both(theme(t))))}>
+            <td class="gd-col-ref"><span class={`ico ico16 ico-pin-${it.tier.toLowerCase()}`} aria-hidden="true"></span> {it.id}</td>
+            <td><a href={`#gd-item-${it.id}`} data-gd-sel={it.id} class="gd-row-name">{it.name}</a>{(it.by || it.subtitle) && <span class="gd-row-sub">{[it.by, it.subtitle].filter(Boolean).join(' - ')}</span>}</td>
+            {hasDays && <td class="gd-col-day" data-gd-cell><Bi t={weekPattern(it.open)} /></td>}
+            <td class="gd-col-area"><Bi t={zone(it.zone)} /></td>
+          </tr>
+        ))}
+      </tbody>
+      <tbody data-gd-group="closed" hidden>
+        <tr class="gd-group"><th colspan={hasDays ? 4 : 3} scope="colgroup" data-gd-closed-head></th></tr>
+      </tbody>
+      {loose.length > 0 && (
+        <tbody data-gd-group="listings">
+          <tr class="gd-group"><th colspan={hasDays ? 4 : 3} scope="colgroup"><Bi t={view.labels.listings} /></th></tr>
+          {loose.map((r) => (
+            <tr data-gd-row={r.id} data-kind="listing" data-start={r.start} data-end={r.end} data-q={q(r.id, r.name, both(category(r.category)), r.details)}>
+              <td class="gd-col-ref"><span class="ico ico16 ico-pin-d" aria-hidden="true"></span> {r.id}</td>
+              <td><a href={`#gd-item-${r.id}`} data-gd-sel={r.id} class="gd-row-name">{r.name}</a><span class="gd-row-sub"><Bi t={category(r.category)} /></span></td>
+              {hasDays && <td class="gd-col-day" data-gd-cell></td>}
+              <td class="gd-col-area"></td>
+            </tr>
+          ))}
+        </tbody>
+      )}
+    </table>
+    <p class="gd-empty" data-gd-empty hidden><Bi t={W.noMatch} /> <button type="button" data-gd-clear-find><Bi t={W.clear} /></button></p>
+  </div>
+</section>
