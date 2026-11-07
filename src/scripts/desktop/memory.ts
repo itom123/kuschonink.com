@@ -5,7 +5,8 @@
 //   Windows 98 remembers folder windows. localStorage, so it lasts.
 // - The desktop, for a refresh: the pages open in windows, front to back,
 //   minimised or not, how far down each one was read, and each one's Back and
-//   Forward. sessionStorage: this tab only, gone when the tab is closed.
+//   Forward. sessionStorage: this tab only, gone when the tab is closed, and put
+//   back only by a reload or Back/Forward, never by typing the address again.
 // - "Show this screen each time Xiangyin 98 starts": the home page opens
 //   Welcome only when it should (start-up and log-on decide in boot.ts).
 import { navigate } from './router';
@@ -126,9 +127,20 @@ export function settleLoad() {
   delete html.dataset.nowelcome;
 }
 
-/** After a refresh, put the windows back as they were; from then on, keep the desktop up to date. */
+/** A refresh, or Back/Forward to this page; not an address typed or a link followed. */
+function cameBack() {
+  const nav = performance.getEntriesByType?.('navigation')[0] as PerformanceNavigationTiming | undefined;
+  return !nav || nav.type === 'reload' || nav.type === 'back_forward';
+}
+
+/**
+ * After a refresh, put the windows back as they were; from then on, keep the
+ * desktop up to date. Only a refresh (or Back/Forward) does: going to
+ * kuschonink.com again in the same tab shows the page asked for, not the
+ * program that was in front last time.
+ */
 export async function restoreDesk() {
-  const desk = html.dataset.boot ? null : readDesk();
+  const desk = html.dataset.boot || !cameBack() ? null : readDesk();
   const go = () => {
     if (ready) return;
     ready = true;

@@ -80,11 +80,12 @@ const { seo, image, noindex, path } = Astro.props;
       var bot = navigator.webdriver || /bot|crawl|spider|slurp|lighthouse|pagespeed|headless|preview|facebookexternalhit|embedly|whatsapp|telegram|discord|slack/i.test(navigator.userAgent);
       // A visit that starts at a guide's link (/guides/<slug>) skips start-up, as bots do, and
       // counts as started, so the next page in this session doesn't start up either: logged on
-      // under the last name typed, or Guest (the cookie session.ts sets).
+      // under the last name typed, or Guest. The cookie is session.ts's, with its 30 minutes
+      // (AWAY_MINUTES) to run after the last page of the site was open.
       if (location.pathname.indexOf('/guides/') === 0 && !/(?:^|;\s*)kus98_session=/.test(document.cookie)) {
         var who = 'Guest';
         try { who = localStorage.getItem('kus98:user') || 'Guest'; } catch (e) {}
-        document.cookie = 'kus98_session=' + encodeURIComponent(who) + '; path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+        document.cookie = 'kus98_session=' + encodeURIComponent(who) + '; path=/; max-age=1800; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
       }
       if (!bot && !/(?:^|;\s*)kus98_session=/.test(document.cookie)) d.setAttribute('data-boot', 'boot');
       setTimeout(function () { if (!window.__kus98) d.removeAttribute('data-boot'); }, 10000);
