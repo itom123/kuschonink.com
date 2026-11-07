@@ -1,0 +1,91 @@
+/* ===== Field Guide (导览): the log-on box, src/components/guide/LogOn.astro =====
+   A small splash (the program's icon at twice its size, the guide's public
+   title), then Windows 98's "Enter Network Password" as a group box. The
+   Worker sets data-gd-state on the wrapper when a log-on without JavaScript
+   fails; the matching message then shows under the fields. */
+
+.gd-logon-body { background: var(--face) !important; }
+
+.gd-logon {
+  box-sizing: border-box; min-height: 100%;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 18px; padding: 28px 8px 24px;
+  color: #000; font: 11px var(--ui-font);
+  container: gd-logon / inline-size;
+}
+.gd-logon[data-busy], .gd-logon[data-busy] * { cursor: progress; }
+
+/* ---- Splash: content fonts, no photographs ---- */
+.gd-logon-splash {
+  display: flex; align-items: center; gap: 14px;
+  width: min(420px, 100%); box-sizing: border-box;
+}
+.gd-logon-icon { width: 64px; height: 64px; image-rendering: pixelated; }
+.gd-logon-names { min-width: 0; }
+.gd-logon-title {
+  margin: 0; font: bold 22px/1.15 "Times New Roman", Times, "Songti SC", SimSun, serif;
+  overflow-wrap: anywhere;
+}
+.gd-logon-sub {
+  margin: 4px 0 0; font: 13px/1.3 Tahoma, Geneva, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--shadow);
+}
+
+/* ---- Enter Network Password ---- */
+.gd-logon-form { width: min(420px, 100%); margin: 0; }
+.gd-logon-box { margin: 0; padding: 10px 10px 8px; min-width: 0; }
+.gd-logon-box legend { padding: 0 3px; background: var(--face); }
+.gd-logon-grid { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+.gd-logon-keys { margin: 2px 2px 0; }
+.gd-logon-intro { margin: 2px 0 10px; line-height: 15px; }
+.gd-logon-row { display: grid; grid-template-columns: 68px minmax(0, 1fr); align-items: center; gap: 6px; margin-bottom: 8px; }
+.gd-logon-row input { width: 100%; box-sizing: border-box; font: 11px var(--ui-font); }
+.gd-logon-res { color: #000; text-overflow: ellipsis; }
+.gd-logon-res:read-only { background-color: var(--face); }
+.gd-logon-check { margin: 2px 0 0 74px; }
+.gd-logon-buttons { display: flex; flex-direction: column; gap: 6px; }
+.gd-logon-buttons button { min-width: 75px; }
+
+/* Cancel is a link (home, without JavaScript) dressed as a 98.css button. */
+.gd-logon-cancel {
+  box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center;
+  min-width: 75px; min-height: 23px; padding: 0 12px;
+  background: var(--face); box-shadow: var(--raised);
+  color: #000; text-decoration: none; font: 11px var(--ui-font);
+}
+.gd-logon-cancel:active { box-shadow: var(--pressed); }
+.gd-logon-cancel:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+@media (pointer: coarse) { .gd-logon-cancel { min-height: 32px; } }
+
+/* ---- Messages (one per state; none shows by default) ---- */
+.gd-logon-msg {
+  display: none; align-items: flex-start; gap: 6px;
+  margin: 10px 0 0; padding: 4px 6px; line-height: 15px;
+  background: var(--tip); border: 1px solid #000;
+}
+.gd-logon-msg > .ico { margin-top: -1px; }
+.gd-logon[data-gd-state="wrong"] [data-gd-msg="wrong"],
+.gd-logon[data-gd-state="wait"] [data-gd-msg="wait"],
+.gd-logon[data-gd-state="off"] [data-gd-msg="off"],
+.gd-logon[data-gd-state="denied"] [data-gd-msg="error"],
+.gd-logon[data-gd-state="error"] [data-gd-msg="error"] { display: flex; }
+
+/* ---- Narrow windows (phones): icon above, buttons in a row ---- */
+@container gd-logon (max-width: 400px) {
+  .gd-logon { padding-top: 16px; gap: 12px; }
+  .gd-logon-icon { width: 48px; height: 48px; }
+  .gd-logon-title { font-size: 19px; }
+  .gd-logon-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .gd-logon-keys { display: none; }
+  .gd-logon-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .gd-logon-check { margin-left: 0; }
+  .gd-logon-buttons { flex-direction: row; justify-content: flex-end; }
+}
+
+/* ---- High Contrast ---- */
+:where(html[data-scheme="contrast"]) .gd-logon-body { background: #fff !important; }
+:where(html[data-scheme="contrast"]) .gd-logon-sub { color: #000; }
+:where(html[data-scheme="contrast"]) .gd-logon-res:read-only { background-color: #fff; }
+:where(html[data-scheme="contrast"]) .gd-logon-cancel { background: #fff; box-shadow: inset 0 0 0 1px #000; }
+:where(html[data-scheme="contrast"]) .gd-logon-cancel:active { box-shadow: inset 0 0 0 3px #000; }
+:where(html[data-scheme="contrast"]) .gd-logon-msg { background: #fff; border-width: 2px; }

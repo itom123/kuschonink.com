@@ -129,6 +129,42 @@ const KNIGHT = [
   '...kkkkkkkkkkkkkkkkkkkkk',
 ];
 
+/** A map folded in three like a leaflet: zigzag panels `pw` wide and `h` high, from (x0, y0). */
+function foldedMap(c: Canvas, x0: number, y0: number, pw: number, h: number, dip: number) {
+  const xs = [x0, x0 + pw, x0 + 2 * pw, x0 + 3 * pw];
+  const top = (i: number) => (i % 2 ? y0 : y0 + dip);
+  // Panels facing the light (1 and 3) are paler than the one turned away (2).
+  const cols = ['h', 'y', 'h'];
+  for (let i = 0; i < 3; i++) {
+    c.poly([[xs[i], top(i)], [xs[i + 1], top(i + 1)], [xs[i + 1], top(i + 1) + h], [xs[i], top(i) + h]], cols[i]);
+  }
+  return { xs, top };
+}
+
+/** A round-headed map pin: head centred on (cx, cy), radius r, needle `len` long. */
+function mapPin(cx: number, cy: number, r: number, len: number, w: number) {
+  const p = new Canvas(w, w);
+  p.rect(Math.floor(cx), Math.floor(cy), 1, Math.round(r + len), 'd');
+  p.disc(cx + 0.5, cy + 0.5, r, 'r');
+  p.disc(cx + 0.5 + r * 0.25, cy + 0.5 + r * 0.25, r * 0.6, 'r');
+  // shade low right, light high left
+  for (let y = 0; y < w; y++) for (let x = 0; x < w; x++) {
+    if (p.get(x, y) !== 'r') continue;
+    const dx = x + 0.5 - (cx + 0.5), dy = y + 0.5 - (cy + 0.5);
+    if (dx + dy > r * 0.75) p.set(x, y, 'm');
+  }
+  p.set(Math.floor(cx - r * 0.45), Math.floor(cy - r * 0.45), 'w');
+  p.set(Math.floor(cx - r * 0.45) + 1, Math.floor(cy - r * 0.45), 'w');
+  p.set(Math.floor(cx - r * 0.45), Math.floor(cy - r * 0.45) + 1, 'w');
+  return p.outline('k');
+}
+
+/** Paint `top` over `c` (its transparent pixels leave `c` showing). */
+function overlay(c: Canvas, top: Canvas) {
+  for (let y = 0; y < c.h; y++) for (let x = 0; x < c.w; x++) if (top.get(x, y) !== '.') c.set(x, y, top.get(x, y));
+  return c;
+}
+
 export const ICONS: Record<string, Draw> = {
   computer() {
     const c = N();
@@ -879,6 +915,103 @@ export const ICONS: Record<string, Draw> = {
   },
   'tb-redo'() {
     return mirrored(undoArrow());
+  },
+  // ---- Field Guide ----
+  /** The program: a map folded in three, with a river, and a red pin. */
+  guide() {
+    const c = N();
+    const { xs, top } = foldedMap(c, 2, 8, 9, 20, 3);
+    // a park and the river crossing all three panels
+    c.rect(4, 22, 4, 3, 'e').rect(4, 22, 4, 1, 'l');
+    c.line(3, 16, 7, 14, 'b').line(7, 14, 12, 17, 'b').line(12, 17, 17, 15, 'b').line(17, 15, 21, 19, 'b').line(21, 19, 28, 16, 'b');
+    c.line(3, 17, 7, 15, 'a').line(7, 15, 12, 18, 'a').line(12, 18, 17, 16, 'a').line(17, 16, 21, 20, 'a').line(21, 20, 28, 17, 'a');
+    // streets
+    c.line(14, 9, 14, 30, 'g').line(23, 13, 25, 30, 'g');
+    // folds
+    for (let i = 1; i < 3; i++) c.line(xs[i], top(i), xs[i], top(i) + 19, 'o');
+    c.outline('k');
+    return overlay(c, mapPin(20, 5, 4.2, 6, 32));
+  },
+  // Its toolbar: Map, List, Routes, Days, Info.
+  'tb-map'() {
+    const c = new Canvas(20, 20);
+    const { xs, top } = foldedMap(c, 1, 3, 6, 13, 2);
+    c.line(2, 10, 5, 8, 'b').line(5, 8, 9, 11, 'b').line(9, 11, 13, 9, 'b').line(13, 9, 17, 11, 'b');
+    c.line(10, 6, 10, 17, 'g');
+    for (let i = 1; i < 3; i++) c.line(xs[i], top(i), xs[i], top(i) + 12, 'o');
+    return c.outline('k');
+  },
+  'tb-list'() {
+    const c = new Canvas(20, 20);
+    c.rect(1, 2, 18, 16, 'k').rect(2, 3, 16, 14, 'w');
+    for (const [y, col] of [[4, 'n'], [8, 't'], [12, 'p']] as const) {
+      c.rect(4, y, 3, 3, col).set(4, y, col === 'n' ? 'b' : col === 't' ? 'c' : 'f');
+      c.rect(8, y + 1, 8, 1, 'k');
+    }
+    c.rect(8, 15, 5, 1, 'g');
+    return c;
+  },
+  'tb-route'() {
+    const c = new Canvas(20, 20);
+    // a dotted path from a start disc (lower left) to a pin (upper right)
+    for (const [x, y] of [[6, 14], [8, 13], [10, 14], [12, 13], [14, 12]]) c.set(x, y, 'k');
+    c.disc(3.5, 15.5, 2.6, 'k').disc(3.5, 15.5, 1.6, 'l');
+    return overlay(c, mapPin(14, 4, 3.2, 4, 20));
+  },
+  'tb-days'() {
+    const c = new Canvas(20, 20);
+    c.rect(1, 3, 18, 16, 'k').rect(2, 4, 16, 14, 'w');
+    c.rect(2, 4, 16, 3, 'r').rect(2, 4, 16, 1, 'f');
+    c.rect(5, 1, 2, 5, 'k').rect(13, 1, 2, 5, 'k').set(5, 2, 's').set(13, 2, 's');
+    for (let j = 0; j < 3; j++) for (let i = 0; i < 4; i++) c.rect(3 + i * 4, 8 + j * 3, 2, 2, 'g');
+    c.rect(11, 11, 2, 2, 'n').box(10, 10, 4, 4, 'n');
+    return c;
+  },
+  'tb-info'() {
+    const c = new Canvas(20, 20);
+    c.disc(10, 10, 9, 'k').disc(10, 10, 8, 'w');
+    c.rect(9, 4, 2, 2, 'b');
+    c.rect(8, 8, 3, 1, 'b').rect(9, 8, 2, 7, 'b').rect(8, 14, 4, 1, 'b');
+    return c;
+  },
+  // Map pins by tier: A navy disc, B teal diamond, C white square, D (other entries) small grey square.
+  'tb-locate'() {
+    // Where am I?: a crosshair round a red dot.
+    const c = new Canvas(20, 20);
+    c.disc(10, 10, 6.6, 'k').disc(10, 10, 5.4, 'w');
+    c.rect(9, 1, 2, 5, 'k').rect(9, 14, 2, 5, 'k').rect(1, 9, 5, 2, 'k').rect(14, 9, 5, 2, 'k');
+    c.disc(10, 10, 2.8, 'r').set(9, 9, 'w');
+    return c;
+  },
+  'pin-me'() {
+    // You are here: a red dot in a white ring.
+    const c = new Canvas(16, 16);
+    c.disc(8, 8, 6.6, 'w').disc(8, 8, 4.6, 'r');
+    c.set(6, 6, 'w').set(7, 6, 'w').set(6, 7, 'w');
+    return c.outline('k');
+  },
+  'pin-a'() {
+    const c = new Canvas(16, 16);
+    c.disc(8, 8, 6, 'n');
+    c.set(5, 5, 'b').set(6, 4, 'b').set(4, 6, 'b').set(5, 4, 'b').set(4, 5, 'b').set(5, 6, 'a').set(6, 5, 'a');
+    return c.outline('k');
+  },
+  'pin-b'() {
+    const c = new Canvas(16, 16);
+    c.poly([[8, 1.5], [14.5, 8], [8, 14.5], [1.5, 8]], 't');
+    c.line(3, 8, 8, 3, 'c');
+    return c.outline('k');
+  },
+  'pin-c'() {
+    const c = new Canvas(16, 16);
+    c.rect(3, 3, 10, 10, 'w').rect(12, 4, 1, 9, 's').rect(4, 12, 9, 1, 's');
+    c.rect(6, 6, 4, 4, 'p');
+    return c.outline('k');
+  },
+  'pin-d'() {
+    const c = new Canvas(16, 16);
+    c.rect(5, 5, 6, 6, 'g').rect(5, 5, 5, 1, 's').rect(5, 5, 1, 5, 's');
+    return c.outline('k');
   },
   shortcut() {
     const c = N();

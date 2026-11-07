@@ -42,6 +42,9 @@ Ground rules:
 | `src/styles/doc.css` | Resets 98.css for page content inside windows (`.doc`) |
 | `src/styles/system.css` | Start-up, log-on, shut-down, trails, Control Panel, screen savers, Run, Find, Recycle Bin |
 | `src/styles/schemes.css` | Colour schemes (Standard, High Contrast White, Slate) |
+| `src/lib/guides/` | Field Guide: the shapes of a guide (`types.ts`), day rules, dates and map maths safe for the browser (`core.ts`), the interface's words, the checks, and the server-only loader that builds each audience's view and its browser data |
+| `src/scripts/guide/` | Field Guide in the browser: the window, panes, details sheet, menus, the map engine (camera, pins, labels, routes, heat) and the log-on box. It imports only `types.ts`, `core.ts` and `words.ts`, never guide content |
+| `worker/guides.ts` | The Field Guide's password gate: the log-on and log-off, the signed cookie, and which audience's page (and pictures) a request gets |
 
 ### The shell: `src/scripts/desktop/`
 
@@ -65,7 +68,8 @@ Ground rules:
 
 Paint (`/paint`) is a program with a page, but its code lives apart, in
 `src/scripts/paint/`: it is page content (see below) and only talks to the
-shell through `window.kus98`.
+shell through `window.kus98`. The Field Guide (`/guides`) works the same way,
+from `src/scripts/guide/`.
 
 ## The window contract
 
@@ -111,7 +115,7 @@ may run more than once, and their page may sit in a window next to others:
 | --- | --- |
 | `alert({ title, text, icon, buttons, owner })` | A message box; resolves with the button pressed |
 | `dialog({ title, body, owner, … })` | A dialog window; returns `{ el, close }` |
-| `open(url)` | Open a site page in its window |
+| `open(url, { reload? })` | Open a site page in its window. With `reload: true` it fetches the page afresh into the same window and replaces the history entry (the Field Guide's log-on and log-off use it) |
 | `close(el)` | Close the window holding `el` |
 | `replaceUrl(el, url)` | Keep the window's address in step (map pans) |
 | `play(name)` | A system sound (`ding`, `chord`, `exclamation`…) |
@@ -178,7 +182,8 @@ Kept in this browser only.
 
 | Where | Key | Holds |
 | --- | --- | --- |
-| Cookie (session) | `kus98_session` | Logged on in this browser session (so new tabs skip the start-up) |
+| Cookie (session) | `kus98_session` | Logged on in this browser session (so new tabs skip the start-up). A visit that starts at `/guides/…` sets it too, to the last name typed or Guest |
+| Cookie (`HttpOnly`, `Path=/guides`) | `kus98_guides` | Field Guide: logged on with a guide password, and as which audience. Set and read only by the Worker (`worker/guides.ts`), signed with `GUIDES_COOKIE_SECRET` (or `TURNSTILE_SECRET` when that isn't set): 30 days with *Save this password*, otherwise until the browser closes (12 hours at most). File ▸ Log Off clears it |
 | `localStorage` | `kus98:settings` | Settings that differ from the defaults (see `settings.ts`) |
 | | `kus98:icons` | Where desktop icons were dragged |
 | | `kus98:bin` | Icons in the Recycle Bin (`gone` once emptied) |
@@ -187,11 +192,13 @@ Kept in this browser only.
 | | `kus98:run` | What was typed in Run |
 | | `kus98:paint` | Paint: the tool in hand, colours, custom colours, tool options |
 | | `kus98:windows` | Each program's window as it was last left: place and size, maximised, the bars hidden with View ▸ Toolbars and Status Bar |
+| | `kus98:guide` | Field Guide: heat map and labels on or off, how the Places table is sorted (`{heat, labels, sort}`). Log Off clears it |
 | IndexedDB | `kus98-paint` | Paint: the picture being drawn (a PNG), until File ▸ New |
 | | `lang` | The language chosen with the 中/EN switch |
 | `sessionStorage` | `kus98:begun` | The "Click here to begin" hint was used |
 | | `kus98:desk` | For a refresh: the pages open in windows, front to back, minimised or not, how far each was scrolled, each one's Back and Forward |
 | | `kus98:draft` | Contact: a message not sent yet (cleared once it's sent) |
+| | `kus98:guide:view` | Field Guide: for a refresh, which guide was open, the map's camera and area, and how far the pane was scrolled (`{guide, cam, area, scroll}`). Log Off clears it |
 
 **What a refresh keeps.** Reloading the page (or a phone reloading a tab it put
 to sleep) brings the desktop back as it was: `memory.ts` writes `kus98:desk`
@@ -218,8 +225,10 @@ runs it also sets `data-busy` (hourglass), `data-dragging`, `data-help-mode`
 and `data-saver`.
 
 Start-up and log-on never show to search engines or link previews
-(`navigator.webdriver` and bot user agents), and a safety net removes the
-start-up screen after 10 seconds if the shell fails to load.
+(`navigator.webdriver` and bot user agents), or on a visit that starts at
+`/guides/…` (it sets `kus98_session` to the last name typed, or Guest, so the
+rest of the session skips them too). A safety net removes the start-up screen
+after 10 seconds if the shell fails to load.
 
 ## How to…
 
@@ -253,6 +262,22 @@ needs it, reflect it on `<html>` in `apply()` and in the script in
 `Desktop.astro`. Add the control to a property sheet with the helpers in
 `apps/propsheet.ts`, and give it a `help` text for What's This?.
 
+**Put a program behind a password** (as the Field Guide does). The public URL
+stays one page, and the Worker decides what it holds. Add the path to
+`assets.run_worker_first` in `wrangler.jsonc` and route it in `worker/index.ts`
+to a handler with injected services, like `worker/guides.ts`. Build every
+locked version as its own page under a path the Worker serves only internally
+(`views/<audience>`), plus a neutral log-on page; both use the same `Window`
+props (app, variant, url, title, icon), so unlocking swaps the window in place.
+Send both with `Cache-Control: private, no-store` and `Vary: Cookie`: the
+router never caches such a page, so a log-on or log-off is never hidden by a
+copy it fetched before. The log-on form posts without JavaScript (a 303 back to
+the page) and with it (`fetch`, then `kus98.open(url, { reload: true })`).
+Keep the passwords, and the key that signs the cookie, Cloudflare secrets;
+keep anything private out of browser scripts and public pages, and let a
+build-time check (like
+`scripts/guides-guard.mjs`) read `dist/` and fail the build on a leak.
+
 **Add a Help topic.** Add it to `src/content/help.json` (id, title, icon,
 keywords, html). It appears in Contents, Index and Search, and in Find.
 
@@ -269,3 +294,16 @@ npm test
 
 Then try it in the browser (`npm run preview`), including at phone width, with
 the keyboard only, and with JavaScript turned off.
+
+`npm run preview` runs the built site on the local Workers runtime, so the
+Field Guide's gate works there too. Give it made-up passwords in `.dev.vars`
+at the top of the repo (it's gitignored; never put real ones there):
+
+```ini
+GUIDES_PASSWORD=made-up-visitor-pass
+GUIDES_PASSWORD_FOTOFILMIC=made-up-participant-pass
+GUIDES_COOKIE_SECRET=made-up-key-of-32-or-more-characters
+```
+
+Then open `/guides/<slug>` and log on with each, to see both views. Without
+`.dev.vars` the guides say they aren't open yet.

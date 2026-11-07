@@ -64,4 +64,6 @@ export const MENU_ZH: Record<string, string> = {
   '&Insert': '插入(&I)',
   '&Image': '图像(&I)',
   '&Colors': '颜色(&C)',
+  'D&ays': '日期(&A)',
+  '&Routes': '路线(&R)',
 };

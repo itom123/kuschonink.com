@@ -1,0 +1,65 @@
+---
+// Field Guide: the Days pane (guides with dates only). One block per day of
+// the guide's window: holiday notice, the events (filtered for the audience
+// already), the day plan when the audience has one, and "Show this day".
+// JS marks today and greys past days, in the guide's own time zone.
+import Bi from '../Bi.astro';
+import { attr } from '../../lib/i18n';
+import { dayLabelLong } from '../../lib/guides/core';
+import { W, timeSpan } from '../../lib/guides/words';
+import type { Bi as BiT, GuideView } from '../../lib/guides/types';
+
+interface Props { view: GuideView }
+const { view } = Astro.props;
+const has = (t?: BiT) => !!t && !!(t.en || t.zh);
+const days = view.window?.days ?? [];
+const on = (d: string) =>
+  view.events
+    .filter((e) => e.date <= d && d <= (e.until ?? e.date))
+    .sort((a, b) => (a.start ?? '').localeCompare(b.start ?? ''));
+const where = (id?: string) => {
+  if (!id) return null;
+  const p = view.places.find((x) => x.id === id);
+  if (p) return { id, name: p.short || p.name, plate: true, tier: '' };
+  const it = view.items.find((x) => x.id === id);
+  if (it) return { id, name: it.short || it.name, plate: false, tier: it.tier.toLowerCase() };
+  return null;
+};
+---
+{days.length > 0 && (
+  <section class="gd-pane" id="gd-days" data-gd-pane="days" tabindex="-1" {...attr('aria-label', W.days)}>
+    <div class="gd-pane-bar">
+      <h2><Bi t={W.days} /></h2>
+      <button type="button" class="gd-x" data-gd-close-pane data-js-only {...attr('aria-label', W.close)} {...attr('title', W.close)}></button>
+    </div>
+    <div class="gd-pane-body gd-doc">
+      {days.map((d) => {
+        const hol = view.holidays.find((h) => h.date === d);
+        const evs = on(d);
+        const plans = view.days.filter((p) => p.date === d);
+        return (
+          <section class="gd-day" data-gd-day={d}>
+            <h3><Bi t={dayLabelLong(d)} />{hol && <> - <Bi t={hol.name} /></>} <span class="gd-today-tag" hidden><Bi t={W.todayTag} /></span></h3>
+            {hol && has(hol.notice) && <p class="gd-caution"><Bi t={hol.notice} /></p>}
+            {evs.length > 0 ? (
+              <ul class="gd-events">
+                {evs.map((e) => {
+                  const w = where(e.place);
+                  return (
+                    <li class:list={[{ 'gd-optional': e.optional }]}>
+                      {timeSpan(e.start, e.end) && <b class="gd-time">{timeSpan(e.start, e.end)}</b>}{' '}<Bi t={e.title} />
+                      {w && <> <a class="gd-chip" href={`#gd-item-${w.id}`} data-gd-sel={w.id}>{w.plate ? <span class="gd-plate" aria-hidden="true">{w.id}</span> : <span class={`ico ico16 ico-pin-${w.tier}`} aria-hidden="true"></span>} {w.name}</a></>}
+                      {has(e.note) && <span class="gd-event-note"> <Bi t={e.note} /></span>}
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : <p class="gd-quiet"><Bi t={W.nothingThatDay} /></p>}
+            {plans.map((p) => <p class="gd-plan"><b><Bi t={W.plan} />:</b> <Bi t={p.plan} /></p>)}
+            <p class="gd-actions" data-js-only><button type="button" data-gd-show-day={d}><Bi t={W.showDay} /></button></p>
+          </section>
+        );
+      })}
+    </div>
+  </section>
+)}

@@ -5,11 +5,11 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/guides-guard.mjs && node --experimental-strip-types --no-warnings worker/guides.test.mts",
     "preview": "wrangler dev",
-    "deploy": "astro build && wrangler deploy",
+    "deploy": "npm run build && wrangler deploy",
     "check": "astro check",
-    "test": "node --experimental-strip-types --no-warnings worker/contact.test.mts && node --experimental-strip-types --no-warnings worker/drawing.test.mts && node --experimental-strip-types --no-warnings src/scripts/paint/fill.test.mts"
+    "test": "node --experimental-strip-types --no-warnings worker/contact.test.mts && node --experimental-strip-types --no-warnings worker/drawing.test.mts && node --experimental-strip-types --no-warnings src/scripts/paint/fill.test.mts && node --experimental-strip-types --no-warnings src/lib/guides/guides.test.mts && node --experimental-strip-types --no-warnings worker/guides.test.mts && node --experimental-strip-types --no-warnings src/scripts/guide/camera.test.mts && node --experimental-strip-types --no-warnings src/scripts/guide/find.test.mts"
   },
   "dependencies": {
     "astro": "^7.4.1",

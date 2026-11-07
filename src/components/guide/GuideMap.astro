@@ -1,0 +1,113 @@
+---
+// Field Guide (导览): the map. Without JS it is a picture of the city with its
+// pins as links to the articles below (%-positioned with core.ts project()).
+// With JS, src/scripts/guide/map.ts (GuideMap) takes the same elements over:
+// pan, zoom, clusters, labels, route and heat. Styles: src/styles/guide-map.css.
+import type { GuideView } from '../../lib/guides/types';
+import { project } from '../../lib/guides/core.ts';
+import { attr } from '../../lib/i18n';
+import Bi from '../Bi.astro';
+
+interface Props { view: GuideView }
+const { view } = Astro.props;
+const city = view.map.views[0];
+const other = view.map.views[1];
+
+const pct = (lonlat: [number, number]) => {
+  const p = project(lonlat, city.z);
+  return { left: ((p.x - city.originX) / city.width) * 100, top: ((p.y - city.originY) / city.height) * 100 };
+};
+const on = (q: { left: number; top: number }) => q.left >= 0 && q.left <= 100 && q.top >= 0 && q.top <= 100;
+const style = (q: { left: number; top: number }) => `left:${q.left.toFixed(3)}%;top:${q.top.toFixed(3)}%`;
+
+const places = view.places.map((p) => ({ p, q: pct(p.coordinates) })).filter((x) => on(x.q));
+const items = view.items.map((it) => ({ it, q: pct(it.coordinates) })).filter((x) => on(x.q));
+const tierClass = (t: string) => `ico ico16 ico-pin-${t.toLowerCase()}`;
+
+const cityName = view.city;
+const mapLabel = {
+  en: `Map of ${cityName.en}. Drag or use the arrow keys to move; plus and minus zoom. The list has the same places.`,
+  zh: `${cityName.zh || cityName.en}地图。拖动或用方向键移动地图；加号和减号缩放。列表中有相同的地点。`,
+};
+const W = {
+  pins: { en: 'Places on the map', zh: '地图上的地点' },
+  zoomIn: { en: 'Zoom in', zh: '放大' },
+  zoomOut: { en: 'Zoom out', zh: '缩小' },
+  whole: { en: 'Whole map', zh: '全图' },
+  me: { en: 'Where am I? Shows you on the map, and the nearest places', zh: '我在哪里？在地图上标出你和离你最近的地点' },
+  heat: { en: 'Heat map', zh: '热力图' },
+  area: other ? { en: `Show ${other.name.en}`, zh: `显示${other.name.zh || other.name.en}` } : null,
+  legend: { en: 'Legend', zh: '图例' },
+  walking: { en: 'Walking route', zh: '步行路线' },
+  transit: { en: 'Public transport route', zh: '公共交通路线' },
+  heatKey: { en: 'Heat: more recommended places nearby', zh: '热力：附近推荐地点越多越热' },
+  noJs: { en: 'The interactive map needs JavaScript; everything else is below.', zh: '交互地图需要 JavaScript；其余内容都在下方。' },
+};
+const credit = [view.map.attribution, view.credits.points.en].filter(Boolean).join(' · ');
+const creditZh = [view.map.attribution, view.credits.points.zh || view.credits.points.en].filter(Boolean).join(' · ');
+---
+<div class="gd-map" data-gd-map data-area={city.id}>
+  <div class="gd-viewport" tabindex="0" role="region" {...attr('aria-label', mapLabel)}>
+    <div class="gd-stage" style={`aspect-ratio:${city.width} / ${city.height}`}>
+      <div class="gd-base" data-view={city.id}>
+        <img src={city.src} alt="" width={city.width} height={city.height} decoding="async" fetchpriority="high" draggable="false" />
+      </div>
+      <div class="gd-pins" role="group" {...attr('aria-label', W.pins)}>
+        {places.map(({ p, q }) => (
+          <a class="gd-pin" data-id={p.id} data-kind="place" href={`#gd-item-${p.id}`} style={style(q)}
+            {...attr('aria-label', { en: `${p.id}, ${p.label.en}: ${p.name}`, zh: `${p.id}，${p.label.zh || p.label.en}：${p.name}` })}>
+            <span class="gd-plate" aria-hidden="true">{p.id}</span>
+            <span class="gd-pin-label" aria-hidden="true">{p.short}</span>
+          </a>
+        ))}
+        {items.map(({ it, q }) => (
+          <a class="gd-pin" data-id={it.id} data-kind="item" data-tier={it.tier} href={`#gd-item-${it.id}`} style={style(q)}
+            {...attr('aria-label', { en: `${it.id}, ${it.name}`, zh: `${it.id}，${it.name}` })}>
+            <span class={tierClass(it.tier)} aria-hidden="true"></span>
+            {it.label && <span class="gd-pin-label" aria-hidden="true"><b>{it.id}</b> {it.short}</span>}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+  <noscript><p class="gd-map-note"><Bi t={W.noJs} /></p></noscript>
+
+  <div class="gd-mapui" data-js-only>
+    <div class="gd-mapui-zoom">
+      <button type="button" data-cmd="gd-locate" {...attr('aria-label', W.me)} {...attr('title', W.me)}><span class="ico ico20 ico-tb-locate" aria-hidden="true"></span></button>
+      <button type="button" data-gd-zoom="in" {...attr('aria-label', W.zoomIn)} {...attr('title', W.zoomIn)}><span class="ico ico20 ico-tb-zoomin" aria-hidden="true"></span></button>
+      <button type="button" data-gd-zoom="out" {...attr('aria-label', W.zoomOut)} {...attr('title', W.zoomOut)}><span class="ico ico20 ico-tb-zoomout" aria-hidden="true"></span></button>
+      <button type="button" data-gd-zoom="home" {...attr('aria-label', W.whole)} {...attr('title', W.whole)}><span class="ico ico20 ico-tb-fit" aria-hidden="true"></span></button>
+    </div>
+    <div class="gd-mapui-layers">
+      <button type="button" data-cmd="gd-heat" aria-pressed="false" {...attr('aria-label', W.heat)} {...attr('title', W.heat)}><span class="gd-heat-swatch" aria-hidden="true"></span></button>
+      {other && W.area && (
+        <button type="button" data-cmd="gd-area" data-view={other.id} aria-pressed="false" {...attr('aria-label', W.area)} {...attr('title', W.area)}><span class="ico ico20 ico-tb-map" aria-hidden="true"></span></button>
+      )}
+    </div>
+  </div>
+
+  <details class="gd-legend">
+    <summary><Bi t={W.legend} /></summary>
+    <ul>
+      {view.tiers.map((t) => (
+        <li><span class={tierClass(t.id)} aria-hidden="true"></span> <b>{t.id}</b> <Bi t={t.name} /></li>
+      ))}
+      {view.places.map((p) => (
+        <li><span class="gd-plate" aria-hidden="true">{p.id}</span> <Bi t={p.label} /></li>
+      ))}
+      {view.listings.records.length > 0 && (
+        <li data-js-only><span class="ico ico16 ico-pin-d" aria-hidden="true"></span> <Bi t={view.labels.listing} /></li>
+      )}
+      {view.routes.length > 0 && (
+        <>
+          <li data-js-only><span class="gd-key-route" data-mode="walking" aria-hidden="true"></span> <Bi t={W.walking} /></li>
+          {view.routes.some((r) => r.mode === 'transit') && <li data-js-only><span class="gd-key-route" data-mode="transit" aria-hidden="true"></span> <Bi t={W.transit} /></li>}
+        </>
+      )}
+      <li data-js-only class="gd-key-heat"><span class="gd-heat-swatch" aria-hidden="true"></span> <Bi t={W.heatKey} /></li>
+    </ul>
+  </details>
+
+  <p class="gd-attrib"><Bi t={{ en: credit, zh: creditZh }} /></p>
+</div>

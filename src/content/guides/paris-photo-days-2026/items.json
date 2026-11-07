@@ -1,0 +1,1338 @@
+{
+  "_comment": "The 29 recommended exhibitions (A start here, B deepen a theme, C optional). Weekdays are mon…sun. See docs/GUIDES.md. 29 个推荐展览；星期写作 mon…sun。",
+  "items": [
+    {
+      "id": "A1",
+      "tier": "A",
+      "name": "Fondation Henri Cartier-Bresson",
+      "short": "HCB",
+      "subtitle": "Nicaragua, Histoire, Mémoire / Images, presse et luttes féministes",
+      "by": "Susan Meiselas / Martine Franck",
+      "zone": "marais",
+      "themes": [
+        "documentary",
+        "archive"
+      ],
+      "why": "See how a documentary photograph acquires new political and collective meanings through circulation; compare image-making with its later use.",
+      "whyZh": "看一张纪实照片如何在流传中获得新的政治意义和集体意义；比较影像的拍摄与它后来被如何使用。",
+      "address": "79 Rue des Archives, 75003 Paris",
+      "hours": "Tue–Sun 11:00–19:00; last entry 18:20; closed Monday",
+      "hoursZh": "周二至周日 11:00–19:00；最晚入场 18:20；周一闭馆",
+      "start": "2026-10-21",
+      "end": "2027-03-07",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "holiday": "open",
+      "minutes": 85,
+      "price": "€10; reduced €6 only if eligible.",
+      "priceZh": "€10；优惠票 €6，仅限符合条件者。",
+      "sourceUrl": "https://photodays.paris/Fondation-HCB",
+      "links": [
+        "https://www.henricartierbresson.org/pratique/"
+      ],
+      "listing": "D12",
+      "coordinates": [
+        2.360162,
+        48.863007
+      ],
+      "image": {
+        "file": "A1.jpg",
+        "credit": "© Susan Meiselas",
+        "caption": "Installation de Fuite devant les bombardements, Estelí. La Garde nationale a repris la ville aux mains des rebelles sandinistes, 20 septembre 1978. Série Reframing History, aux environs d’Estelí, 2004",
+        "alt": "Exhibition image: Installation de Fuite devant les bombardements, Estelí. La Garde nationale a repris la ville aux mains des rebelles sandinistes, 20 septembre 1978. Série Reframing History, aux environs d’Estelí, 2004",
+        "altZh": "展览图片：Installation de Fuite devant les bombardements, Estelí. La Garde nationale a repris la ville aux mains des rebelles sandinistes, 20 septembre 1978. Série Reframing History, aux environs d’Estelí, 2004"
+      }
+    },
+    {
+      "id": "A2",
+      "tier": "A",
+      "name": "Ithaque",
+      "short": "Ithaque",
+      "subtitle": "Heure de pointe",
+      "by": "Mark Steinmetz",
+      "zone": "marais",
+      "themes": [
+        "everyday",
+        "material"
+      ],
+      "why": "Study the small gestures and changing relationships between people and the street; look closely at the silver-gelatin prints.",
+      "whyZh": "研究人与街道之间细微的姿态和不断变化的关系；近距离细看明胶银盐照片。",
+      "address": "5 Rue des Haudriettes, 75003 Paris",
+      "hours": "Tue–Sat 11:00–13:00 / 14:00–19:00; lunch closure",
+      "hoursZh": "周二至周六 11:00–13:00 / 14:00–19:00；午间闭馆",
+      "start": "2026-10-27",
+      "end": "2026-12-12",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 30,
+      "note": "Venue dates start 27 Oct; festival lists 12 Nov. Opening on 12 Nov, 18:00–21:00. The venue mislabels that date as Wednesday; it is Thursday.",
+      "noteZh": "画廊公布的展期从 10月27日开始，摄影节则写 11月12日。11月12日 18:00–21:00 开幕。画廊把这一天误标为周三，实际是周四。",
+      "sourceUrl": "https://photodays.paris/Ithaque",
+      "links": [
+        "https://www.ithaque-paris.fr/marksteinmetz",
+        "https://www.ithaque-paris.fr/"
+      ],
+      "listing": "D79",
+      "coordinates": [
+        2.357557,
+        48.86154
+      ],
+      "image": {
+        "file": "A2.jpg",
+        "credit": "© Mark Steinmetz",
+        "caption": "Porte de Champerret (December 2025) #2, 2025. Archival silver gelatin print",
+        "alt": "Exhibition image: Porte de Champerret (December 2025) #2, 2025. Archival silver gelatin print",
+        "altZh": "展览图片：Porte de Champerret (December 2025) #2, 2025。收藏级明胶银盐照片"
+      },
+      "label": false
+    },
+    {
+      "id": "A3",
+      "tier": "A",
+      "name": "Thaddaeus Ropac",
+      "short": "Ropac",
+      "subtitle": "L’Essence du portrait",
+      "by": "Irving Penn",
+      "zone": "marais",
+      "themes": [
+        "portrait",
+        "staging"
+      ],
+      "why": "Compare a precisely controlled portrait with the sense of spontaneous presence it produces. Pair with Penn at the MEP.",
+      "whyZh": "比较一张精确控制的肖像与它所营造出的自然、即兴的在场感。可与 MEP 的 Penn 展搭配观看。",
+      "address": "7 Rue Debelleyme, 75003 Paris",
+      "hours": "Tue–Sat 10:00–19:00",
+      "hoursZh": "周二至周六 10:00–19:00",
+      "start": "2026-11-07",
+      "end": "2027-01-30",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 40,
+      "sourceUrl": "https://photodays.paris/Thaddaeus-Ropac",
+      "links": [
+        "https://ropac.net/exhibitions/804-irving-penn-l-essence-du-portrait/"
+      ],
+      "listing": "D88",
+      "coordinates": [
+        2.363637,
+        48.860763
+      ],
+      "image": {
+        "file": "A3.jpg",
+        "credit": "© The Irving Penn Foundation",
+        "caption": "Irving Penn, Miles Davis Hand on Trumpet, New York, 1986. Gelatin silver print",
+        "alt": "Exhibition image: Irving Penn, Miles Davis Hand on Trumpet, New York, 1986. Gelatin silver print",
+        "altZh": "展览图片：Irving Penn, Miles Davis Hand on Trumpet, New York, 1986。明胶银盐照片"
+      }
+    },
+    {
+      "id": "A4",
+      "tier": "A",
+      "name": "MEP · Maison européenne de la Photographie",
+      "short": "MEP",
+      "subtitle": "PENN & FASHION / pays des merveilles",
+      "by": "Irving Penn / Nanténé Traoré",
+      "zone": "south-marais",
+      "themes": [
+        "portrait",
+        "staging",
+        "material"
+      ],
+      "why": "Study the construction of fashion images alongside Traoré’s altered film, memory and moving image. A strong comparison of control and instability.",
+      "whyZh": "研究时尚影像是如何建构的，同时对照 Traoré 经过改造的胶片、记忆与动态影像。这是“控制”与“不稳定”之间一组很有力的对比。",
+      "address": "5/7 Rue de Fourcy, 75004 Paris",
+      "hours": "Wed/Fri 11:00–20:00; Thu 11:00–22:00; Sat/Sun 10:00–20:00; closed Mon/Tue",
+      "hoursZh": "周三、周五 11:00–20:00；周四 11:00–22:00；周六、周日 10:00–20:00；周一、周二闭馆",
+      "start": "2026-09-30",
+      "end": "2027-01-17",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "minutes": 100,
+      "price": "At desk €13 / reduced €8; online €14 / reduced €9. Proof required.",
+      "priceZh": "现场购票 €13，优惠票 €8；网上购票 €14，优惠票 €9。优惠票需出示有效证件。",
+      "note": "Primary MEP hours override the shorter Photo Days listing. Traoré ends 29 Nov. Ticket desk closes 30 min before; rooms cleared 15 min before. Confirm 11 Nov holiday access before relying on it.",
+      "noteZh": "以 MEP 官方的开放时间为准，不采用 Photo Days 列出的较短时间。Traoré 的展览 11月29日结束。售票处提前 30 分钟停止售票；展厅提前 15 分钟清场。11月11日是公共假日，能否入场请先确认，再做安排。",
+      "sourceUrl": "https://photodays.paris/MEP",
+      "links": [
+        "https://www.mep-fr.org/venir/",
+        "https://billetterie.mep-fr.org/toute-la-billetterie.html"
+      ],
+      "listing": "D26",
+      "coordinates": [
+        2.359057,
+        48.855168
+      ],
+      "image": {
+        "file": "A4.jpg",
+        "credit": "© Collection The Irving Penn Foundation",
+        "caption": "Irving Penn, Issey Miyake Fashion, Face Covered with Hair, New York, 1991",
+        "alt": "Exhibition image: Irving Penn, Issey Miyake Fashion, Face Covered with Hair, New York, 1991",
+        "altZh": "展览图片：Irving Penn, Issey Miyake Fashion, Face Covered with Hair, New York, 1991"
+      }
+    },
+    {
+      "id": "A5",
+      "tier": "A",
+      "name": "Jeu de Paume",
+      "short": "Jeu de Paume",
+      "subtitle": "Parallax",
+      "by": "Stan Douglas",
+      "zone": "west-concorde",
+      "themes": [
+        "moving-image",
+        "staging",
+        "archive"
+      ],
+      "why": "Watch how narrative, sound and the viewer’s position build competing versions of history. Allow time for the moving-image works.",
+      "whyZh": "观察叙事、声音以及观众所处的位置，如何构建出相互竞争的历史版本。请为动态影像作品留出足够时间。",
+      "address": "1 Place de la Concorde, Jardin des Tuileries, 75001 Paris",
+      "hours": "Tue 11:00–21:00; Wed–Sun 11:00–19:00; closed Monday",
+      "hoursZh": "周二 11:00–21:00；周三至周日 11:00–19:00；周一闭馆",
+      "start": "2026-10-20",
+      "end": "2027-01-10",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "holiday": "open",
+      "minutes": 110,
+      "price": "€14; students €7.50 Tue–Fri, €9.50 weekend, with proof.",
+      "priceZh": "€14；学生周二至周五 €7.50，周末 €9.50，需出示有效证件。",
+      "sourceUrl": "https://photodays.paris/Jeu-de-Paume",
+      "links": [
+        "https://jeudepaume.org/evenement/stan-douglas/",
+        "https://jeudepaume.org/visite/horaires-acces/",
+        "https://jeudepaume.org/visite/tarifs/"
+      ],
+      "listing": "D15",
+      "coordinates": [
+        2.3236,
+        48.865978
+      ],
+      "image": {
+        "file": "A5.jpg",
+        "credit": "© Stan Douglas. Courtesy de l’artiste et des galeries Victoria Miro et David Zwirner",
+        "caption": "Hastings Park, 16 July 1955, 2008. De la série Crowds and Riots",
+        "alt": "Exhibition image: Hastings Park, 16 July 1955, 2008. De la série Crowds and Riots",
+        "altZh": "展览图片：Hastings Park, 16 July 1955, 2008. De la série Crowds and Riots"
+      }
+    },
+    {
+      "id": "A6",
+      "tier": "A",
+      "name": "LE BAL",
+      "short": "LE BAL",
+      "subtitle": "L’Espace entre nous",
+      "by": "Wilson Centre collection; including Elinor Carucci, Francesca Woodman, Tomoko Sawada and Susan Meiselas",
+      "zone": "north-clichy",
+      "themes": [
+        "portrait",
+        "documentary"
+      ],
+      "why": "Ask what changes when photographer and subject collaborate, confront each other or share an intimate space.",
+      "whyZh": "思考当摄影师与被摄者合作、相互对峙，或共处一个私密空间时，会发生什么变化。",
+      "address": "6 Impasse de la Défense, 75018 Paris",
+      "hours": "SPECIAL 11–15 Nov: 11:00–19:00; last entry 18:30. Usual Wed 12:00–20:00, Thu–Sun 12:00–19:00; closed Mon/Tue",
+      "hoursZh": "特别安排：11月11日至15日 11:00–19:00，最晚入场 18:30。平时周三 12:00–20:00，周四至周日 12:00–19:00；周一、周二闭馆",
+      "start": "2026-06-19",
+      "end": "2027-01-03",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "holiday": "open",
+      "minutes": 85,
+      "price": "€10 / students €6; students free on Wednesdays with proof.",
+      "priceZh": "€10，学生 €6；学生周三免费入场，需出示有效证件。",
+      "note": "14 Nov signings: 12:00 Meeks/Fridlyand; 13:00 Meiselas/Depoorter; 17:00 Sevinçli. Verify individual participation and capacity.",
+      "noteZh": "11月14日签售：12:00 Meeks/Fridlyand；13:00 Meiselas/Depoorter；17:00 Sevinçli。每位摄影师是否到场、名额是否有限，请自行核实。",
+      "sourceUrl": "https://photodays.paris/LE-BAL",
+      "links": [
+        "https://www.le-bal.fr/horaires-et-acces",
+        "https://www.le-bal.fr/tarifs-et-billetterie-en-ligne-0"
+      ],
+      "listing": "D18",
+      "coordinates": [
+        2.327211,
+        48.885311
+      ],
+      "image": {
+        "file": "A6.jpg",
+        "credit": "© Center for Creative Photography, Arizona Board of Regents. Courtesy Wilson Centre for Photography",
+        "caption": "John Gutmann, Haussement d’épaules, 1935",
+        "alt": "Exhibition image: John Gutmann, Haussement d’épaules, 1935",
+        "altZh": "展览图片：John Gutmann, Haussement d’épaules, 1935"
+      }
+    },
+    {
+      "id": "A7",
+      "tier": "A",
+      "name": "Maubert",
+      "short": "Maubert",
+      "subtitle": "Que vos pas soient légers, car vous marchez sur mes rêves",
+      "by": "Payram",
+      "zone": "marais",
+      "themes": [
+        "archive",
+        "material"
+      ],
+      "why": "Look at how Polaroid, solarisation and collage carry exile, family bonds and absence through the physical image.",
+      "whyZh": "观察宝丽来、中途曝光和拼贴如何通过实体影像，承载流亡、家庭纽带与缺席。",
+      "address": "20 Rue Saint-Gilles, 75003 Paris",
+      "hours": "Tue–Sat 12:00–19:00; appointments also available",
+      "hoursZh": "周二至周六 12:00–19:00；也可预约参观",
+      "start": "2026-11-06",
+      "end": "2027-01-09",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 35,
+      "note": "Venue starts 6 Nov; Photo Days starts 5 Nov. Difference does not affect this guide’s 8–15 Nov window.",
+      "noteZh": "画廊展期从 11月6日开始，Photo Days 则从 11月5日开始。这一差异不影响本导览 11月8日至15日的时间范围。",
+      "sourceUrl": "https://photodays.paris/Galerie-Maubert",
+      "links": [
+        "https://www.galeriemaubert.com/"
+      ],
+      "listing": "D82",
+      "coordinates": [
+        2.366171,
+        48.857965
+      ],
+      "image": {
+        "file": "A7.jpg",
+        "credit": "© Payram. Courtesy Galerie Maubert",
+        "caption": "Portrait de femme en blanc, Paris, 1994. Tirage noir et blanc baryté d’après négatif Polaroïd 55",
+        "alt": "Exhibition image: Portrait de femme en blanc, Paris, 1994. Tirage noir et blanc baryté d’après négatif Polaroïd 55",
+        "altZh": "展览图片：Portrait de femme en blanc, Paris, 1994. Tirage noir et blanc baryté d’après négatif Polaroïd 55"
+      },
+      "label": false
+    },
+    {
+      "id": "A8",
+      "tier": "A",
+      "name": "Quai de la Photo",
+      "short": "Quai Photo",
+      "subtitle": "Teenage Dream",
+      "by": "Lee Shulman / The Anonymous Project",
+      "zone": "seine-13e",
+      "themes": [
+        "archive",
+        "everyday"
+      ],
+      "why": "See what is gained and lost when anonymous family snapshots become a public story about adolescence.",
+      "whyZh": "看看匿名的家庭快照变成一个关于青春期的公共故事时，得到了什么，又失去了什么。",
+      "address": "9 Port de la Gare, 75013 Paris",
+      "hours": "Winter: Wed–Sun from 12:00; at least until midnight, up to 02:00. Closed Mon/Tue",
+      "hoursZh": "冬季：周三至周日 12:00 起开放，至少到午夜，最晚到 02:00。周一、周二闭馆",
+      "start": "2026-10-16",
+      "end": "2026-12-20",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "holiday": "open",
+      "minutes": 55,
+      "price": "Free entry.",
+      "priceZh": "免费入场。",
+      "note": "Use venue address Port de la Gare, not the official-map wording “quai”. Venue end date is 20 Dec, not map’s 22 Dec. Late closing varies; choose daytime for quiet viewing.",
+      "noteZh": "请使用场馆地址 Port de la Gare，不要用官方地图上“quai”的写法。场馆展期到 12月20日结束，而不是地图上写的 12月22日。夜间闭馆时间不固定；想安静看展，请白天去。",
+      "sourceUrl": "https://photodays.paris/quai-de-la-Photo",
+      "links": [
+        "https://quaidelaphoto.fr/evenement/exposition-teenage-dream/",
+        "https://quaidelaphoto.fr/venez/acces-horaires/"
+      ],
+      "listing": "D32",
+      "coordinates": [
+        2.375273,
+        48.836617
+      ],
+      "image": {
+        "file": "A8.jpg",
+        "credit": "© The Anonymous Project",
+        "caption": "USA, 1981",
+        "alt": "Exhibition image: USA, 1981",
+        "altZh": "展览图片：USA, 1981"
+      }
+    },
+    {
+      "id": "A9",
+      "tier": "A",
+      "name": "Union de la Jeunesse Internationale",
+      "short": "Union Jeunesse",
+      "subtitle": "Being There",
+      "by": "Lee Shulman / Omar Victor Diop",
+      "zone": "north-barbes",
+      "themes": [
+        "staging",
+        "archive",
+        "portrait"
+      ],
+      "why": "Examine how re-enactment and clothing place a Black presence inside mid-century American snapshots and question who belongs in an archive.",
+      "whyZh": "审视重演与服装如何把黑人的在场放进二十世纪中叶的美国快照里，并追问：谁有资格出现在档案之中？",
+      "address": "2–4 Boulevard Marguerite de Rochechouart, 75018 Paris",
+      "hours": "Daily 11:30–19:00, from 13 Nov",
+      "hoursZh": "11月13日起每日 11:30–19:00",
+      "start": "2026-11-13",
+      "end": "2026-12-13",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "minutes": 55,
+      "note": "Opening party 14 Nov from 20:00 is a separate event. Admission price not stated by Photo Days.",
+      "noteZh": "11月14日 20:00 起的开幕派对是另一场独立活动。Photo Days 没有公布门票价格。",
+      "sourceUrl": "https://photodays.paris/Union-de-la-Jeunesse-Internationale",
+      "links": [],
+      "listing": "D57",
+      "coordinates": [
+        2.349336,
+        48.883964
+      ],
+      "image": {
+        "file": "A9.jpg",
+        "credit": "© Lee Shulman & Omar Victor Diop",
+        "alt": "Exhibition image: Being There",
+        "altZh": "展览图片：Being There"
+      }
+    },
+    {
+      "id": "A10",
+      "tier": "A",
+      "name": "BnF François Mitterrand",
+      "short": "BnF",
+      "subtitle": "Scènes, signes, sensations — Japanese photographs, 1945–2025",
+      "by": "Group exhibition; including Shōji Ueda, Daidō Moriyama, Eikō Hosoe and Tokuko Ushioda",
+      "zone": "seine-13e",
+      "themes": [
+        "staging",
+        "material",
+        "documentary"
+      ],
+      "why": "Compare documentary, theatrical and sensory approaches across post-war Japanese photography; study the relationship between books and prints.",
+      "whyZh": "比较战后日本摄影中纪实、戏剧化与感官化的不同路径；研究摄影书与照片原作之间的关系。",
+      "address": "BnF François-Mitterrand, Galerie 2, Quai François Mauriac, 75013; entrance from Rue Émile-Durkheim",
+      "hours": "Tue–Sat 10:00–19:00; Sun 13:00–19:00; closed Mondays and public holidays",
+      "hoursZh": "周二至周六 10:00–19:00；周日 13:00–19:00；周一及公共假日闭馆",
+      "start": "2026-09-29",
+      "end": "2027-01-31",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "holiday": "closed",
+      "minutes": 110,
+      "price": "Paid exhibition; verify ticket category on BnF website, guided visits priced separately.",
+      "priceZh": "收费展览；票种请到 BnF 官网核实，导览另行收费。",
+      "sourceUrl": "https://photodays.paris/BnF",
+      "links": [
+        "https://www.bnf.fr/fr/agenda/visites-guidees-de-lexposition-photographies-japonaises-de-la-bnf-novembre"
+      ],
+      "listing": "D07",
+      "coordinates": [
+        2.376845,
+        48.832761
+      ],
+      "image": {
+        "file": "A10.jpg",
+        "credit": "© Shoji Ueda",
+        "caption": "Shoji Ueda, Paysage de dunes avec ma femme, 1950. Série Dunes de sable. BnF, Estampes et photographie",
+        "alt": "Exhibition image: Shoji Ueda, Paysage de dunes avec ma femme, 1950. Série Dunes de sable. BnF, Estampes et photographie",
+        "altZh": "展览图片：Shoji Ueda, Paysage de dunes avec ma femme, 1950. Série Dunes de sable. BnF, Estampes et photographie"
+      }
+    },
+    {
+      "id": "A11",
+      "tier": "A",
+      "name": "Atelier néerlandais",
+      "short": "Atelier néerl.",
+      "subtitle": "A Wider Gaze",
+      "by": "Emilia Martin, Giya Makondo-Wills, Julia Gat, Maite Vanhellemont, Mark Rammers, Pablo Lerma, Rafael Roncato, Sanne van den Elzen, Sheng-Wen Lo, Thana Faroq",
+      "zone": "central",
+      "themes": [
+        "archive",
+        "moving-image",
+        "documentary"
+      ],
+      "why": "Compare how artists use photography, textiles, installation and archives to discuss belonging, labour, colonial histories and migration.",
+      "whyZh": "比较艺术家如何运用摄影、纺织、装置与档案，讨论归属、劳动、殖民历史与移民。",
+      "address": "22 Avenue Victoria, 75001 Paris",
+      "hours": "Daily 11:00–18:00; listed guided visit 11:30",
+      "hoursZh": "每日 11:00–18:00；公布的导览场次 11:30",
+      "start": "2026-11-06",
+      "end": "2026-11-15",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "minutes": 65,
+      "price": "Free entry.",
+      "priceZh": "免费入场。",
+      "note": "Curated by Damarice Amao. Artist encounters 11–13 Nov; 12 Nov 11:30 photo-book event; 14 Nov 11:00–13:00 Trigger/FOMU. Event capacity/registration may apply.",
+      "noteZh": "策展人：Damarice Amao。11月11日至13日有艺术家见面活动；11月12日 11:30 摄影书活动；11月14日 11:00–13:00 Trigger/FOMU 活动。活动可能有名额限制或需要报名。",
+      "sourceUrl": "https://photodays.paris/Atelier-Neerlandais",
+      "links": [],
+      "listing": "D06",
+      "coordinates": [
+        2.346166,
+        48.858308
+      ],
+      "image": {
+        "file": "A11.jpg",
+        "credit": "© Julia Gat",
+        "caption": "mother & child, from Mare Internum, 2023 – ongoing",
+        "alt": "Exhibition image: mother & child, from Mare Internum, 2023 – ongoing",
+        "altZh": "展览图片：mother & child，出自 Mare Internum，2023 年至今"
+      }
+    },
+    {
+      "id": "A12",
+      "tier": "A",
+      "name": "See Galerie",
+      "short": "See Galerie",
+      "subtitle": "Translations",
+      "by": "Arsenia Sirente / Elsa & Johanna",
+      "zone": "marais",
+      "themes": [
+        "staging",
+        "portrait"
+      ],
+      "why": "Look at colour, sets and performed identities: how does a staged scene make a feeling credible?",
+      "whyZh": "关注色彩、布景和被“表演”出来的身份：一个摆拍的场景，如何让一种情感变得可信？",
+      "address": "84 Rue du Temple, 75003 Paris",
+      "hours": "Thu–Sat 14:00–19:00",
+      "hoursZh": "周四至周六 14:00–19:00",
+      "start": "2026-11-02",
+      "end": "2026-12-12",
+      "open": [
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 30,
+      "sourceUrl": "https://photodays.paris/see-galerie",
+      "links": [],
+      "listing": "D86",
+      "coordinates": [
+        2.357104,
+        48.861928
+      ],
+      "image": {
+        "file": "A12.jpg",
+        "credit": "© Elsa & Johanna. Courtesy La Forest Divonne",
+        "caption": "Eternité, Le Lieu d'une attente infinie, 2017",
+        "alt": "Exhibition image: Eternité, Le Lieu d'une attente infinie, 2017",
+        "altZh": "展览图片：Eternité, Le Lieu d'une attente infinie, 2017"
+      },
+      "label": false
+    },
+    {
+      "id": "B1",
+      "tier": "B",
+      "name": "Institut suédois",
+      "short": "Inst. suédois",
+      "subtitle": "An Act of Attention",
+      "by": "Marguerite Bornhauser, Theo Elias, Tom Hallgren, Salad Hilowle, Massao Mascaro, Iris Millot, Ela Polkowska",
+      "zone": "marais",
+      "themes": [
+        "material",
+        "portrait"
+      ],
+      "why": "Explore image surfaces and expanded photographic forms after an atelier led by Sophie Ristelhueber.",
+      "whyZh": "探索影像的表面与拓展的摄影形式，作品来自 Sophie Ristelhueber 带领的一期创作课（atelier）。",
+      "address": "11 Rue Payenne, 75003 Paris",
+      "hours": "Tue–Sun 12:00–19:00; Thu until 21:00; closed Monday",
+      "hoursZh": "周二至周日 12:00–19:00；周四开到 21:00；周一闭馆",
+      "start": "2026-11-13",
+      "end": "2027-02-21",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "minutes": 45,
+      "price": "Free entry.",
+      "priceZh": "免费入场。",
+      "note": "Sources disagree on opening: 11/12/13 Nov. Guide uses 13 Nov conservatively; earlier access is unconfirmed.",
+      "noteZh": "各来源给出的开幕日期不一致，有 11月11日、12日、13日三种说法。本导览保守地采用 11月13日；更早能否入场尚未确认。",
+      "sourceUrl": "https://photodays.paris/Institut-suedois",
+      "links": [],
+      "listing": "D14",
+      "coordinates": [
+        2.3621,
+        48.858108
+      ],
+      "image": {
+        "file": "B1.jpg",
+        "credit": "© Tom Hallgren",
+        "caption": "Sebastian",
+        "alt": "Exhibition image: Sebastian",
+        "altZh": "展览图片：Sebastian"
+      }
+    },
+    {
+      "id": "B2",
+      "tier": "B",
+      "name": "Galerie Putman",
+      "short": "Putman",
+      "subtitle": "En levko",
+      "by": "Dana Cojbuc",
+      "zone": "marais",
+      "themes": [
+        "material"
+      ],
+      "why": "Photographs extended through drawing and cut-out processes: attend to the boundary between an observed landscape and its reconstruction.",
+      "whyZh": "照片经由素描和剪切得到延展：留意眼前观察到的风景与它的重构之间的边界。",
+      "address": "230 Rue Saint-Martin, 75003 Paris",
+      "hours": "Tue–Sat 14:00–19:00",
+      "hoursZh": "周二至周六 14:00–19:00",
+      "start": "2026-11-07",
+      "end": "2026-12-19",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 30,
+      "sourceUrl": "https://photodays.paris/Catherine-Putman",
+      "links": [],
+      "listing": "D76",
+      "coordinates": [
+        2.353113,
+        48.8642
+      ],
+      "image": {
+        "file": "B2.jpg",
+        "credit": "© Dana Cojbuc. Courtesy l'artiste et Galerie Putman",
+        "caption": "En Levko #24, 2026. Tirage pigmentaire et dessin au fusain et pastel sec",
+        "alt": "Exhibition image: En Levko #24, 2026. Tirage pigmentaire et dessin au fusain et pastel sec",
+        "altZh": "展览图片：En Levko #24, 2026. Tirage pigmentaire et dessin au fusain et pastel sec"
+      }
+    },
+    {
+      "id": "B3",
+      "tier": "B",
+      "name": "Rabouan Moussion",
+      "short": "Rabouan",
+      "subtitle": "Transcripts of a Sea",
+      "by": "Stephan Vanfleteren",
+      "zone": "marais",
+      "themes": [
+        "everyday",
+        "material"
+      ],
+      "why": "Follow an immersive, sustained practice in which the sea is encountered from inside its movement rather than as a distant view.",
+      "whyZh": "跟随一种沉浸而持续的创作实践：大海不是被远远观看的风景，而是从它的运动内部去遭遇。",
+      "address": "11 Rue Pastourelle, 75003 Paris",
+      "hours": "Tue–Sat 10:00–19:00, exhibition from 12 Nov",
+      "hoursZh": "周二至周六 10:00–19:00，展览 11月12日开始",
+      "start": "2026-11-12",
+      "end": "2027-01-16",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 30,
+      "note": "Opening 12 Nov from 17:00.",
+      "noteZh": "11月12日 17:00 起开幕。",
+      "sourceUrl": "https://photodays.paris/Rabouan-Moussion",
+      "links": [],
+      "listing": "D85",
+      "coordinates": [
+        2.360564,
+        48.861876
+      ],
+      "image": {
+        "file": "B3.jpg",
+        "credit": "© Stephan Vanfleteren. Courtesy Galerie Rabouan Moussion",
+        "caption": "Transcripts of a Sea #054841_RB",
+        "alt": "Exhibition image: Transcripts of a Sea #054841_RB",
+        "altZh": "展览图片：Transcripts of a Sea #054841_RB"
+      }
+    },
+    {
+      "id": "B4",
+      "tier": "B",
+      "name": "Polka Galerie",
+      "short": "Polka",
+      "subtitle": "Immersion / Les ruines de Detroit, 20 ans après",
+      "by": "Steve McCurry / Yves Marchand & Romain Meffre",
+      "zone": "marais",
+      "themes": [
+        "documentary",
+        "archive"
+      ],
+      "why": "Compare colour-led documentary with a return to architectural photographs twenty years later; attend to how a project changes through revisiting.",
+      "whyZh": "比较以色彩为主导的纪实摄影，与二十年后重返建筑照片的创作；留意一个项目如何在重访中发生变化。",
+      "address": "12 Rue Saint-Gilles, 75003 Paris",
+      "hours": "Tue–Sat 11:00–19:00; exhibitions from 12 Nov",
+      "hoursZh": "周二至周六 11:00–19:00；展览 11月12日开始",
+      "start": "2026-11-12",
+      "end": "2027-01-16",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 45,
+      "note": "12 Nov opening is listed from 18:00 / 18:30 on different festival pages; treat 18:30 as the safer arrival.",
+      "noteZh": "11月12日的开幕时间，在摄影节不同页面上分别写作 18:00 和 18:30；按 18:30 到场更稳妥。",
+      "sourceUrl": "https://photodays.paris/Polka-Galerie",
+      "links": [],
+      "listing": "D84",
+      "coordinates": [
+        2.366553,
+        48.8579
+      ],
+      "image": {
+        "file": "B4.jpg",
+        "credit": "Courtesy Polka Galerie",
+        "caption": "Steve McCurry, Porbandar, Gujarat, India, 1983",
+        "alt": "Exhibition image: Steve McCurry, Porbandar, Gujarat, India, 1983",
+        "altZh": "展览图片：Steve McCurry, Porbandar, Gujarat, India, 1983"
+      }
+    },
+    {
+      "id": "B5",
+      "tier": "B",
+      "name": "Angalia",
+      "short": "Angalia",
+      "subtitle": "The future is not ours to see",
+      "by": "Gosette Lubondo",
+      "zone": "marais",
+      "themes": [
+        "staging",
+        "portrait"
+      ],
+      "why": "A mini-retrospective across seven series by a Kinshasa-based photographer; compare visual worlds across a ten-year practice.",
+      "whyZh": "一位常驻金沙萨的摄影师的小型回顾展，横跨七个系列；比较她十年创作中的不同视觉世界。",
+      "address": "10–12 Rue des Coutures Saint-Gervais, 75003 Paris",
+      "hours": "Tue 12:00–19:00; Wed–Sat 11:00–19:00",
+      "hoursZh": "周二 12:00–19:00；周三至周六 11:00–19:00",
+      "start": "2026-10-17",
+      "end": "2026-12-23",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 35,
+      "sourceUrl": "https://photodays.paris/angalia",
+      "links": [],
+      "listing": "D65",
+      "coordinates": [
+        2.362551,
+        48.860122
+      ],
+      "image": {
+        "file": "B5.jpg",
+        "credit": "© Gosette Lubondo",
+        "caption": "The future is not ours to see. Série Terre de lait, terre de miel, 2022",
+        "alt": "Exhibition image: The future is not ours to see. Série Terre de lait, terre de miel, 2022",
+        "altZh": "展览图片：The future is not ours to see. Série Terre de lait, terre de miel, 2022"
+      }
+    },
+    {
+      "id": "B6",
+      "tier": "B",
+      "name": "Clémentine de la Féronnière",
+      "short": "Féronnière",
+      "subtitle": "Lucky Jim",
+      "by": "James Barnor",
+      "zone": "south-marais",
+      "themes": [
+        "archive",
+        "portrait"
+      ],
+      "why": "Self-presentation and friendship connect studio work, Ghana and the UK in an artist’s own archive.",
+      "whyZh": "在艺术家本人的档案中，自我呈现与友谊把影棚创作、加纳和英国联系在一起。",
+      "address": "51 Rue Saint-Louis-en-l’Île, second courtyard, 75004 Paris",
+      "hours": "Tue–Sat 11:00–19:00",
+      "hoursZh": "周二至周六 11:00–19:00",
+      "start": "2026-09-25",
+      "end": "2026-11-21",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 35,
+      "note": "Festival page says Tue–Sat; map says Mon–Sat. Do not rely on Monday access.",
+      "noteZh": "摄影节页面写周二至周六，地图写周一至周六。不要指望周一能入场。",
+      "sourceUrl": "https://photodays.paris/Clementine-de-la-Feronniere",
+      "links": [],
+      "listing": "D69",
+      "coordinates": [
+        2.355393,
+        48.851884
+      ],
+      "image": {
+        "file": "B6.jpg",
+        "credit": "© James Barnor. Courtesy Galerie Clémentine de la Féronnière",
+        "alt": "Exhibition image: Lucky Jim",
+        "altZh": "展览图片：Lucky Jim"
+      }
+    },
+    {
+      "id": "B7",
+      "tier": "B",
+      "name": "Camion RosAlma",
+      "short": "RosAlma",
+      "subtitle": "Concentric Circles",
+      "by": "Rebecca Topakian",
+      "zone": "west-left-bank",
+      "themes": [
+        "moving-image",
+        "archive"
+      ],
+      "why": "An image-and-sound installation links Armenian song, dance and bodily practice to living memory and resistance to erasure.",
+      "whyZh": "一件影像与声音装置，把亚美尼亚的歌曲、舞蹈和身体实践，与鲜活的记忆、对抹除的抵抗联系在一起。",
+      "address": "2 Port du Gros Caillou, 75007 Paris",
+      "hours": "Daily 11:00–20:00, 12–15 Nov only",
+      "hoursZh": "仅 11月12日至15日，每日 11:00–20:00",
+      "start": "2026-11-12",
+      "end": "2026-11-15",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "minutes": 45,
+      "note": "12 Nov 18:00–21:00 opening/performance/conversation; 13 Nov 16:30 artist tour: RSVP. Boat/quayside access: check exact entrance.",
+      "noteZh": "11月12日 18:00–21:00 开幕、表演与对谈；11月13日 16:30 艺术家导览，需预约。展场在船上或码头边，请确认具体入口。",
+      "sourceUrl": "https://photodays.paris/Camion-RosAlma",
+      "links": [],
+      "listing": "D34",
+      "coordinates": [
+        2.309337,
+        48.863087
+      ],
+      "image": {
+        "file": "B7.jpg",
+        "credit": "© Rebecca Topakian",
+        "caption": "Concentric Circles, Kokh, 1",
+        "alt": "Exhibition image: Concentric Circles, Kokh, 1",
+        "altZh": "展览图片：Concentric Circles, Kokh, 1"
+      }
+    },
+    {
+      "id": "B8",
+      "tier": "B",
+      "name": "Musée de la Légion d'honneur",
+      "short": "Légion d'hon.",
+      "subtitle": "Le théâtre de la mémoire",
+      "by": "Jean-Michel Fauquet",
+      "zone": "west-left-bank",
+      "themes": [
+        "material",
+        "staging"
+      ],
+      "why": "Reworked negatives, painted photographs and modest constructions turn photographed objects into small theatres of memory.",
+      "whyZh": "重新加工的底片、手绘的照片和简朴的搭建，把被拍摄的物件变成一座座记忆的小剧场。",
+      "address": "2 Rue de la Légion d’Honneur, 75007 Paris",
+      "hours": "Wed–Sun 13:00–18:00",
+      "hoursZh": "周三至周日 13:00–18:00",
+      "start": "2026-11-11",
+      "end": "2027-02-28",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "minutes": 40,
+      "note": "11 Nov holiday access not independently confirmed; choose 12–15 Nov.",
+      "noteZh": "11月11日公共假日能否入场，尚未得到独立确认；请选择 11月12日至15日前往。",
+      "sourceUrl": "https://photodays.paris/Musee-de-la-legion-d-honneur",
+      "links": [],
+      "listing": "D28",
+      "coordinates": [
+        2.324551,
+        48.860123
+      ],
+      "image": {
+        "file": "B8.jpg",
+        "credit": "© Jean-Michel Fauquet",
+        "alt": "Exhibition image: Le théâtre de la mémoire",
+        "altZh": "展览图片：Le théâtre de la mémoire"
+      }
+    },
+    {
+      "id": "B9",
+      "tier": "B",
+      "name": "Chapelle St-Vincent-de-Paul · Thomas KLOTZ",
+      "short": "Chapelle Klotz",
+      "subtitle": "Révélation",
+      "by": "Thomas Klotz",
+      "zone": "left-bank",
+      "themes": [
+        "staging",
+        "material"
+      ],
+      "why": "A slow, large-format encounter with religious space; consider how the existing chapel changes the photographs’ presence.",
+      "whyZh": "以大画幅缓慢地面对宗教空间；思考原有的礼拜堂如何改变照片的在场感。",
+      "address": "95 Rue de Sèvres, 75006 Paris",
+      "hours": "Daily 07:00–12:00 / 14:30–18:00 per festival venue page",
+      "hoursZh": "每日 07:00–12:00 / 14:30–18:00（据摄影节场馆页面）",
+      "start": "2026-11-02",
+      "end": "2026-11-30",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "minutes": 30,
+      "price": "Free access as listed.",
+      "priceZh": "据公布信息免费入场。",
+      "note": "Official map gives continuous 08:00–18:00; use the stricter split hours and avoid services/midday.",
+      "noteZh": "官方地图写的是 08:00–18:00 连续开放；请以更严格的分段时间为准，并避开礼拜时段和中午。",
+      "sourceUrl": "https://photodays.paris/Chapelle-St-Vincent-de-Paul-Thomas-KLOTZ",
+      "links": [],
+      "listing": "D59",
+      "coordinates": [
+        2.321725,
+        48.848942
+      ],
+      "image": {
+        "file": "B9.jpg",
+        "credit": "© Thomas Klotz. Courtesy Photo Days et Clémentine de la Féronnière",
+        "caption": "Révélation, 2026–2027",
+        "alt": "Exhibition image: Révélation, 2026–2027",
+        "altZh": "展览图片：Révélation, 2026–2027"
+      }
+    },
+    {
+      "id": "B10",
+      "tier": "B",
+      "name": "Maison · agnès b.",
+      "short": "agnès b.",
+      "subtitle": "5 jours à Moscou en 1987",
+      "by": "agnès b.",
+      "zone": "republique",
+      "themes": [
+        "everyday",
+        "documentary"
+      ],
+      "why": "A personal photographic record of Moscow in 1987: compare the curiosity of an encounter with a pre-existing image of a place.",
+      "whyZh": "一份 1987 年莫斯科的个人摄影记录：比较一次相遇中的好奇，与人们对一个地方早已形成的印象。",
+      "address": "17 Rue Dieu, 75010 Paris",
+      "hours": "Mon–Fri 10:00–19:00; Sat 13:00–18:00",
+      "hoursZh": "周一至周五 10:00–19:00；周六 13:00–18:00",
+      "start": "2026-10-29",
+      "end": "2026-11-13",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 25,
+      "price": "Free access as listed.",
+      "priceZh": "据公布信息免费入场。",
+      "note": "Closes 13 Nov; no visit on 14 Nov. Saturday hours are outside this exhibition’s final week.",
+      "noteZh": "11月13日闭展；11月14日无法参观。本展最后一周用不到周六的开放时间。",
+      "sourceUrl": "https://photodays.paris/Maison-agnes-b",
+      "links": [],
+      "listing": "D61",
+      "coordinates": [
+        2.364646,
+        48.870447
+      ],
+      "image": {
+        "file": "B10.jpg",
+        "credit": "© agnès b. Courtesy galerie du jour agnès b.",
+        "caption": "5 jours à Moscou en 1987",
+        "alt": "Exhibition image: 5 jours à Moscou en 1987",
+        "altZh": "展览图片：5 jours à Moscou en 1987"
+      }
+    },
+    {
+      "id": "B11",
+      "tier": "B",
+      "name": "Dominique Fiat",
+      "short": "Dominique Fiat",
+      "subtitle": "PHOTOGRAPHIER L’ACTION",
+      "by": "Günter Brus, Hannah Collins, John Goto, Nicola Lo Calzo, Emo de Medeiros, Chantal Regnault, Sue Williamson",
+      "zone": "republique",
+      "themes": [
+        "staging",
+        "archive"
+      ],
+      "why": "Consider the photograph as a continuation of performance rather than a neutral record of an action.",
+      "whyZh": "把照片看作行为表演的延续，而不是对一个动作的中性记录。",
+      "address": "12 Rue Martel, courtyard right, 75010 Paris",
+      "hours": "Tue–Fri 15:00–19:00; other times by appointment",
+      "hoursZh": "周二至周五 15:00–19:00；其他时间需预约",
+      "start": "2026-10-15",
+      "end": "2027-01-15",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri"
+      ],
+      "minutes": 40,
+      "note": "12 Nov 18:30–20:00 artist encounter; RSVP via festival page. Do not assume Saturday access.",
+      "noteZh": "11月12日 18:30–20:00 艺术家见面会；需通过摄影节页面预约。不要默认周六可以入场。",
+      "sourceUrl": "https://photodays.paris/Dominique-Fiat",
+      "links": [],
+      "listing": "D71",
+      "coordinates": [
+        2.353394,
+        48.874294
+      ],
+      "image": {
+        "file": "B11.jpg",
+        "credit": "© Chantal Regnault. Courtesy Dominique Fiat",
+        "caption": "Tony Overness, Grandest March Ever (Aids Benefit), Palladium, 1990",
+        "alt": "Exhibition image: Tony Overness, Grandest March Ever (Aids Benefit), Palladium, 1990",
+        "altZh": "展览图片：Tony Overness, Grandest March Ever (Aids Benefit), Palladium, 1990"
+      }
+    },
+    {
+      "id": "B12",
+      "tier": "B",
+      "name": "La Hune",
+      "short": "La Hune",
+      "subtitle": "House of Love",
+      "by": "Shelby Duncan",
+      "zone": "left-bank",
+      "themes": [
+        "everyday",
+        "portrait"
+      ],
+      "why": "Intimacy and a shared creative household: compare being an observer with being part of the scene.",
+      "whyZh": "亲密关系与一个共同创作的家庭：比较“旁观者”与“身在其中”的区别。",
+      "address": "16 Rue de l’Abbaye, 75006 Paris",
+      "hours": "Mon 10:30–19:00; Tue–Sat 10:00–19:00; Sun 11:00–18:00",
+      "hoursZh": "周一 10:30–19:00；周二至周六 10:00–19:00；周日 11:00–18:00",
+      "start": "2026-10-17",
+      "end": "2026-11-15",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "minutes": 35,
+      "note": "10 Nov 17:30–19:00 festival artist salon: RSVP, conflicts with FotoFilmic’s 18:00 opening.",
+      "noteZh": "11月10日 17:30–19:00 摄影节艺术家沙龙，需预约；与 FotoFilmic 18:00 的开幕式冲突。",
+      "sourceUrl": "https://photodays.paris/La-Hune",
+      "links": [],
+      "listing": "D43",
+      "coordinates": [
+        2.33388,
+        48.854512
+      ],
+      "image": {
+        "file": "B12.jpg",
+        "credit": "© Shelby Duncan",
+        "caption": "Léa Seydoux, 2010",
+        "alt": "Exhibition image: Léa Seydoux, 2010",
+        "altZh": "展览图片：Léa Seydoux, 2010"
+      }
+    },
+    {
+      "id": "B13",
+      "tier": "B",
+      "name": "Écho 119",
+      "short": "Écho 119",
+      "subtitle": "À marée basse",
+      "by": "Kusukazu Uraguchi / Laure Gilquin",
+      "zone": "marais",
+      "themes": [
+        "documentary",
+        "material"
+      ],
+      "why": "Compare photographs of ama divers with poetic and material approaches to the marine world.",
+      "whyZh": "比较海女（ama）的照片，与从诗意和材质角度呈现海洋世界的作品。",
+      "address": "1 Rue des Minimes, 75003 Paris",
+      "hours": "Wed–Sat 12:00–19:00",
+      "hoursZh": "周三至周六 12:00–19:00",
+      "start": "2026-10-28",
+      "end": "2027-01-16",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 30,
+      "sourceUrl": "https://photodays.paris/Echo-119",
+      "links": [],
+      "listing": "D72",
+      "coordinates": [
+        2.367189,
+        48.85694
+      ],
+      "image": {
+        "file": "B13.jpg",
+        "credit": "© Kusukazu Uraguchi",
+        "caption": "Sous l'eau, série AMA, 1965",
+        "alt": "Exhibition image: Sous l'eau, série AMA, 1965",
+        "altZh": "展览图片：Sous l'eau, série AMA, 1965"
+      }
+    },
+    {
+      "id": "B14",
+      "tier": "B",
+      "name": "Galerie Eva Meyer",
+      "short": "Eva Meyer",
+      "subtitle": "Paris by Night",
+      "by": "Deidi von Schaewen",
+      "zone": "marais",
+      "themes": [
+        "everyday",
+        "moving-image"
+      ],
+      "why": "Attend to nocturnal urban surfaces and the relationship between photographic observation and projected images.",
+      "whyZh": "留意夜间城市的各种表面，以及摄影观察与投影影像之间的关系。",
+      "address": "11 Rue Michel-le-Comte, 75003 Paris",
+      "hours": "Wed–Sat 11:00–19:00",
+      "hoursZh": "周三至周六 11:00–19:00",
+      "start": "2026-11-02",
+      "end": "2026-11-30",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 25,
+      "note": "Opening 12 Nov 17:00–20:00. Special projections on 18 Nov occur after this guide’s week (8–15 Nov).",
+      "noteZh": "11月12日 17:00–20:00 开幕。11月18日的特别放映在本导览这一周（11月8日至15日）之后。",
+      "sourceUrl": "https://photodays.paris/Eva-Meyer",
+      "links": [],
+      "listing": "D75",
+      "coordinates": [
+        2.356212,
+        48.862071
+      ],
+      "image": {
+        "file": "B14.jpg",
+        "credit": "© Deidi von Schaewen. Courtesy Galerie Eva Meyer",
+        "caption": "Paris By Night 29.12.2021. Tirage argento-numérique",
+        "alt": "Exhibition image: Paris By Night 29.12.2021. Tirage argento-numérique",
+        "altZh": "展览图片：Paris By Night 29.12.2021. Tirage argento-numérique"
+      }
+    },
+    {
+      "id": "B15",
+      "tier": "B",
+      "name": "Alta Vista Art",
+      "short": "Alta Vista",
+      "subtitle": "SHE IS THE STORY",
+      "by": "Group exhibition including Christa Blackwood, Jo Ann Chaus, Sarah Hadley, Tama Hochbaum, Bootsy Holler and Sal Taylor Kydd",
+      "zone": "marais",
+      "themes": [
+        "portrait",
+        "material"
+      ],
+      "why": "A range of women’s practices across self-portraiture, memory, abstraction and collage; compare how different methods carry lived experience.",
+      "whyZh": "多位女性艺术家的创作，涵盖自拍像、记忆、抽象与拼贴；比较不同方法如何承载亲身经验。",
+      "address": "8 Rue Chapon, 75003 Paris",
+      "hours": "11–13 Nov 14:00–19:00; 14 Nov 14:00–21:00; 15 Nov appointment only",
+      "hoursZh": "11月11日至13日 14:00–19:00；11月14日 14:00–21:00；11月15日仅限预约",
+      "start": "2026-11-10",
+      "end": "2026-11-15",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "exceptions": [
+        {
+          "date": "2026-11-15",
+          "status": "appointment",
+          "note": "Last day: appointment only",
+          "noteZh": "最后一天：仅限预约"
+        }
+      ],
+      "minutes": 35,
+      "note": "10 Nov 18:00–20:00 opening conflicts with FotoFilmic opening; 14 Nov finissage 18:00–21:00. Saturday afternoon timing is conservatively taken from the official map.",
+      "noteZh": "11月10日 18:00–20:00 开幕，与 FotoFilmic 的开幕式冲突；11月14日 18:00–21:00 闭幕活动。周六下午的时间保守地采用官方地图的信息。",
+      "sourceUrl": "https://photodays.paris/Alta-Vista-Arts",
+      "links": [],
+      "listing": "D64",
+      "coordinates": [
+        2.356886,
+        48.86328
+      ],
+      "image": {
+        "file": "B15.jpg",
+        "credit": "© Sarah Hadley",
+        "caption": "Pink Hydrangeas, 2025",
+        "alt": "Exhibition image: Pink Hydrangeas, 2025",
+        "altZh": "展览图片：Pink Hydrangeas, 2025"
+      }
+    },
+    {
+      "id": "C1",
+      "tier": "C",
+      "name": "Editions Firmin-Didot",
+      "short": "Firmin-Didot",
+      "subtitle": "Pandora’s Box",
+      "by": "Bianca Sforni",
+      "zone": "marais",
+      "themes": [
+        "material",
+        "staging"
+      ],
+      "why": "Study deliberate changes to perspective and focus made with a large-format Sinar camera, and the image’s transformation into a photographic object.",
+      "whyZh": "研究如何用大画幅 Sinar 相机刻意改变透视与焦点，以及影像如何转化为一件摄影物件。",
+      "address": "13 bis Rue Payenne, 75003 Paris",
+      "hours": "Appointment only, within daily 14:30–18:30 window",
+      "hoursZh": "仅限预约，时间在每日 14:30–18:30 之间",
+      "start": "2026-11-02",
+      "end": "2026-11-30",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "access": "appointment",
+      "minutes": 25,
+      "note": "Do not turn up without an appointment. Festival venue page is stricter than its map.",
+      "noteZh": "没有预约请不要直接前往。摄影节场馆页面的规定比它的地图更严格。",
+      "sourceUrl": "https://photodays.paris/Editions-Firmin-Didot",
+      "links": [],
+      "listing": "D39",
+      "coordinates": [
+        2.362415,
+        48.858248
+      ],
+      "image": {
+        "file": "C1.jpg",
+        "credit": "© Bianca Sforni",
+        "alt": "Exhibition image: Pandora’s Box",
+        "altZh": "展览图片：Pandora’s Box"
+      }
+    },
+    {
+      "id": "C2",
+      "tier": "C",
+      "name": "MUSKHANE",
+      "short": "MUSKHANE",
+      "subtitle": "PARESSE",
+      "by": "Maeva Delacroix / Patrick Guedj",
+      "zone": "marais",
+      "themes": [
+        "everyday",
+        "material"
+      ],
+      "why": "Slow looking, analogue photographs and ordinary moments; the project also links images, a book and fragrance.",
+      "whyZh": "慢慢看：胶片照片与日常瞬间；这个项目还把影像、一本书和一款香氛联系在一起。",
+      "address": "29 Rue des Gravilliers, 75003 Paris",
+      "hours": "Mon–Fri 11:00–14:00 / 15:00–19:00; Sat 11:00–19:00; Sun 11:00–18:00",
+      "hoursZh": "周一至周五 11:00–14:00 / 15:00–19:00；周六 11:00–19:00；周日 11:00–18:00",
+      "start": "2026-11-05",
+      "end": "2026-11-29",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "minutes": 25,
+      "sourceUrl": "https://photodays.paris/MUSKHANE",
+      "links": [],
+      "listing": "D47",
+      "coordinates": [
+        2.356145,
+        48.863905
+      ],
+      "image": {
+        "file": "C2.jpg",
+        "credit": "© Maeva Delacroix",
+        "alt": "Exhibition image: PARESSE",
+        "altZh": "展览图片：PARESSE"
+      }
+    }
+  ]
+}

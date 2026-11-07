@@ -1,7 +1,7 @@
 // The programs of Xiangyin 98 and which URLs open in which program.
 // No Astro imports: this file is also bundled into the browser (the shell).
 
-export type AppId = 'welcome' | 'explorer' | 'about' | 'contact' | 'paint' | 'house' | 'help' | 'error';
+export type AppId = 'welcome' | 'explorer' | 'about' | 'contact' | 'paint' | 'house' | 'help' | 'guide' | 'error';
 
 export interface AppInfo {
   /** Program name, shown in tooltips and Properties. */
@@ -23,6 +23,7 @@ export const APPS: Record<AppId, AppInfo> = {
   paint: { name: 'Paint', icon: 'paint', w: 900, h: 660 },
   house: { name: 'The House', icon: 'house', w: 1100, h: 760, max: true },
   help: { name: 'Help', icon: 'help', w: 800, h: 580 },
+  guide: { name: 'Field Guide', icon: 'guide', w: 1100, h: 760, max: true },
   error: { name: 'Error', icon: 'error', w: 460, h: 300 },
 };
 
@@ -42,6 +43,7 @@ export function appFor(path: string): AppId {
   if (p === '/paint') return 'paint';
   if (p === '/house' || p.startsWith('/house/')) return 'house';
   if (p === '/help') return 'help';
+  if (p === '/guides' || p.startsWith('/guides/')) return 'guide';
   return 'error';
 }
 
@@ -53,6 +55,7 @@ export function addressFor(path: string): string {
   if (p === '/contact') return 'C:\\xiangyin\\Contact';
   if (p === '/paint') return 'C:\\xiangyin\\Paint';
   if (p === '/help') return 'C:\\xiangyin\\Help';
+  if (p === '/guides' || p.startsWith('/guides/')) return 'C:\\xiangyin\\Guides' + p.slice('/guides'.length).replace(/\//g, '\\');
   return 'C:\\xiangyin' + p.replace(/\//g, '\\');
 }
 
@@ -61,8 +64,12 @@ export function upOf(url: string): string | null {
   const p = cleanPath(url.split(/[?#]/)[0]);
   if (p.startsWith('/image/')) return '/image';
   if (p.startsWith('/house/') && p !== '/house/facade') return '/house';
+  if (p.startsWith('/guides/')) return '/guides';
   return null;
 }
+
+/** Programs whose window keeps the URL's query string (deep links such as /guides/x?place=A3). */
+export const keepsQuery = (app: string) => app === 'house' || app === 'guide';
 
 /**
  * Turn what someone typed into an address bar or the Run box into a site path.

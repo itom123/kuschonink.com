@@ -1,0 +1,28 @@
+{
+  "_comment": "Base maps (Web-Mercator crops of Plan IGN). Do not edit: the numbers must match the images. 底图参数，请勿修改。",
+  "views": [
+    {
+      "id": "city",
+      "name": "Central Paris",
+      "nameZh": "巴黎市中心",
+      "file": "city.jpg",
+      "z": 14,
+      "originX": 2123851.005587911,
+      "originY": 1442294.7187901973,
+      "width": 1510,
+      "height": 1146
+    },
+    {
+      "id": "region",
+      "name": "Paris & Île-de-France",
+      "nameZh": "巴黎与法兰西岛",
+      "file": "region.jpg",
+      "z": 11,
+      "originX": 265163.37569848885,
+      "originY": 179952.08984877466,
+      "width": 1054,
+      "height": 902
+    }
+  ],
+  "attribution": "© IGN 2026 · Géoplateforme / Plan IGN"
+}

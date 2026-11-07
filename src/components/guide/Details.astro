@@ -1,0 +1,112 @@
+---
+// Field Guide: one details article per item, place and official listing,
+// server-rendered for one audience. Without JS they all show, one after
+// another; with JS only the selected one shows (src/scripts/guide/details.ts).
+// The top of each article (kicker, name, subtitle, day status, actions) is what
+// a phone's half sheet shows first, so the photo comes after it.
+import Bi from '../Bi.astro';
+import { attr } from '../../lib/i18n';
+import { dayLabel, mapsSearchUrl } from '../../lib/guides/core';
+import { W, kicker, dateRange, timeSpan } from '../../lib/guides/words';
+import type { Bi as BiT, GuideView } from '../../lib/guides/types';
+
+interface Props { view: GuideView }
+const { view } = Astro.props;
+const tier = (id: string) => view.tiers.find((t) => t.id === id);
+const theme = (id: string) => view.themes.find((t) => t.id === id)?.name ?? { en: id, zh: '' };
+const zone = (id: string) => view.zones.find((z) => z.id === id)?.name ?? { en: id, zh: '' };
+const category = (id: string) => view.categories.find((c) => c.id === id)?.name ?? { en: id, zh: '' };
+const has = (t?: BiT) => !!t && !!(t.en || t.zh);
+const dir = (name: string, address: string) => `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${name}, ${address}`)}&travelmode=walking`;
+const host = (u: string) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; } };
+const listingOf = (id?: string) => (id ? view.listings.records.find((r) => r.id === id) : undefined);
+const eventsAt = (id: string) => view.events.filter((e) => e.place === id);
+const lang = view.listings.source.lang || undefined;
+const listingNote = has(view.defaults.listingNote) ? view.defaults.listingNote : W.notChecked;
+const loose = view.listings.records.filter((r) => !r.item);
+---
+<div class="gd-articles" data-gd-articles>
+  {view.places.map((p) => (
+    <article class="gd-article gd-place" id={`gd-item-${p.id}`} data-gd-article={p.id} data-kind="place" data-gd-address={`${p.name}, ${p.address}`}>
+      <p class="gd-kicker"><span class="gd-plate" aria-hidden="true">{p.id}</span> <Bi t={p.label} /></p>
+      <h2 class="gd-name" tabindex="-1">{p.name}</h2>
+      {has(p.hours) && <div class="gd-status"><span class="gd-sq" data-code="choose-day" aria-hidden="true"></span><b><Bi t={p.hours} /></b></div>}
+      <p class="gd-actions">
+        <a class="button-link" href={mapsSearchUrl(p.name, p.address)} target="_blank" rel="noopener"><Bi t={W.openMaps} /></a>
+        <a class="button-link" href={dir(p.name, p.address)} target="_blank" rel="noopener"><Bi t={W.directions} /></a>
+        <button type="button" class="gd-copy" data-gd-copy data-js-only><Bi t={W.copyAddress} /></button>
+      </p>
+      {eventsAt(p.id).length > 0 && (
+        <ul class="gd-events-here">
+          {eventsAt(p.id).map((e) => (
+            <li><b><Bi t={dayLabel(e.date)} />{e.until && <> - <Bi t={dayLabel(e.until)} /></>} {timeSpan(e.start, e.end)}</b> <Bi t={e.title} />{has(e.note) && <> (<Bi t={e.note} />)</>}</li>
+          ))}
+        </ul>
+      )}
+      <dl class="gd-facts">
+        <dt><Bi t={W.address} /></dt><dd>{p.address}</dd>
+      </dl>
+      {has(p.note) && <p class="gd-caution"><Bi t={p.note} /></p>}
+      {p.links.length > 0 && <p class="gd-links">{p.links.map((u) => <a href={u} target="_blank" rel="noopener">{host(u)}</a>)}</p>}
+    </article>
+  ))}
+  {view.items.map((it) => {
+    const t = tier(it.tier);
+    const lst = listingOf(it.listing);
+    const dates = dateRange(it.start, it.end);
+    return (
+      <article class="gd-article gd-item" id={`gd-item-${it.id}`} data-gd-article={it.id} data-kind="item" data-gd-address={`${it.name}, ${it.address}`}>
+        <p class="gd-kicker"><span class={`ico ico16 ico-pin-${it.tier.toLowerCase()}`} aria-hidden="true"></span> <Bi t={kicker(it.id, t?.name ?? { en: it.tier, zh: '' })} /></p>
+        <h2 class="gd-name" tabindex="-1">{it.name}</h2>
+        {(it.subtitle || it.by) && <p class="gd-sub">{it.subtitle && <b>{it.subtitle}</b>}{it.subtitle && it.by && <br />}{it.by && <span class="gd-by">{it.by}</span>}</p>}
+        <div class="gd-status" data-gd-status><span class="gd-sq" data-code="choose-day" aria-hidden="true"></span><b data-gd-status-text><Bi t={W.chooseDay} /></b> <span class="gd-status-note" data-gd-status-note></span></div>
+        <p class="gd-actions">
+          <a class="button-link" href={mapsSearchUrl(it.name, it.address)} target="_blank" rel="noopener"><Bi t={W.openMaps} /></a>
+          <a class="button-link" href={dir(it.name, it.address)} target="_blank" rel="noopener"><Bi t={W.directions} /></a>
+          <button type="button" class="gd-copy" data-gd-copy data-js-only><Bi t={W.copyAddress} /></button>
+        </p>
+        {it.image && (
+          <figure class="gd-photo">
+            <img src={it.image.src} {...attr('alt', it.image.alt)} loading="lazy" decoding="async" draggable="false" data-credit={it.image.credit} />
+            <figcaption>{it.image.caption && <>{it.image.caption} </>}<span class="gd-credit">{it.image.credit}</span>{has(view.credits.image) && <> - <Bi t={view.credits.image} /></>}</figcaption>
+            <p class="gd-photo-failed" hidden><Bi t={W.photoFailed} /></p>
+          </figure>
+        )}
+        {has(it.why) && <p class="gd-why"><Bi t={it.why} /></p>}
+        <dl class="gd-facts">
+          <dt><Bi t={W.address} /></dt><dd>{it.address}</dd>
+          {has(it.hours) && <><dt><Bi t={W.hours} /></dt><dd><Bi t={it.hours} /> <small>(<Bi t={W.publishedHours} />)</small></dd></>}
+          {dates && <><dt><Bi t={W.dates} /></dt><dd><Bi t={dates} /></dd></>}
+          {(has(it.price) || has(view.defaults.price)) && <><dt><Bi t={W.price} /></dt><dd><Bi t={has(it.price) ? it.price : view.defaults.price} /></dd></>}
+          {it.minutes && <><dt><Bi t={W.allow} /></dt><dd><Bi t={W.minutes(it.minutes)} /></dd></>}
+          {it.zone && <><dt><Bi t={W.area} /></dt><dd><Bi t={zone(it.zone)} /></dd></>}
+          {it.themes.length > 0 && <><dt><Bi t={W.themes} /></dt><dd class="gd-themes">{it.themes.map((id, i) => <>{i > 0 && ', '}<a href={`?theme=${encodeURIComponent(id)}`} data-gd-theme={id}><Bi t={theme(id)} /></a></>)}</dd></>}
+          {lst && <><dt><Bi t={view.labels.listing} /></dt><dd><details><summary>{lst.id}</summary><p class="gd-listing-text" lang={lang}>{lst.details}</p></details></dd></>}
+        </dl>
+        {has(it.note) && <p class="gd-caution"><Bi t={it.note} /></p>}
+        {(it.sourceUrl || it.links.length > 0) && (
+          <p class="gd-links">
+            {it.sourceUrl && <a href={it.sourceUrl} target="_blank" rel="noopener"><Bi t={W.sourcePage} /></a>}
+            {it.links.map((u) => <a href={u} target="_blank" rel="noopener">{host(u)}</a>)}
+          </p>
+        )}
+      </article>
+    );
+  })}
+  {loose.map((r) => (
+    <article class="gd-article gd-listing" id={`gd-item-${r.id}`} data-gd-article={r.id} data-kind="listing">
+      <p class="gd-kicker"><span class="ico ico16 ico-pin-d" aria-hidden="true"></span> {r.id} - <Bi t={view.labels.listing} /> - <Bi t={category(r.category)} /></p>
+      <h2 class="gd-name" tabindex="-1">{r.name}</h2>
+      <p class="gd-actions">
+        <a class="button-link" href={`https://www.google.com/maps/search/?api=1&query=${r.coordinates[1]},${r.coordinates[0]}`} target="_blank" rel="noopener"><Bi t={W.openMaps} /></a>
+      </p>
+      <p class="gd-listing-text" lang={lang}>{r.details}</p>
+      <p class="gd-caution"><Bi t={listingNote} /></p>
+      <p class="gd-links">
+        {r.url && <a href={r.url} target="_blank" rel="noopener">{host(r.url)}</a>}
+        {view.listings.source.url ? <a href={view.listings.source.url} target="_blank" rel="noopener">{view.listings.source.name}</a> : <span>{view.listings.source.name}</span>}
+      </p>
+    </article>
+  ))}
+  <div class="gd-article gd-group-list" data-gd-cluster hidden></div>
+</div>

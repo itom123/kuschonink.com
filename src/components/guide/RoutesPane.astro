@@ -1,0 +1,66 @@
+---
+// Field Guide: the Routes pane. A radio list; the chosen route opens to show
+// its stops (with their day status, filled by JS), when, a note, Show on map
+// and the Google Maps links (one walking link, or one per leg by transit).
+import Bi from '../Bi.astro';
+import { attr } from '../../lib/i18n';
+import { mapsRouteUrls } from '../../lib/guides/core';
+import { W } from '../../lib/guides/words';
+import type { Bi as BiT, GuideView } from '../../lib/guides/types';
+
+interface Props { view: GuideView }
+const { view } = Astro.props;
+const has = (t?: BiT) => !!t && !!(t.en || t.zh);
+const stop = (id: string) => {
+  const it = view.items.find((i) => i.id === id);
+  if (it) return { id, name: it.name, address: it.address, icon: `ico ico16 ico-pin-${it.tier.toLowerCase()}`, plate: false };
+  const p = view.places.find((x) => x.id === id);
+  if (p) return { id, name: p.name, address: p.address, icon: '', plate: true };
+  return null;
+};
+---
+<section class="gd-pane" id="gd-routes" data-gd-pane="routes" tabindex="-1" {...attr('aria-label', W.routes)}>
+  <div class="gd-pane-bar">
+    <h2><Bi t={W.routes} /></h2>
+    <button type="button" class="gd-x" data-gd-close-pane data-js-only {...attr('aria-label', W.close)} {...attr('title', W.close)}></button>
+  </div>
+  <div class="gd-pane-body gd-doc">
+    <p class="gd-route-pick" data-js-only>
+      <input type="radio" name="gd-route" id="gd-route-none" value="" data-gd-route-radio checked />
+      <label for="gd-route-none"><Bi t={W.noRoute} /></label>
+    </p>
+    <ul class="gd-routes">
+      {view.routes.map((r, n) => {
+        const stops = r.stops.map(stop).filter((s) => s !== null);
+        const links = mapsRouteUrls(stops.map((s) => ({ name: s.name, address: s.address })), r.mode);
+        return (
+          <li class="gd-routeitem" data-gd-route={r.id}>
+            <p class="gd-route-pick">
+              <input type="radio" name="gd-route" id={`gd-route-${r.id}`} value={r.id} data-gd-route-radio />
+              <label for={`gd-route-${r.id}`}><span><b>{n + 1}.</b> <Bi t={r.name} />{has(r.length) && <> - <Bi t={r.length} /></>}</span></label>
+            </p>
+            <div class="gd-route-card">
+              <ol class="gd-stops">
+                {stops.map((s) => (
+                  <li>
+                    <a href={`#gd-item-${s.id}`} data-gd-sel={s.id}>{s.plate ? <span class="gd-plate" aria-hidden="true">{s.id}</span> : <span class={s.icon} aria-hidden="true"></span>}{' '}{s.plate ? s.name : `${s.id} ${s.name}`}</a>
+                    <span class="gd-stop-status" data-gd-stop-status={s.id}></span>
+                  </li>
+                ))}
+              </ol>
+              <dl class="gd-facts">
+                {has(r.duration) && <><dt><Bi t={W.duration} /></dt><dd><Bi t={r.duration} /></dd></>}
+                {has(r.when) && <><dt><Bi t={W.whenLabel} /></dt><dd><Bi t={r.when} /></dd></>}
+                {has(r.note) && <><dt><Bi t={W.noteLabel} /></dt><dd><Bi t={r.note} /></dd></>}
+              </dl>
+              <p class="gd-actions">
+                <button type="button" data-gd-route-show={r.id} data-js-only><Bi t={W.showOnMap} /></button>
+                {links.map((l) => <a class="button-link" href={l.href} target="_blank" rel="noopener"><Bi t={l.label} /></a>)}
+              </p>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+</section>

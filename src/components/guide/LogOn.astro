@@ -1,0 +1,73 @@
+---
+// Field Guide (导览): the log-on box of one guide, modelled on Windows 98's
+// "Enter Network Password". Public and neutral: only the guide's public title
+// and subtitle, never its content. Without JavaScript the form posts to the
+// Worker (worker/guides.ts), which answers with a 303 to the guide, or with
+// this page again and data-gd-state set to wrong | wait | off | denied | error;
+// CSS then shows the matching message below. src/scripts/guide/logon.ts posts
+// with fetch instead and shows the same messages as message boxes.
+import Bi from '../Bi.astro';
+import type { Bi as BiText } from '../../lib/i18n';
+import '../../styles/guide-logon.css';
+
+interface Props {
+  slug: string;
+  title: BiText;
+  subtitle: BiText;
+}
+const { slug, title, subtitle } = Astro.props;
+const resource = `\\\\XIANGYIN\\GUIDES\\${slug.toUpperCase()}`;
+const id = `gd-logon-${slug}`;
+const zhOr = (b: BiText) => b.zh || b.en;
+---
+<div class="gd-logon" data-gd-logon data-gd-state="none" data-gd-slug={slug} data-gd-title-en={title.en} data-gd-title-zh={zhOr(title)}>
+  <header class="gd-logon-splash">
+    <span class="ico ico-guide gd-logon-icon" aria-hidden="true"></span>
+    <div class="gd-logon-names">
+      <h1 class="gd-logon-title"><Bi t={title} /></h1>
+      {subtitle.en && <p class="gd-logon-sub"><Bi t={subtitle} /></p>}
+    </div>
+  </header>
+
+  <form class="gd-logon-form" method="post" action={`/guides/${slug}/login`} data-gd-logon-form>
+    <fieldset class="gd-logon-box">
+      <legend><Bi t={{ en: 'Enter Network Password', zh: '输入网络密码' }} /></legend>
+      <div class="gd-logon-grid">
+        <span class="ico ico-keys gd-logon-keys" aria-hidden="true"></span>
+        <div class="gd-logon-fields">
+          <p class="gd-logon-intro" id={`${id}-intro`}><Bi t={{ en: 'You must supply a password to open:', zh: '必须提供密码才能打开：' }} /></p>
+          <div class="gd-logon-row">
+            <label for={`${id}-res`}><span data-l="en"><u>R</u>esource:</span><span data-l="zh" lang="zh-Hans">资源(<u>R</u>)：</span></label>
+            {/* No name: it is not sent. It tells password managers where the password belongs. */}
+            <input id={`${id}-res`} type="text" value={resource} readonly spellcheck="false" autocomplete="username" class="gd-logon-res" />
+          </div>
+          <div class="gd-logon-row">
+            <label for={`${id}-pass`}><span data-l="en"><u>P</u>assword:</span><span data-l="zh" lang="zh-Hans">密码(<u>P</u>)：</span></label>
+            <input id={`${id}-pass`} type="password" name="password" maxlength="256" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby={`${id}-intro ${id}-msgs`} data-gd-pass />
+          </div>
+          <div class="gd-logon-check">
+            <input id={`${id}-save`} type="checkbox" name="remember" value="1" checked />
+            <label for={`${id}-save`}><span data-l="en"><u>S</u>ave this password</span><span data-l="zh" lang="zh-Hans">保存密码(<u>S</u>)</span></label>
+          </div>
+          <input type="hidden" name="next" value="" data-gd-next />
+        </div>
+        <div class="gd-logon-buttons">
+          <button type="submit" class="default" data-gd-ok><Bi t={{ en: 'OK', zh: '确定' }} /></button>
+          <a class="gd-logon-cancel" href="/" role="button" data-gd-cancel><Bi t={{ en: 'Cancel', zh: '取消' }} /></a>
+        </div>
+      </div>
+      <div class="gd-logon-msgs" id={`${id}-msgs`} aria-live="polite">
+        <p class="gd-logon-msg" data-gd-msg="wrong"><span class="ico ico16 ico-error" aria-hidden="true"></span><span><Bi t={{ en: 'The password is incorrect. Type it again.', zh: '密码不正确。请重新键入。' }} /></span></p>
+        <p class="gd-logon-msg" data-gd-msg="wait"><span class="ico ico16 ico-warning" aria-hidden="true"></span><span><Bi t={{ en: 'Too many tries. Wait a minute, then try again.', zh: '尝试次数过多。请等一分钟，然后再试。' }} /></span></p>
+        <p class="gd-logon-msg" data-gd-msg="off"><span class="ico ico16 ico-info" aria-hidden="true"></span><span><Bi t={{ en: 'This guide is not open yet. Try again later.', zh: '这份导览尚未开放。请稍后再试。' }} /></span></p>
+        <p class="gd-logon-msg" data-gd-msg="error"><span class="ico ico16 ico-error" aria-hidden="true"></span><span><Bi t={{ en: 'This guide could not check the password. Reload the page and try again.', zh: '这份导览无法检查密码。请刷新网页后再试。' }} /></span></p>
+      </div>
+    </fieldset>
+  </form>
+</div>
+
+<script>
+  import { initLogOn } from '../../scripts/guide/logon';
+  initLogOn();
+  document.addEventListener('astro:page-load', initLogOn);
+</script>

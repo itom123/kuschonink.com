@@ -1,0 +1,121 @@
+{
+  "_comment": "Self-guided routes; stops are item and place ids in order. \"after-class\" is for participants only. 自助路线；after-class 只给学员。",
+  "routes": [
+    {
+      "id": "after-class",
+      "name": "After class",
+      "nameZh": "课后短线",
+      "length": "60–90 min",
+      "lengthZh": "60–90 分钟",
+      "stops": [
+        "W",
+        "B2",
+        "A2",
+        "F"
+      ],
+      "mode": "walking",
+      "duration": "One or two nearby stops only; allow 60–90 min.",
+      "durationZh": "只去附近一两站；留出 60–90 分钟。",
+      "when": "9–11 Nov only if class ends early enough; choose HCB instead on Wed 11 if galleries cannot confirm holiday access.",
+      "whenZh": "仅限11月9日至11日，且课程结束得够早；如果画廊无法确认假日能否入场，11月11日（周三）改去 HCB。",
+      "note": "For Ithaque before 12 Nov the venue lists access, while Photo Days lists 12 Nov as the start. Call first. Return for the 10 Nov 18:00 FotoFilmic opening.",
+      "noteZh": "关于11月12日之前去 Ithaque：场馆网站显示可以入场，而 Photo Days 写的开展日期是11月12日。请先打电话确认。记得回来参加11月10日 18:00 的 FotoFilmic 开幕式。",
+      "audience": "fotofilmic"
+    },
+    {
+      "id": "marais",
+      "name": "Marais",
+      "nameZh": "玛黑核心线",
+      "length": "3 hours",
+      "lengthZh": "3 小时",
+      "stops": [
+        "F",
+        "A3",
+        "B5",
+        "A7",
+        "B4"
+      ],
+      "mode": "walking",
+      "duration": "Four stops with breaks: about 3 h; choose 2–3 if viewing slowly.",
+      "durationZh": "四站，含休息：约 3 小时；如果看得慢，选 2–3 站。",
+      "when": "12–14 Nov, start about 13:30.",
+      "whenZh": "11月12日至14日，约 13:30 出发。",
+      "note": "Follow portraits → staging → material/exile → documentary revisiting. End at Polka/Maubert in the same street; add no other museum.",
+      "noteZh": "顺序：肖像 → 场景编排 → 材质／流亡 → 重访纪实。终点是同一条街上的 Polka/Maubert；不要再加其他博物馆。"
+    },
+    {
+      "id": "portraits-fashion",
+      "name": "Portraits to fashion",
+      "nameZh": "肖像与时尚线",
+      "length": "half day",
+      "lengthZh": "半天",
+      "stops": [
+        "F",
+        "A1",
+        "A12",
+        "A4",
+        "B6"
+      ],
+      "mode": "walking",
+      "duration": "Select HCB + MEP, plus one gallery; about 4 h with breaks.",
+      "durationZh": "选 HCB + MEP，再加一家画廊；含休息约 4 小时。",
+      "when": "12–14 Nov. On Thu 12, MEP stays open until 22:00.",
+      "whenZh": "11月12日至14日。11月12日（周四）MEP 开放到 22:00。",
+      "note": "Do not try every stop. At MEP compare Penn with Traoré; optionally continue to Barnor only if time remains before 19:00.",
+      "noteZh": "不要试图每站都去。在 MEP 对比 Penn 和 Traoré 的作品；如果 19:00 前还有时间，可以再去 Barnor。"
+    },
+    {
+      "id": "north",
+      "name": "North",
+      "nameZh": "北城观看关系线",
+      "length": "half day",
+      "lengthZh": "半天",
+      "stops": [
+        "A6",
+        "A9"
+      ],
+      "mode": "walking",
+      "duration": "Two substantial stops plus lunch: 3–4 h.",
+      "durationZh": "两个分量足的展点加午餐：3–4 小时。",
+      "when": "13–15 Nov only; Being There starts 13 Nov.",
+      "whenZh": "仅限11月13日至15日；Being There 11月13日开展。",
+      "note": "LE BAL exceptionally opens at 11:00 in this week. 14 Nov book signings may be busy. Travel between venues: allow about 30 min, verify live route.",
+      "noteZh": "本周 LE BAL 破例 11:00 开门。11月14日的签售会可能人多。场馆之间的交通约需 30 分钟，请查看实时路线。"
+    },
+    {
+      "id": "seine",
+      "name": "Seine",
+      "nameZh": "塞纳河日本摄影线",
+      "length": "half day",
+      "lengthZh": "半天",
+      "stops": [
+        "A10",
+        "A8"
+      ],
+      "mode": "walking",
+      "duration": "BnF 90–120 min + Quai 45–60 min + a break: about 3–4 h.",
+      "durationZh": "BnF 90–120 分钟 + Quai 45–60 分钟 + 一次休息：约 3–4 小时。",
+      "when": "12–15 Nov; Sunday BnF starts at 13:00. Do not choose 11 Nov.",
+      "whenZh": "11月12日至15日；周日 BnF 13:00 开门。不要选11月11日。",
+      "note": "Enter BnF Galerie 2 from Rue Émile-Durkheim, then walk to the lower riverbank at Port de la Gare.",
+      "noteZh": "从 Rue Émile-Durkheim 进入 BnF Galerie 2，然后步行到 Port de la Gare 的下层河岸。"
+    },
+    {
+      "id": "history-sound",
+      "name": "History, sound, installation",
+      "nameZh": "历史与声音专线",
+      "stops": [
+        "A5",
+        "B8",
+        "B7"
+      ],
+      "mode": "transit",
+      "duration": "Choose Stan Douglas plus ONE Left Bank venue; about 4 h including lunch/transfers.",
+      "durationZh": "选 Stan Douglas，再加一个左岸场馆即可；含午餐和换乘约 4 小时。",
+      "when": "12–15 Nov. RosAlma exists only through 15 Nov.",
+      "whenZh": "11月12日至15日。RosAlma 只展到11月15日。",
+      "note": "The line shows visit order, not a walking track. Allow transport and sufficient time for moving-image works; do not rush three exhibitions.",
+      "noteZh": "线条表示参观顺序，不是步行路径。请预留交通时间，并给动态影像作品足够的观看时间；不要匆忙赶完三个展览。"
+    }
+  ]
+}

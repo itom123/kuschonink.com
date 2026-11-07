@@ -1,7 +1,7 @@
 // Opens pages inside windows. Every URL is a real page; with JavaScript a
 // click fetches that page and shows its window on the desktop instead of
 // loading a new document. Anything unusual falls back to a normal page load.
-import { addressFor, addressToPath, appFor, cleanPath, upOf } from '../../lib/apps';
+import { addressFor, addressToPath, appFor, cleanPath, keepsQuery, upOf } from '../../lib/apps';
 import { msgbox } from './dialogs';
 import { settings } from './settings';
 import { play } from './sound';
@@ -29,6 +29,8 @@ export interface NavOpts {
 const CACHE_MAX = 20;
 const cache = new Map<string, Page>();
 const inflight = new Map<string, Promise<Page>>();
+/** Pages sent with `Cache-Control: no-store` (a log-on, a guide behind a password): never cached, prefetched at most once. */
+const noStore = new Set<string>();
 const executed = new Set<string>();
 const controllers = new Map<string, AbortController>();
 const seqs = new Map<string, number>();
@@ -49,6 +51,8 @@ function isPageUrl(url: URL) {
   if (url.origin !== location.origin) return false;
   const p = url.pathname;
   if (/^\/(_astro|v1|system)\//.test(p) || p.startsWith('/house/drawer/')) return false;
+  // Below a guide are its files and endpoints (img/, map/, login, logout), not pages.
+  if (/^\/guides\/[^/]+\/.+/.test(p)) return false;
   return !/\.[a-z0-9]+$/i.test(p) || p.endsWith('.html');
 }
 
@@ -87,7 +91,11 @@ async function fetchPage(url: URL, reload = false, signal?: AbortSignal): Promis
     if (new URL(res.url).origin !== location.origin) throw new Error('cross-origin');
     if (!(res.headers.get('content-type') ?? '').includes('text/html')) throw new Error('not-html');
     const page = { html: await res.text(), status: res.status };
-    if (res.ok) {
+    if (/no-store/i.test(res.headers.get('cache-control') ?? '')) {
+      cache.delete(key);
+      noStore.add(key);
+    } else if (res.ok) {
+      noStore.delete(key);
       cache.set(key, page);
       if (cache.size > CACHE_MAX) cache.delete(cache.keys().next().value as string);
     }
@@ -105,7 +113,7 @@ export function prefetch(href: string) {
   try {
     const url = new URL(href, location.href);
     const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    if (!isPageUrl(url) || conn?.saveData) return;
+    if (!isPageUrl(url) || conn?.saveData || noStore.has(cleanPath(url.pathname))) return;
     fetchPage(url).catch(() => {});
   } catch { /* ignore */ }
 }
@@ -240,7 +248,7 @@ export async function navigate(input: string | URL, o: NavOpts = {}): Promise<vo
   const app = appFor(path);
   const fromWin = wm.byEl(o.from ?? null);
   let win = fromWin && fromWin.app === app && !fromWin.dialog ? fromWin : wm.find(app);
-  const target = path + (app === 'house' ? url.search : '');
+  const target = path + (keepsQuery(app) ? url.search : '');
   const winHistory = o.winHistory ?? true;
 
   if (win && !o.reload && cleanPath(wm.urlOf(win).split('?')[0]) === path) {
@@ -422,7 +430,7 @@ export function initRouter() {
   document.addEventListener('keydown', onAddressKey);
   document.addEventListener('focusin', (e) => {
     const input = (e.target as Element | null)?.closest?.('[data-address]') as HTMLInputElement | null;
-    if (input) setTimeout(() => input.select(), 0);
+    if (input instanceof HTMLInputElement) setTimeout(() => input.select(), 0);
   });
 
   let hoverTimer = 0;

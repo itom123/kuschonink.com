@@ -31,7 +31,7 @@ appears with the page they asked for open in a window.
   with an Image Viewer for the photographs), About.doc (`/about`, a document),
   Contact (`/contact`, a New Message window), Paint (`/paint`, for drawing
   something and sending it to the artist), The House (`/house/…`, a browser
-  window) and Help (`/help`).
+  window), Field Guide (`/guides`, behind passwords) and Help (`/help`).
 - **The Control Panel**: Display (wallpaper, screen saver, colour schemes
   including High Contrast, window effects), Mouse (faint pointer trails, off to
   begin with; larger pointers; double-click speed), Sounds, and Folder Options
@@ -293,6 +293,66 @@ choices and custom colours are in `localStorage` (`kus98:paint`).
 - **Tests:** `npm test` also runs the drawing handler (`worker/drawing.test.mts`,
   with real PNGs) and the fill (`src/scripts/paint/fill.test.mts`).
 
+### Field Guide (password)
+
+**Field Guide** (导览, `/guides`, on the desktop and in Start ▸ Programs) holds
+city guides for friends and groups: a map of recommended places in three tiers,
+with a heat map, routes, the days of an event and practical notes. Each guide is
+a document inside the program, at `/guides/<slug>` (`\\XIANGYIN\GUIDES\<SLUG>`
+in the log-on box). The first is `paris-photo-days-2026`. On a computer the window
+shows a list, the map and the details side by side; on a phone it shows one at a
+time, and tapping a pin raises a details sheet. It works without JavaScript as
+one readable page.
+
+**Passwords and audiences.** Before the password, a visitor sees only the
+program's name and each listed guide's neutral public title, then an *Enter
+Network Password* box. The Worker (`worker/guides.ts`, on `/guides/*`) checks the
+password and decides which **audience** it belongs to. Audiences, and which
+guides each may open, are in `src/content/guides/access.json`; each audience's
+password is a Cloudflare secret named there (`GUIDES_PASSWORD` for visitors,
+`GUIDES_PASSWORD_FOTOFILMIC` for participants), never in the repo. Each needs
+6 or more characters and must differ from the other; case, extra spaces and
+full-width characters don't matter. Every
+guide is built once per audience, and the Worker serves the page for the
+visitor's audience, so a visitor's HTML and data never hold what's marked for
+someone else. The log-on is a signed `HttpOnly` cookie, `kus98_guides`; pictures
+and base maps are served only with it. A server-only key signs it, so nobody
+can forge one: the secret `GUIDES_COOKIE_SECRET` (recommended: 32 or more
+random characters), or `TURNSTILE_SECRET` when that isn't set. Changing either
+secret logs everyone out. All these secrets go under Workers & Pages →
+kuschonink → Settings → Variables and Secrets, type Secret, not under
+Settings → Build (only the build can see those variables). Without a password set, a guide says it
+isn't open yet. Guide pages are `noindex` and not in the sitemap.
+
+**The data.** Each guide is a folder of JSON in `src/content/guides/<slug>/`
+(`guide.json`, `items.json`, `places.json`, `events.json`, `routes.json`,
+`listings.json`, `map.json`), with its pictures and base maps in
+`public/guides/<slug>/img/` and `map/`. Any entry can carry `"audience"` to show
+it only to some audiences. The build checks everything (real dates, known ids,
+coordinates inside the map, matching times in the Chinese, no unknown fields)
+and stops with a list of `file › id › field` problems, so a mistake never
+reaches the live site.
+
+**The leak guard.** After the build, `scripts/guides-guard.mjs` reads `dist/`.
+Public files (the home, the log-on pages, scripts, `desktop.json`, the sitemap)
+must contain nothing from inside a guide, and each audience's view nothing kept
+for another; each guide's `sensitive` words in `guide.json` are checked too. A
+leak fails the build, and the old version stays live.
+
+How to edit a guide, add one, add an audience or change a password, in Chinese
+and English: [`docs/GUIDES.md`](docs/GUIDES.md).
+
+- **Code:** pages in `src/pages/guides/` (the home, `[slug]/locked.astro` for the
+  log-on, `[slug]/views/[audience].astro` for each view); types, rules, checks and
+  loading in `src/lib/guides/`; the program and its map in `src/scripts/guide/`
+  and `src/components/guide/`; styles in `src/styles/guide*.css`; the gate in
+  `worker/guides.ts`.
+- **Tests:** `npm test` runs `src/lib/guides/guides.test.mts` (day rules, time
+  zones, audience filtering, the real data, broken copies) and
+  `worker/guides.test.mts` (the gate: views, cookies, log-on, log-off) and
+  `src/scripts/guide/camera.test.mts` (the map's pan and zoom). The build
+  runs the guard and the Worker's tests as well.
+
 ### Analytics
 
 Cloudflare Web Analytics is enabled for the kuschonink.com zone with automatic
@@ -315,7 +375,9 @@ There's no code in this repo and no cookie banner is needed.
 | `src/scripts/map.ts` | Map interaction (pan, zoom, floors, search) |
 | `src/components/house/` | Floorplan map and room panel |
 | `src/pages/paint.astro`, `src/scripts/paint/` | Paint, and sending a drawing to the artist |
-| `worker/` | The Worker: the contact form (`contact.ts`) and Paint's drawings (`drawing.ts`) |
+| `src/content/guides/` | Field Guide: `access.json` (audiences) and one folder per guide |
+| `src/lib/guides/`, `src/scripts/guide/` | Field Guide: data rules and checks; the program in the browser |
+| `worker/` | The Worker: the contact form (`contact.ts`), Paint's drawings (`drawing.ts`) and the Field Guide's password gate (`guides.ts`) |
 | `src/layouts/Desktop.astro` | Every page: the Xiangyin 98 desktop with the page in a window |
 | `src/components/desktop/` | Window, taskbar, Start menu, desktop icons, start-up screens |
 | `src/scripts/desktop/` | The desktop shell: windows, menus, sounds, Control Panel… (see [`docs/DESKTOP.md`](docs/DESKTOP.md)) |
@@ -351,6 +413,9 @@ Image `src` paths are relative to `src/assets/images`. Images may also have a
   `src/assets/images/...` with the new one, keeping the same file name. Astro
   generates all the web sizes (up to 2500 px wide, WebP) at build time.
 - **Restyle the house:** the colours are at the top of `src/styles/house.css`.
+- **Update a Field Guide** (hours, dates, a closure, a new place): edit its JSON
+  in `src/content/guides/<slug>/` on GitHub and commit to `main`. Recipes and
+  direct edit links: [`docs/GUIDES.md`](docs/GUIDES.md).
 
 ## Deploying to Cloudflare Workers
 
@@ -379,8 +444,9 @@ Worker's *Settings → Domains & Routes*. Until then the site is available at
 ### Adding server features later
 
 `worker/index.ts` runs only for the paths listed in `assets.run_worker_first`
-(currently `/v1/contact/*`: the contact form and Paint's drawings). Everything else is served as static files. Add a
-path there and handle it in the Worker to add an API route.
+(currently `/v1/contact/*`, the contact form and Paint's drawings, and
+`/guides/*`, the Field Guide's gate). Everything else is served as static files.
+Add a path there and handle it in the Worker to add an API route.
 
 ## Migration notes
 

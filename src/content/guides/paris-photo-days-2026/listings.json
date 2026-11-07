@@ -1,0 +1,1124 @@
+{
+  "_comment": "Official Photo Days map entries (uMap #1453094), in French as published. Keep the ids D01–D88 on any re-import. 官方地图条目，保留法文原文；重新导入时保持编号不变。",
+  "source": {
+    "name": "Photo Days 2026 official map",
+    "url": "https://umap.openstreetmap.fr/fr/map/photo-days-2026_1453094",
+    "checked": "2026-11-06",
+    "lang": "fr",
+    "credit": "Photo Days / Camille Gajate"
+  },
+  "records": [
+    {
+      "id": "D01",
+      "name": "Lectures de Portfolio · L'École des Arts Joailliers",
+      "category": "events",
+      "coordinates": [
+        2.341198,
+        48.871977
+      ],
+      "details": "Lectures de portfolio\ngratuites pour les photographes\ninscription obligatoire\n\nlundi 9 et mardi 10.11.2026\n16bis boulevard Montmartre — Paris 9e",
+      "url": "https://photodays.paris/Lectures-de-portfolio"
+    },
+    {
+      "id": "D02",
+      "name": "Les artistes font salon",
+      "category": "events",
+      "coordinates": [
+        2.333771,
+        48.854541
+      ],
+      "details": "chez La Hune, 16 rue de l'Abbaye · Paris 6e\n\nRencontres d'artistes\nmardis 3, 10, 17, 24 nov 17h30-19h",
+      "url": "https://photodays.paris/Les-artistes-font-salon"
+    },
+    {
+      "id": "D03",
+      "name": "Les Nuits Photo",
+      "category": "events",
+      "coordinates": [
+        2.316558,
+        48.833893
+      ],
+      "details": "au Cinéma L'Entrepôt, 7 rue Francis de Pressensé — Paris 14e\n\n6e édition\nFestival du film photographique\n\nvendredi 27.11 de 18h à 1h\nsamedi 28.11 de 13h à 1h\net dimanche 29.11 de 13h à 22h",
+      "url": "https://photodays.paris/Les-Nuits-Photo"
+    },
+    {
+      "id": "D04",
+      "name": "Paris Photo",
+      "category": "events",
+      "coordinates": [
+        2.313266,
+        48.866211
+      ],
+      "details": "Grand Palais — Paris 8e\njeu-sam 13h-20h / dim 13h-19h\n\nParis Photo, 29e édition\n12.11.2026 — 15.11.2026",
+      "url": "https://www.parisphoto.com",
+      "start": "2026-11-12",
+      "end": "2026-11-15"
+    },
+    {
+      "id": "D05",
+      "name": "Prix StudioCollector",
+      "category": "events",
+      "coordinates": [
+        2.32408,
+        48.865759
+      ],
+      "details": "Remise du 20e prix StudioCollector\npar Nathalie MAMANE COHEN en collaboration avec Le Fresnoy\n\nAuditorium du Jeu de Paume, 1 place de la Concorde — Paris 1er\nlundi 23/11 à 18h précises\naccès libre en fonction des places disponibles\n\nRSVP · communication@lefresnoy.net",
+      "url": "https://photodays.paris/Prix-StudioCollector"
+    },
+    {
+      "id": "D06",
+      "name": "Atelier néerlandais",
+      "category": "institutions",
+      "coordinates": [
+        2.346166,
+        48.858308
+      ],
+      "details": "22 avenue Victoria — Paris 1er\n\nA Wider Gaze\nexposition collective\n6.11 — 15.11.2026\n\ntous les jours 11h–18h, avec une visite guidée à 11h30",
+      "url": "https://photodays.paris/Atelier-Neerlandais",
+      "start": "2026-11-06",
+      "end": "2026-11-15"
+    },
+    {
+      "id": "D07",
+      "name": "BnF François Mitterrand",
+      "category": "institutions",
+      "coordinates": [
+        2.376845,
+        48.832761
+      ],
+      "details": "entrée côté rue Emile-Durkheim,\nGalerie 2 — Paris 13e\n\nPhotographies japonaises. Scènes, signes, sensations.\n29.9 — 31.1.2027\n\nmardi-samedi 10h-19h / dimanche 13h-19h",
+      "url": "https://photodays.paris/BnF",
+      "start": "2026-09-29",
+      "end": "2027-01-31"
+    },
+    {
+      "id": "D08",
+      "name": "Centre culturel canadien",
+      "category": "institutions",
+      "coordinates": [
+        2.312432,
+        48.872445
+      ],
+      "details": "130 rue du Faubourg Saint-Honoré — Paris 8e\n\nRobert BURLEY\nGrands Lacs. L’horizon commun des mers intérieures\n6.6 — 14.11.2026\n\nlundi-vendredi 10h-18h\nouverture exceptionnelle lundi 9 10h-21h et samedi 14 14h-20h30",
+      "url": "https://photodays.paris/Centre-culturel-canadien",
+      "start": "2026-06-06",
+      "end": "2026-11-14"
+    },
+    {
+      "id": "D09",
+      "name": "Centre tchèque de Paris",
+      "category": "institutions",
+      "coordinates": [
+        2.334292,
+        48.856239
+      ],
+      "details": "18 rue Bonaparte — Paris 6e\n\nJindřich ŠTREIT\nHumanity\n5.11 — 16.1.2027\n\njeudi-samedi 13h-19h",
+      "url": "https://photodays.paris/Centre-tcheque-de-Paris",
+      "start": "2026-11-05",
+      "end": "2027-01-16"
+    },
+    {
+      "id": "D10",
+      "name": "CPIF · Centre Photographique d'Île-de-France",
+      "category": "institutions",
+      "coordinates": [
+        2.607665,
+        48.801458
+      ],
+      "details": "107 avenue de la République — Pontault-Combault (77)\n\nIsabelle LE MINH\nA Rose is a Rose is the Last Rose of Summer\n4.10 — 20.12.2026\n\nmercredi-vendredi 13h-18h / week-ends 14h-18h",
+      "url": "https://photodays.paris/CPIF",
+      "start": "2026-10-04",
+      "end": "2026-12-20"
+    },
+    {
+      "id": "D11",
+      "name": "Fondation Fiminco",
+      "category": "institutions",
+      "coordinates": [
+        2.434152,
+        48.89539
+      ],
+      "details": "30 rue Jean-Jacques Rousseau — Romainville (93)\n\nStephan ZIMMERLI, Johanna HULLÁR, Sophie BALLMER et Tarik HAYWARD, Julie SEMOROZ, Santiago MARTINEZ, Séverin GUELPA\nRester Vivant(e)\n15.10 — 29.11.2026\n\nmardi-dimanche 14h-18h",
+      "url": "https://photodays.paris/Fondation-Fiminco",
+      "start": "2026-10-15",
+      "end": "2026-11-29"
+    },
+    {
+      "id": "D12",
+      "name": "Fondation Henri Cartier-Bresson",
+      "category": "institutions",
+      "coordinates": [
+        2.360162,
+        48.863007
+      ],
+      "details": "79 rue des Archives — Paris 3e\n\nSusan MEISELAS\nNicaragua, Histoire, Mémoire\n\nMartine FRANCK\nImages, presse et luttes féministes\n\n21.10 — 7.3.2027\nmardi-dimanche 11h-19h",
+      "url": "https://photodays.paris/Fondation-HCB",
+      "start": "2026-10-21",
+      "end": "2027-03-07"
+    },
+    {
+      "id": "D13",
+      "name": "Hangar Y",
+      "category": "institutions",
+      "coordinates": [
+        2.233107,
+        48.79859
+      ],
+      "details": "9 av. de Trivaux — Meudon (92)\n\nBRASSAÏ\nL'œil de Paris\n17.10 — 21.2.2027\n\n11h–19h les week-ends\net tous les jours fériés et de vacances scolaires",
+      "url": "https://photodays.paris/Hangar-Y",
+      "start": "2026-10-17",
+      "end": "2027-02-21"
+    },
+    {
+      "id": "D14",
+      "name": "Institut suédois",
+      "category": "institutions",
+      "coordinates": [
+        2.3621,
+        48.858108
+      ],
+      "details": "11 rue Payenne — Paris 3e\n\nMarguerite BORNHAUSER, Theo ELIAS, Tom HALLGREN, Salad HILOWLE, Massao MASCARO, Iris MILLOT et Ela POLKOWSKA\nAn Act of Attention\n13.11 — 21.2.2027\n\nmardi-dimanche 12h-19h. nocturne le jeudi jusque 21h",
+      "url": "https://photodays.paris/Institut-suedois",
+      "start": "2026-11-13",
+      "end": "2027-02-21"
+    },
+    {
+      "id": "D15",
+      "name": "Jeu de Paume",
+      "category": "institutions",
+      "coordinates": [
+        2.3236,
+        48.865978
+      ],
+      "details": "1 place de la Concorde — Paris 1er\n\nStan DOUGLAS\nParallax\n20.10 — 10.1.2027\n\nmardi-dimanche 11h-19h. nocturne le mardi jusque 21h",
+      "url": "https://photodays.paris/Jeu-de-Paume",
+      "start": "2026-10-20",
+      "end": "2027-01-10"
+    },
+    {
+      "id": "D16",
+      "name": "La Fab.",
+      "category": "institutions",
+      "coordinates": [
+        2.375072,
+        48.831471
+      ],
+      "details": "place Jean-Michel Basquiat — Paris 13e\n\nHistoires d’amour\ndans la collection agnès b.\n20.11 — 21.3.2027\n\nmercredi-samedi 11h-19h / dimanche 14h-19h",
+      "url": "https://photodays.paris/La-Fab",
+      "start": "2026-11-20",
+      "end": "2027-03-21"
+    },
+    {
+      "id": "D17",
+      "name": "Le 100 ECS",
+      "category": "institutions",
+      "coordinates": [
+        2.377008,
+        48.847684
+      ],
+      "details": "100, rue de Charenton, Paris 12 — Paris 12e\n\nMarie CANTOS . Claire COLIN-COLLIN . Julia DUPONT . Dorothée VOLUT\nAu milieu\n5.11 — 28.11.2026\n\nlundi-samedi 9h-23h",
+      "url": "https://photodays.paris/LE-100",
+      "start": "2026-11-05",
+      "end": "2026-11-28"
+    },
+    {
+      "id": "D18",
+      "name": "LE BAL",
+      "category": "institutions",
+      "coordinates": [
+        2.327211,
+        48.885311
+      ],
+      "details": "6 impasse de la Défense — 18e\n\nL'Espace entre nous\nDans la collection du Wilson Centre for Photography\n19.6 — 3.1.2027\n\nmercredi 12h-20h / jeudi-dimanche 12h-19h",
+      "url": "https://photodays.paris/LE-BAL",
+      "start": "2026-06-19",
+      "end": "2027-01-03"
+    },
+    {
+      "id": "D19",
+      "name": "Le Lavoir Numérique",
+      "category": "institutions",
+      "coordinates": [
+        2.345914,
+        48.815744
+      ],
+      "details": "4 rue de Freiberg — Gentilly (94)\n\nTrier le monde\nRegards post-algorithmiques sur la collection de photographies\n18.9 — 14.3.2027\n\nmercredi-vendredi 13h30-18h30 / samedi-dimanche 13h30-19h",
+      "url": "https://photodays.paris/Le-Lavoir-Numerique",
+      "start": "2026-09-18",
+      "end": "2027-03-14"
+    },
+    {
+      "id": "D20",
+      "name": "MAC VAL",
+      "category": "institutions",
+      "coordinates": [
+        2.387005,
+        48.792758
+      ],
+      "details": "place de la Libération — Vitry-sur-Seine (94)\n\nSMITH\nIci grand ouvert\n23.5 — 31.1.2027\n\nmardi-dimanche 11h-18h",
+      "url": "https://photodays.paris/MAC-VAL",
+      "start": "2026-05-23",
+      "end": "2027-01-31"
+    },
+    {
+      "id": "D21",
+      "name": "MAD · Musée des Arts décoratifs",
+      "category": "institutions",
+      "coordinates": [
+        2.3329,
+        48.863346
+      ],
+      "details": "107 rue Rivoli — Paris 1er\n\nRafael PAVAROTTI\nRafael Pavarotti. Photographe\n2.10 — 2.5.2027\n\nmardi-dimanche 11h-18h",
+      "url": "https://photodays.paris/MAD",
+      "start": "2026-10-02",
+      "end": "2027-05-02"
+    },
+    {
+      "id": "D22",
+      "name": "Maison de Balzac",
+      "category": "institutions",
+      "coordinates": [
+        2.28091,
+        48.85545
+      ],
+      "details": "47 rue Raynouard — Paris 16e\n\nDe la vigne au verre.\nLe vin chez Balzac\n26.11 — 6.4.2027\n\nmardi-dimanche 10h-18h",
+      "url": "https://photodays.paris/Maison-de-Balzac",
+      "start": "2026-11-26",
+      "end": "2027-04-06"
+    },
+    {
+      "id": "D23",
+      "name": "Maison Doisneau",
+      "category": "institutions",
+      "coordinates": [
+        2.347461,
+        48.814164
+      ],
+      "details": "1 rue de la Division du Général Leclerc — Gentilly (94)\n\nKwame BRATHWAITE\nBlack is beautiful\n18.9 — 14.3.2027\n\nmercredi-vendredi 13h30-18h30 / samedi-dimanche 13h30-19h",
+      "url": "https://photodays.paris/Maison-Doisneau",
+      "start": "2026-09-18",
+      "end": "2027-03-14"
+    },
+    {
+      "id": "D24",
+      "name": "MAM",
+      "category": "institutions",
+      "coordinates": [
+        2.297821,
+        48.864342
+      ],
+      "details": "Musée d'Art Moderne de Paris\n11 av. du Président Wilson — 16e\n\nJean-François BAURET au sein de la collection permanente\n9.6 — 4.1.2027\n\nmardi-dimanche 10h-18h",
+      "url": "https://photodays.paris/MAM",
+      "start": "2026-06-09",
+      "end": "2027-01-04"
+    },
+    {
+      "id": "D25",
+      "name": "Mémorial de la Shoah",
+      "category": "institutions",
+      "coordinates": [
+        2.356205,
+        48.854951
+      ],
+      "details": "17 rue Geoffroy l’Asnier — Paris 4e\n\nSimone VEIL. Mes sœurs et moi\n10.2 — 29.11.2026\n\nImages de la rafle du « billet vert »\n10.5 — 31.12.2026\n\ndimanche-vendredi 10h-18h. nocturne le jeudi jusqu’à 21h",
+      "url": "https://photodays.paris/memorial-de-la-shoah"
+    },
+    {
+      "id": "D26",
+      "name": "MEP · Maison européenne de la Photographie",
+      "category": "institutions",
+      "coordinates": [
+        2.359057,
+        48.855168
+      ],
+      "details": "5/7 rue de Fourcy — Paris 4e\n\nPENN & FASHION\n30.9 — 17.1.2027\n\nNanténé TRAORÉ pays des merveilles\n30.9 — 29.11.2026\n\nmercredi-dimanche 11h30-18h30",
+      "url": "https://photodays.paris/MEP"
+    },
+    {
+      "id": "D27",
+      "name": "Musée de l'Armée",
+      "category": "institutions",
+      "coordinates": [
+        2.312708,
+        48.857007
+      ],
+      "details": "129 rue de Grenelle — Paris 7e\n\nDécouverte des collections de photographies, riches de nouvelles acquisitions\n\nle 24.11 uniquement sur réservation",
+      "url": "https://photodays.paris/Musee-de-l-Armee"
+    },
+    {
+      "id": "D28",
+      "name": "Musée de la Légion d'honneur",
+      "category": "institutions",
+      "coordinates": [
+        2.324551,
+        48.860123
+      ],
+      "details": "2 rue de la Légion d'Honneur — Paris 7e\n\nJean-Michel FAUQUET\nLe théâtre de la mémoire\n11.11 — 28.2.2027\n\nmercredi-dimanche 13h-18h",
+      "url": "https://photodays.paris/Musee-de-la-legion-d-honneur",
+      "start": "2026-11-11",
+      "end": "2027-02-28"
+    },
+    {
+      "id": "D29",
+      "name": "Musée de la Libération de Paris",
+      "category": "institutions",
+      "coordinates": [
+        2.331644,
+        48.833975
+      ],
+      "details": "4 avenue du Colonel Henri Rol-Tanguy — Paris 14e\n\nRobert CAPA. Photographe de guerre\n18.2 — 20.12.2026\n\nmardi-dimanche 10h-17h30",
+      "url": "https://photodays.paris/Musee-de-la-liberation",
+      "start": "2026-02-18",
+      "end": "2026-12-20"
+    },
+    {
+      "id": "D30",
+      "name": "Musée départemental Albert-Kahn",
+      "category": "institutions",
+      "coordinates": [
+        2.228476,
+        48.841223
+      ],
+      "details": "2 rue du Port — Boulogne-Billancourt (92)\n\nChoisir la paix. Le combat d’Albert Kahn (1860‑1940)\n13.10 — 13.6.2027\n\nmardi-dimanche 11h-18h",
+      "url": "https://photodays.paris/Musee-Albert-Kahn",
+      "start": "2026-10-13",
+      "end": "2027-06-13"
+    },
+    {
+      "id": "D31",
+      "name": "Musée du quai Branly - Jacques Chirac",
+      "category": "institutions",
+      "coordinates": [
+        2.297773,
+        48.861481
+      ],
+      "details": "37 quai Jacques Chirac — Paris 7e\n\nVoir Tahiti.\n29.9 — 31.1.2027\n\nVanuatu, archipel sous tension.\n15.10 — 5.4.2027\n\nPrix pour la Photographie 2024\n3.11 — 22.11.2026\n\nViolence silencieuse. Sous le regard de Roméo Mivekannin\n10.11 — 4.4.2027\n\nmardi-dimanche 10h30-19h / nocturne le jeudi jusqu'à 22h",
+      "url": "https://photodays.paris/Musee-du-quai-Branly"
+    },
+    {
+      "id": "D32",
+      "name": "Quai de la Photo",
+      "category": "institutions",
+      "coordinates": [
+        2.375273,
+        48.836617
+      ],
+      "details": "9 quai de la Gare — Paris 13e\n\nThe Anonymous Project\nTeenage Dream\n16.10 — 22.12.2026\n\nmercredi-dimanche 12h-23h",
+      "url": "https://photodays.paris/quai-de-la-Photo",
+      "start": "2026-10-16",
+      "end": "2026-12-22"
+    },
+    {
+      "id": "D33",
+      "name": "Artivistas",
+      "category": "atypical",
+      "coordinates": [
+        2.331258,
+        48.880042
+      ],
+      "details": "35 rue Blanche — Paris 9e\n\nLa Habana Invencible\n4.11 — 24.11.2026\n\nmardi-samedi 12h-19h / dimanche 12h-18h",
+      "url": "https://photodays.paris/Artivistas",
+      "start": "2026-11-04",
+      "end": "2026-11-24"
+    },
+    {
+      "id": "D34",
+      "name": "Camion RosAlma",
+      "category": "atypical",
+      "coordinates": [
+        2.309337,
+        48.863087
+      ],
+      "details": "2 port du Gros Caillou — Paris 7e\n\nRebecca TOPAKIAN\nConcentric Circles\n12.11 — 15.11.2026\n\ntous les jours 11h-20h",
+      "url": "https://photodays.paris/Camion-RosAlma",
+      "start": "2026-11-12",
+      "end": "2026-11-15"
+    },
+    {
+      "id": "D35",
+      "name": "Caravane L U X",
+      "category": "atypical",
+      "coordinates": [
+        2.322793,
+        48.86175
+      ],
+      "details": "port de Solférino, promenade Édouard-Glissant — Paris 7e\n\nÀ l'origine du Cœur\nporté par le Collectif Trigone\n11.11 — 15.11.2026\n\ntous les jours 11h-18h",
+      "url": "https://photodays.paris/Caravane-LUX",
+      "start": "2026-11-11",
+      "end": "2026-11-15"
+    },
+    {
+      "id": "D36",
+      "name": "Césure",
+      "category": "atypical",
+      "coordinates": [
+        2.354213,
+        48.840079
+      ],
+      "details": "13 rue Santeuil — Paris 5e\n\nDaniel BOURGAIS . Dana COJBUC . Nathalie JOFFRE . Maryam KHOSROVANI . Eléonore SIMON.\nVisite des ateliers d'artiste\n20.11 — 24.11.2026\n\nuniquement sur rdv",
+      "url": "https://photodays.paris/Cesure",
+      "start": "2026-11-20",
+      "end": "2026-11-24"
+    },
+    {
+      "id": "D37",
+      "name": "Collection Regard",
+      "category": "atypical",
+      "coordinates": [
+        2.353686,
+        48.852641
+      ],
+      "details": "rue Jean du Bellay — Paris 4e\n\nHein GORNY Collections\n7.11 — 13.12.2026\n\nuniquement sur rdv",
+      "url": "https://photodays.paris/Collection-Regard",
+      "start": "2026-11-07",
+      "end": "2026-12-13"
+    },
+    {
+      "id": "D38",
+      "name": "Diamantino Labo Photo",
+      "category": "atypical",
+      "coordinates": [
+        2.41716,
+        48.858647
+      ],
+      "details": "46 rue Jules Ferry — Bagnolet (93)\n\nLaboratoire argentique\nDécouverte avec le maître-artisan tireur-filtreur\n\nuniquement sur rdv",
+      "url": "https://photodays.paris/Diamantino"
+    },
+    {
+      "id": "D39",
+      "name": "Editions Firmin-Didot",
+      "category": "atypical",
+      "coordinates": [
+        2.362415,
+        48.858248
+      ],
+      "details": "13 rue Payenne — Paris 3e\n\nBianca SFORNI\nPandora's Box\n2.11 — 30.11.2026\n\ntous les jours 14h30-18h30",
+      "url": "https://photodays.paris/Editions-Firmin-Didot",
+      "start": "2026-11-02",
+      "end": "2026-11-30"
+    },
+    {
+      "id": "D40",
+      "name": "Gare de Lyon",
+      "category": "atypical",
+      "coordinates": [
+        2.375718,
+        48.844631
+      ],
+      "details": "Hall 2, mezzanine, place Louis Armand, 75012 Paris — Paris 12e\n\nLiLiROZE, Laura BONNEFOUS\nAUX OISEAUX et SOUFFLE ARIDE\n3.11 — 3.12.2026\n\nentrée libre",
+      "url": "https://photodays.paris/Objectif-FEMMES",
+      "start": "2026-11-03",
+      "end": "2026-12-03"
+    },
+    {
+      "id": "D41",
+      "name": "HEMERIA",
+      "category": "atypical",
+      "coordinates": [
+        2.371518,
+        48.849418
+      ],
+      "details": "Viaduc des Arts, 89 avenue Daumesnil — Paris 12e\n\nJérémy CHARBAUT\nLa Furie et la Foi\n17.11 — 29.11.2026\n\nlundi-vendredi 18h-20h, samedi 15h-20h",
+      "url": "https://photodays.paris/HEMERIA",
+      "start": "2026-11-17",
+      "end": "2026-11-29"
+    },
+    {
+      "id": "D42",
+      "name": "IWPA",
+      "category": "atypical",
+      "coordinates": [
+        2.292022,
+        48.883963
+      ],
+      "details": "chez Odile Ouizeman\n8 rue Galvani — Paris 17e\n\nVal BARROS · Oleñka CARRASCO · Myriam COHENCA · Tina MASSUMI\nVoices in Motion\n12.11 — 18.12.2026\n\nmercredi-vendredi 15h-19h et samedi 11h-19h\nuniquement sur rdv : info@iwpa.fr",
+      "url": "https://photodays.paris/IWPA",
+      "start": "2026-11-12",
+      "end": "2026-12-18"
+    },
+    {
+      "id": "D43",
+      "name": "La Hune",
+      "category": "atypical",
+      "coordinates": [
+        2.33388,
+        48.854512
+      ],
+      "details": "16 rue de l'Abbaye — Paris 6e\n\nShelby DUNCAN\nHouse of Love\n17.10 — 15.11.2026\n\nlundi 14h-19h / mardi-samedi 10h-19h / dimanche 11h-18h",
+      "url": "https://photodays.paris/La-Hune",
+      "start": "2026-10-17",
+      "end": "2026-11-15"
+    },
+    {
+      "id": "D44",
+      "name": "La Suite du Huit",
+      "category": "atypical",
+      "coordinates": [
+        2.341075,
+        48.862851
+      ],
+      "details": "27 rue Jean-Jacques Rousseau, 3e étage — Paris 1er\n\nToufic BEYHUM . Selma BELLA ZARHLOUL\nOvid's Salon\n6.11 — 30.11.2026\n\nuniquement sur rdv, les samedis 14h-19h",
+      "url": "https://photodays.paris/La-Suite-du-Huit",
+      "start": "2026-11-06",
+      "end": "2026-11-30"
+    },
+    {
+      "id": "D45",
+      "name": "Les Trois Bains",
+      "category": "atypical",
+      "coordinates": [
+        2.402263,
+        48.855736
+      ],
+      "details": "80 rue des Vignoles — Paris 20e\n\nFrédéric GOYEAU\nSaving Daylight\n8.10 — 5.11.2026\n\nCONTACT\n11.11 — 28.11.2026\n\nmardi-vendredi 9h-17h",
+      "url": "https://photodays.paris/Les-Trois-Bains"
+    },
+    {
+      "id": "D46",
+      "name": "Mairie du 7 · Musée de l'Armée",
+      "category": "atypical",
+      "coordinates": [
+        2.320213,
+        48.856813
+      ],
+      "details": "Salle Béatrice Hodent de Broutelles, 116 rue de Grenelle — Paris 7e\n\nChloé SHARROCK\nLe ciel et la terre après eux\n5.11 — 27.11.2026\n\nlundi-vendredi 8h30-17h / samedi 9h-12h30",
+      "url": "https://photodays.paris/Musee-de-l-Armee",
+      "start": "2026-11-05",
+      "end": "2026-11-27"
+    },
+    {
+      "id": "D47",
+      "name": "MUSKHANE",
+      "category": "atypical",
+      "coordinates": [
+        2.356145,
+        48.863905
+      ],
+      "details": "29 rue des Gravilliers — Paris 3e\n\nMaeva DELACROIX . Patrick GUEDJ\nPARESSE\n5.11 — 29.11.2026\n\nlundi au vendredi 11h-14h et 15h-19h / samedi 11h-19h / dimanche 11h-18h",
+      "url": "https://photodays.paris/MUSKHANE",
+      "start": "2026-11-05",
+      "end": "2026-11-29"
+    },
+    {
+      "id": "D48",
+      "name": "Neuflize OBC",
+      "category": "atypical",
+      "coordinates": [
+        2.314736,
+        48.875142
+      ],
+      "details": "boulevard Hausmann — Paris 8e\n\nCollection\nNeuflize OBC\n\nle 1.12, uniquement sur rdv",
+      "url": "https://photodays.paris/Neuflize-OBC"
+    },
+    {
+      "id": "D49",
+      "name": "Objectif FEMMES",
+      "category": "atypical",
+      "coordinates": [
+        2.340968,
+        48.872513
+      ],
+      "details": "Mairie du 9e, 6 rue Drouot — Paris 9e\n\nLiLiROZE, Murmures\n3.11 — 8.11.2026\n\nCoco Amardeil, Yasmine Lavoine (Jeune Talent 2026), Lisa Miquet, Flore Prébay, Victoria Vinas. Photographes sélectionnées 2026\n10.11 — 23.11.2026\n\nLaura BONNEFOUS & Nina OLIVET, VOLUME\n24.11 — 30.11.2026\n\nlundi-vendredi 8h30-17h / samedi 9h-12h30",
+      "url": "https://photodays.paris/Objectif-FEMMES"
+    },
+    {
+      "id": "D50",
+      "name": "Paris La Défense",
+      "category": "atypical",
+      "coordinates": [
+        2.240927,
+        48.890963
+      ],
+      "details": "parcours libre en plein air sur le Parvis de la Défense (92)\n\nElsa LEYDIER, Julien LOMBARDI, Marine LANIER et SMITH, Brèches\n17.09 — 15.11.2026",
+      "url": "https://photodays.paris/Paris-La-Defense",
+      "start": "2026-09-17",
+      "end": "2026-11-15"
+    },
+    {
+      "id": "D51",
+      "name": "Raspail 261",
+      "category": "atypical",
+      "coordinates": [
+        2.331956,
+        48.83732
+      ],
+      "details": "261 boulevard Raspail — Paris 14e\n\nAnaïs TONDEUR, et ses invités\nLà où le sol pousse\n25.11 — 23.12.2026\n\nmercredi-dimanche 11h-19h / jeudi nocturne jusque 21h",
+      "url": "https://photodays.paris/Raspail-261",
+      "start": "2026-11-25",
+      "end": "2026-12-23"
+    },
+    {
+      "id": "D52",
+      "name": "RPBB",
+      "category": "atypical",
+      "coordinates": [
+        2.230616,
+        48.842827
+      ],
+      "details": "Boulogne-Billancourt (92)",
+      "url": "https://photodays.paris/rpbb"
+    },
+    {
+      "id": "D53",
+      "name": "Société Générale",
+      "category": "atypical",
+      "coordinates": [
+        2.332363,
+        48.872929
+      ],
+      "details": "29 blv. Haussmann — Paris 8e\n\nLieux révélés\nsous la coupole de l’Agence centrale\n19.09 — 26.11.2026",
+      "url": "https://photodays.paris/Societe-Generale",
+      "start": "2026-09-19",
+      "end": "2026-11-26"
+    },
+    {
+      "id": "D54",
+      "name": "Société Générale · Puteaux",
+      "category": "atypical",
+      "coordinates": [
+        2.235825,
+        48.891351
+      ],
+      "details": "uniquement sur rdv",
+      "url": "https://photodays.paris/Societe-Generale"
+    },
+    {
+      "id": "D55",
+      "name": "Studio Bauret",
+      "category": "atypical",
+      "coordinates": [
+        2.320347,
+        48.885319
+      ],
+      "details": "rue des Batignolles — Paris 17e\n\nJean-François BAURET\nDécouverte de son atelier avec Mme Claude Bauret-Allard\n\nle 28.11, uniquement sur rdv",
+      "url": "https://photodays.paris/Studio-Bauret"
+    },
+    {
+      "id": "D56",
+      "name": "Studio Frank Horvat",
+      "category": "atypical",
+      "coordinates": [
+        2.234395,
+        48.840942
+      ],
+      "details": "5 rue de l'Ancienne Mairie — Boulogne-Billancourt (92)\n\nSylvie BONNOT\nDialogue 6 : Fracture / Voilure\n9.11 — 20.3.2027\n\nuniquement sur réservation",
+      "url": "https://photodays.paris/Frank-Horvat-Studio",
+      "start": "2026-11-09",
+      "end": "2027-03-20"
+    },
+    {
+      "id": "D57",
+      "name": "Union de la Jeunesse Internationale",
+      "category": "atypical",
+      "coordinates": [
+        2.349336,
+        48.883964
+      ],
+      "details": "2–4 blv. Marguerite de Rochechouart — Paris 18e\n\nLee SHULMAN · Omar Victor DIOP\nBeing There\n13.11 — 13.12.2026\n\ntous les jours 11h30-19h",
+      "url": "https://photodays.paris/Union-de-la-Jeunesse-Internationale",
+      "start": "2026-11-13",
+      "end": "2026-12-13"
+    },
+    {
+      "id": "D58",
+      "name": "we are_",
+      "category": "atypical",
+      "coordinates": [
+        2.31461,
+        48.87128
+      ],
+      "details": "73 rue du Faubourg Saint-Honoré — Paris 8e\n\nMuriel PÉNICAUD\nAu temps du temps, itinérance japonaise\n1.10 — 8.1.2027",
+      "url": "https://photodays.paris/we-are_",
+      "start": "2026-10-01",
+      "end": "2027-01-08"
+    },
+    {
+      "id": "D59",
+      "name": "Chapelle St-Vincent-de-Paul · Thomas KLOTZ",
+      "category": "festival",
+      "coordinates": [
+        2.321725,
+        48.848942
+      ],
+      "details": "95 rue de Sèvres — Paris 6e\n\nThomas KLOTZ\nRévélation\n2.11.2026 — 30.11.2026\n\nvernissage vendredi 6.11 18h-20h\n\naccès libre, tous les jours 8h-18h",
+      "url": "https://photodays.paris/Chapelle-St-Vincent-de-Paul-Thomas-KLOTZ",
+      "start": "2026-11-02",
+      "end": "2026-11-30"
+    },
+    {
+      "id": "D60",
+      "name": "MAC Créteil · Véronique ELLENA",
+      "category": "festival",
+      "coordinates": [
+        2.454157,
+        48.777206
+      ],
+      "details": "place Salvador Allende — Créteil (94)\n\nVéronique ELLENA\nMains d'œuvre\n19.9 — 19.12.2026\n\nrencontre samedi 14.11 à 15h\naccès libre, mardi-samedi 11h-18h",
+      "url": "https://photodays.paris/MAC-Creteil-Veronique-ELLENA",
+      "start": "2026-09-19",
+      "end": "2026-12-19"
+    },
+    {
+      "id": "D61",
+      "name": "Maison · agnès b.",
+      "category": "festival",
+      "coordinates": [
+        2.364646,
+        48.870447
+      ],
+      "details": "17 rue Dieu — Paris 10e\n\nagnès b.\n5 jours à Moscou en 1987\n29.10 — 13.11.2026\n\nvernissage lundi 2.11 à 18h\naccès libre lundi-vendredi 10h-19h",
+      "url": "https://photodays.paris/Maison-agnes-b",
+      "start": "2026-10-29",
+      "end": "2026-11-13"
+    },
+    {
+      "id": "D62",
+      "name": "Rotonde Balzac · Alexandra CATIERE",
+      "category": "festival",
+      "coordinates": [
+        2.303189,
+        48.875772
+      ],
+      "details": "Fondation des Artistes, 11 rue Berryer — Paris 8e\n\nAlexandra CATIERE, SALVE\nLauréate de l’appel Balzac & le vin\n4.11 — 28.11.2026\n\nvernissage mercredi 4.11 17h-19h\naccès uniquement sur réservation",
+      "url": "https://photodays.paris/Rotonde-Balzac-Alexandra-CATIERE",
+      "start": "2026-11-04",
+      "end": "2026-11-28"
+    },
+    {
+      "id": "D63",
+      "name": "Sorbonne Artgallery · Catherine BALET",
+      "category": "festival",
+      "coordinates": [
+        2.344594,
+        48.846707
+      ],
+      "details": "Aile Soufflot, 12 place du Panthéon — Paris 5e\n\nCatherine BALET\nLooking for the Masters\n2.11.2026 — 30.11.2026\n\nvernissage lundi 16.11 dès 18h\n\nlundi-samedi 10h-18h, accès gratuit avec pass d'entrée téléchargeable ici",
+      "url": "https://photodays.paris/Sorbonne-Artgallery-Catherine-BALET",
+      "start": "2026-11-02",
+      "end": "2026-11-30"
+    },
+    {
+      "id": "D64",
+      "name": "Alta Vista Art",
+      "category": "galleries",
+      "coordinates": [
+        2.356886,
+        48.86328
+      ],
+      "details": "8 rue Chapon — Paris 3e\n\nSHE IS THE STORY\nexposition collective\n10.11 — 15.11.2026\n\nvernissage, mardi 10, 18h-20h\nmercredi 11-vendredi 13, 14h-19h\nsamedi 14, 14h-21h\ndimanche 15, uniquement sur rdv",
+      "url": "https://photodays.paris/Alta-Vista-Arts",
+      "start": "2026-11-10",
+      "end": "2026-11-15"
+    },
+    {
+      "id": "D65",
+      "name": "Angalia",
+      "category": "galleries",
+      "coordinates": [
+        2.362551,
+        48.860122
+      ],
+      "details": "10-12 rue des Coutures saint Gervais — Paris 3e\n\nGosette LUBONDO\nThe future is not ours to see\n17.10 — 23.12.2026\n\nmardi 12h-19h / mercredi-samedi 11h-19h",
+      "url": "https://photodays.paris/angalia",
+      "start": "2026-10-17",
+      "end": "2026-12-23"
+    },
+    {
+      "id": "D66",
+      "name": "Arcturus",
+      "category": "galleries",
+      "coordinates": [
+        2.337261,
+        48.855193
+      ],
+      "details": "5 rue Jacques Callot — Paris 6e\n\nMarc RIBOUD\nLa géométrie devient poésie, vie, émotion\n5.11 — 16.11.2026\n\nlundi-samedi 11h-13h puis 14h-19h, et dimanche sur rdv",
+      "url": "https://photodays.paris/arcturus",
+      "start": "2026-11-05",
+      "end": "2026-11-16"
+    },
+    {
+      "id": "D67",
+      "name": "Au Médicis",
+      "category": "galleries",
+      "coordinates": [
+        2.339587,
+        48.848672
+      ],
+      "details": "5 rue de Médicis — Paris 6e\n\nVictor Vladimir LAZAREFF\nFILL THE VOID\n10.11 — 15.11.2026\n\nmardi-samedi 10h-21h",
+      "url": "https://photodays.paris/Au-Medicis",
+      "start": "2026-11-10",
+      "end": "2026-11-15"
+    },
+    {
+      "id": "D68",
+      "name": "Bruno Moinard Editions",
+      "category": "galleries",
+      "coordinates": [
+        2.333554,
+        48.855549
+      ],
+      "details": "31 rue Jacob — Paris 6e\n\nAnne VALVERDE\nKOMOREBI PROJECT\n3.11 — 28.11.2026\n\nmardi-samedi 11h-19h / et sur rdv",
+      "url": "https://photodays.paris/Galerie-Bruno-Moinard-Editions",
+      "start": "2026-11-03",
+      "end": "2026-11-28"
+    },
+    {
+      "id": "D69",
+      "name": "Clémentine de la Féronnière",
+      "category": "galleries",
+      "coordinates": [
+        2.355393,
+        48.851884
+      ],
+      "details": "51 rue Saint-Louis en l'Île — Paris 4e\n\nJames BARNOR\nLucky Jim\n25.09 — 21.11.2026\n\nlundi-samedi 11h-19h",
+      "url": "https://photodays.paris/Clementine-de-la-Feronniere",
+      "start": "2026-09-25",
+      "end": "2026-11-21"
+    },
+    {
+      "id": "D70",
+      "name": "DARMO",
+      "category": "galleries",
+      "coordinates": [
+        2.314328,
+        48.852971
+      ],
+      "details": "16 boulevard des Invalides — Paris 7e\n\nCollection Claude Berri\nCe qui restera de moi\n11.11 — 27.11.2026\n\nlundi-vendredi 10h-19h",
+      "url": "https://photodays.paris/DARMO",
+      "start": "2026-11-11",
+      "end": "2026-11-27"
+    },
+    {
+      "id": "D71",
+      "name": "Dominique Fiat",
+      "category": "galleries",
+      "coordinates": [
+        2.353394,
+        48.874294
+      ],
+      "details": "12 rue Martel — Paris 10e\n\nGünter BRUS · Hannah COLLINS · John GOTO · Nicola LO CALZO · Emo DE MEDEIROS · Chantal REGNAULT · Sue WILLIAMSON\nPHOTOGRAPHIER L'ACTION\n15.10 — 15.1.2027\n\nmardi-vendredi 15h-19h et sur rdv",
+      "url": "https://photodays.paris/Dominique-Fiat",
+      "start": "2026-10-15",
+      "end": "2027-01-15"
+    },
+    {
+      "id": "D72",
+      "name": "Écho 119",
+      "category": "galleries",
+      "coordinates": [
+        2.367189,
+        48.85694
+      ],
+      "details": "1 rue des Minimes — Paris 3e\n\nKusukazu URAGUCHI . Laure GILQUIN\nà marée basse\n28.10 — 16.1.2027\n\nmercredi-samedi 12h-19h",
+      "url": "https://photodays.paris/Echo-119",
+      "start": "2026-10-28",
+      "end": "2027-01-16"
+    },
+    {
+      "id": "D73",
+      "name": "Galerie 24b.",
+      "category": "galleries",
+      "coordinates": [
+        2.3328,
+        48.865925
+      ],
+      "details": "24bis rue Saint Roch — Paris 1er\n\nPX3 & State of the World Price\n11.11 — 13.11.2026\n\nPhoto-Art\n18.11 — 28.11.2026\n\nmardi-samedi 11h-20h",
+      "url": "https://photodays.paris/24b"
+    },
+    {
+      "id": "D74",
+      "name": "galerie du jour agnès b.",
+      "category": "galleries",
+      "coordinates": [
+        2.374928,
+        48.831507
+      ],
+      "details": "au sein de La Fab., place Jean-Michel Basquiat — Paris 13e\n\nGerard MALANGA\n4.11 — 10.1.2027\n\nmercredi-samedi 11h-19h / dimanche 14h-19h",
+      "url": "https://photodays.paris/galerie-du-jour",
+      "start": "2026-11-04",
+      "end": "2027-01-10"
+    },
+    {
+      "id": "D75",
+      "name": "Galerie Eva Meyer",
+      "category": "galleries",
+      "coordinates": [
+        2.356212,
+        48.862071
+      ],
+      "details": "11 rue Michel le Comte — Paris 3e\n\nDeidi VON SCHAEWEN\nParis by Night\n2.11 — 30.11.2026\n\nmercredi-samedi 11h-19h",
+      "url": "https://photodays.paris/Eva-Meyer",
+      "start": "2026-11-02",
+      "end": "2026-11-30"
+    },
+    {
+      "id": "D76",
+      "name": "Galerie Putman",
+      "category": "galleries",
+      "coordinates": [
+        2.353113,
+        48.8642
+      ],
+      "details": "230 rue Saint Martin — Paris 3e\n\nDana COJBUC\nEn levko\n6.11 — 19.12.2026\n\nmardi-samedi 14-19h",
+      "url": "https://photodays.paris/Catherine-Putman",
+      "start": "2026-11-06",
+      "end": "2026-12-19"
+    },
+    {
+      "id": "D77",
+      "name": "Galerie XII",
+      "category": "galleries",
+      "coordinates": [
+        2.360567,
+        48.853315
+      ],
+      "details": "14 rue des Jardins Saint-Paul — Paris 4e\n\nMaciej MARKOWICZ\nHuit Secondes\n10.11 — 16.1.2027\n\nmercredi-vendredi 14h-19h / samedi 12h-19h et sur rdv",
+      "url": "https://photodays.paris/Galerie-xii",
+      "start": "2026-11-10",
+      "end": "2027-01-16"
+    },
+    {
+      "id": "D78",
+      "name": "Initial Labo",
+      "category": "galleries",
+      "coordinates": [
+        2.234903,
+        48.845049
+      ],
+      "details": "62 avenue Jean-Baptiste Clément — Boulogne-Billancourt (92)\n\nChangnam LEE\nLe Temps de la mer\n29.10 — 14.11.2026\n\nmardi-samedi 10h-18h, et sur rdv",
+      "url": "https://photodays.paris/Initial-LABO",
+      "start": "2026-10-29",
+      "end": "2026-11-14"
+    },
+    {
+      "id": "D79",
+      "name": "Ithaque",
+      "category": "galleries",
+      "coordinates": [
+        2.357557,
+        48.86154
+      ],
+      "details": "5 rue des Haudriettes — Paris 3e\n\nMark STEINMETZ\nHeure de pointe\n12.11 — 12.12.2026\n\nmardi-samedi 11h-13h puis 14h-19h",
+      "url": "https://photodays.paris/Ithaque",
+      "start": "2026-11-12",
+      "end": "2026-12-12"
+    },
+    {
+      "id": "D80",
+      "name": "Jean-François Cazeau",
+      "category": "galleries",
+      "coordinates": [
+        2.363941,
+        48.859657
+      ],
+      "details": "8 rue Sainte-Anastase — Paris 3e\n\nPierre JAHAN\na retrospective\n24.10 — 23.12.2026\n\nmardi-samedi 11h-19h",
+      "url": "https://photodays.paris/Jean-Francois-Cazeau",
+      "start": "2026-10-24",
+      "end": "2026-12-23"
+    },
+    {
+      "id": "D81",
+      "name": "Jorge Alyskewycz",
+      "category": "galleries",
+      "coordinates": [
+        2.375376,
+        48.854553
+      ],
+      "details": "14 rue des Taillandiers — Paris 11e\n\nStéphane COUTELLE\nGenZ\n6.11 — 8.11.2026\n\nvendredi, 18h-22h / samedi-dimanche 11h-19h",
+      "url": "https://photodays.paris/Jorge-Alyskewycz",
+      "start": "2026-11-06",
+      "end": "2026-11-08"
+    },
+    {
+      "id": "D82",
+      "name": "Maubert",
+      "category": "galleries",
+      "coordinates": [
+        2.366171,
+        48.857965
+      ],
+      "details": "20 rue Saint Gilles — Paris 3e\n\nPAYRAM\nQue vos pas soient légers, car vous marchez sur mes rêves\n5.11 — 9.1.2027\n\nmardi-samedi 12h-19h / et sur rdv",
+      "url": "https://photodays.paris/Galerie-Maubert",
+      "start": "2026-11-05",
+      "end": "2027-01-09"
+    },
+    {
+      "id": "D83",
+      "name": "Pixi · Marie-Victoire Poliakoff",
+      "category": "galleries",
+      "coordinates": [
+        2.337164,
+        48.851879
+      ],
+      "details": "95 rue de Seine — Paris 6e\n\nElizabeth LENNARD\nL'oiseau rare\n1.10 — 12.12.2026\n\nmardi-samedi 14h30-19h / sur rdv le matin",
+      "url": "https://photodays.paris/Galerie-Pixi",
+      "start": "2026-10-01",
+      "end": "2026-12-12"
+    },
+    {
+      "id": "D84",
+      "name": "Polka Galerie",
+      "category": "galleries",
+      "coordinates": [
+        2.366553,
+        48.8579
+      ],
+      "details": "12 rue Saint-Gilles — Paris 3e\n\nSteve McCURRY\nImmersion\n\nYves MARCHAND & Romain MEFFRE\nLes ruines de Detroit, 20 ans après\n\n12.11 — 16.1.2027\nmardi-samedi 11h-19h",
+      "url": "https://photodays.paris/Polka-Galerie",
+      "start": "2026-11-12",
+      "end": "2027-01-16"
+    },
+    {
+      "id": "D85",
+      "name": "Rabouan Moussion",
+      "category": "galleries",
+      "coordinates": [
+        2.360564,
+        48.861876
+      ],
+      "details": "11 rue Pastourelle — Paris 3e\n\nStephan VANFLETEREN\nTranscripts of a Sea\n12.11 — 16.1.2027\n\nmardi-samedi 10h-19h",
+      "url": "https://photodays.paris/Rabouan-Moussion",
+      "start": "2026-11-12",
+      "end": "2027-01-16"
+    },
+    {
+      "id": "D86",
+      "name": "See Galerie",
+      "category": "galleries",
+      "coordinates": [
+        2.357104,
+        48.861928
+      ],
+      "details": "84 rue du Temple — Paris 3e\n\nArsenia SIRENTE . Elsa & Johanna\nTranslations\n02.11 — 12.12.2026\n\njeudi-samedi 14h-19h",
+      "url": "https://photodays.paris/see-galerie",
+      "start": "2026-11-02",
+      "end": "2026-12-12"
+    },
+    {
+      "id": "D87",
+      "name": "SOLA",
+      "category": "galleries",
+      "coordinates": [
+        2.354722,
+        48.858469
+      ],
+      "details": "8 square Sainte-Croix de la Bretonnerie — Paris 4e\n\nSOLA. A declaration of natural feminine beauty.\n10.11 — 17.11.2026\n\ntous les jours 12h-20h",
+      "url": "https://photodays.paris/SOLA",
+      "start": "2026-11-10",
+      "end": "2026-11-17"
+    },
+    {
+      "id": "D88",
+      "name": "Thaddaeus Ropac",
+      "category": "galleries",
+      "coordinates": [
+        2.363637,
+        48.860763
+      ],
+      "details": "7 rue Debelleyme — Paris 3e\n\nIrving PENN\nL’Essence du portrait\n7.11 — 30.1.2027\n\nmardi-samedi 10h-19h / et sur rdv",
+      "url": "https://photodays.paris/Thaddaeus-Ropac",
+      "start": "2026-11-07",
+      "end": "2027-01-30"
+    }
+  ]
+}
