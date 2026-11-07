@@ -8,6 +8,7 @@ import Bi from '../Bi.astro';
 import { attr } from '../../lib/i18n';
 import { dayLabel, mapsSearchUrl } from '../../lib/guides/core';
 import { W, kicker, dateRange, timeSpan } from '../../lib/guides/words';
+import { SW } from '../../lib/guides/suggest-words';
 import type { Bi as BiT, GuideView } from '../../lib/guides/types';
 
 interface Props { view: GuideView }
@@ -81,6 +82,7 @@ const loose = view.listings.records.filter((r) => !r.item);
           {it.minutes && <><dt><Bi t={W.allow} /></dt><dd><Bi t={W.minutes(it.minutes)} /></dd></>}
           {it.zone && <><dt><Bi t={W.area} /></dt><dd><Bi t={zone(it.zone)} /></dd></>}
           {it.themes.length > 0 && <><dt><Bi t={W.themes} /></dt><dd class="gd-themes">{it.themes.map((id, i) => <>{i > 0 && ', '}<a href={`?theme=${encodeURIComponent(id)}`} data-gd-theme={id}><Bi t={theme(id)} /></a></>)}</dd></>}
+          {it.suggested && <><dt><Bi t={SW.suggested} /></dt><dd class="gd-suggested"><Bi t={SW.suggestedBy(it.suggested.by, it.suggested.own)} /></dd></>}
           {lst && <><dt><Bi t={view.labels.listing} /></dt><dd><details><summary>{lst.id}</summary><p class="gd-listing-text" lang={lang}>{lst.details}</p></details></dd></>}
         </dl>
         {has(it.note) && <p class="gd-caution"><Bi t={it.note} /></p>}

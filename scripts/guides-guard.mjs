@@ -29,7 +29,8 @@ const TEXT_EXT = new Set(['.html', '.htm', '.js', '.mjs', '.css', '.json', '.xml
 const IMAGE_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif']);
 const MAX_IMAGE = 1024 * 1024;
 const MIN_RUN = 24;
-const CAP = 400;
+/** Sentinels per guide. More would slow the scan; reaching it fails the build rather than checking less. */
+const CAP = 5000;
 
 const errors = [];
 const fail = (file, reason) => errors.push(`Field Guide guard: ${file}: ${reason}`);
@@ -319,13 +320,17 @@ const distFiles = walk(DIST);
 const PRIVATE = /^guides\/[^/]+\/(views|img|map)(\/|$)/;
 const publicFiles = distFiles.filter((f) => !PRIVATE.test(f));
 
-// Public sentinels: everything a guide wrote, restricted first, capped.
+// Public sentinels: everything a guide wrote, restricted first. A guide with
+// more than CAP fails the build: checking only some of them would let a leak
+// through unseen as the guide grows (approved suggestions add text).
 const publicSentinels = [];
 const publicWords = [];
 for (const [slug, g] of data) {
   const restricted = [...new Set(g.texts.filter((t) => t.chain.length).map((t) => t.s))];
   const open = [...new Set(g.texts.filter((t) => !t.chain.length).map((t) => t.s))].filter((s) => !restricted.includes(s));
-  for (const s of [...restricted, ...open].slice(0, CAP)) publicSentinels.push({ slug, s });
+  const all = [...restricted, ...open];
+  if (all.length > CAP) fail(`src/content/guides/${slug}/`, `has ${all.length} texts to check, more than the guard's ${CAP}: raise CAP in scripts/guides-guard.mjs`);
+  for (const s of all.slice(0, CAP)) publicSentinels.push({ slug, s });
   for (const w of g.sensitive.public ?? []) if (typeof w === 'string' && w.trim().length >= 3) publicWords.push({ slug, w: w.trim(), re: wordRe(w) });
 }
 

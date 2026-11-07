@@ -218,14 +218,20 @@ export async function handleSuggest(req: Request, slug: string, deps: SuggestDep
     deps.log('suggest: Turnstile unreachable', (e as Error).message);
     return fail('verification_unavailable', 503);
   }
-  if (!ts.success || ts.action !== TURNSTILE_ACTION || !ts.hostname || !deps.turnstile.hostnames.has(ts.hostname)) {
+  // Cloudflare's test secret answers "example.com" with no action. That answer only counts where
+  // example.com is an allowed hostname: in .dev.vars and preview settings, never on the live site.
+  const testAnswer = ts.hostname === 'example.com' && !ts.action && deps.turnstile.hostnames.has('example.com');
+  if (!ts.success || !ts.hostname || !deps.turnstile.hostnames.has(ts.hostname) || (ts.action !== TURNSTILE_ACTION && !testAnswer)) {
     deps.log('suggest: Turnstile refused', { success: ts.success, hostname: ts.hostname, action: ts.action, errors: ts['error-codes'] });
     return fail('verification_failed', 403);
   }
 
-  // Sent already? The same wizard (its id), or the same place from the same visitor after a reload.
+  // Sent already? The same wizard (its id), or exactly the same suggestion from the same visitor
+  // after a reload (a new id). Anything changed, such as a picture added, is a new suggestion; the
+  // place's fingerprint still tells the owner it may be a duplicate.
   const fp = fingerprint({ guide: slug, name: c.s.name, address: c.s.address, website: c.s.website });
-  const keys = [`suggest:id:${c.id}`, `suggest:fp:${await sha(`${fp}|${who}`)}`];
+  const same = await sha(JSON.stringify({ ...c.s, picture: c.picture ? await sha(c.picture) : '' }) + `|${who}`);
+  const keys = [`suggest:id:${c.id}`, `suggest:same:${same}`];
   for (const k of keys) {
     const held = await deps.guard.claim(k, HOLD_S);
     if (!held.fresh) {

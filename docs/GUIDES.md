@@ -15,6 +15,7 @@ directly.
 - [8. 构建失败时 When the build fails](#8-构建失败时-when-the-build-fails)
 - [9. 让云端 Claude Code 来改 Asking cloud Claude Code](#9-让云端-claude-code-来改-asking-cloud-claude-code)
 - [10. 字段说明 Field reference](#10-字段说明-field-reference)
+- [11. 读者推荐 Suggestions](#11-读者推荐-suggestions)
 
 ---
 
@@ -565,6 +566,7 @@ below). Any file may have a `_comment`, which is never shown.
 | `image?` | `{ file, credit, caption?, alt?, altZh? }`；文件在 `img/` | Picture; the file is in `img/` |
 | `label?` | 开场缩放时显示标签（默认 A 级显示） | Label at the opening zoom (default: tier A) |
 | `audience?` | 只给某些读者 | Only for some audiences |
+| `suggested?` | `{ on, by?, own?, ref }`：读者推荐，由发布器加入（第 11 节）；`ref` 是 Notion 页面编号，不会出现在网页里 | A reader's suggestion, added by the publisher (section 11); `ref` is the Notion page and never reaches browsers |
 
 ### `places.json` (`places[]`)
 
@@ -610,3 +612,151 @@ below). Any file may have a `_comment`, which is never shown.
 
 一般不用手改 `map.json`；底图让 Claude 做。You rarely edit `map.json` by
 hand; ask Claude for base maps.
+
+---
+
+## 11. 读者推荐 Suggestions
+
+已经登录某份导览的人（访客和学员都可以），可以用 **文件 ▸ 推荐地点…** 或工具栏的 **推荐**，推荐一个地点或展览，也可以是自己的展览。推荐不会直接出现在导览里：先进入 Notion，由你决定。
+
+People logged on to a guide (visitors and participants alike) can suggest a
+place or a show, their own included, with **File ▸ Suggest a Place…** or the
+toolbar's **Suggest**. Nothing goes into the guide by itself: it lands in
+Notion and you decide.
+
+### 11.1 流程 How it goes
+
+1. 推荐者填写向导：是什么、时间地点、链接和图片、关于自己（可不填）、确认发送。服务器（`worker/suggest.ts`）核对来源、登录、内容、频率和反垃圾验证，清除图片里的位置等信息，然后在 Notion 的 **Suggestions** 里新建一条（状态 `NEW`），并给你发一封通知邮件。Notion 出问题时，整条推荐改用邮件发给你，不会丢失。
+2. 你在 Notion 里（或网站的管理界面里）把状态改成 **APPROVED**（收录）或 **REFUSED**（不收录）。收录前可以设 **Tier**（A/B/C，默认 C）、**Show to**（`Everyone`，或某一类读者，如 `fotofilmic`）和 **Owner notes**（给云端例程的说明）。
+3. 云端例程（Claude Code 的定时任务，每天 08:00–22:00 巴黎时间每小时一次，你在网站上批准时也会立即运行一次）按 [`scripts/suggestions/ROUTINE.md`](../scripts/suggestions/ROUTINE.md) 处理每条 `APPROVED`：核对官网、补全链接和开放时间、定位、查重，写好条目，把状态改成 `READY`（或 `DUPLICATE`、`NEEDS CHECK`、`ERROR`）。**例程不能改仓库**：它读的是陌生人写的文字和外部网页，可能被误导。
+4. 网站自己的代码（发布器，`worker/publish.ts`，每 10 分钟一次）把 `READY` 的条目再检查一遍（只能用已知字段、通过构建时的同一套检查、不能含某类读者不该看到的词），然后提交到 `main`：只改这份导览的 `items.json` 和 `img/` 里的图片。状态变成 `PUBLISHING`；构建通过后变成 `PUBLISHED`。构建失败的话，发布器会自动撤回这次提交，状态变成 `ERROR`。
+
+1. The sender goes through the wizard: what it is, when and where, links and
+   a picture, about them (optional), check and send. The server
+   (`worker/suggest.ts`) checks where it came from, the log-on, the fields,
+   how often, and the anti-spam check, strips location data from the picture,
+   and adds a page to **Suggestions** in Notion (status `NEW`), then emails
+   you. If Notion fails, the whole suggestion is emailed to you instead.
+2. In Notion (or the site's admin queue), set the status to **APPROVED** or
+   **REFUSED**. Before approving you can set **Tier** (A, B or C; C by
+   default), **Show to** (`Everyone`, or one audience such as `fotofilmic`)
+   and **Owner notes** (instructions for the routine).
+3. The cloud routine (a Claude Code scheduled task, hourly 08:00–22:00 Paris,
+   and at once when you approve on the site) follows
+   [`scripts/suggestions/ROUTINE.md`](../scripts/suggestions/ROUTINE.md) for
+   each `APPROVED` page: it checks the venue's own pages, fills in links and
+   hours, finds the place on the map, looks for duplicates, writes the entry,
+   and sets `READY` (or `DUPLICATE`, `NEEDS CHECK`, `ERROR`). **The routine
+   can't change the repository**: it reads strangers' text and other sites,
+   so it could be misled.
+4. The site's own code (the publisher, `worker/publish.ts`, every ten minutes)
+   checks each `READY` entry again (known fields only, the build's own checks,
+   no word an audience mustn't see) and commits it to `main`, touching only
+   the guide's `items.json` and its `img/`. The status becomes `PUBLISHING`,
+   then `PUBLISHED` once the build passes. If the build fails, the publisher
+   takes the commit back and sets `ERROR`.
+
+### 11.2 状态 The statuses
+
+| 状态 Status | 谁设 Set by | 意思 Meaning |
+| --- | --- | --- |
+| `NEW` | 服务器 the Worker | 刚收到 Just in |
+| `ASKED` | 你 you | 已发邮件问推荐者 You emailed the sender |
+| `APPROVED` / `REFUSED` | 你 you | 收录 / 不收录 Take it / don't |
+| `PROCESSING` | 例程 the routine | 正在处理（两小时没完成就重新排队）Being worked on (free again after two hours) |
+| `READY` | 例程 the routine | 条目已写好，等发布器 Entry written, waiting for the publisher |
+| `PUBLISHING` / `PUBLISHED` | 发布器 the publisher | 已提交 / 已上线 Committed / live |
+| `DUPLICATE` | 例程 the routine | 导览里已有，或别人推荐过（见 Result）Already in the guide, or sent before (see Result) |
+| `NEEDS CHECK` | 例程、发布器 routine, publisher | 需要你决定（见 Result），改好后再设 `APPROVED` Needs your decision (see Result); set `APPROVED` again after |
+| `ERROR` | 例程、发布器 routine, publisher | 出错（见 Result）Something failed (see Result) |
+| `SPAM` | 你 you | 垃圾信息，忽略 Spam, ignored |
+
+查重：同一个网址、50 米以内名字相近、同一场馆且日期重叠并有相同艺术家或相近的展名，都算重复。每条导览条目都带着它在 Notion 里的编号（`suggested.ref`），所以重复运行也不会加两次。条目编号（如 C3）从不重复使用；改级别（如 C 改 B）会换一个新编号，路线和日程里的引用一起改。
+
+Duplicates: the same web address; within 50 m with a similar name; or the same
+venue with overlapping dates and a shared artist or a similar show title. Each
+entry carries its Notion page (`suggested.ref`), so running twice never adds
+anything twice. Ids (such as C3) are never reused; a new tier (C to B) gives a
+new id, and routes and events follow it.
+
+### 11.3 隐私 Privacy
+
+- 推荐者的名字和电子邮箱只存在 **Contacts** 里（例程读不到），导览结束 90 天后自动删除（没有日期的导览：一年后）。
+- 只有推荐者在“署名”里填了名字，导览里才会写“由 … 推荐”。导览的文件在 GitHub 上公开，所以署名会留在历史记录里（向导里写明了）。
+- 网络地址只用来限制频率，不保存。
+
+- The sender's name and email are kept only in **Contacts** (the routine can't
+  read it) and deleted 90 days after the guide ends (a year after sending for a
+  guide without dates).
+- The guide says who suggested an entry only with the name they gave under
+  *Credit me*. The guide's files are public on GitHub, so that name stays in
+  their history; the wizard says so.
+- Internet addresses are used for rate limits only and aren't kept.
+
+### 11.4 设置 Settings
+
+只需设一次。Cloudflare 的 secret（不写进仓库）：
+
+Once only. Cloudflare secrets (never in the repo):
+
+| Secret | 用途 For |
+| --- | --- |
+| `NOTION_TOKEN` | 网站的 Notion 集成 The site's Notion integration (Suggestions, Contacts, log) |
+| `TURNSTILE_SECRET_SUGGEST` | 推荐向导自己的 Turnstile The wizard's own Turnstile widget |
+| `GITHUB_TOKEN` | 只限本仓库、Contents 读写的细粒度令牌（发布器）A fine-grained token, this repo only, Contents read/write (the publisher) |
+
+- `wrangler.jsonc` 的 `vars`：三个 Notion 数据源的编号（`NOTION_SUGGESTIONS`、`NOTION_CONTACTS`、`NOTION_LOG`）。为空时推荐改用邮件。
+- `src/content/guides/suggest.json`：Turnstile 的公开站点密钥（不是 secret）。为空时正式网站上不能推荐；本机和预览用 Cloudflare 的测试密钥。
+- 云端例程的环境：完全联网（要打开画廊网站）；例程自己的 Notion 集成（只共享 Suggestions 和日志，不共享 Contacts），作为 `api.notion.com` 的网络 secret；不要连接器。
+
+- `vars` in `wrangler.jsonc`: the three Notion data-source ids
+  (`NOTION_SUGGESTIONS`, `NOTION_CONTACTS`, `NOTION_LOG`). Empty: suggestions
+  are emailed instead.
+- `src/content/guides/suggest.json`: the Turnstile widget's public site key
+  (not a secret). Empty: no suggestions on the live site; `wrangler dev` and
+  previews use Cloudflare's test key.
+- The routine's environment: full network access (for gallery sites); the
+  routine's own Notion integration (shared with Suggestions and the log only,
+  never Contacts) as a network secret for `api.notion.com`; no connectors.
+
+Worker Previews (PR previews) get test values, never the real ones, in the
+dashboard's Preview settings: made-up guide passwords and cookie secret,
+`TURNSTILE_SECRET_SUGGEST=1x0000000000000000000000000000000AA` with
+`TURNSTILE_HOSTNAMES=example.com`, no `GITHUB_TOKEN`, and a test Notion
+integration shared only with the page "Field Guide suggestions (kuschonink) ·
+test copies", whose databases are:
+
+预览（PR 预览）只用测试值：在控制台的 Preview 设置里，用编出来的导览密码和 cookie
+密钥、Turnstile 测试密钥、不设 `GITHUB_TOKEN`，以及一个只共享给“test copies”页面的测试
+Notion 集成：
+
+| Var | Test data source |
+| --- | --- |
+| `NOTION_SUGGESTIONS` | `d2a5fe18-8031-425e-a123-3969fb32fbe7` |
+| `NOTION_CONTACTS` | `26a774fe-1de2-4760-a1c7-8700b1b62de5` |
+| `NOTION_LOG` | `652c23d0-b96b-4cee-a9a3-d4708c1207b8` |
+
+### 11.5 本机测试 Trying it locally
+
+```bash
+node scripts/dev/notion-standin.mjs 8790
+```
+
+`.dev.vars`（不进仓库 gitignored）里加：
+
+Add to `.dev.vars` (gitignored):
+
+```ini
+NOTION_TOKEN=dev
+NOTION_API=http://localhost:8790
+NOTION_SUGGESTIONS=ds-suggestions
+NOTION_CONTACTS=ds-contacts
+NOTION_LOG=ds-log
+TURNSTILE_SECRET_SUGGEST=1x0000000000000000000000000000000AA
+TURNSTILE_HOSTNAMES=example.com,localhost
+```
+
+然后 `npm run build` 和 `npm run preview`，登录一份导览，用 **文件 ▸ 推荐地点…**。`http://localhost:8790/_dump` 显示存下了什么。
+
+Then `npm run build` and `npm run preview`, log on to a guide and use **File ▸
+Suggest a Place…**. `http://localhost:8790/_dump` shows what was kept.

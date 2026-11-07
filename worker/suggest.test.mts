@@ -86,10 +86,13 @@ const jpeg = await sharp({ create: { width: 80, height: 60, channels: 3, backgro
 
   const again = await send(w, { ...base, id: uuid(1), picture: toBase64(jpeg), pictureCredit: 'Photo: Ana Silva', rights: true });
   check('the same wizard sent twice: the same reference, nothing new', again.status === 200 && again.body.reference === r.body.reference && again.body.repeat === true && pagesIn(w, 'ds-s').length === 1 && w.mail.length === 1, again);
-  const reload = await send(w, { ...base, id: uuid(2) });
-  check('after a reload (a new id), the same place: the same reference', reload.status === 200 && reload.body.reference === r.body.reference && pagesIn(w, 'ds-s').length === 1, reload);
+  const reload = await send(w, { ...base, id: uuid(2), picture: toBase64(jpeg), pictureCredit: 'Photo: Ana Silva', rights: true });
+  check('after a reload (a new id), exactly the same suggestion: the same reference', reload.status === 200 && reload.body.reference === r.body.reference && pagesIn(w, 'ds-s').length === 1, reload);
+  const withMore = await send(w, { ...base, id: uuid(6), description: 'Now with a better description.' });
+  check('the same place, changed (a better description): a new suggestion, marked as a possible duplicate', withMore.status === 202 && withMore.body.reference !== r.body.reference && readSuggestion(pagesIn(w, 'ds-s').at(-1)).duplicate.includes(String(r.body.reference)), withMore);
+  const before = pagesIn(w, 'ds-s').length;
   const other = await send(w, { ...base, id: uuid(3), name: 'Another Place', address: '9 rue Ailleurs', website: '' }, { ip: '5.6.7.8' });
-  check('a different place goes in', other.status === 202 && pagesIn(w, 'ds-s').length === 2);
+  check('a different place goes in', other.status === 202 && pagesIn(w, 'ds-s').length === before + 1 && readSuggestion(pagesIn(w, 'ds-s').at(-1)).duplicate === '');
   const dupe = await send(w, { ...base, id: uuid(4) }, { ip: '9.9.9.9' });
   const dupeRow = readSuggestion(pagesIn(w, 'ds-s').at(-1));
   check('the same place from someone else: in, marked as a possible duplicate', dupe.status === 202 && dupeRow.duplicate.includes(String(r.body.reference)), dupeRow.duplicate);
@@ -157,7 +160,12 @@ const jpeg = await sharp({ create: { width: 80, height: 60, channels: 3, backgro
   check('Turnstile says no: 403', (await send(world({ ts: { success: false, 'error-codes': ['invalid-input-response'] } }), { ...base, id: uuid(41) })).status === 403);
   check('another action (the contact form\'s): 403', (await send(world({ ts: { success: true, hostname: 'kuschonink.com', action: 'kuschonink-contact' } }), { ...base, id: uuid(42) })).status === 403);
   check('another hostname: 403', (await send(world({ ts: { success: true, hostname: 'evil.example', action: TURNSTILE_ACTION } }), { ...base, id: uuid(43) })).status === 403);
-  check('Turnstile unreachable: 503', (await send(world({ ts: async () => { throw new Error('down'); } }), { ...base, id: uuid(44) })).status === 503);
+  const testKeyAnswer: TurnstileResult = { success: true, hostname: 'example.com' }; // what Cloudflare's test secret says
+  check('the test key\'s answer is refused on the live site', (await send(world({ ts: testKeyAnswer }), { ...base, id: uuid(45) })).status === 403);
+  const dev = world({ ts: testKeyAnswer });
+  dev.deps.turnstile.hostnames = new Set(['example.com', 'localhost']);
+  check('… and accepted where example.com is allowed (wrangler dev, previews)', (await send(dev, { ...base, id: uuid(46) })).status === 202);
+  check('Turnstile unreachable: 503',(await send(world({ ts: async () => { throw new Error('down'); } }), { ...base, id: uuid(44) })).status === 503);
 }
 
 // ---- When things fail ----

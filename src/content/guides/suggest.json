@@ -1,0 +1,4 @@
+{
+  "_comment": "The Suggest a Place wizard (docs/GUIDES.md, Suggestions). turnstileSiteKey is the PUBLIC site key of the suggestion form's own Turnstile widget (its secret is the Cloudflare secret TURNSTILE_SECRET_SUGGEST). Empty: suggestions are closed on kuschonink.com (wrangler dev and previews use Cloudflare's test key). 推荐地点向导：turnstileSiteKey 是公开的站点密钥，不是 secret。",
+  "turnstileSiteKey": ""
+}

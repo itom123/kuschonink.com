@@ -1,7 +1,7 @@
 // npm test: the Field Guide's password gate (worker/guides.ts), against a
 // stand-in ASSETS, made-up audiences and made-up passwords.
 import { createHmac, pbkdf2Sync } from 'node:crypto';
-import { COOKIE, MIN_PEPPER, REMEMBER_S, SESSION_S, cleanNext, closure, handleGuides, isGuidesPath, limitKey, makeToken, normalise, viewOf, type GuidesDeps } from './guides.ts';
+import { COOKIE, MIN_PEPPER, REMEMBER_S, SESSION_S, cleanNext, closure, guideAudience, handleGuides, isGuidesPath, limitKey, makeToken, normalise, viewOf, type GuidesDeps } from './guides.ts';
 import type { AccessFile } from '../src/lib/guides/types';
 import realAccess from '../src/content/guides/access.json' with { type: 'json' };
 
@@ -448,6 +448,20 @@ await expectView('member cookie → members-only: the member view', get('/guides
       }
     }
   check(`access.json: each audience of each guide opens its own view (${slugs.join(', ')})`, all);
+}
+
+// ---- Suggestions from inside a guide (worker/suggest.ts) ----
+{
+  const c = await cookieFor('city-one', PW.member);
+  const none = await run(post('/guides/city-one/suggest', {}, { ct: 'application/json', body: '{}' }));
+  check("/suggest without a handler: the site's 404", none.status === 404);
+  const seen: string[] = [];
+  const d = deps({ suggest: async (req, slug) => (seen.push(`${req.method} ${slug}`), new Response('handled', { status: 202 })) });
+  const res = await run(post('/guides/city-one/suggest', {}, { ct: 'application/json', body: '{}', headers: { cookie: c } }), d);
+  check('/suggest goes to the handler, with the guide', res.status === 202 && seen.join() === 'POST city-one', seen);
+  check('guideAudience: the view the cookie opens', (await guideAudience(get('/guides/city-one/suggest', c), 'city-one', d)) === 'member');
+  check('guideAudience: null without a cookie or for an unknown guide', (await guideAudience(get('/guides/city-one/suggest'), 'city-one', d)) === null && (await guideAudience(get('/x', c), 'nowhere', d)) === null && (await guideAudience(get('/x', c), 'Bad Slug', d)) === null);
+  check('guideAudience: a cookie is an audience, so it opens what that audience may see elsewhere too', (await guideAudience(get('/x', c), 'open-day', d)) === 'visitor' && (await guideAudience(get('/x', c), 'members-only', d)) === 'member');
 }
 
 console.log(fails ? `${fails} of ${count} FAILED` : `all ${count} passed`);

@@ -12,8 +12,8 @@ function check(name: string, ok: boolean, detail: unknown = '') {
 
 type It = { id: string; name: string; subtitle?: string; by?: string; address: string; sourceUrl?: string; links?: string[]; coordinates: [number, number]; start?: string; end?: string };
 const known: Known[] = [
-  ...(items.items as It[]).map((i) => ({ id: i.id, kind: 'item' as const, name: i.name, show: i.subtitle, artists: i.by, address: i.address, website: i.sourceUrl, links: i.links, coordinates: i.coordinates, start: i.start, end: i.end })),
-  ...(listings.records as { id: string; name: string; url?: string; coordinates: [number, number]; start?: string; end?: string }[]).map((r) => ({ id: r.id, kind: 'listing' as const, name: r.name, website: r.url, coordinates: r.coordinates, start: r.start, end: r.end })),
+  ...(items.items as unknown as It[]).map((i) => ({ id: i.id, kind: 'item' as const, name: i.name, show: i.subtitle, artists: i.by, address: i.address, website: i.sourceUrl, links: i.links, coordinates: i.coordinates, start: i.start, end: i.end })),
+  ...(listings.records as unknown as { id: string; name: string; url?: string; coordinates: [number, number]; start?: string; end?: string }[]).map((r) => ({ id: r.id, kind: 'listing' as const, name: r.name, website: r.url, coordinates: r.coordinates, start: r.start, end: r.end })),
 ];
 const top = (c: Parameters<typeof findMatches>[0]) => findMatches(c, known)[0];
 
@@ -43,12 +43,12 @@ check('people: "A / B", "A, B & C", "A et B"', people('Irving Penn / Nanténé T
   check('the MEP visit page as website → A4 by its web address', m?.id === 'A4' && m.why.includes('same web address'), m);
 }
 {
-  const a1 = (items.items as It[]).find((i) => i.id === 'A1')!;
+  const a1 = (items.items as unknown as It[]).find((i) => i.id === 'A1')!;
   const m = top({ name: 'Henri Cartier-Bresson Foundation', coordinates: [a1.coordinates[0] + 0.0001, a1.coordinates[1]], artists: 'Susan Meiselas' });
   check('HCB, 7 m away, with Susan Meiselas → the same show as A1', m?.id === 'A1' && m.match === 'same-show', m);
 }
 {
-  const l = (listings.records as { id: string; name: string; coordinates: [number, number] }[])[0];
+  const l = (listings.records as unknown as { id: string; name: string; coordinates: [number, number] }[])[0];
   const m = findMatches({ name: l.name, coordinates: l.coordinates }, known).find((x) => x.kind === 'listing');
   check('an official listing is found by name and place', m?.id === l.id, m);
 }
@@ -63,4 +63,6 @@ check('fingerprint: another street number is another place', f1 !== fingerprint(
 check('fingerprint: another guide is another suggestion', f1 !== fingerprint({ guide: 'lisbon', name: 'Galerie Exemple', address: '1 rue Exemple', website: 'exemple.fr' }));
 
 console.log(fails ? `${fails} FAILED` : 'all passed');
-if (fails) process.exitCode = 1;
+// Node runs this file (npm test); the site's type check knows only the browser.
+const node = (globalThis as { process?: { exitCode?: number } }).process;
+if (fails && node) node.exitCode = 1;
