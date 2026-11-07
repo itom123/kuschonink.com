@@ -205,7 +205,9 @@ to sleep) brings the desktop back as it was: `memory.ts` writes `kus98:desk`
 whenever windows change and when the page is hidden or left, and after the next
 load reopens those pages in their windows (quietly: no caption animation, no
 sound, no error box if a page has gone, and Start ▸ Documents is left as it
-was). A new tab, or start-up and log-on in a new browser session, starts afresh.
+was). Only a reload or Back/Forward does this: typing the address again, a
+link from elsewhere, a new tab, or start-up and log-on in a new browser session
+starts afresh with the page asked for.
 A program's window opens where it was last left (`kus98:windows`), as Windows 98
 does for folders; dialog boxes always open in the middle, and on a phone every
 window fills the screen anyway.
