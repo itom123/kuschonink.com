@@ -1,0 +1,35 @@
+---
+// Administration ▸ Changes: the newest commits on main (admin saves, the
+// publisher's entries, everyone's code) and whether each one's build went
+// live. An empty shell: the list comes from /v1/admin/changes
+// (worker/admin-files.ts), which checks the admin session.
+import Desktop from '../../layouts/Desktop.astro';
+import Window from '../../components/desktop/Window.astro';
+import Bi from '../../components/Bi.astro';
+import { site } from '../../lib/content';
+import { attr, seoTitle } from '../../lib/i18n';
+import type { Tool } from '../../lib/chrome';
+import { AW } from '../../lib/admin-words';
+
+const title = { en: `${AW.changes.en} - ${AW.program.en}`, zh: `${AW.changes.zh} - ${AW.program.zh}` };
+const seo = { ...seoTitle(title, site.name), description: `${site.name}: administration.`, descriptionZh: `${site.name}：管理。` };
+const tools: Tool[] = [{ cmd: 'ch-refresh', label: AW.refresh.en, zh: AW.refresh.zh, icon: 'tb-refresh' }];
+---
+<Desktop seo={seo} noindex path="/admin/changes">
+  <Window app="admin" title={title} icon="documents" url="/admin/changes" menus={['&File', '&View', '&Help']} tools={tools} bodyClass="adm-body" status={[AW.loading, '']}>
+    <div class="adm-changes" data-adm-changes>
+      <p class="adm-lead"><Bi t={AW.changesLead} /></p>
+      <table class="adm-table" {...attr('aria-label', AW.changes)}>
+        <thead><tr><th><Bi t={AW.changeCols.when} /></th><th><Bi t={AW.changeCols.what} /></th><th><Bi t={AW.changeCols.build} /></th></tr></thead>
+        <tbody data-adm-changes-rows></tbody>
+      </table>
+      <noscript><p class="adm-noscript"><Bi t={{ en: 'Administration needs JavaScript.', zh: '管理需要 JavaScript。' }} /></p></noscript>
+    </div>
+  </Window>
+</Desktop>
+
+<script>
+  import { initChanges } from '../../scripts/admin/changes';
+  initChanges();
+  document.addEventListener('astro:page-load', initChanges);
+</script>

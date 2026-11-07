@@ -1,0 +1,49 @@
+---
+// Administration ▸ Notepad: edit the site's texts (the JSON files in
+// src/content). An empty shell, like every admin page: the files come from
+// /v1/admin/files (worker/admin-files.ts), which checks the session on every
+// call, and each save is one commit to main that the build checks before the
+// site changes. ?path=src/content/about.json opens a file; ?for=/about opens
+// the files a page is made from (Edit This Page...).
+import Desktop from '../../layouts/Desktop.astro';
+import Window from '../../components/desktop/Window.astro';
+import Bi from '../../components/Bi.astro';
+import { site } from '../../lib/content';
+import { attr, seoTitle } from '../../lib/i18n';
+import { SEP, type Tool } from '../../lib/chrome';
+import { AW } from '../../lib/admin-words';
+
+const title = { en: `${AW.editor.en} - ${AW.program.en}`, zh: `${AW.editor.zh} - ${AW.program.zh}` };
+const seo = { ...seoTitle(title, site.name), description: `${site.name}: administration.`, descriptionZh: `${site.name}：管理。` };
+const t = (cmd: string, label: { en: string; zh: string }, icon: string, tip?: { en: string; zh: string }): Tool => ({ cmd, label: label.en, zh: label.zh, icon, title: tip?.en, titleZh: tip?.zh });
+const plain = (b: { en: string; zh: string }) => ({ en: b.en.replace(/\(&.\)|&/g, ''), zh: b.zh.replace(/\(&.\)|&/g, '') });
+const tools: Tool[] = [
+  t('ed-open', AW.openFile, 'tb-open', AW.siteFilesTip),
+  t('ed-save', AW.save, 'tb-save', { en: 'Save (Ctrl+S): a commit to main', zh: '保存（Ctrl+S）：提交到 main' }),
+  t('ed-reload', plain(AW.reload), 'tb-refresh'),
+  SEP,
+  t('ed-format', plain(AW.format), 'tb-list'),
+  t('ed-picture', AW.uploadPicture, 'tb-views', AW.uploadPictureTip),
+  t('ed-github', { en: 'GitHub', zh: 'GitHub' }, 'tb-forward', plain(AW.onGitHub)),
+];
+---
+<Desktop seo={seo} noindex path="/admin/edit">
+  <Window app="admin" title={title} icon="document" url="/admin/edit" menus={['&File', '&Edit', '&View', '&Help']} tools={tools} bodyClass="adm-body flat" status={[AW.loading, '', '']}>
+    <div class="adm-editor" data-adm-editor>
+      <nav class="adm-files" data-adm-files {...attr('aria-label', AW.siteFiles)}>
+        <p class="adm-hint"><Bi t={AW.loading} /></p>
+      </nav>
+      <section class="adm-text">
+        <label class="sr-only" for="adm-text"><Bi t={AW.editor} /></label>
+        <textarea id="adm-text" class="adm-textarea" data-adm-text spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" disabled {...attr('placeholder', AW.noFile)}></textarea>
+      </section>
+      <noscript><p class="adm-noscript"><Bi t={{ en: 'Administration needs JavaScript.', zh: '管理需要 JavaScript。' }} /></p></noscript>
+    </div>
+  </Window>
+</Desktop>
+
+<script>
+  import { initEditor } from '../../scripts/admin/editor';
+  initEditor();
+  document.addEventListener('astro:page-load', initEditor);
+</script>

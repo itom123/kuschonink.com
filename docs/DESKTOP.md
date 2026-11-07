@@ -45,7 +45,7 @@ Ground rules:
 | `src/lib/guides/` | Field Guide: the shapes of a guide (`types.ts`), day rules, dates and map maths safe for the browser (`core.ts`), the interface's words, the checks, and the server-only loader that builds each audience's view and its browser data |
 | `src/scripts/guide/` | Field Guide in the browser: the window, panes, details sheet, menus, the map engine (camera, pins, labels, routes, heat) and the log-on box. It imports only `types.ts`, `core.ts` and `words.ts`, never guide content |
 | `worker/guides.ts` | The Field Guide's password gate: the log-on and log-off, the signed cookie, and which audience's page (and pictures) a request gets |
-| `worker/admin.ts`, `src/pages/admin/`, `src/scripts/admin/` | Admin mode: the hidden log-on at `/admin` (password and authenticator code, checked on the server), the suggestions queue, admin on the desktop ([`docs/ADMIN.md`](ADMIN.md)) |
+| `worker/admin.ts`, `worker/admin-files.ts`, `src/pages/admin/`, `src/scripts/admin/` | Admin mode: the hidden log-on at `/admin` (password and authenticator code, checked on the server), the suggestions queue, editing the site (Notepad, Changes, Upload Picture, New Project; Start ▸ Edit This Page...), admin on the desktop ([`docs/ADMIN.md`](ADMIN.md)) |
 
 ### The shell: `src/scripts/desktop/`
 
@@ -201,6 +201,7 @@ Kept in this browser only.
 | | `kus98:desk` | For a refresh: the pages open in windows, front to back, minimised or not, how far each was scrolled, each one's Back and Forward |
 | | `kus98:draft` | Contact: a message not sent yet (cleared once it's sent) |
 | | `kus98:guide:suggest:<slug>` | Field Guide: the Suggest a Place wizard's text, not sent yet (no picture). Cleared once it is sent |
+| | `kus98:admin:draft:<path>` | Admin mode's Notepad: the text of a content file, not saved yet. Cleared once it is saved |
 | | `kus98:guide:view` | Field Guide: for a refresh, which guide was open, the map's camera and area, and how far the pane was scrolled (`{guide, cam, area, scroll}`). Log Off clears it |
 
 **What a refresh keeps.** Reloading the page (or a phone reloading a tab it put

@@ -3,22 +3,8 @@
 // asks the desktop through window.kus98 when it is there (docs/DESKTOP.md).
 import { AW } from '../../lib/admin-words';
 import { adminOff, adminOn, api, forget, whoAmI } from './api';
-
-type Bi = { en: string; zh: string };
-const pick = (b: Bi) => (document.documentElement.dataset.lang === 'zh' && b.zh ? b.zh : b.en);
-const kus = () => (window as unknown as { kus98?: { alert(o: object): Promise<string>; play(n: string): void; open(u: string, o?: object): Promise<void> } }).kus98;
-
-/** Both languages, as the 中/EN switch expects (two data-l spans). */
-export function setText(el: Element, b: Bi) {
-  const en = document.createElement('span');
-  en.dataset.l = 'en';
-  en.textContent = b.en;
-  const zh = document.createElement('span');
-  zh.dataset.l = 'zh';
-  zh.lang = 'zh-Hans';
-  zh.textContent = b.zh || b.en;
-  el.replaceChildren(en, zh);
-}
+import { newProject, uploadPicture } from './site';
+import { kus, pick, setText, type Bi } from './ui';
 
 export function initAdminHome() {
   for (const root of document.querySelectorAll<HTMLElement>('[data-adm]:not([data-ready])')) {
@@ -90,6 +76,18 @@ export function initAdminHome() {
       const btn = (e.target as Element).closest<HTMLElement>('[data-adm-cmd]');
       if (!btn) return;
       const cmd = btn.dataset.admCmd;
+      const win = root.closest('[data-window]');
+      if (cmd === 'picture') {
+        const l = await api<{ folders: string[] }>('/files');
+        if (l.ok) await uploadPicture(win, l.data.folders);
+        else await kus()?.alert({ title: AW.uploadPicture, text: l.data.error === 'not_configured' ? AW.notSetUp('GitHub (GITHUB_TOKEN)') : AW.failed2(l.data.error ?? String(l.status)), icon: 'warning', owner: win });
+        return;
+      }
+      if (cmd === 'project') {
+        const file = await newProject(win);
+        if (file) await kus()?.open(`/admin/edit?path=${encodeURIComponent(file)}`);
+        return;
+      }
       if (cmd === 'logoff-all') {
         const k = kus();
         const sure = k ? await k.alert({ title: AW.logOffAll, text: { en: 'End admin mode in every browser where you are logged on?', zh: '在所有已登录的浏览器里结束管理模式吗？' }, icon: 'question', buttons: ['Yes', 'No'] }) : (window.confirm(pick(AW.logOffAll)) ? 'Yes' : 'No');

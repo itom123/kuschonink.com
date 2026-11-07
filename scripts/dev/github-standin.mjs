@@ -67,6 +67,11 @@ export function githubStandIn(o = {}) {
       const bytes = blobs.get(blob);
       return bytes.length > 1024 * 1024 ? json({ type: 'file', sha: blob, encoding: 'none', content: '' }) : json({ type: 'file', sha: blob, encoding: 'base64', content: b64(bytes) });
     }
+    if (req.method === 'GET' && (m = /^\/git\/trees\/(.+)$/.exec(rest))) {
+      const t = trees.get(m[1]) ?? treeOf(m[1]);
+      if (!t) return err(404, 'Not Found');
+      return json({ sha: m[1], truncated: false, tree: [...t].map(([path, sha]) => ({ path, type: 'blob', sha })) });
+    }
     if (req.method === 'GET' && (m = /^\/git\/blobs\/(.+)$/.exec(rest))) {
       const bytes = blobs.get(m[1]);
       return bytes ? json({ sha: m[1], encoding: 'base64', content: b64(bytes) }) : err(404, 'Not Found');

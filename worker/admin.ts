@@ -21,6 +21,7 @@ import type { AccessFile, ItemRecord, ItemsFile, TierId } from '../src/lib/guide
 import { checkGuide } from '../src/lib/guides/check.ts';
 import { findMatches, type Known } from '../src/lib/guides/dedupe.ts';
 import { escapeHtml, isEmail, unsafe } from './contact.ts';
+import { filesForUrl, listFiles, MAX_TEXT, newProject, readFile, recentChanges, saveFile, uploadPicture, type Out } from './admin-files.ts';
 import type { GuardApi } from './guard.ts';
 import { commitOnMain, type Change, type GitHub } from './github.ts';
 import { P, R, type Notion, type NotionPage } from './notion.ts';
@@ -40,6 +41,8 @@ export const FAILS = { visitor: 10, all: 200 };
 /** Emails to submitters, an hour. */
 export const EMAILS_PER_HOUR = 10;
 const MAX_BODY = 64 * 1024;
+/** A picture (8 MB at most) sent as base64, with room to spare. */
+const MAX_UPLOAD = 12 * 1024 * 1024;
 const ID = /^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i;
 
 export interface OutMail { to: string; from: { email: string; name: string }; replyTo: string; subject: string; text: string; html: string }
@@ -61,6 +64,8 @@ export interface AdminDeps {
   /** Run the publisher now; null without Notion and GitHub. */
   publish: (() => Promise<PublishReport | null>) | null;
   gh: GitHub | null;
+  /** The repository's web address, for "Open on GitHub". */
+  repoUrl?: string;
   now: () => number;
   log: (...args: unknown[]) => void;
 }
@@ -124,10 +129,11 @@ function configured(deps: AdminDeps): { password: string; secret: string } | nul
   return { password, secret };
 }
 
-async function readBody(req: Request): Promise<Record<string, unknown> | null> {
+async function readBody(req: Request, max = MAX_BODY): Promise<Record<string, unknown> | null> {
   if (!/^application\/json\b/i.test(req.headers.get('content-type') ?? '')) return null;
+  if (Number(req.headers.get('content-length') ?? 0) > max) return null;
   const text = await req.text();
-  if (text.length > MAX_BODY) return null;
+  if (text.length > max) return null;
   try {
     const v = JSON.parse(text);
     return v && typeof v === 'object' && !Array.isArray(v) ? v : null;
@@ -167,7 +173,7 @@ async function route(req: Request, deps: AdminDeps): Promise<Response> {
     // Each guide's audiences, least privileged first (for "Show to"): sent to the admin only, never in a public script.
     const guides = Object.fromEntries(Object.entries(deps.access.guides).filter(([k]) => !k.startsWith('_')));
     const audiences = Object.fromEntries(deps.access.audiences.map((a) => [a.id, { en: a.label || a.id, zh: a.labelZh || a.label || a.id }]));
-    return json({ admin: true, exp: session.exp, notion: !!deps.notion, mail: !!deps.mail, routine: !!deps.fireRoutine, publish: !!deps.publish, github: !!deps.gh, guides, audiences });
+    return json({ admin: true, exp: session.exp, notion: !!deps.notion, mail: !!deps.mail, routine: !!deps.fireRoutine, publish: !!deps.publish, github: !!deps.gh, repo: deps.repoUrl ?? '', guides, audiences });
   }
   if (!session.ok) return withCookies(fail('log_on_first', 401), sessionCookies(url, null));
   if (path === '/logout' && req.method === 'POST') {
@@ -195,7 +201,31 @@ async function route(req: Request, deps: AdminDeps): Promise<Response> {
   }
   if ((m = /^\/items\/([a-z0-9-]+)\/([A-C]\d+)$/.exec(path)) && req.method === 'POST') return editItem(m[1], m[2], req, deps);
   if ((m = /^\/items\/([a-z0-9-]+)\/([A-C]\d+)$/.exec(path)) && req.method === 'GET') return getItem(m[1], m[2], deps);
+  if (/^\/(?:files(?:\/for)?|pictures|projects|changes)$/.test(path)) return siteFiles(path, req, url, deps);
   return fail('not_found', 404);
+}
+
+// ---- Editing the site (worker/admin-files.ts) ----
+
+async function siteFiles(path: string, req: Request, url: URL, deps: AdminDeps): Promise<Response> {
+  if (!deps.gh) return fail('not_configured', 503, { what: 'github' });
+  const d = { gh: deps.gh, access: deps.access };
+  const send = (o: Out) => json(o.body, o.status);
+  const body = async (max: number) => readBody(req, max);
+  const m = req.method;
+  if (path === '/files' && m === 'GET') return send(url.searchParams.has('path') ? await readFile(url.searchParams.get('path') ?? '', d) : await listFiles(d));
+  if (path === '/files/for' && m === 'GET') return send(await filesForUrl(url.searchParams.get('url') ?? '/', d));
+  if (path === '/changes' && m === 'GET') return send(await recentChanges(d));
+  if (path === '/files' && m === 'PUT') {
+    const b = await body(MAX_TEXT + 64 * 1024);
+    return b ? send(await saveFile(b, d)) : fail('invalid_request', 400);
+  }
+  if ((path === '/pictures' || path === '/projects') && m === 'POST') {
+    const b = await body(MAX_UPLOAD);
+    if (!b) return fail('invalid_request', 400);
+    return send(path === '/pictures' ? await uploadPicture(b, d) : await newProject(b, d));
+  }
+  return fail('method_not_allowed', 405);
 }
 
 // ---- Log on ----

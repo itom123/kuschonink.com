@@ -96,3 +96,38 @@ html:not([data-admin]) [data-admin-only] { display: none !important; }
   .adm-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .adm-row input, .adm-row textarea, .adm-row select { font-size: 16px; }
 }
+
+/* Ticks in admin forms: 98.css draws them from the label; the box keeps its own size. */
+.adm-row input[type="checkbox"] { width: auto; }
+.adm-row-check > span:last-child { display: flex; align-items: center; gap: 4px; }
+.adm-row input[type="file"] { padding: 2px 0; }
+
+/* Notepad (src/pages/admin/edit.astro): the files on the left, the text on the right. */
+.adm-editor { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 3px; height: 100%; min-height: 0; font: 11px var(--ui-font); }
+.adm-files { overflow: auto; padding: 2px 0 6px; background: var(--light, #fff); box-shadow: var(--sunken); }
+.adm-files h3 { margin: 6px 8px 2px; font-size: 11px; }
+.adm-files summary { padding: 1px 6px; }
+.adm-files ul { list-style: none; margin: 0; padding: 0 0 2px 10px; }
+.adm-file { display: block; width: 100%; min-width: 0; min-height: 0; padding: 1px 6px; border: 0; box-shadow: none; background: none; color: inherit; font: inherit; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adm-file[aria-current="true"] { background: var(--sel, #000080); color: var(--sel-text, #fff); }
+.adm-file:focus-visible { outline: 1px dotted currentColor; outline-offset: -1px; }
+.adm-text { display: flex; min-width: 0; min-height: 0; }
+.adm-textarea { flex: 1; box-sizing: border-box; width: 100%; height: 100%; margin: 0; resize: none; padding: 4px 6px; font: 13px/1.4 ui-monospace, Consolas, "Courier New", monospace; tab-size: 2; white-space: pre; overflow: auto; }
+.adm-editor[data-wrap] .adm-textarea { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Changes (src/pages/admin/changes.astro) */
+.adm-changes { box-sizing: border-box; height: 100%; overflow: auto; padding: 8px 10px; font: 11px var(--ui-font); }
+.adm-changes .adm-lead { margin: 0 0 8px; }
+.adm-changes td:nth-child(2) { overflow-wrap: anywhere; }
+.adm-st-live { color: #006400; }
+.adm-st-building { color: #000080; }
+.adm-st-none { border: 0; }
+
+@media (max-width: 700px) {
+  /* Notepad on a phone: the list or the text, one at a time (Open shows the list). */
+  .adm-editor { grid-template-columns: minmax(0, 1fr); }
+  .adm-files { display: none; }
+  .adm-editor[data-list] .adm-files { display: block; }
+  .adm-editor[data-list] .adm-text { display: none; }
+  .adm-textarea { font-size: 14px; }
+}

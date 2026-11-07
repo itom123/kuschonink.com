@@ -4,9 +4,8 @@
 // /v1/admin/* (worker/admin.ts), which checks the session each time.
 import { AW, FOLDERS } from '../../lib/admin-words';
 import { api, whoAmI, type AdminMe } from './api';
-import { setText } from './home';
+import { el, form as uiForm, kus, pick, setText, tell as uiTell, type Bi } from './ui';
 
-type Bi = { en: string; zh: string };
 interface Row {
   id: string; url: string; created: string; status: string; guide: string; kind: string; lang: string; sentBy: string;
   name: string; show: string; artists: string; start: string; end: string; hours: string; address: string; website: string;
@@ -17,37 +16,8 @@ interface Row {
 interface Contact { submitter: string; email: string; mayContact: boolean }
 interface LogLine { run: string; when: string; trigger: string; actor: string; outcome: string; pages: string; commit: string; session: string; details: string }
 
-interface Kus {
-  alert(o: { title?: unknown; text: unknown; icon?: string; buttons?: string[]; owner?: Element | null }): Promise<string>;
-  dialog(o: { title: unknown; body: Node; owner?: Element | null; icon?: string; className?: string; onClose?: () => void }): { el: HTMLElement; close: () => void };
-  play(n: string): void;
-}
-const kus = () => (window as unknown as { kus98?: Kus }).kus98;
-const pick = (b: Bi) => (document.documentElement.dataset.lang === 'zh' && b.zh ? b.zh : b.en);
-
-function el<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, string | boolean | undefined> = {}, ...kids: (Node | string | Bi | null | undefined | false)[]): HTMLElementTagNameMap[K] {
-  const e = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) {
-    if (v === undefined || v === false) continue;
-    e.setAttribute(k, v === true ? '' : v);
-  }
-  for (const k of kids) {
-    if (k === null || k === undefined || k === false) continue;
-    if (typeof k === 'string' || k instanceof Node) e.append(k);
-    else {
-      const s = document.createElement('span');
-      setText(s, k);
-      e.append(...s.childNodes);
-    }
-  }
-  return e;
-}
-
-async function tell(text: Bi, icon = 'info', owner?: Element | null) {
-  const k = kus();
-  if (k) await k.alert({ title: AW.queue, text, icon, owner });
-  else window.alert(pick(text));
-}
+/** A message box titled with the queue's name. */
+const tell = (text: Bi, icon = 'info', owner?: Element | null) => uiTell(AW.queue, text, icon, owner);
 
 const statusClass = (s: string) => `adm-st adm-st-${s.toLowerCase().replace(/\s+/g, '-')}`;
 const fmtDate = (iso: string) => (iso ? new Date(iso).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' }) : '');
@@ -247,41 +217,7 @@ class Queue {
 
   /** A small form in a dialog; resolves with the values, or null on Cancel. */
   form(title: Bi, lead: Bi | null, fields: { name: string; label: Bi; value: string; kind?: 'text' | 'area' | 'select' | 'date'; options?: [string, Bi][] }[], okLabel: Bi = AW.save): Promise<Record<string, string> | null> {
-    return new Promise((resolve) => {
-      const inputs = new Map<string, HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>();
-      const uid = Math.random().toString(36).slice(2, 8);
-      const rows = fields.map((f) => {
-        const id = `adm-${uid}-${f.name}`;
-        let input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-        if (f.kind === 'area') input = el('textarea', { id, rows: '5' });
-        else if (f.kind === 'select') input = el('select', { id }, ...(f.options ?? []).map(([v, b]) => el('option', { value: v }, pick(b))));
-        else input = el('input', { id, type: f.kind === 'date' ? 'date' : 'text' });
-        input.value = f.value;
-        inputs.set(f.name, input);
-        return el('div', { class: 'adm-row' }, el('label', { for: id }, pick(f.label).replace(/\(&.\)|&/g, '')), input);
-      });
-      const ok = el('button', { type: 'submit', class: 'default' }, pick(okLabel));
-      const cancel = el('button', { type: 'button' }, pick(AW.cancel));
-      const body = el('form', { class: 'adm-form' }, ...(lead ? [el('p', { class: 'adm-lead' }, lead)] : []), ...rows, el('div', { class: 'adm-buttons' }, ok, cancel));
-      let done = false;
-      const k = kus();
-      const d = k ? k.dialog({ title, body, owner: this.win, icon: 'keys', className: 'adm-dialog', onClose: () => { if (!done) resolve(null); } }) : null;
-      const close = () => { done = true; d?.close(); };
-      cancel.addEventListener('click', () => { close(); resolve(null); });
-      body.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const out: Record<string, string> = {};
-        for (const [n, i] of inputs) out[n] = i.value;
-        close();
-        resolve(out);
-      });
-      if (!d) {
-        // Without the desktop: a plain prompt per field.
-        const out: Record<string, string> = {};
-        for (const f of fields) out[f.name] = window.prompt(pick(f.label), f.value) ?? f.value;
-        resolve(out);
-      } else rows[0]?.querySelector<HTMLElement>('input, textarea, select')?.focus();
-    });
+    return uiForm(this.win, title, lead, fields, okLabel, AW.cancel);
   }
 
   async approve(row: Row) {

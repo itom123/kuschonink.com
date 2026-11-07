@@ -69,6 +69,13 @@ export function github(deps: GitHubDeps) {
       return r!.object.sha;
     },
 
+    /** Every file's path at a commit (or branch). */
+    async tree(ref = 'main'): Promise<string[]> {
+      const r = await call<{ tree: { path: string; type: string }[]; truncated?: boolean }>('GET', `${repo}/git/trees/${encodeURIComponent(ref)}?recursive=1`);
+      if (r?.truncated) throw new GitHubError(507, 'the repository is too big to list');
+      return (r?.tree ?? []).filter((e) => e.type === 'blob').map((e) => e.path);
+    },
+
     /** A file at a commit (or branch), or null when it isn't there. */
     async file(path: string, ref = 'main'): Promise<FileAt | null> {
       const r = await call<{ type: string; content?: string; encoding?: string; sha: string }>('GET', `${repo}/contents/${path.split('/').map(encodeURIComponent).join('/')}?ref=${encodeURIComponent(ref)}`, undefined, true);
@@ -118,7 +125,13 @@ export function github(deps: GitHubDeps) {
       return (r?.check_runs ?? []).map((x) => ({ name: x.name, status: x.status, conclusion: x.conclusion, title: x.output?.title ?? '', summary: x.output?.summary ?? '', url: x.html_url }));
     },
 
-    /** Recent commits touching a path (the admin's Changes window). */
+    /** The newest commits on a branch (the admin's Changes window). */
+    async recent(n = 15, branch = 'main'): Promise<{ sha: string; message: string; date: string; url: string }[]> {
+      const r = await call<{ sha: string; html_url: string; commit: { message: string; committer: { date: string } } }[]>('GET', `${repo}/commits?sha=${encodeURIComponent(branch)}&per_page=${n}`);
+      return (r ?? []).map((x) => ({ sha: x.sha, message: x.commit.message, date: x.commit.committer.date, url: x.html_url }));
+    },
+
+    /** Recent commits touching a path. */
     async history(path: string, n = 20): Promise<{ sha: string; message: string; date: string; url: string }[]> {
       const r = await call<{ sha: string; html_url: string; commit: { message: string; committer: { date: string } } }[]>('GET', `${repo}/commits?path=${encodeURIComponent(path)}&per_page=${n}`);
       return (r ?? []).map((x) => ({ sha: x.sha, message: x.commit.message, date: x.commit.committer.date, url: x.html_url }));
