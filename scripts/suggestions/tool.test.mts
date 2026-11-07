@@ -104,7 +104,7 @@ const FG = join(work, 'field-guide');
   const install = 'npm ci --no-audit --no-fund';
   const prompts = docs.split('```text').slice(1).map((b) => b.split('```')[0]!).filter((b) => b.includes('kuschonink-routine'));
   check('the prompt in GUIDES.md 11.6 (both languages, the same) names the copy, ./tool and npm ci as ROUTINE.md does', prompts.length === 2 && prompts[0] === prompts[1] && prompts.every((p) => p.includes('itom123/kuschonink-routine') && p.includes('./tool') && p.includes(install)) && steps.includes('./tool list --status APPROVED') && steps.includes(`\`${install}\``), prompts.length);
-  check("the copy's workflow takes the files with main's download.mjs every 10 minutes, off the minute :00, and pushes them", sync.includes('https://raw.githubusercontent.com/itom123/kuschonink.com/main/scripts/suggestions/download.mjs') && /cron: '3-59\/10 \* \* \* \*'/.test(sync) && sync.includes('git push'), sync.slice(0, 200));
+  check("the copy's workflow takes the files with main's download.mjs every 10 minutes, off the minute :00, and pushes them", sync.includes('https://raw.githubusercontent.com/itom123/kuschonink.com/main/scripts/suggestions/download.mjs') && /cron: '3,13,23,33,43,53 \* \* \* \*'/.test(sync) && sync.includes('git push'), sync.slice(0, 200));
   // The routine runs whatever lands in the copy, so only the copy's deploy key may push there (its
   // ruleset), the actions are pinned to commits, and the copy's own files come from here too.
   const uses = [...sync.matchAll(/^\s*- uses: (\S+)/gm)].map((m) => m[1]!);
