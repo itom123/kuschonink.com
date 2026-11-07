@@ -78,6 +78,14 @@ check('nextId: one more than the highest in the tier', nextId([{ id: 'C1', tier:
   const sens = { public: ['FotoFilmic'], fotofilmic: ['workshop'] };
   check('forbiddenWord: a participants-only word in an entry for everyone', forbiddenWord(it, ACCESS, SLUG, sens)?.word === 'workshop');
   check('forbiddenWord: fine when only participants see it', forbiddenWord({ ...it, audience: 'fotofilmic' }, ACCESS, SLUG, sens) === null);
+  const fine = { ...it, why: 'Fine.' };
+  const also: [string, object][] = [
+    ['a picture caption', { image: { file: 'C9.jpg', alt: 'A room', caption: 'The workshop room' } }],
+    ['a one-day note', { exceptions: [{ date: '2026-11-08', status: 'closed', note: 'Closed for the workshop' }] }],
+    ['"Suggested by"', { suggested: { on: '2026-11-07', by: 'The workshop team', ref: 'p1' } }],
+  ];
+  for (const [what, extra] of also) check(`forbiddenWord: also in ${what}`, forbiddenWord({ ...fine, ...extra } as unknown as ItemRecord, ACCESS, SLUG, sens)?.word === 'workshop');
+  check('forbiddenWord: the audience tags and the Notion reference are not text', forbiddenWord({ ...fine, suggested: { on: '2026-11-07', ref: 'workshop-ref' } } as unknown as ItemRecord, ACCESS, SLUG, sens) === null);
 }
 
 // ---- Publishing ----

@@ -321,8 +321,9 @@ File ▸ Log Off removes it, so None doesn't log anyone out of a guide.
 **Without JavaScript** nothing is asked: posting the log-on form is itself the
 request for the guide's cookie.
 
-**Not covered:** Cloudflare's own pieces, the anti-spam check on Contact
-(Turnstile, in its own frame) and the analytics beacon (README, *Analytics*).
+**Not covered:** Cloudflare's own pieces, the anti-spam check on Contact,
+Paint's Send to Xiangyin and the Field Guide's Suggest a Place (Turnstile, in
+its own frame) and the analytics beacon (README, *Analytics*).
 
 **Keeping something new.** Decide its kind, ask `consent.allows()` (or use
 `stored()`), start its key with `kus98:` so a stricter choice removes it, write
