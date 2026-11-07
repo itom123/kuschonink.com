@@ -53,8 +53,7 @@ ok(saveSort('zone') === 'zone' && saveSort('open') === 'open', 'other orders are
 ok(loadSort('near') === 'tier' && loadSort('bogus') === 'tier' && loadSort(undefined) === 'tier', 'a saved nearest first, or junk, reads back as the default');
 ok(loadSort('name') === 'name' && loadSort('open') === 'open', 'a saved order reads back');
 
-if (fails) {
-  console.error(`${fails} failed`);
-  process.exit(1);
-}
-console.log('All order tests passed.');
+console.log(fails ? `${fails} FAILED` : 'All order tests passed.');
+// Node runs this file (npm test); the site's type check knows only the browser.
+const node = (globalThis as { process?: { exitCode?: number } }).process;
+if (fails && node) node.exitCode = 1;
