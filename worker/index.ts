@@ -205,13 +205,28 @@ async function download(url: string): Promise<Uint8Array | null> {
   }
 }
 
+/**
+ * The commit the running site was built from: the first 12 characters of
+ * WORKERS_CI_COMMIT_SHA, which every page carries (src/lib/build.ts), read
+ * from this Worker's own files. null for a build made without one.
+ */
+async function liveBuild(env: Env): Promise<string | null> {
+  try {
+    const res = await env.ASSETS.fetch(new Request('https://assets.invalid/'));
+    if (!res.ok) return null;
+    return /<meta\s+name="kus98-build"\s+content="([0-9a-f]{12})"/.exec(await res.text())?.[1] ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** The publisher, when Notion and GitHub are both set up. */
 async function runPublisher(env: Env, trigger: 'scheduled' | 'manual') {
   const n = notionOf(env);
   const gh = githubOf(env);
   if (!n || !gh) return null;
   return publish(
-    { notion: n.api, db: n.db, gh, repoUrl: `https://github.com/${env.GITHUB_REPO}`, guard: guardOf(env), access: access as AccessFile, download, now: () => Date.now(), log: (...a) => console.error(...a) },
+    { notion: n.api, db: n.db, gh, repoUrl: `https://github.com/${env.GITHUB_REPO}`, guard: guardOf(env), access: access as AccessFile, download, liveBuild: () => liveBuild(env), now: () => Date.now(), log: (...a) => console.error(...a) },
     trigger,
   );
 }

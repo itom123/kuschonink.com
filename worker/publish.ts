@@ -11,22 +11,26 @@
 //   and "suggested" come from here, never from the entry;
 // - a word only some readers may see, in an entry everyone sees → NEEDS CHECK;
 // - the guide must pass checkGuide() (the build's own check) with the entry in;
-// - one commit, fast-forward only; then PUBLISHING until that commit's build
-//   check passes (PUBLISHED) or fails (taken back in a new commit, ERROR).
+// - one commit, fast-forward only; then PUBLISHING until the site runs that
+//   commit (PUBLISHED) or its build fails (taken back in a new commit, ERROR).
 // Entries are matched by suggested.ref (the Notion page id), so running twice
 // never adds anything twice.
 import type { AccessFile, ItemRecord, ItemsFile, TierId } from '../src/lib/guides/types';
 import { checkGuide, type RawGuide } from '../src/lib/guides/check.ts';
 import { todayIn } from '../src/lib/guides/core.ts';
 import type { GuardApi } from './guard.ts';
-import { commitOnMain, type Change, type FileAt, type GitHub } from './github.ts';
+import { commitOnMain, type Change, type CheckRun, type FileAt, type GitHub } from './github.ts';
 import { cleanImage } from './image.ts';
 import { P, type Notion } from './notion.ts';
 import { isStatus, logProps, readSuggestion, S, type LogEntry, type SuggestionRow } from './suggestions.ts';
 
 export const MAX_PICTURE = 1024 * 1024;
 export const MAX_WIDTH = 640;
-/** No build check this long after the commit: take it as live. */
+/**
+ * Not live this long after the commit (a build takes about a minute): the site
+ * never took it, so it is taken back. When the site's own build isn't known,
+ * it is taken as live instead.
+ */
 const BUILD_WAIT_MS = 45 * 60 * 1000;
 const LOCK_S = 600;
 const BATCH = 10;
@@ -59,6 +63,8 @@ export interface PublishDeps {
   access: AccessFile;
   /** A Notion file link (signed, short-lived) to bytes, or null. */
   download: (url: string) => Promise<Uint8Array | null>;
+  /** The commit the running site was built from (its first 12 characters, as its pages carry it), or null when not known. */
+  liveBuild: () => Promise<string | null>;
   now: () => number;
   log: (...args: unknown[]) => void;
 }
@@ -202,7 +208,13 @@ export async function publish(deps: PublishDeps, trigger: LogEntry['trigger'] = 
   const lock = await deps.guard.claim('publish:lock', LOCK_S);
   if (!lock.fresh) return { ...report, skipped: 'busy' };
   try {
-    await watchBuilds(deps, report);
+    try {
+      await watchBuilds(deps, report);
+    } catch (e) {
+      // Even when the builds can't be watched, new entries still go in.
+      deps.log('publish: could not watch the builds', (e as Error).message);
+      report.errors.push((e as Error).message);
+    }
     const ready = (await deps.notion.queryAll(deps.db.suggestions, { filter: isStatus('READY'), sorts: [{ timestamp: 'created_time', direction: 'ascending' }] }, BATCH)).map(readSuggestion);
     const bySlug = new Map<string, SuggestionRow[]>();
     for (const r of ready) {
@@ -214,10 +226,16 @@ export async function publish(deps: PublishDeps, trigger: LogEntry['trigger'] = 
       bySlug.set(r.guide, [...(bySlug.get(r.guide) ?? []), r]);
     }
     for (const [slug, rows] of bySlug) {
-      // After a failed build, entries go one per commit, so the next failure names its entry.
-      const solo = rows.filter((r) => r.run === 'solo');
-      const batches = solo.length ? [[solo[0]]] : [rows];
-      for (const batch of batches) await publishBatch(deps, slug, batch, trigger, report);
+      try {
+        // After a failed build, entries go one per commit, so the next failure names its entry.
+        const solo = rows.filter((r) => r.run === 'solo');
+        const batches = solo.length ? [[solo[0]]] : [rows];
+        for (const batch of batches) await publishBatch(deps, slug, batch, trigger, report);
+      } catch (e) {
+        // One guide failing holds up no other.
+        deps.log('publish: failed for', slug, (e as Error).message);
+        report.errors.push(`${slug}: ${(e as Error).message}`);
+      }
     }
   } catch (e) {
     deps.log('publish: failed', (e as Error).message);
@@ -338,7 +356,19 @@ async function publishBatch(deps: PublishDeps, slug: string, rows: SuggestionRow
   await addLog(deps, { run: `Publish ${slug}`, trigger, actor: 'publisher', pages: kept.map((r) => `${r.reference} ${r.name}`).join('\n'), outcome: excluded.size ? 'Partial' : 'OK', commit: done.url, details: [...excluded.values()].map((x) => x.why).join('\n') });
 }
 
-/** PUBLISHING pages: live once their commit's build passes; taken back if it fails. */
+/**
+ * PUBLISHING pages: PUBLISHED once the site runs their commit (or a later one
+ * built on it), taken back when their build fails.
+ *
+ * - Live: the running site's own build id (deps.liveBuild), compared with the
+ *   commit on GitHub, which the fine-grained token may do.
+ * - Failed: the build's check run says so. The token can't read check runs,
+ *   so they are read without it, when GitHub allows (see checks()).
+ * - Neither after BUILD_WAIT_MS: the site never took the commit, so it is
+ *   taken back too (or taken as live, when the site's build isn't known).
+ * Each commit is watched on its own: one that can't be checked now waits for
+ * the next run and holds up nothing else.
+ */
 async function watchBuilds(deps: PublishDeps, report: PublishReport) {
   const rows = (await deps.notion.queryAll(deps.db.suggestions, { filter: isStatus('PUBLISHING') }, 50)).map(readSuggestion);
   const bySha = new Map<string, SuggestionRow[]>();
@@ -346,28 +376,55 @@ async function watchBuilds(deps: PublishDeps, report: PublishReport) {
     const sha = shaOf(r.commit);
     if (sha) bySha.set(sha, [...(bySha.get(sha) ?? []), r]);
   }
+  if (!bySha.size) return;
+  const live = await deps.liveBuild().catch(() => null);
   for (const [sha, group] of bySha) {
-    const runs = await deps.gh.checks(sha);
-    const build = runs.find((c) => /workers builds/i.test(c.name)) ?? runs[0];
-    const age = deps.now() - Date.parse(group[0].processed || new Date(0).toISOString());
-    if (build && build.status === 'completed' && build.conclusion === 'success') {
-      for (const r of group) await mark(deps, r, 'PUBLISHED', `Live as ${r.itemId}.`);
-      report.live.push(...group.map((r) => r.reference));
-    } else if (build && build.status === 'completed' && build.conclusion !== 'neutral' && build.conclusion !== 'skipped') {
-      const why = [build.title, build.summary].filter(Boolean).join(': ').slice(0, 600) || `the build ${build.conclusion}`;
-      const back = await takeBack(deps, group);
-      for (const r of group) {
-        // Alone in its commit: it is the one that broke the build. Otherwise each tries again alone.
-        if (group.length === 1) await mark(deps, r, 'ERROR', `The build failed (${why}). Taken back in ${back ?? 'no commit'}. ${build.url}`);
-        else await deps.notion.updatePage(r.id, { [S.status]: P.select('READY'), [S.run]: P.text('solo'), [S.result]: P.text(`The build failed with other entries (${why}); trying again on its own.`) });
-      }
-      report.takenBack.push(...group.map((r) => r.reference));
-      await addLog(deps, { run: 'Take back', trigger: 'scheduled', actor: 'publisher', pages: group.map((r) => r.reference).join('\n'), outcome: 'Failed', commit: back ?? undefined, details: why });
-    } else if (!build && age > BUILD_WAIT_MS) {
-      for (const r of group) await mark(deps, r, 'PUBLISHED', `Live as ${r.itemId} (no build check was seen).`);
-      report.live.push(...group.map((r) => r.reference));
+    try {
+      await watchCommit(deps, sha, group, live, report);
+    } catch (e) {
+      deps.log('publish: could not check the build of', sha.slice(0, 12), (e as Error).message);
+      report.errors.push(`build ${sha.slice(0, 12)}: ${(e as Error).message}`);
     }
   }
+}
+
+/** Check-run endings that say nothing about the entry (a cancelled build too): the site's own build decides. */
+const NO_VERDICT = new Set(['neutral', 'skipped', 'cancelled', 'stale']);
+
+async function watchCommit(deps: PublishDeps, sha: string, group: SuggestionRow[], live: string | null, report: PublishReport) {
+  const published = async (how = '') => {
+    for (const r of group) await mark(deps, r, 'PUBLISHED', `Live as ${r.itemId}${how}.`);
+    report.live.push(...group.map((r) => r.reference));
+  };
+  if (live && (sha.startsWith(live) || ['ahead', 'identical'].includes((await deps.gh.compare(sha, live))?.status ?? ''))) return published();
+  let build: CheckRun | undefined;
+  try {
+    const runs = await deps.gh.checks(sha);
+    build = runs.find((c) => /workers builds/i.test(c.name)) ?? runs[0];
+  } catch {
+    // Not readable now (GitHub's allowance without a token is used up): wait.
+  }
+  const done = build?.status === 'completed' ? build.conclusion ?? '' : '';
+  if (done === 'success') return published();
+  if (build && done && !NO_VERDICT.has(done)) {
+    const why = [build.title, build.summary].filter(Boolean).join(': ').slice(0, 600) || `the build ${done}`;
+    return takeBackGroup(deps, group, { what: 'The build failed', why, link: build.url }, report);
+  }
+  const age = deps.now() - Date.parse(group[0].processed || new Date(0).toISOString());
+  if (age <= BUILD_WAIT_MS) return;
+  if (!live) return published(" (its build couldn't be checked)");
+  await takeBackGroup(deps, group, { what: `It didn't go live within ${BUILD_WAIT_MS / 60000} minutes`, why: `the site still runs ${live}`, link: '' }, report);
+}
+
+/** Take a commit's entries back. Alone in it, an entry is the one that broke the build (ERROR); with others, each tries again on its own. */
+async function takeBackGroup(deps: PublishDeps, group: SuggestionRow[], f: { what: string; why: string; link: string }, report: PublishReport) {
+  const back = await takeBack(deps, group);
+  for (const r of group) {
+    if (group.length === 1) await mark(deps, r, 'ERROR', `${f.what} (${f.why}). Taken back in ${back ?? 'no commit'}.${f.link ? ` ${f.link}` : ''}`);
+    else await deps.notion.updatePage(r.id, { [S.status]: P.select('READY'), [S.run]: P.text('solo'), [S.result]: P.text(`${f.what} with other entries (${f.why}); trying again on its own.`) });
+  }
+  report.takenBack.push(...group.map((r) => r.reference));
+  await addLog(deps, { run: 'Take back', trigger: 'scheduled', actor: 'publisher', pages: group.map((r) => r.reference).join('\n'), outcome: 'Failed', commit: back ?? undefined, details: f.why });
 }
 
 /** Remove these entries (by ref) and their pictures from main, in one commit. */

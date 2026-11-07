@@ -1,11 +1,15 @@
 // A stand-in for the few GitHub REST calls the Worker makes (refs, contents,
-// blobs, trees, commits, check runs), as an in-memory repository, so tests and
-// `wrangler dev` never touch the real repository. Plain Node ESM.
+// blobs, trees, commits, compare, check runs), as an in-memory repository, so
+// tests and `wrangler dev` never touch the real repository. Plain Node ESM.
 //
 // In tests: const g = githubStandIn({ files: { 'a/b.json': '{}' } });
 //           github({ token: 't', repo: 'o/r', fetch: g.fetch, base: g.base })
 // g.files() reads main's files; g.checks.set(sha, [...]) sets a commit's checks;
 // g.moveMain() makes a commit "someone else" pushed meanwhile.
+//
+// As on GitHub with a fine-grained token: check runs refuse the token and are
+// read without one; g.limitAnonymous(true) uses up that allowance. Everything
+// else needs the token.
 import { createHash } from 'node:crypto';
 
 const sha1 = (s) => createHash('sha1').update(s).digest('hex');
@@ -20,6 +24,7 @@ export function githubStandIn(o = {}) {
   const checks = new Map();
   const calls = [];
   let n = 0;
+  let limited = false;
 
   const putBlob = (bytes) => {
     const sha = sha1(Buffer.concat([Buffer.from(`blob ${++n}`), Buffer.from(bytes)]));
@@ -46,16 +51,44 @@ export function githubStandIn(o = {}) {
   const err = (status, message) => json({ message }, status);
   const b64 = (b) => Buffer.from(b).toString('base64');
   const treeOf = (ref) => trees.get(commits.get(refs.get(ref) ?? ref)?.tree);
+  /** A branch, a commit id or a short one (7 characters or more). */
+  const resolve = (x) => refs.get(x) ?? (commits.has(x) ? x : x.length >= 7 ? [...commits.keys()].find((k) => k.startsWith(x)) : undefined);
+  const ancestors = (sha) => {
+    const out = new Set();
+    for (const todo = [sha]; todo.length; ) {
+      const s = todo.pop();
+      if (out.has(s)) continue;
+      out.add(s);
+      todo.push(...(commits.get(s)?.parents ?? []));
+    }
+    return out;
+  };
 
   async function handle(req) {
     const url = new URL(req.url);
     const p = decodeURIComponent(url.pathname);
-    calls.push(`${req.method} ${p}`);
-    if (req.headers.get('authorization') !== `Bearer ${o.token ?? 'gh-token'}`) return err(401, 'Bad credentials');
+    const auth = req.headers.get('authorization');
+    calls.push(`${req.method} ${p}${auth ? '' : ' (no token)'}`);
     const pre = `/repos/${repo}`;
     if (!p.startsWith(pre)) return err(404, 'Not Found');
     const rest = p.slice(pre.length);
     let m;
+    if (req.method === 'GET' && (m = /^\/commits\/([^/]+)\/check-runs$/.exec(rest))) {
+      if (auth) return err(403, 'Resource not accessible by personal access token');
+      if (limited) return err(403, 'API rate limit exceeded for 203.0.113.7.');
+      return json({ total_count: (checks.get(m[1]) ?? []).length, check_runs: checks.get(m[1]) ?? [] });
+    }
+    if (auth !== `Bearer ${o.token ?? 'gh-token'}`) return err(401, 'Bad credentials');
+    if (req.method === 'GET' && (m = /^\/compare\/([^.]+)\.\.\.([^.]+)$/.exec(rest))) {
+      const a = resolve(m[1]);
+      const b = resolve(m[2]);
+      if (!a || !b) return err(404, 'Not Found');
+      const ofA = ancestors(a);
+      const ofB = ancestors(b);
+      const status = a === b ? 'identical' : ofB.has(a) ? 'ahead' : ofA.has(b) ? 'behind' : 'diverged';
+      const ahead = [...ofB].filter((s) => !ofA.has(s)).sort((x, y) => commits.get(x).date.localeCompare(commits.get(y).date));
+      return json({ status, ahead_by: ahead.length, behind_by: [...ofA].filter((s) => !ofB.has(s)).length, commits: ahead.map((sha) => ({ sha })) });
+    }
     if (req.method === 'GET' && (m = /^\/git\/ref\/heads\/(.+)$/.exec(rest))) {
       const sha = refs.get(m[1]);
       return sha ? json({ ref: `refs/heads/${m[1]}`, object: { sha, type: 'commit' } }) : err(404, 'Not Found');
@@ -104,9 +137,6 @@ export function githubStandIn(o = {}) {
       refs.set(m[1], b.sha);
       return json({ ref: `refs/heads/${m[1]}`, object: { sha: b.sha } });
     }
-    if (req.method === 'GET' && (m = /^\/commits\/([^/]+)\/check-runs$/.exec(rest))) {
-      return json({ total_count: (checks.get(m[1]) ?? []).length, check_runs: checks.get(m[1]) ?? [] });
-    }
     if (req.method === 'GET' && rest === '/commits') {
       const out = [];
       let sha = refs.get('main');
@@ -132,6 +162,10 @@ export function githubStandIn(o = {}) {
     },
     head: () => refs.get('main'),
     message: (sha) => commits.get(sha ?? refs.get('main'))?.message,
+    /** GitHub's hourly allowance for calls without a token: used up (true) or not. */
+    limitAnonymous(on = true) {
+      limited = on;
+    },
     /** Someone else commits to main (a file changed), so the next fast-forward from the old head fails. */
     moveMain(path = 'README.md', text = 'moved') {
       const t = new Map(treeOf('main'));

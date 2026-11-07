@@ -4,7 +4,8 @@
 // passed in, so tests use scripts/dev/github-standin.mjs.
 //
 // The token is a fine-grained one for this repository only, with Contents
-// read and write (GITHUB_TOKEN, a Cloudflare secret).
+// read and write (GITHUB_TOKEN, a Cloudflare secret). Such tokens can't read
+// check runs, so checks() goes without it (the repository is public).
 
 export const GITHUB_API = 'https://api.github.com';
 
@@ -40,12 +41,12 @@ export function github(deps: GitHubDeps) {
   const base = (deps.base || GITHUB_API).replace(/\/+$/, '');
   const repo = `/repos/${deps.repo}`;
 
-  async function call<T>(method: string, path: string, body?: unknown, ok404 = false): Promise<T | null> {
+  async function call<T>(method: string, path: string, body?: unknown, ok404 = false, anonymous = false): Promise<T | null> {
     const res = await deps.fetch(`${base}${path}`, {
       method,
       headers: {
         accept: 'application/vnd.github+json',
-        authorization: `Bearer ${deps.token}`,
+        ...(anonymous ? {} : { authorization: `Bearer ${deps.token}` }),
         'x-github-api-version': '2022-11-28',
         'user-agent': 'kuschonink-worker',
         ...(body !== undefined ? { 'content-type': 'application/json' } : {}),
@@ -112,10 +113,28 @@ export function github(deps: GitHubDeps) {
       return { sha: c!.sha, url: c!.html_url };
     },
 
-    /** The checks on a commit (Workers Builds reports as one). */
+    /**
+     * The checks on a commit (Workers Builds reports as one), read without the
+     * token: fine-grained tokens can't read check runs, and the repository is
+     * public. GitHub allows only 60 calls an hour per address without a token,
+     * and Workers share their addresses, so this often fails: callers take a
+     * failure as "not known yet".
+     */
     async checks(sha: string): Promise<CheckRun[]> {
-      const r = await call<{ check_runs: { name: string; status: string; conclusion: string | null; html_url: string; output?: { title?: string; summary?: string } }[] }>('GET', `${repo}/commits/${sha}/check-runs?per_page=50`);
+      const r = await call<{ check_runs: { name: string; status: string; conclusion: string | null; html_url: string; output?: { title?: string; summary?: string } }[] }>('GET', `${repo}/commits/${sha}/check-runs?per_page=50`, undefined, false, true);
       return (r?.check_runs ?? []).map((x) => ({ name: x.name, status: x.status, conclusion: x.conclusion, title: x.output?.title ?? '', summary: x.output?.summary ?? '', url: x.html_url }));
+    },
+
+    /**
+     * How `head` stands to `base` (commit ids, short ones too): "identical",
+     * "ahead" (head has base and more), "behind" or "diverged", with the
+     * commits head has that base hasn't (up to 100). null when GitHub doesn't
+     * know one of them.
+     */
+    async compare(base: string, head: string): Promise<{ status: string; ahead: Set<string> } | null> {
+      if (![base, head].every((x) => /^[0-9a-f]{7,40}$/.test(x))) throw new GitHubError(400, 'compare takes commit ids');
+      const r = await call<{ status: string; commits?: { sha: string }[] }>('GET', `${repo}/compare/${base}...${head}?per_page=100`, undefined, true);
+      return r ? { status: r.status, ahead: new Set((r.commits ?? []).map((c) => c.sha)) } : null;
     },
 
     /** Recent commits touching a path (the admin's Changes window). */
