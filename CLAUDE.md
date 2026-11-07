@@ -13,7 +13,8 @@
   Field Guide's passwords are Cloudflare secrets named in
   `src/content/guides/access.json` (`GUIDES_PASSWORD`,
   `GUIDES_PASSWORD_FOTOFILMIC`); `GUIDES_COOKIE_SECRET` signs its log-on
-  cookies (`TURNSTILE_SECRET` stands in when it isn't set). For local testing
+  cookies (`TURNSTILE_SECRET` stands in when it isn't set; a secret under 24
+  characters signs together with `TURNSTILE_SECRET`). For local testing
   use made-up values in the gitignored `.dev.vars`.
 - **Writing**: British English, short plain sentences, written from the
   visitor's side. The interface is bilingual (`{ en, zh }`, Simplified Chinese

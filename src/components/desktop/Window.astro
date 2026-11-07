@@ -7,6 +7,7 @@
 //   [data-window-body]   the scrolling content area
 //   [data-keep="…"]      a node carried over when the window navigates (the house map)
 //   [data-cmd="…"]       minimize, maximize, close, back, forward, up, home, refresh, stop
+//   [data-fit="dialog"]  a dialog-sized page (the Field Guide's log-on box), see `fit`
 import { APPS, addressFor, cleanPath, type AppId } from '../../lib/apps';
 import type { QuickLink, Tool } from '../../lib/chrome';
 import { accelKey, biAccelHtml, MENU_ZH, plainLabel } from '../../lib/menus';
@@ -30,6 +31,14 @@ interface Props {
   status?: string | BiText | (string | BiText)[];
   variant?: 'folder' | 'browser' | 'document' | 'mail' | 'paint' | 'help' | 'welcome' | 'dialog' | 'error' | 'guide';
   maximized?: boolean;
+  /**
+   * 'dialog': the page is a dialog box in a program's window (the Field Guide's
+   * log-on box). On a computer the window opens in the middle, `w` wide and as
+   * tall as what it holds (`h` until it's placed), can't be sized or maximised,
+   * and its place isn't remembered; the program's other pages open as they were
+   * left. On a phone it fills the screen like every window.
+   */
+  fit?: 'dialog';
   w?: number;
   h?: number;
   bodyClass?: string;
@@ -46,9 +55,11 @@ const MENUS: Record<string, string[]> = {
   document: ['&File', '&Edit', '&View', '&Help'],
   mail: ['&File', '&Edit', '&View', '&Help'],
 };
-const { app, title, icon, url, address, status, variant = 'folder', maximized, w, h, bodyClass, alt, home, tools = [], links = [], menus } = Astro.props;
+const { app, title, icon, url, address, status, variant = 'folder', maximized, fit, w, h, bodyClass, alt, home, tools = [], links = [], menus } = Astro.props;
 const menuNames = menus ?? MENUS[variant] ?? [];
 const info = APPS[app];
+const sized = fit === 'dialog';
+const max = !sized && (maximized ?? info.max);
 const path = cleanPath(url ?? Astro.url.pathname);
 const ico = icon ?? info.icon;
 const addr = address === false ? null : (address ?? addressFor(path));
@@ -57,11 +68,12 @@ const bi = (x: string | BiText): BiText => (typeof x === 'string' ? { en: x, zh:
 const titleId = `${app}-title`;
 ---
 <section
-  class:list={['window', 'app-window', `v-${variant}`]}
+  class:list={['window', 'app-window', `v-${variant}`, sized && 'no-resize']}
   data-window
   data-app={app}
   data-url={path}
-  data-state={maximized ?? info.max ? 'max' : 'normal'}
+  data-state={max ? 'max' : 'normal'}
+  data-fit={fit}
   data-icon={ico}
   data-alt-href={alt}
   data-home={home}
@@ -75,7 +87,7 @@ const titleId = `${app}-title`;
     </div>
     <div class="title-bar-controls">
       <button type="button" class="tb-btn tb-min" data-cmd="minimize" {...attr('aria-label', { en: 'Minimize', zh: '最小化' })} {...attr('title', { en: 'Minimize', zh: '最小化' })}></button>
-      <button type="button" class="tb-btn tb-max" data-cmd="maximize" {...attr('aria-label', { en: 'Maximize', zh: '最大化' })} {...attr('title', { en: 'Maximize', zh: '最大化' })}></button>
+      <button type="button" class="tb-btn tb-max" data-cmd="maximize" disabled={sized} {...attr('aria-label', { en: 'Maximize', zh: '最大化' })} {...attr('title', { en: 'Maximize', zh: '最大化' })}></button>
       <a class="tb-btn tb-close" href="/" data-cmd="close" {...attr('aria-label', { en: 'Close', zh: '关闭' })} {...attr('title', { en: 'Close', zh: '关闭' })}></a>
     </div>
   </div>

@@ -1,6 +1,7 @@
 // npm test: the Field Guide's Find ranking (match.ts) and Where am I? (locate.ts).
 import { field, fit, ranges, score, search, words, worthShowing, type Entry } from './match.ts';
-import { distance, distanceText, nearest, walkMinutes } from './locate.ts';
+import { distance, distanceText, nearest, offMaps, walkMinutes } from './locate.ts';
+import { project } from '../../lib/guides/core.ts';
 
 let fails = 0;
 const ok = (cond: boolean, name: string, extra = '') => {
@@ -40,7 +41,8 @@ ok(score(entries[0], ['penn', 'nowhere']) === 0, 'every word must match');
 ok(score(entries[0], ['marais', 'penn']) === score(entries[0], ['penn', 'marais']), 'word order does not matter');
 const penn = search(entries, 'Penn').map((h) => h.e.id);
 ok(penn.join(',') === 'B2,A4,A3', 'Penn: a name that starts with it, then a name with it, then the artist alone', penn.join(','));
-ok(search(entries, 'a3')[0]?.e.id === 'A3', 'an id typed as is comes first');
+const a3 = search([...entries, item('B5', 'B', 'A3 Prints')], 'a3').map((h) => h.e.id);
+ok(a3[0] === 'A3' && a3.includes('B5'), 'an id typed as is comes first, before a name that starts with it', a3.join(','));
 const echo = search(entries, 'echo').map((h) => h.e.id);
 ok(echo[0] === 'D12' && echo[1] === 'C1', 'accents do not count; a name that starts with the word wins', echo.join(','));
 ok(search(entries, '玛黑')[0]?.e.id === 'marais', 'Chinese finds a route by its Chinese name');
@@ -70,6 +72,18 @@ ok(distanceText(1234).en === '1.2 km' && distanceText(1234).zh === '1.2 公里',
 ok(distanceText(12345).en === '12 km', 'distance text: whole kilometres from 10 km');
 const near = nearest(louvre, [{ id: 'far', coordinates: [2.4, 48.9] as [number, number] }, { id: 'nd', coordinates: notreDame }, { id: 'here', coordinates: louvre }], 2);
 ok(near.map((x) => x.id).join(',') === 'here,nd', 'nearest: the closest first, cut to n', near.map((x) => x.id).join(','));
+// A map box at z12 from 2.20 to 2.50 E and 48.80 to 48.92 N, as map.json stores one.
+const boxOf = (w: number, n: number, e: number, s: number) => {
+  const a = project([w, n], 12), b = project([e, s], 12);
+  return { z: 12, originX: a.x, originY: a.y, width: b.x - a.x, height: b.y - a.y };
+};
+const paris = boxOf(2.20, 48.92, 2.50, 48.80);
+const fontainebleau: [number, number] = [2.70, 48.40];
+const off = offMaps(fontainebleau, [paris]);
+ok(off > 44000 && off < 50000, 'off the maps: measured to the nearest corner (about 47 km)', off.toFixed(0));
+ok(distance(fontainebleau, [2.35, 48.86]) - off > 5000, 'off the maps: not to the middle of the map (about 57 km)');
+ok(offMaps(louvre, [paris]) === 0, 'off the maps: 0 inside a map');
+ok(offMaps(fontainebleau, [paris, boxOf(2.60, 48.50, 2.80, 48.30)]) === 0, 'off the maps: any map that holds you counts');
 
 console.log(fails ? `\n${fails} failed` : '\nall passed');
 // Node runs this file (npm test); the site's type check knows only the browser.
