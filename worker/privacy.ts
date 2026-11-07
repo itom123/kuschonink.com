@@ -4,6 +4,7 @@
 // and a year after sending for a guide without dates. What the guide already
 // published (a credited name in items.json) is public and stays in its history,
 // as the wizard says before anyone sends.
+import { slugNames } from '../src/lib/guides/address.ts';
 import type { AccessFile } from '../src/lib/guides/types';
 import type { GitHub } from './github.ts';
 import { P, type Notion } from './notion.ts';
@@ -33,17 +34,20 @@ export async function privacySweep(deps: PrivacyDeps): Promise<{ contacts: numbe
       deps.log('privacy: could not read guide.json', slug, (e as Error).message);
       continue; // don't guess: try again tomorrow
     }
+    // Pages sent under the guide's old addresses (access.json "moved") keep their old name in Notion.
+    const names = slugNames(deps.access, slug);
+    const isGuide = (property: string) => (names.length === 1 ? { property, select: { equals: slug } } : { or: names.map((n) => ({ property, select: { equals: n } })) });
     const contactFilter = end
       ? Date.parse(`${end}T00:00:00Z`) + (KEEP_DAYS + 1) * DAY <= deps.now()
-        ? { property: C.guide, select: { equals: slug } }
+        ? isGuide(C.guide)
         : null
-      : { and: [{ property: C.guide, select: { equals: slug } }, { timestamp: 'created_time', created_time: { before: new Date(deps.now() - KEEP_UNDATED_DAYS * DAY).toISOString() } }] };
+      : { and: [isGuide(C.guide), { timestamp: 'created_time', created_time: { before: new Date(deps.now() - KEEP_UNDATED_DAYS * DAY).toISOString() } }] };
     if (!contactFilter) continue;
     const contacts = await deps.notion.queryAll(deps.db.contacts, { filter: contactFilter }, 1000);
     for (const p of contacts) await deps.notion.trashPage(p.id);
     let credits = 0;
     if (end) {
-      const credited = await deps.notion.queryAll(deps.db.suggestions, { filter: { and: [{ property: S.guide, select: { equals: slug } }, { property: S.creditAs, rich_text: { is_not_empty: true } }] } }, 1000);
+      const credited = await deps.notion.queryAll(deps.db.suggestions, { filter: { and: [isGuide(S.guide), { property: S.creditAs, rich_text: { is_not_empty: true } }] } }, 1000);
       for (const p of credited) await deps.notion.updatePage(p.id, { [S.creditAs]: P.text('') });
       credits = credited.length;
     }

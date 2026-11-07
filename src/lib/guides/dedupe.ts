@@ -201,6 +201,25 @@ export function findMatches(c: Candidate, known: Known[]): Match[] {
     .sort((a, b) => order[a.match] - order[b.match] || b.score - a.score || (a.id < b.id ? -1 : 1));
 }
 
+/** A guide item as the matcher sees it. Loose input (items.json as read), so that the guide check can use it on any record. */
+export function itemKnown(i: Record<string, unknown>, id: string): Known {
+  const s = (v: unknown) => (typeof v === 'string' ? v : undefined);
+  const c = i.coordinates;
+  return {
+    id,
+    kind: 'item',
+    name: s(i.name) ?? '',
+    show: s(i.subtitle),
+    artists: s(i.by),
+    address: s(i.address),
+    website: s(i.sourceUrl),
+    links: Array.isArray(i.links) ? i.links.filter((l): l is string => typeof l === 'string') : undefined,
+    coordinates: Array.isArray(c) && c.length === 2 && c.every((n) => typeof n === 'number' && Number.isFinite(n)) ? (c as LonLat) : undefined,
+    start: s(i.start),
+    end: s(i.end),
+  };
+}
+
 /** A stable key for "the same suggestion again": guide, name words, street number and street, web address. */
 export function fingerprint(x: { guide: string; name: string; address?: string; website?: string }): string {
   const name = [...new Set(nameTokens(x.name))].sort().join('-').slice(0, 80);

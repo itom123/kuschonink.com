@@ -783,15 +783,45 @@ entry carries its Notion page (`suggested.ref`), so running twice never adds
 anything twice. Ids (such as C3) are never reused; a new tier (C to B) gives a
 new id, and routes and events follow it.
 
+保持一致：
+
+- 导览的检查（构建、发布器和管理模式的编辑都用它）不许同一个推荐（同一个 `suggested.ref`）出现两次，也不许两个条目看起来是同一个展
+  （同一场馆、日期不冲突、相同的艺术家或相近的展名）。发布器遇到这样的 `READY` 条目，就设成 `NEEDS CHECK`，不发布。
+- 除了 `main`，每个分支的构建（`scripts/guides-main.mjs`）都把它的导览和 `main` 的比一比：`main` 上有发布器加的条目（带 `suggested`），
+  这个分支却没有，构建就失败，并说把 `main` 合并进这个分支（GitHub 上的 **Update branch**）。所以分支的预览总带着已经发布的条目，
+  合并时也丢不了。读不到 GitHub 时只提醒，不挡构建。
+- 发布器每次运行都核对：Notion 里 `PUBLISHED` 的推荐，它的条目还在不在 `main` 上。不在了（后来的提交把它删了），就设成
+  `NEEDS CHECK`，并在处理日志里记一条。要特意删掉一个已发布的条目，就把它的推荐也改成 `REFUSED`。
+
+Keeping in step:
+
+- The guide's check (the build, the publisher and admin edits all use it)
+  refuses the same suggestion twice (one `suggested.ref` on two items), and
+  two items that look like the same show (the same venue, dates that don't
+  clash, a shared artist or a similar title). The publisher sets such a
+  `READY` entry to `NEEDS CHECK` instead of publishing it.
+- On every branch but `main`, the build (`scripts/guides-main.mjs`) compares
+  the branch's guides with `main`'s: when `main` has an entry the publisher
+  added (one with `suggested`) that the branch doesn't, the build fails and
+  says to merge `main` into the branch (GitHub's **Update branch**). So a
+  branch's preview always has the published entries, and a merge can't drop
+  them. When GitHub can't be reached, it only warns.
+- Every run, the publisher checks that each `PUBLISHED` suggestion's entry is
+  still on `main`. When one isn't (a later commit took it out), it becomes
+  `NEEDS CHECK`, with a line in the Processing log. To take a published
+  entry out on purpose, set its suggestion to `REFUSED` too.
+
 ### 11.3 隐私 Privacy
 
-- 推荐者的名字和电子邮箱只存在 **Contacts** 里（例程读不到），导览结束 90 天后自动删除（没有日期的导览：一年后）。
+- 推荐者的名字和电子邮箱只存在 **Contacts** 里（例程读不到），导览结束 90 天后自动删除（没有日期的导览：一年后），用导览旧地址
+  （`access.json` 的 `moved`）发来的也一样。
 - 只有推荐者在“署名”里填了名字，导览里才会写“由 … 推荐”。导览的文件在 GitHub 上公开，所以署名会留在历史记录里（向导里写明了）。
 - 网络地址只用来限制频率，不保存。
 
 - The sender's name and email are kept only in **Contacts** (the routine can't
   read it) and deleted 90 days after the guide ends (a year after sending for a
-  guide without dates).
+  guide without dates), those sent under one of the guide's old addresses
+  (`access.json` "moved") too.
 - The guide says who suggested an entry only with the name they gave under
   *Credit me*. The guide's files are public on GitHub, so that name stays in
   their history; the wizard says so.
