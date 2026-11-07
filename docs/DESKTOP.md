@@ -217,6 +217,7 @@ Kept in this browser only, and only as far as the visitor allows (see
 |  | `kus98:desk` | This tab | For a refresh: the pages open in windows, front to back, minimised or not, how far each was scrolled, each one's Back and Forward |
 |  | `kus98:draft` | This tab | Contact: a message not sent yet (cleared once it's sent) |
 |  | `kus98:guide:view` | This tab | Field Guide: for a refresh, which guide was open, the map's camera and area, and how far the pane was scrolled (`{guide, cam, area, scroll}`). Log Off clears it |
+|  | `kus98:guide:suggest:<slug>` | This tab | Field Guide: a suggestion being written in Suggest a Place (what was typed, not the picture), so a refresh doesn't lose it; cleared once it's sent |
 
 **What a refresh keeps.** Reloading the page (or a phone reloading a tab it put
 to sleep) brings the desktop back as it was: `memory.ts` writes `kus98:desk`
