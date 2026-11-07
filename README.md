@@ -314,9 +314,10 @@ a document inside the program, at `/guides/<slug>` (`\\XIANGYIN\GUIDES\<SLUG>`
 in the log-on box). The first is `paris-photo-days-2026`. On a computer the window
 shows a list, the map and the details side by side; on a phone it shows one at a
 time, and tapping a pin raises a details sheet. It works without JavaScript as
-one readable page. Zoomed in past the base picture, the map shows street-level
+one readable page. Wherever a base picture is magnified past 1:1 (the region
+round the city plan long before the plan itself), the map shows street-level
 tiles from IGN's Plan IGN. The Worker fetches them at
-`/guides/<slug>/tiles/{z}/{x}/{y}.png` (zooms 14 to 19), for logged-on viewers
+`/guides/<slug>/tiles/{z}/{x}/{y}.png` (zooms 12 to 19), for logged-on viewers
 only and only inside the box `access.json` gives under `tiles` (in degrees, at
 most 3° each way, containing every base map), so IGN sees the Worker and never
 the visitor. Each visitor may fetch at most 600 tiles from IGN a minute.

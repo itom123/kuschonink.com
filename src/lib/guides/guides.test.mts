@@ -189,7 +189,7 @@ const base = (): RawGuide => ({
   ok(!js.includes('Hotel Fixture') && !js.includes(String(W[0])) && !js.includes('Why A1') && !js.includes('Galerie\\nexpo'), 'the visitor payload holds no hidden place and no long texts');
   ok(pay.items.length === 5 && pay.places.length === 1 && pay.routes.length === 1, 'payload counts');
   ok(js.includes('Opening <3') && !JSON.stringify(pay).replace(/</g, '\\u003c').includes('<'), 'payload "<" can be escaped (load.ts payloadJson)');
-  ok(pay.tiles?.url === '/guides/fixture/tiles/{z}/{x}/{y}.png' && pay.tiles.min === 14 && pay.tiles.max === 19 && vv.tiles?.url === pay.tiles.url, 'payload tiles: the Worker\'s proxy for this guide, z14 to z19', JSON.stringify(pay.tiles));
+  ok(pay.tiles?.url === '/guides/fixture/tiles/{z}/{x}/{y}.png' && pay.tiles.min === 12 && pay.tiles.max === 19 && vv.tiles?.url === pay.tiles.url, 'payload tiles: the Worker\'s proxy for this guide, z12 to z19', JSON.stringify(pay.tiles));
   ok(buildPayload(buildView(raw, 'fixture', { ...acc, tiles: undefined }, 'visitor')).tiles === undefined && !('tiles' in buildPayload(buildView(raw, 'fixture', { ...acc, tiles: {} }, 'visitor'))), 'no tile bounds in access.json → no tiles in the payload');
   let threw = false;
   try { buildView(raw, 'fixture', { ...acc, guides: { fixture: ['visitor'] } }, P); } catch { threw = true; }

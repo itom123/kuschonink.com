@@ -36,7 +36,7 @@
 :where(html[data-scheme="contrast"]) .gd-base img { filter: grayscale(1) contrast(1.1); }
 .gd-map-note { margin: 4px 0; font: 13px/1.3 "Times New Roman", Times, serif; }
 
-html.js .gd-map { width: 100%; height: 100%; min-height: 200px; overflow: hidden; background: var(--gd-desk); }
+html.js .gd-map { width: 100%; height: 100%; min-height: 0; overflow: hidden; background: var(--gd-desk); }
 html.js .gd-viewport {
   position: absolute; inset: 0; outline: none;
   touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
@@ -81,7 +81,7 @@ html.js .gd-live {
   position: absolute; z-index: 5; top: 6px; left: max(92px, calc((100% - var(--gd-free-right, 0px)) / 2 - 75px));
   display: flex; align-items: center; max-width: calc(100% - var(--gd-free-right, 0px) - 104px);
   background: var(--tip); color: #000; border: 1px solid #000; white-space: nowrap;
-  font: bold 11px Tahoma, Verdana, var(--ui-font);
+  font: bold 11px var(--gd-sans);
 }
 .gd-live[hidden] { display: none; }
 /* html.js lifts these over 98.css and .gd button (guide.css loads later). */
@@ -265,8 +265,8 @@ html.js .gd-legend { position: absolute; z-index: 5; left: 12px; top: 12px; marg
 .gd-map:not([data-heat]) .gd-key-heat { display: none; }
 
 /* ---- Attribution ---- */
-.gd-attrib { margin: 2px 0; padding: 1px 4px; font: 10px/1.25 Tahoma, Verdana, sans-serif; color: #000; background: rgba(255, 255, 255, 0.85); }
-html.js .gd-attrib { position: absolute; z-index: 5; right: var(--gd-free-right, 0px); bottom: var(--gd-free-bottom, 0px); margin: 0; max-width: calc(100% - 24px); text-align: right; }
+.gd-attrib { margin: 2px 0; padding: 1px 4px; font: 10px/1.25 var(--gd-sans); color: #000; background: rgba(255, 255, 255, 0.85); }
+html.js .gd-attrib { position: absolute; z-index: 5; right: var(--gd-free-right, 0px); bottom: var(--gd-free-bottom, 0px); margin: 0; max-width: calc(100% - var(--gd-free-right, 0px) - 24px); box-sizing: border-box; text-align: right; }
 
 /* ---- High Contrast and forced colours ---- */
 :where(html[data-scheme="contrast"]) .gd-label { background: #fff; color: #000; }

@@ -233,7 +233,7 @@ export function buildView(raw: RawGuide, slug: string, access: AccessFile, audie
 }
 
 /** The zooms the Worker proxies tiles at (worker/guides.ts TILE_Z says the same; the Worker can't import this file). */
-export const TILE_Z = { min: 14, max: 19 };
+export const TILE_Z = { min: 12, max: 19 };
 
 /** Where the browser gets street-level tiles for a guide, or null when access.json declares no bounds for it. */
 export function tileSource(access: AccessFile, slug: string): TileSource | null {

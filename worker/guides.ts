@@ -41,10 +41,10 @@ const FILE = /^\/(?:img|map)\/[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/;
 const TILE_PATH = /^\/tiles\/(\d{2})\/(0|[1-9]\d{0,5})\/(0|[1-9]\d{0,5})\.png$/;
 /**
  * Tiles are proxied at these Web-Mercator zooms only (src/lib/guides/view.ts tells the browser the same range).
- * From 14, the base picture's own zoom: a tile pixel is then never much smaller than the picture's, so the lettering
- * does not shrink where tiles take over just past 1:1.
+ * From 12: the region picture (z11) is magnified past 1:1 long before the city plan (z14) is, so the overview
+ * round the city needs tiles at 12 and 13 to be sharp. Below 12 the region picture is the map.
  */
-export const TILE_Z = { min: 14, max: 19 };
+export const TILE_Z = { min: 12, max: 19 };
 /**
  * Plan IGN v2 from IGN's Géoplateforme WMTS (Etalab 2.0 licence, no key). The
  * layer and every other parameter are fixed here; only z, x and y come from

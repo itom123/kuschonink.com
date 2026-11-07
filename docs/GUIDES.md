@@ -37,7 +37,7 @@ directly.
   数据有错时构建会失败，网站保持原样，不会坏掉。
 - **地点的排序**：地点列表上方的“排序方式”默认是“推荐”（A、B、C 级依次排，同级按编号）。另外还有“名称”、“区域”（按导览里片区的顺序）、“当天开放的优先”（先在“日期”框里选定一天）和“离我最近”（先按“我在哪里？”）。选了别的排序后会出现“默认”按钮，单击即可恢复推荐顺序。“查看 ▸ 排序方式”菜单里是同样几种排序。排序只调整每一组之内的次序（参考点、当天闭馆的地点和官方条目各自是一组）。选择会记在这台设备上，“离我最近”除外。
 - **我在哪里？**：只有按下按钮时，浏览器才会询问位置。之后地图上会出现一个红色的圆点，并显示“实时位置”标签，旁边有“停止”按钮。再按一次按钮、单击“停止”，或者刷新页面、注销、关闭窗口，都会关掉它；刷新之后它是关着的。位置只留在设备上，从不发送出去。浏览器不允许时，导览会说明怎样开启。
-- **街道地图**：放大到底图放不下细节时，街道级的地图瓦片由 Worker 从 IGN（Plan IGN）代为取得，地址是 `/guides/<名字>/tiles/{z}/{x}/{y}.png`，缩放级别 14 至 19，只给已登录的读者。范围由 `access.json` 的 `tiles` 决定（见第 10 节）。IGN 只看到 Worker，看不到访客。每位访客每分钟从 IGN 取图最多 600 块（已在缓存里的不算），超出的瓦片返回 429。
+- **街道地图**：底图被放大到超过原图大小的地方（城区底图周围的大区底图会最先被放大），街道级的地图瓦片由 Worker 从 IGN（Plan IGN）代为取得，地址是 `/guides/<名字>/tiles/{z}/{x}/{y}.png`，缩放级别 12 至 19，只给已登录的读者。城区底图放不满窗口时（比如竖着拿的平板），四周会补上大区底图和它的瓦片，不会露出灰色。范围由 `access.json` 的 `tiles` 决定（见第 10 节）。IGN 只看到 Worker，看不到访客。每位访客每分钟从 IGN 取图最多 600 块（已在缓存里的不算），超出的瓦片返回 429。
 
 **Field Guide (导览)** is a program on the Xiangyin 98 desktop for city guides
 behind a password: a map, recommended places in three tiers (A, B, C), routes,
@@ -76,9 +76,11 @@ dates and texts. A guide lives at `kuschonink.com/guides/<slug>`; the first is
   refresh, log off or closed window turns it off, and it stays off after a
   refresh. Your position stays on your device and is never sent anywhere. If the
   browser refuses, the guide says how to allow it.
-- **Street-level tiles.** Once you zoom in past the base picture, street tiles
-  from Plan IGN take over. The Worker fetches them at
-  `/guides/<slug>/tiles/{z}/{x}/{y}.png` for zooms 14 to 19, only for logged-on
+- **Street-level tiles.** Wherever a base picture is magnified past 1:1 (the
+  region round the city plan first), street tiles from Plan IGN take over.
+  Where the city plan doesn't fill the window (a tablet held upright, say),
+  the region and its tiles fill the rest, so no grey shows. The Worker fetches
+  them at `/guides/<slug>/tiles/{z}/{x}/{y}.png` for zooms 12 to 19, only for logged-on
   viewers and only inside the box that `access.json` gives under `tiles`
   (section 10). IGN sees the Worker, never the visitor. Each visitor may fetch at
   most 600 tiles from IGN a minute (cached tiles don't count); beyond that a tile
