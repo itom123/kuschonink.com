@@ -5,11 +5,11 @@
 // The top of each article (kicker, name, subtitle, day status, actions) is what
 // a phone's half sheet shows first, so the photo comes after it.
 import Bi from '../Bi.astro';
-import { attr } from '../../lib/i18n';
 import { dayLabel, mapsSearchUrl } from '../../lib/guides/core';
 import { W, kicker, dateRange, timeSpan } from '../../lib/guides/words';
 import { SW } from '../../lib/guides/suggest-words';
 import type { Bi as BiT, GuideView } from '../../lib/guides/types';
+import Photo from './Photo.astro';
 
 interface Props { view: GuideView }
 const { view } = Astro.props;
@@ -31,7 +31,7 @@ const loose = view.listings.records.filter((r) => !r.item);
     <article class="gd-article gd-place" id={`gd-item-${p.id}`} data-gd-article={p.id} data-kind="place" data-gd-address={`${p.name}, ${p.address}`}>
       <p class="gd-kicker"><span class="gd-plate" aria-hidden="true">{p.id}</span> <Bi t={p.label} /></p>
       <h2 class="gd-name" tabindex="-1">{p.name}</h2>
-      {has(p.hours) && <div class="gd-status"><span class="gd-sq" data-code="choose-day" aria-hidden="true"></span><b><Bi t={p.hours} /></b></div>}
+      {has(p.hours) && <div class="gd-status"><b><Bi t={p.hours} /></b></div>}
       <p class="gd-actions">
         <a class="button-link" href={mapsSearchUrl(p.name, p.address)} target="_blank" rel="noopener"><Bi t={W.openMaps} /></a>
         <a class="button-link" href={dir(p.name, p.address)} target="_blank" rel="noopener"><Bi t={W.directions} /></a>
@@ -66,13 +66,7 @@ const loose = view.listings.records.filter((r) => !r.item);
           <a class="button-link" href={dir(it.name, it.address)} target="_blank" rel="noopener"><Bi t={W.directions} /></a>
           <button type="button" class="gd-copy" data-gd-copy data-js-only><Bi t={W.copyAddress} /></button>
         </p>
-        {it.image && (
-          <figure class="gd-photo">
-            <img src={it.image.src} {...attr('alt', it.image.alt)} loading="lazy" decoding="async" draggable="false" data-credit={it.image.credit} />
-            <figcaption>{it.image.caption && <>{it.image.caption} </>}<span class="gd-credit">{it.image.credit}</span>{has(view.credits.image) && <> - <Bi t={view.credits.image} /></>}</figcaption>
-            <p class="gd-photo-failed" hidden><Bi t={W.photoFailed} /></p>
-          </figure>
-        )}
+        {it.image && <Photo p={it.image} fallback={view.credits.image} />}
         {has(it.why) && <p class="gd-why"><Bi t={it.why} /></p>}
         <dl class="gd-facts">
           <dt><Bi t={W.address} /></dt><dd>{it.address}</dd>
@@ -102,6 +96,7 @@ const loose = view.listings.records.filter((r) => !r.item);
       <p class="gd-actions">
         <a class="button-link" href={`https://www.google.com/maps/search/?api=1&query=${r.coordinates[1]},${r.coordinates[0]}`} target="_blank" rel="noopener"><Bi t={W.openMaps} /></a>
       </p>
+      {r.image && <Photo p={r.image} fallback={view.credits.image} />}
       <p class="gd-listing-text" lang={lang}>{r.details}</p>
       <p class="gd-caution"><Bi t={listingNote} /></p>
       <p class="gd-links">

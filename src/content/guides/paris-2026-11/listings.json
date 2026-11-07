@@ -1,5 +1,5 @@
 {
-  "_comment": "Official Photo Days map entries (uMap #1453094), in French as published. Keep the ids D01–D88 on any re-import. 官方地图条目，保留法文原文；重新导入时保持编号不变。",
+  "_comment": "Official Photo Days map entries (uMap #1453094), in French as published. Where a map caption left out the address, dates or opening hours, the record was completed from its own festival page (the record's url) on 7 Nov; D52's point is the Espace Landowski (Base Adresse Nationale). Pictures: the one each festival page publishes, with its credit. Keep the ids D01–D88 on any re-import. 官方地图条目，保留法文原文；地图说明缺少地址、日期或开放时间的，于11月7日按该条目自己的摄影节页面补全；图片为摄影节页面发布的图片及其署名。重新导入时保持编号不变。",
   "source": {
     "name": "Photo Days 2026 official map",
     "url": "https://umap.openstreetmap.fr/fr/map/photo-days-2026_1453094",
@@ -17,7 +17,9 @@
         48.871977
       ],
       "details": "Lectures de portfolio\ngratuites pour les photographes\ninscription obligatoire\n\nlundi 9 et mardi 10.11.2026\n16bis boulevard Montmartre — Paris 9e",
-      "url": "https://photodays.paris/Lectures-de-portfolio"
+      "url": "https://photodays.paris/Lectures-de-portfolio",
+      "start": "2026-11-09",
+      "end": "2026-11-10"
     },
     {
       "id": "D02",
@@ -39,7 +41,16 @@
         48.833893
       ],
       "details": "au Cinéma L'Entrepôt, 7 rue Francis de Pressensé — Paris 14e\n\n6e édition\nFestival du film photographique\n\nvendredi 27.11 de 18h à 1h\nsamedi 28.11 de 13h à 1h\net dimanche 29.11 de 13h à 22h",
-      "url": "https://photodays.paris/Les-Nuits-Photo"
+      "url": "https://photodays.paris/Les-Nuits-Photo",
+      "start": "2026-11-27",
+      "end": "2026-11-29",
+      "image": {
+        "file": "D03.jpg",
+        "credit": "© Hutong Productions, Le Bal",
+        "caption": "Hélène Giannecchini, I Want my People to be Remembered",
+        "alt": "Exhibition image: Hélène Giannecchini, I Want my People to be Remembered",
+        "altZh": "展览图片：Hélène Giannecchini, I Want my People to be Remembered"
+      }
     },
     {
       "id": "D04",
@@ -63,7 +74,16 @@
         48.865759
       ],
       "details": "Remise du 20e prix StudioCollector\npar Nathalie MAMANE COHEN en collaboration avec Le Fresnoy\n\nAuditorium du Jeu de Paume, 1 place de la Concorde — Paris 1er\nlundi 23/11 à 18h précises\naccès libre en fonction des places disponibles\n\nRSVP · communication@lefresnoy.net",
-      "url": "https://photodays.paris/Prix-StudioCollector"
+      "url": "https://photodays.paris/Prix-StudioCollector",
+      "start": "2026-11-23",
+      "end": "2026-11-23",
+      "image": {
+        "file": "D05.jpg",
+        "credit": "production Le Fresnoy – Studio national des arts contemporains",
+        "caption": "Lauréate 2025 Kieu-Anh Nguyen Phuong pour Fallen Noon, 2025",
+        "alt": "Exhibition image: Lauréate 2025 Kieu-Anh Nguyen Phuong pour Fallen Noon, 2025",
+        "altZh": "展览图片：Lauréate 2025 Kieu-Anh Nguyen Phuong pour Fallen Noon, 2025"
+      }
     },
     {
       "id": "D06",
@@ -102,7 +122,14 @@
       "details": "130 rue du Faubourg Saint-Honoré — Paris 8e\n\nRobert BURLEY\nGrands Lacs. L’horizon commun des mers intérieures\n6.6 — 14.11.2026\n\nlundi-vendredi 10h-18h\nouverture exceptionnelle lundi 9 10h-21h et samedi 14 14h-20h30",
       "url": "https://photodays.paris/Centre-culturel-canadien",
       "start": "2026-06-06",
-      "end": "2026-11-14"
+      "end": "2026-11-14",
+      "image": {
+        "file": "D08.jpg",
+        "credit": "Robert BURLEY",
+        "caption": "Lake Michigan-Chicago #9, 2022",
+        "alt": "Exhibition image: Lake Michigan-Chicago #9, 2022",
+        "altZh": "展览图片：Lake Michigan-Chicago #9, 2022"
+      }
     },
     {
       "id": "D09",
@@ -115,7 +142,13 @@
       "details": "18 rue Bonaparte — Paris 6e\n\nJindřich ŠTREIT\nHumanity\n5.11 — 16.1.2027\n\njeudi-samedi 13h-19h",
       "url": "https://photodays.paris/Centre-tcheque-de-Paris",
       "start": "2026-11-05",
-      "end": "2027-01-16"
+      "end": "2027-01-16",
+      "image": {
+        "file": "D09.jpg",
+        "credit": "© Jindřich Štreit",
+        "alt": "Exhibition image (Jindřich Štreit)",
+        "altZh": "展览图片（Jindřich Štreit）"
+      }
     },
     {
       "id": "D10",
@@ -128,7 +161,14 @@
       "details": "107 avenue de la République — Pontault-Combault (77)\n\nIsabelle LE MINH\nA Rose is a Rose is the Last Rose of Summer\n4.10 — 20.12.2026\n\nmercredi-vendredi 13h-18h / week-ends 14h-18h",
       "url": "https://photodays.paris/CPIF",
       "start": "2026-10-04",
-      "end": "2026-12-20"
+      "end": "2026-12-20",
+      "image": {
+        "file": "D10.jpg",
+        "credit": "© Adagp, Paris, 2026",
+        "caption": "Isabelle LE MINH, Manoeuvrability, installation Raw Loop, 2023",
+        "alt": "Exhibition image: Isabelle LE MINH, Manoeuvrability, installation Raw Loop, 2023",
+        "altZh": "展览图片：Isabelle LE MINH, Manoeuvrability, installation Raw Loop, 2023"
+      }
     },
     {
       "id": "D11",
@@ -141,7 +181,14 @@
       "details": "30 rue Jean-Jacques Rousseau — Romainville (93)\n\nStephan ZIMMERLI, Johanna HULLÁR, Sophie BALLMER et Tarik HAYWARD, Julie SEMOROZ, Santiago MARTINEZ, Séverin GUELPA\nRester Vivant(e)\n15.10 — 29.11.2026\n\nmardi-dimanche 14h-18h",
       "url": "https://photodays.paris/Fondation-Fiminco",
       "start": "2026-10-15",
-      "end": "2026-11-29"
+      "end": "2026-11-29",
+      "image": {
+        "file": "D11.jpg",
+        "credit": "© Johanna HULLÁR",
+        "caption": "Black waters #3, Paris 2026, Set design Maureen Coleman",
+        "alt": "Exhibition image: Black waters #3, Paris 2026, Set design Maureen Coleman",
+        "altZh": "展览图片：Black waters #3, Paris 2026, Set design Maureen Coleman"
+      }
     },
     {
       "id": "D12",
@@ -167,7 +214,14 @@
       "details": "9 av. de Trivaux — Meudon (92)\n\nBRASSAÏ\nL'œil de Paris\n17.10 — 21.2.2027\n\n11h–19h les week-ends\net tous les jours fériés et de vacances scolaires",
       "url": "https://photodays.paris/Hangar-Y",
       "start": "2026-10-17",
-      "end": "2027-02-21"
+      "end": "2027-02-21",
+      "image": {
+        "file": "D13.jpg",
+        "credit": "© Estate Brassaï Succession – Philippe Ribeyrolles",
+        "caption": "Brassaï, L'événement, années 1930-40",
+        "alt": "Exhibition image: Brassaï, L'événement, années 1930-40",
+        "altZh": "展览图片：Brassaï, L'événement, années 1930-40"
+      }
     },
     {
       "id": "D14",
@@ -206,7 +260,14 @@
       "details": "place Jean-Michel Basquiat — Paris 13e\n\nHistoires d’amour\ndans la collection agnès b.\n20.11 — 21.3.2027\n\nmercredi-samedi 11h-19h / dimanche 14h-19h",
       "url": "https://photodays.paris/La-Fab",
       "start": "2026-11-20",
-      "end": "2027-03-21"
+      "end": "2027-03-21",
+      "image": {
+        "file": "D16.jpg",
+        "credit": "© Ryan McGINLEY, courtesy de l'artiste",
+        "caption": "Jakes' eyes, 2003",
+        "alt": "Exhibition image: Jakes' eyes, 2003",
+        "altZh": "展览图片：Jakes' eyes, 2003"
+      }
     },
     {
       "id": "D17",
@@ -219,7 +280,13 @@
       "details": "100, rue de Charenton, Paris 12 — Paris 12e\n\nMarie CANTOS . Claire COLIN-COLLIN . Julia DUPONT . Dorothée VOLUT\nAu milieu\n5.11 — 28.11.2026\n\nlundi-samedi 9h-23h",
       "url": "https://photodays.paris/LE-100",
       "start": "2026-11-05",
-      "end": "2026-11-28"
+      "end": "2026-11-28",
+      "image": {
+        "file": "D17.jpg",
+        "credit": "© Julia Dupont",
+        "alt": "Exhibition image (Julia Dupont)",
+        "altZh": "展览图片（Julia Dupont）"
+      }
     },
     {
       "id": "D18",
@@ -245,7 +312,13 @@
       "details": "4 rue de Freiberg — Gentilly (94)\n\nTrier le monde\nRegards post-algorithmiques sur la collection de photographies\n18.9 — 14.3.2027\n\nmercredi-vendredi 13h30-18h30 / samedi-dimanche 13h30-19h",
       "url": "https://photodays.paris/Le-Lavoir-Numerique",
       "start": "2026-09-18",
-      "end": "2027-03-14"
+      "end": "2027-03-14",
+      "image": {
+        "file": "D19.jpg",
+        "credit": "© Queenie F. CHARLES",
+        "alt": "Exhibition image (Queenie F. CHARLES)",
+        "altZh": "展览图片（Queenie F. CHARLES）"
+      }
     },
     {
       "id": "D20",
@@ -258,7 +331,14 @@
       "details": "place de la Libération — Vitry-sur-Seine (94)\n\nSMITH\nIci grand ouvert\n23.5 — 31.1.2027\n\nmardi-dimanche 11h-18h",
       "url": "https://photodays.paris/MAC-VAL",
       "start": "2026-05-23",
-      "end": "2027-01-31"
+      "end": "2027-01-31",
+      "image": {
+        "file": "D20.jpg",
+        "credit": "© SMITH, Courtesy Galerie Christophe Gaillard",
+        "caption": "Sans titre, in Dami (Fulmen), 2023, Thermogramme sur aluminium brossé",
+        "alt": "Exhibition image: Sans titre, in Dami (Fulmen), 2023, Thermogramme sur aluminium brossé",
+        "altZh": "展览图片：Sans titre, in Dami (Fulmen), 2023, Thermogramme sur aluminium brossé"
+      }
     },
     {
       "id": "D21",
@@ -271,7 +351,14 @@
       "details": "107 rue Rivoli — Paris 1er\n\nRafael PAVAROTTI\nRafael Pavarotti. Photographe\n2.10 — 2.5.2027\n\nmardi-dimanche 11h-18h",
       "url": "https://photodays.paris/MAD",
       "start": "2026-10-02",
-      "end": "2027-05-02"
+      "end": "2027-05-02",
+      "image": {
+        "file": "D21.jpg",
+        "credit": "© Rafael PAVAROTTI",
+        "caption": "Future Proof, British Vogue, septembre 2022, avec Mamuor Majeng, Nyaueth Riam, tenues Bottega Veneta",
+        "alt": "Exhibition image: Future Proof, British Vogue, septembre 2022, avec Mamuor Majeng, Nyaueth Riam, tenues Bottega Veneta",
+        "altZh": "展览图片：Future Proof, British Vogue, septembre 2022, avec Mamuor Majeng, Nyaueth Riam, tenues Bottega Veneta"
+      }
     },
     {
       "id": "D22",
@@ -284,7 +371,13 @@
       "details": "47 rue Raynouard — Paris 16e\n\nDe la vigne au verre.\nLe vin chez Balzac\n26.11 — 6.4.2027\n\nmardi-dimanche 10h-18h",
       "url": "https://photodays.paris/Maison-de-Balzac",
       "start": "2026-11-26",
-      "end": "2027-04-06"
+      "end": "2027-04-06",
+      "image": {
+        "file": "D22.jpg",
+        "credit": "courtesy Maison de Balzac",
+        "alt": "Exhibition image (courtesy Maison de Balzac)",
+        "altZh": "展览图片（courtesy Maison de Balzac）"
+      }
     },
     {
       "id": "D23",
@@ -297,7 +390,14 @@
       "details": "1 rue de la Division du Général Leclerc — Gentilly (94)\n\nKwame BRATHWAITE\nBlack is beautiful\n18.9 — 14.3.2027\n\nmercredi-vendredi 13h30-18h30 / samedi-dimanche 13h30-19h",
       "url": "https://photodays.paris/Maison-Doisneau",
       "start": "2026-09-18",
-      "end": "2027-03-14"
+      "end": "2027-03-14",
+      "image": {
+        "file": "D23.jpg",
+        "credit": "Courtesy of the Kwame Brathwaite Archive and Philip Martin Gallery, Los Angeles",
+        "caption": "Kwame BRATHWAITE, Radiah Frye lors d’une séance photo aux studios AJASS, vers 1970",
+        "alt": "Exhibition image: Kwame BRATHWAITE, Radiah Frye lors d’une séance photo aux studios AJASS, vers 1970",
+        "altZh": "展览图片：Kwame BRATHWAITE, Radiah Frye lors d’une séance photo aux studios AJASS, vers 1970"
+      }
     },
     {
       "id": "D24",
@@ -310,7 +410,14 @@
       "details": "Musée d'Art Moderne de Paris\n11 av. du Président Wilson — 16e\n\nJean-François BAURET au sein de la collection permanente\n9.6 — 4.1.2027\n\nmardi-dimanche 10h-18h",
       "url": "https://photodays.paris/MAM",
       "start": "2026-06-09",
-      "end": "2027-01-04"
+      "end": "2027-01-04",
+      "image": {
+        "file": "D24.jpg",
+        "credit": "courtesy de la famille de l'artiste",
+        "caption": "Jean-François BAURET, Portrait de Maurice Estève, 1960",
+        "alt": "Exhibition image: Jean-François BAURET, Portrait de Maurice Estève, 1960",
+        "altZh": "展览图片：Jean-François BAURET, Portrait de Maurice Estève, 1960"
+      }
     },
     {
       "id": "D25",
@@ -321,7 +428,14 @@
         48.854951
       ],
       "details": "17 rue Geoffroy l’Asnier — Paris 4e\n\nSimone VEIL. Mes sœurs et moi\n10.2 — 29.11.2026\n\nImages de la rafle du « billet vert »\n10.5 — 31.12.2026\n\ndimanche-vendredi 10h-18h. nocturne le jeudi jusqu’à 21h",
-      "url": "https://photodays.paris/memorial-de-la-shoah"
+      "url": "https://photodays.paris/memorial-de-la-shoah",
+      "image": {
+        "file": "D25.jpg",
+        "credit": "© Archives familles Veil et Vernay",
+        "caption": "La fratrie Jacob, Denise, Simone, Madeleine et Jean, vers 1930",
+        "alt": "Exhibition image: La fratrie Jacob, Denise, Simone, Madeleine et Jean, vers 1930",
+        "altZh": "展览图片：La fratrie Jacob, Denise, Simone, Madeleine et Jean, vers 1930"
+      }
     },
     {
       "id": "D26",
@@ -343,7 +457,16 @@
         48.857007
       ],
       "details": "129 rue de Grenelle — Paris 7e\n\nDécouverte des collections de photographies, riches de nouvelles acquisitions\n\nle 24.11 uniquement sur réservation",
-      "url": "https://photodays.paris/Musee-de-l-Armee"
+      "url": "https://photodays.paris/Musee-de-l-Armee",
+      "start": "2026-11-24",
+      "end": "2026-11-24",
+      "image": {
+        "file": "D27.jpg",
+        "credit": "© Laurent VAN DER STOCKT, Collection du Musée de l'Armée",
+        "caption": "Edin, un jeune membre des forces bosniaques, traverse une avenue exposée à la ligne de front avec les forces croates, à l’ouest de l’enclave. Mostar, Bosnie-Herzégovine, septembre 1993",
+        "alt": "Exhibition image: Edin, un jeune membre des forces bosniaques, traverse une avenue exposée à la ligne de front avec les forces croates, à l’ouest de l’enclave. Mostar, Bosnie-Herzégovine, septembre 1993",
+        "altZh": "展览图片：Edin, un jeune membre des forces bosniaques, traverse une avenue exposée à la ligne de front avec les forces croates, à l’ouest de l’enclave. Mostar, Bosnie-Herzégovine, septembre 1993"
+      }
     },
     {
       "id": "D28",
@@ -369,7 +492,14 @@
       "details": "4 avenue du Colonel Henri Rol-Tanguy — Paris 14e\n\nRobert CAPA. Photographe de guerre\n18.2 — 20.12.2026\n\nmardi-dimanche 10h-17h30",
       "url": "https://photodays.paris/Musee-de-la-liberation",
       "start": "2026-02-18",
-      "end": "2026-12-20"
+      "end": "2026-12-20",
+      "image": {
+        "file": "D29.jpg",
+        "credit": "© Robert Capa / International Center of Photography/Magnum Photos",
+        "caption": "Les troupes américaines prennent d’assaut la plage d’Omaha Beach lors du Débarquement, Normandie, France, 6 juin 1944",
+        "alt": "Exhibition image: Les troupes américaines prennent d’assaut la plage d’Omaha Beach lors du Débarquement, Normandie, France, 6 juin 1944",
+        "altZh": "展览图片：Les troupes américaines prennent d’assaut la plage d’Omaha Beach lors du Débarquement, Normandie, France, 6 juin 1944"
+      }
     },
     {
       "id": "D30",
@@ -382,7 +512,14 @@
       "details": "2 rue du Port — Boulogne-Billancourt (92)\n\nChoisir la paix. Le combat d’Albert Kahn (1860‑1940)\n13.10 — 13.6.2027\n\nmardi-dimanche 11h-18h",
       "url": "https://photodays.paris/Musee-Albert-Kahn",
       "start": "2026-10-13",
-      "end": "2027-06-13"
+      "end": "2027-06-13",
+      "image": {
+        "file": "D30.jpg",
+        "credit": "© Musée départemental Albert Kahn",
+        "caption": "Fernand CUVILLE, France, Le grand entonnoir de la Cote 108, 116m de diamètre, 45m de profondeur, 1919",
+        "alt": "Exhibition image: Fernand CUVILLE, France, Le grand entonnoir de la Cote 108, 116m de diamètre, 45m de profondeur, 1919",
+        "altZh": "展览图片：Fernand CUVILLE, France, Le grand entonnoir de la Cote 108, 116m de diamètre, 45m de profondeur, 1919"
+      }
     },
     {
       "id": "D31",
@@ -393,7 +530,14 @@
         48.861481
       ],
       "details": "37 quai Jacques Chirac — Paris 7e\n\nVoir Tahiti.\n29.9 — 31.1.2027\n\nVanuatu, archipel sous tension.\n15.10 — 5.4.2027\n\nPrix pour la Photographie 2024\n3.11 — 22.11.2026\n\nViolence silencieuse. Sous le regard de Roméo Mivekannin\n10.11 — 4.4.2027\n\nmardi-dimanche 10h30-19h / nocturne le jeudi jusqu'à 22h",
-      "url": "https://photodays.paris/Musee-du-quai-Branly"
+      "url": "https://photodays.paris/Musee-du-quai-Branly",
+      "image": {
+        "file": "D31.jpg",
+        "credit": "Courtesy musée du quai Branly",
+        "caption": "Gustave VIAUD (1836-1865), Papeete, [Pape’ete], le bord de mer entre Fare Ute et la boulangerie militaire, Tahiti, Pape‘ete, 22 août 1860",
+        "alt": "Exhibition image: Gustave VIAUD (1836-1865), Papeete, [Pape’ete], le bord de mer entre Fare Ute et la boulangerie militaire, Tahiti, Pape‘ete, 22 août 1860",
+        "altZh": "展览图片：Gustave VIAUD (1836-1865), Papeete, [Pape’ete], le bord de mer entre Fare Ute et la boulangerie militaire, Tahiti, Pape‘ete, 22 août 1860"
+      }
     },
     {
       "id": "D32",
@@ -419,7 +563,13 @@
       "details": "35 rue Blanche — Paris 9e\n\nLa Habana Invencible\n4.11 — 24.11.2026\n\nmardi-samedi 12h-19h / dimanche 12h-18h",
       "url": "https://photodays.paris/Artivistas",
       "start": "2026-11-04",
-      "end": "2026-11-24"
+      "end": "2026-11-24",
+      "image": {
+        "file": "D33.jpg",
+        "credit": "© Pierre LEBRET",
+        "alt": "Exhibition image (Pierre LEBRET)",
+        "altZh": "展览图片（Pierre LEBRET）"
+      }
     },
     {
       "id": "D34",
@@ -445,7 +595,14 @@
       "details": "port de Solférino, promenade Édouard-Glissant — Paris 7e\n\nÀ l'origine du Cœur\nporté par le Collectif Trigone\n11.11 — 15.11.2026\n\ntous les jours 11h-18h",
       "url": "https://photodays.paris/Caravane-LUX",
       "start": "2026-11-11",
-      "end": "2026-11-15"
+      "end": "2026-11-15",
+      "image": {
+        "file": "D35.jpg",
+        "credit": "© Collectif Trigone",
+        "caption": "À l'origine du Coeur 200 LUX Tour",
+        "alt": "Exhibition image: À l'origine du Coeur 200 LUX Tour",
+        "altZh": "展览图片：À l'origine du Coeur 200 LUX Tour"
+      }
     },
     {
       "id": "D36",
@@ -455,10 +612,17 @@
         2.354213,
         48.840079
       ],
-      "details": "13 rue Santeuil — Paris 5e\n\nDaniel BOURGAIS . Dana COJBUC . Nathalie JOFFRE . Maryam KHOSROVANI . Eléonore SIMON.\nVisite des ateliers d'artiste\n20.11 — 24.11.2026\n\nuniquement sur rdv",
+      "details": "13 rue Santeuil — Paris 5e\n\nDaniel BOURGAIS . Dana COJBUC . Nathalie JOFFRE . Maryam KHOSROVANI . Eléonore SIMON.\nVisite des ateliers d'artiste\nvendredi 20.11 et mardi 24.11 à 12h, sur inscription\n\nuniquement sur rdv",
       "url": "https://photodays.paris/Cesure",
       "start": "2026-11-20",
-      "end": "2026-11-24"
+      "end": "2026-11-24",
+      "image": {
+        "file": "D36.jpg",
+        "credit": "© Eléonore SIMON",
+        "caption": "Le Bleu s'écrit sans bruit",
+        "alt": "Exhibition image: Le Bleu s'écrit sans bruit",
+        "altZh": "展览图片：Le Bleu s'écrit sans bruit"
+      }
     },
     {
       "id": "D37",
@@ -468,10 +632,17 @@
         2.353686,
         48.852641
       ],
-      "details": "rue Jean du Bellay — Paris 4e\n\nHein GORNY Collections\n7.11 — 13.12.2026\n\nuniquement sur rdv",
+      "details": "rue Jean du Bellay — Paris 4e\n\nHein GORNY Collections\n7.11 — 13.12.2026\n\nvisites à 16h les 7.11, 8.11, 9.11, 15.11, 21.11, 22.11, 12.12 et 13.12\nplaces limitées, uniquement sur réservation\nvisites supplémentaires sur rdv : info@collectionregard.com",
       "url": "https://photodays.paris/Collection-Regard",
       "start": "2026-11-07",
-      "end": "2026-12-13"
+      "end": "2026-12-13",
+      "image": {
+        "file": "D37.jpg",
+        "credit": "© Hein GORNY, courtesy Collection Regard Deutsche Fotothek",
+        "caption": "Kekse, 1934-1938",
+        "alt": "Exhibition image: Kekse, 1934-1938",
+        "altZh": "展览图片：Kekse, 1934-1938"
+      }
     },
     {
       "id": "D38",
@@ -481,8 +652,17 @@
         2.41716,
         48.858647
       ],
-      "details": "46 rue Jules Ferry — Bagnolet (93)\n\nLaboratoire argentique\nDécouverte avec le maître-artisan tireur-filtreur\n\nuniquement sur rdv",
-      "url": "https://photodays.paris/Diamantino"
+      "details": "46 rue Jules Ferry — Bagnolet (93)\n\nLaboratoire argentique\nDécouverte avec le maître-artisan tireur-filtreur et son équipe\nvisite guidée par Diamantino vendredi 13.11 à 15h, sur inscription\n\naccessible uniquement sur rdv",
+      "url": "https://photodays.paris/Diamantino",
+      "start": "2026-11-13",
+      "end": "2026-11-13",
+      "image": {
+        "file": "D38.jpg",
+        "credit": "© Marin GAUCI",
+        "caption": "Diamantino et son équipe",
+        "alt": "Exhibition image: Diamantino et son équipe",
+        "altZh": "展览图片：Diamantino et son équipe"
+      }
     },
     {
       "id": "D39",
@@ -508,7 +688,14 @@
       "details": "Hall 2, mezzanine, place Louis Armand, 75012 Paris — Paris 12e\n\nLiLiROZE, Laura BONNEFOUS\nAUX OISEAUX et SOUFFLE ARIDE\n3.11 — 3.12.2026\n\nentrée libre",
       "url": "https://photodays.paris/Objectif-FEMMES",
       "start": "2026-11-03",
-      "end": "2026-12-03"
+      "end": "2026-12-03",
+      "image": {
+        "file": "D40.jpg",
+        "credit": "© Laura BONNEFOUS",
+        "caption": "VOLUME",
+        "alt": "Exhibition image: VOLUME",
+        "altZh": "展览图片：VOLUME"
+      }
     },
     {
       "id": "D41",
@@ -521,7 +708,14 @@
       "details": "Viaduc des Arts, 89 avenue Daumesnil — Paris 12e\n\nJérémy CHARBAUT\nLa Furie et la Foi\n17.11 — 29.11.2026\n\nlundi-vendredi 18h-20h, samedi 15h-20h",
       "url": "https://photodays.paris/HEMERIA",
       "start": "2026-11-17",
-      "end": "2026-11-29"
+      "end": "2026-11-29",
+      "image": {
+        "file": "D41.jpg",
+        "credit": "© Jérémy CHARBAUT",
+        "caption": "Plume calamar, Port de pêche",
+        "alt": "Exhibition image: Plume calamar, Port de pêche",
+        "altZh": "展览图片：Plume calamar, Port de pêche"
+      }
     },
     {
       "id": "D42",
@@ -534,7 +728,14 @@
       "details": "chez Odile Ouizeman\n8 rue Galvani — Paris 17e\n\nVal BARROS · Oleñka CARRASCO · Myriam COHENCA · Tina MASSUMI\nVoices in Motion\n12.11 — 18.12.2026\n\nmercredi-vendredi 15h-19h et samedi 11h-19h\nuniquement sur rdv : info@iwpa.fr",
       "url": "https://photodays.paris/IWPA",
       "start": "2026-11-12",
-      "end": "2026-12-18"
+      "end": "2026-12-18",
+      "image": {
+        "file": "D42.jpg",
+        "credit": "© Tina MASSUMI",
+        "caption": "A Home Made of Us, 2023-2026",
+        "alt": "Exhibition image: A Home Made of Us, 2023-2026",
+        "altZh": "展览图片：A Home Made of Us, 2023-2026"
+      }
     },
     {
       "id": "D43",
@@ -560,7 +761,14 @@
       "details": "27 rue Jean-Jacques Rousseau, 3e étage — Paris 1er\n\nToufic BEYHUM . Selma BELLA ZARHLOUL\nOvid's Salon\n6.11 — 30.11.2026\n\nuniquement sur rdv, les samedis 14h-19h",
       "url": "https://photodays.paris/La-Suite-du-Huit",
       "start": "2026-11-06",
-      "end": "2026-11-30"
+      "end": "2026-11-30",
+      "image": {
+        "file": "D44.jpg",
+        "credit": "© Toufic BEYHUM",
+        "caption": "Coffee Cup, série Echoes of Fenjan",
+        "alt": "Exhibition image: Coffee Cup, série Echoes of Fenjan",
+        "altZh": "展览图片：Coffee Cup, série Echoes of Fenjan"
+      }
     },
     {
       "id": "D45",
@@ -571,7 +779,14 @@
         48.855736
       ],
       "details": "80 rue des Vignoles — Paris 20e\n\nFrédéric GOYEAU\nSaving Daylight\n8.10 — 5.11.2026\n\nCONTACT\n11.11 — 28.11.2026\n\nmardi-vendredi 9h-17h",
-      "url": "https://photodays.paris/Les-Trois-Bains"
+      "url": "https://photodays.paris/Les-Trois-Bains",
+      "image": {
+        "file": "D45.jpg",
+        "credit": "courtesy de l'artiste",
+        "caption": "Frédéric Goyeau, Saving Daylight",
+        "alt": "Exhibition image: Frédéric Goyeau, Saving Daylight",
+        "altZh": "展览图片：Frédéric Goyeau, Saving Daylight"
+      }
     },
     {
       "id": "D46",
@@ -584,7 +799,14 @@
       "details": "Salle Béatrice Hodent de Broutelles, 116 rue de Grenelle — Paris 7e\n\nChloé SHARROCK\nLe ciel et la terre après eux\n5.11 — 27.11.2026\n\nlundi-vendredi 8h30-17h / samedi 9h-12h30",
       "url": "https://photodays.paris/Musee-de-l-Armee",
       "start": "2026-11-05",
-      "end": "2026-11-27"
+      "end": "2026-11-27",
+      "image": {
+        "file": "D46.jpg",
+        "credit": "© Chloe SHARROCK, courtesy de l'artiste et Agence MYOP / Résidence photographique du musée de l’Armée",
+        "caption": "Relique, Verdun, 2025",
+        "alt": "Exhibition image: Relique, Verdun, 2025",
+        "altZh": "展览图片：Relique, Verdun, 2025"
+      }
     },
     {
       "id": "D47",
@@ -607,8 +829,17 @@
         2.314736,
         48.875142
       ],
-      "details": "boulevard Hausmann — Paris 8e\n\nCollection\nNeuflize OBC\n\nle 1.12, uniquement sur rdv",
-      "url": "https://photodays.paris/Neuflize-OBC"
+      "details": "boulevard Haussmann — Paris 8e\n\nDécouverte de la Collection d’entreprise Neuflize OBC\nvisite par la conservatrice de la Collection\nmardi 1.12 à 18h\ninscription obligatoire",
+      "url": "https://photodays.paris/Neuflize-OBC",
+      "start": "2026-12-01",
+      "end": "2026-12-01",
+      "image": {
+        "file": "D48.jpg",
+        "credit": "© Sophie ZÉNON, courtesy de l'artiste et Galerie XII",
+        "caption": "Caraïbes (II), 2025",
+        "alt": "Exhibition image: Caraïbes (II), 2025",
+        "altZh": "展览图片：Caraïbes (II), 2025"
+      }
     },
     {
       "id": "D49",
@@ -619,7 +850,13 @@
         48.872513
       ],
       "details": "Mairie du 9e, 6 rue Drouot — Paris 9e\n\nLiLiROZE, Murmures\n3.11 — 8.11.2026\n\nCoco Amardeil, Yasmine Lavoine (Jeune Talent 2026), Lisa Miquet, Flore Prébay, Victoria Vinas. Photographes sélectionnées 2026\n10.11 — 23.11.2026\n\nLaura BONNEFOUS & Nina OLIVET, VOLUME\n24.11 — 30.11.2026\n\nlundi-vendredi 8h30-17h / samedi 9h-12h30",
-      "url": "https://photodays.paris/Objectif-FEMMES"
+      "url": "https://photodays.paris/Objectif-FEMMES",
+      "image": {
+        "file": "D49.jpg",
+        "credit": "© LiliROZE",
+        "alt": "Exhibition image (LiliROZE)",
+        "altZh": "展览图片（LiliROZE）"
+      }
     },
     {
       "id": "D50",
@@ -632,7 +869,14 @@
       "details": "parcours libre en plein air sur le Parvis de la Défense (92)\n\nElsa LEYDIER, Julien LOMBARDI, Marine LANIER et SMITH, Brèches\n17.09 — 15.11.2026",
       "url": "https://photodays.paris/Paris-La-Defense",
       "start": "2026-09-17",
-      "end": "2026-11-15"
+      "end": "2026-11-15",
+      "image": {
+        "file": "D50.jpg",
+        "credit": "© Marine LANIER",
+        "caption": "Les Vagues",
+        "alt": "Exhibition image: Les Vagues",
+        "altZh": "展览图片：Les Vagues"
+      }
     },
     {
       "id": "D51",
@@ -645,18 +889,32 @@
       "details": "261 boulevard Raspail — Paris 14e\n\nAnaïs TONDEUR, et ses invités\nLà où le sol pousse\n25.11 — 23.12.2026\n\nmercredi-dimanche 11h-19h / jeudi nocturne jusque 21h",
       "url": "https://photodays.paris/Raspail-261",
       "start": "2026-11-25",
-      "end": "2026-12-23"
+      "end": "2026-12-23",
+      "image": {
+        "file": "D51.jpg",
+        "credit": "© Anaïs TONDEUR",
+        "caption": "Impluvium, Chromatographie",
+        "alt": "Exhibition image: Impluvium, Chromatographie",
+        "altZh": "展览图片：Impluvium, Chromatographie"
+      }
     },
     {
       "id": "D52",
       "name": "RPBB",
       "category": "atypical",
       "coordinates": [
-        2.230616,
-        48.842827
+        2.239338,
+        48.835944
       ],
-      "details": "Boulogne-Billancourt (92)",
-      "url": "https://photodays.paris/rpbb"
+      "details": "Rencontres Photographiques de Boulogne-Billancourt\n6, 7 et 9.11.2026 à l’Espace Landowski, 28 avenue André Morizet — Boulogne-Billancourt (92)\nLectures des Rencontres, 4e édition, sur inscription\n\nSandra CALLIGARO\nÀ l'ombre des drapeaux blancs\n18.11.2026 – 28.11.2026\nexposition chez Initial LABO, 62 avenue Jean Baptiste Clément · Boulogne-Billancourt (92)",
+      "url": "https://photodays.paris/rpbb",
+      "image": {
+        "file": "D52.jpg",
+        "credit": "© Sandra CALLIGARO",
+        "caption": "Mina et ses deux plus jeunes enfants, Kaboul, 2025",
+        "alt": "Exhibition image: Mina et ses deux plus jeunes enfants, Kaboul, 2025",
+        "altZh": "展览图片：Mina et ses deux plus jeunes enfants, Kaboul, 2025"
+      }
     },
     {
       "id": "D53",
@@ -666,10 +924,17 @@
         2.332363,
         48.872929
       ],
-      "details": "29 blv. Haussmann — Paris 8e\n\nLieux révélés\nsous la coupole de l’Agence centrale\n19.09 — 26.11.2026",
+      "details": "29 bd Haussmann · Paris 9e\n\nLieux révélés\nsous la coupole de l’Agence centrale\n19.09 — 26.11.2026\nentrée libre aux horaires de l’agence : lundi-vendredi 9h-18h\n\nRejouer le réel\nau 4e étage de l’Agence centrale, sur rdv (date à venir)",
       "url": "https://photodays.paris/Societe-Generale",
       "start": "2026-09-19",
-      "end": "2026-11-26"
+      "end": "2026-11-26",
+      "image": {
+        "file": "D53.jpg",
+        "credit": "© Anne GARDE, Collection d’art Société Générale",
+        "caption": "Chaillot 2, 2006, série EXTRALIGHT, C-Print",
+        "alt": "Exhibition image: Chaillot 2, 2006, série EXTRALIGHT, C-Print",
+        "altZh": "展览图片：Chaillot 2, 2006, série EXTRALIGHT, C-Print"
+      }
     },
     {
       "id": "D54",
@@ -679,8 +944,15 @@
         2.235825,
         48.891351
       ],
-      "details": "uniquement sur rdv",
-      "url": "https://photodays.paris/Societe-Generale"
+      "details": "Tours Société Générale\n17 cours Valmy · Puteaux (92)\n\nvisites gratuites des collections\nuniquement sur réservation",
+      "url": "https://photodays.paris/Societe-Generale",
+      "image": {
+        "file": "D54.jpg",
+        "credit": "© Georges Tony STOLL, courtesy de l’artiste et Galerie Poggi, Paris",
+        "caption": "Sans Titre (Je suis là), 1997",
+        "alt": "Exhibition image: Sans Titre (Je suis là), 1997",
+        "altZh": "展览图片：Sans Titre (Je suis là), 1997"
+      }
     },
     {
       "id": "D55",
@@ -690,8 +962,17 @@
         2.320347,
         48.885319
       ],
-      "details": "rue des Batignolles — Paris 17e\n\nJean-François BAURET\nDécouverte de son atelier avec Mme Claude Bauret-Allard\n\nle 28.11, uniquement sur rdv",
-      "url": "https://photodays.paris/Studio-Bauret"
+      "details": "rue des Batignolles — Paris 17e\n\nJean-François BAURET\nDécouverte de son atelier avec Mme Claude Bauret-Allard\n\nvisite guidée samedi 28.11, uniquement sur rdv\nréservation : reservation@photodays.paris",
+      "url": "https://photodays.paris/Studio-Bauret",
+      "start": "2026-11-28",
+      "end": "2026-11-28",
+      "image": {
+        "file": "D55.jpg",
+        "credit": "© Jean-François BAURET",
+        "caption": "Marie et Laura, 1986",
+        "alt": "Exhibition image: Marie et Laura, 1986",
+        "altZh": "展览图片：Marie et Laura, 1986"
+      }
     },
     {
       "id": "D56",
@@ -701,10 +982,17 @@
         2.234395,
         48.840942
       ],
-      "details": "5 rue de l'Ancienne Mairie — Boulogne-Billancourt (92)\n\nSylvie BONNOT\nDialogue 6 : Fracture / Voilure\n9.11 — 20.3.2027\n\nuniquement sur réservation",
+      "details": "5 rue de l'Ancienne Mairie — Boulogne-Billancourt (92)\n\nSylvie BONNOT\nDialogue 6 : Fracture / Voilure\n9.11 — 20.3.2027\n\nuniquement sur réservation : billetweb.fr/studio-frank-horvat-dialogue\nvernissage samedi 14.11 dès 18h",
       "url": "https://photodays.paris/Frank-Horvat-Studio",
       "start": "2026-11-09",
-      "end": "2027-03-20"
+      "end": "2027-03-20",
+      "image": {
+        "file": "D56.jpg",
+        "credit": "© Sylvie BONNOT",
+        "caption": "Fracture/Voilure I, 2026",
+        "alt": "Exhibition image: Fracture/Voilure I, 2026",
+        "altZh": "展览图片：Fracture/Voilure I, 2026"
+      }
     },
     {
       "id": "D57",
@@ -727,10 +1015,17 @@
         2.31461,
         48.87128
       ],
-      "details": "73 rue du Faubourg Saint-Honoré — Paris 8e\n\nMuriel PÉNICAUD\nAu temps du temps, itinérance japonaise\n1.10 — 8.1.2027",
+      "details": "73 rue du Faubourg Saint-Honoré — Paris 8e\n\nMuriel PÉNICAUD\nAu temps du temps, itinérance japonaise\n1.10 — 8.1.2027\n\nvernissage lundi 9.11 à 18h",
       "url": "https://photodays.paris/we-are_",
       "start": "2026-10-01",
-      "end": "2027-01-08"
+      "end": "2027-01-08",
+      "image": {
+        "file": "D58.jpg",
+        "credit": "© Muriel PÉNICAUD",
+        "caption": "Illumination, Hokkaidō, Japon 2025",
+        "alt": "Exhibition image: Illumination, Hokkaidō, Japon 2025",
+        "altZh": "展览图片：Illumination, Hokkaidō, Japon 2025"
+      }
     },
     {
       "id": "D59",
@@ -756,7 +1051,14 @@
       "details": "place Salvador Allende — Créteil (94)\n\nVéronique ELLENA\nMains d'œuvre\n19.9 — 19.12.2026\n\nrencontre samedi 14.11 à 15h\naccès libre, mardi-samedi 11h-18h",
       "url": "https://photodays.paris/MAC-Creteil-Veronique-ELLENA",
       "start": "2026-09-19",
-      "end": "2026-12-19"
+      "end": "2026-12-19",
+      "image": {
+        "file": "D60.jpg",
+        "credit": "© Véronique ELLENA, courtesy Hangar Gallery Bruxelles",
+        "caption": "Aile de fer, 2025-2026",
+        "alt": "Exhibition image: Aile de fer, 2025-2026",
+        "altZh": "展览图片：Aile de fer, 2025-2026"
+      }
     },
     {
       "id": "D61",
@@ -782,7 +1084,14 @@
       "details": "Fondation des Artistes, 11 rue Berryer — Paris 8e\n\nAlexandra CATIERE, SALVE\nLauréate de l’appel Balzac & le vin\n4.11 — 28.11.2026\n\nvernissage mercredi 4.11 17h-19h\naccès uniquement sur réservation",
       "url": "https://photodays.paris/Rotonde-Balzac-Alexandra-CATIERE",
       "start": "2026-11-04",
-      "end": "2026-11-28"
+      "end": "2026-11-28",
+      "image": {
+        "file": "D62.jpg",
+        "credit": "© Alexandra CATIERE, courtesy Photo Days",
+        "caption": "Salve, 2026",
+        "alt": "Exhibition image: Salve, 2026",
+        "altZh": "展览图片：Salve, 2026"
+      }
     },
     {
       "id": "D63",
@@ -795,7 +1104,14 @@
       "details": "Aile Soufflot, 12 place du Panthéon — Paris 5e\n\nCatherine BALET\nLooking for the Masters\n2.11.2026 — 30.11.2026\n\nvernissage lundi 16.11 dès 18h\n\nlundi-samedi 10h-18h, accès gratuit avec pass d'entrée téléchargeable ici",
       "url": "https://photodays.paris/Sorbonne-Artgallery-Catherine-BALET",
       "start": "2026-11-02",
-      "end": "2026-11-30"
+      "end": "2026-11-30",
+      "image": {
+        "file": "D63.jpg",
+        "credit": "© Catherine BALET",
+        "caption": "Looking for the Masters in Ricardo’s Golden Shoes, Hommage à Eadweard MUYBRIDGE, « Homme montant des escaliers, 1887 », 2014",
+        "alt": "Exhibition image: Looking for the Masters in Ricardo’s Golden Shoes, Hommage à Eadweard MUYBRIDGE, « Homme montant des escaliers, 1887 », 2014",
+        "altZh": "展览图片：Looking for the Masters in Ricardo’s Golden Shoes, Hommage à Eadweard MUYBRIDGE, « Homme montant des escaliers, 1887 », 2014"
+      }
     },
     {
       "id": "D64",
@@ -834,7 +1150,13 @@
       "details": "5 rue Jacques Callot — Paris 6e\n\nMarc RIBOUD\nLa géométrie devient poésie, vie, émotion\n5.11 — 16.11.2026\n\nlundi-samedi 11h-13h puis 14h-19h, et dimanche sur rdv",
       "url": "https://photodays.paris/arcturus",
       "start": "2026-11-05",
-      "end": "2026-11-16"
+      "end": "2026-11-16",
+      "image": {
+        "file": "D66.jpg",
+        "credit": "© Marc RIBOUD, courtesy Galerie Arcturus",
+        "alt": "Exhibition image (Marc RIBOUD, courtesy Galerie Arcturus)",
+        "altZh": "展览图片（Marc RIBOUD, courtesy Galerie Arcturus）"
+      }
     },
     {
       "id": "D67",
@@ -847,7 +1169,14 @@
       "details": "5 rue de Médicis — Paris 6e\n\nVictor Vladimir LAZAREFF\nFILL THE VOID\n10.11 — 15.11.2026\n\nmardi-samedi 10h-21h",
       "url": "https://photodays.paris/Au-Medicis",
       "start": "2026-11-10",
-      "end": "2026-11-15"
+      "end": "2026-11-15",
+      "image": {
+        "file": "D67.jpg",
+        "credit": "© Victor Vladimir LAZAREFF, courtesy de l'artiste",
+        "caption": "Alegra, 2024",
+        "alt": "Exhibition image: Alegra, 2024",
+        "altZh": "展览图片：Alegra, 2024"
+      }
     },
     {
       "id": "D68",
@@ -860,7 +1189,14 @@
       "details": "31 rue Jacob — Paris 6e\n\nAnne VALVERDE\nKOMOREBI PROJECT\n3.11 — 28.11.2026\n\nmardi-samedi 11h-19h / et sur rdv",
       "url": "https://photodays.paris/Galerie-Bruno-Moinard-Editions",
       "start": "2026-11-03",
-      "end": "2026-11-28"
+      "end": "2026-11-28",
+      "image": {
+        "file": "D68.jpg",
+        "credit": "© Anne VALVERDE, courtesy de l'artiste",
+        "caption": "Matsu Kyoto 松京都, 2025",
+        "alt": "Exhibition image: Matsu Kyoto 松京都, 2025",
+        "altZh": "展览图片：Matsu Kyoto 松京都, 2025"
+      }
     },
     {
       "id": "D69",
@@ -886,7 +1222,14 @@
       "details": "16 boulevard des Invalides — Paris 7e\n\nCollection Claude Berri\nCe qui restera de moi\n11.11 — 27.11.2026\n\nlundi-vendredi 10h-19h",
       "url": "https://photodays.paris/DARMO",
       "start": "2026-11-11",
-      "end": "2026-11-27"
+      "end": "2026-11-27",
+      "image": {
+        "file": "D70.jpg",
+        "credit": "© Patrick FAIGENBAUM, courtesy de l'artiste",
+        "caption": "Famille Ricasoli, Florence, 1984",
+        "alt": "Exhibition image: Famille Ricasoli, Florence, 1984",
+        "altZh": "展览图片：Famille Ricasoli, Florence, 1984"
+      }
     },
     {
       "id": "D71",
@@ -923,7 +1266,14 @@
         48.865925
       ],
       "details": "24bis rue Saint Roch — Paris 1er\n\nPX3 & State of the World Price\n11.11 — 13.11.2026\n\nPhoto-Art\n18.11 — 28.11.2026\n\nmardi-samedi 11h-20h",
-      "url": "https://photodays.paris/24b"
+      "url": "https://photodays.paris/24b",
+      "image": {
+        "file": "D73.jpg",
+        "credit": "© Elena DROZDOVA, may 2025",
+        "caption": "P×3 2026 Fine Arts 1st Prize winner",
+        "alt": "Exhibition image: P×3 2026 Fine Arts 1st Prize winner",
+        "altZh": "展览图片：P×3 2026 Fine Arts 1st Prize winner"
+      }
     },
     {
       "id": "D74",
@@ -936,7 +1286,14 @@
       "details": "au sein de La Fab., place Jean-Michel Basquiat — Paris 13e\n\nGerard MALANGA\n4.11 — 10.1.2027\n\nmercredi-samedi 11h-19h / dimanche 14h-19h",
       "url": "https://photodays.paris/galerie-du-jour",
       "start": "2026-11-04",
-      "end": "2027-01-10"
+      "end": "2027-01-10",
+      "image": {
+        "file": "D74.jpg",
+        "credit": "© Gerard MALANGA, courtesy galerie du jour agnès b.",
+        "caption": "Edie Sedgwick Photomaton Portrait, 1966",
+        "alt": "Exhibition image: Edie Sedgwick Photomaton Portrait, 1966",
+        "altZh": "展览图片：Edie Sedgwick Photomaton Portrait, 1966"
+      }
     },
     {
       "id": "D75",
@@ -975,7 +1332,14 @@
       "details": "14 rue des Jardins Saint-Paul — Paris 4e\n\nMaciej MARKOWICZ\nHuit Secondes\n10.11 — 16.1.2027\n\nmercredi-vendredi 14h-19h / samedi 12h-19h et sur rdv",
       "url": "https://photodays.paris/Galerie-xii",
       "start": "2026-11-10",
-      "end": "2027-01-16"
+      "end": "2027-01-16",
+      "image": {
+        "file": "D77.jpg",
+        "credit": "© Maciej MARKOWICZ, courtesy Galerie XII",
+        "caption": "Motiongraph #418, West view from the bridge near Gutschau, River Lech, Gutschau, Reutte, Tyrol, Austria",
+        "alt": "Exhibition image: Motiongraph #418, West view from the bridge near Gutschau, River Lech, Gutschau, Reutte, Tyrol, Austria",
+        "altZh": "展览图片：Motiongraph #418, West view from the bridge near Gutschau, River Lech, Gutschau, Reutte, Tyrol, Austria"
+      }
     },
     {
       "id": "D78",
@@ -988,7 +1352,14 @@
       "details": "62 avenue Jean-Baptiste Clément — Boulogne-Billancourt (92)\n\nChangnam LEE\nLe Temps de la mer\n29.10 — 14.11.2026\n\nmardi-samedi 10h-18h, et sur rdv",
       "url": "https://photodays.paris/Initial-LABO",
       "start": "2026-10-29",
-      "end": "2026-11-14"
+      "end": "2026-11-14",
+      "image": {
+        "file": "D78.jpg",
+        "credit": "© Changnam LEE",
+        "caption": "Paysage après le passage V",
+        "alt": "Exhibition image: Paysage après le passage V",
+        "altZh": "展览图片：Paysage après le passage V"
+      }
     },
     {
       "id": "D79",
@@ -1014,7 +1385,14 @@
       "details": "8 rue Sainte-Anastase — Paris 3e\n\nPierre JAHAN\na retrospective\n24.10 — 23.12.2026\n\nmardi-samedi 11h-19h",
       "url": "https://photodays.paris/Jean-Francois-Cazeau",
       "start": "2026-10-24",
-      "end": "2026-12-23"
+      "end": "2026-12-23",
+      "image": {
+        "file": "D80.jpg",
+        "credit": "© Succession Pierre Jahan, courtesy Galerie Jean-François Cazeau",
+        "caption": "Pierre JAHAN, Nu à l'épi, ca. 1945, Tirage argentique, photogramme",
+        "alt": "Exhibition image: Pierre JAHAN, Nu à l'épi, ca. 1945, Tirage argentique, photogramme",
+        "altZh": "展览图片：Pierre JAHAN, Nu à l'épi, ca. 1945, Tirage argentique, photogramme"
+      }
     },
     {
       "id": "D81",
@@ -1027,7 +1405,14 @@
       "details": "14 rue des Taillandiers — Paris 11e\n\nStéphane COUTELLE\nGenZ\n6.11 — 8.11.2026\n\nvendredi, 18h-22h / samedi-dimanche 11h-19h",
       "url": "https://photodays.paris/Jorge-Alyskewycz",
       "start": "2026-11-06",
-      "end": "2026-11-08"
+      "end": "2026-11-08",
+      "image": {
+        "file": "D81.jpg",
+        "credit": "© Stéphane COUTELLE",
+        "caption": "série GenZ",
+        "alt": "Exhibition image: série GenZ",
+        "altZh": "展览图片：série GenZ"
+      }
     },
     {
       "id": "D82",
@@ -1053,7 +1438,14 @@
       "details": "95 rue de Seine — Paris 6e\n\nElizabeth LENNARD\nL'oiseau rare\n1.10 — 12.12.2026\n\nmardi-samedi 14h30-19h / sur rdv le matin",
       "url": "https://photodays.paris/Galerie-Pixi",
       "start": "2026-10-01",
-      "end": "2026-12-12"
+      "end": "2026-12-12",
+      "image": {
+        "file": "D83.jpg",
+        "credit": "© Elizabeth LENNARD",
+        "caption": "Andy Warhol and the rabbit, 1979, Épreuve gelatino-argentique rehaussée à la peinture à l'huile",
+        "alt": "Exhibition image: Andy Warhol and the rabbit, 1979, Épreuve gelatino-argentique rehaussée à la peinture à l'huile",
+        "altZh": "展览图片：Andy Warhol and the rabbit, 1979, Épreuve gelatino-argentique rehaussée à la peinture à l'huile"
+      }
     },
     {
       "id": "D84",
@@ -1105,7 +1497,13 @@
       "details": "8 square Sainte-Croix de la Bretonnerie — Paris 4e\n\nSOLA. A declaration of natural feminine beauty.\n10.11 — 17.11.2026\n\ntous les jours 12h-20h",
       "url": "https://photodays.paris/SOLA",
       "start": "2026-11-10",
-      "end": "2026-11-17"
+      "end": "2026-11-17",
+      "image": {
+        "file": "D87.jpg",
+        "credit": "© Julien Sunye",
+        "alt": "Exhibition image (Julien Sunye)",
+        "altZh": "展览图片（Julien Sunye）"
+      }
     },
     {
       "id": "D88",

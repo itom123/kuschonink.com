@@ -188,8 +188,8 @@
     {
       "id": "festival",
       "source": "NOS EXPOSITIONS",
-      "name": "Photo Days exhibitions",
-      "nameZh": "Photo Days 展览"
+      "name": "Festival exhibitions",
+      "nameZh": "摄影节展览"
     }
   ],
   "labels": {
@@ -203,8 +203,8 @@
     "byZh": "艺术家",
     "listing": "Official map entry",
     "listingZh": "官方地图条目",
-    "listings": "Official Photo Days map",
-    "listingsZh": "Photo Days 官方地图"
+    "listings": "Other listings",
+    "listingsZh": "其他条目"
   },
   "texts": {
     "about": {
@@ -363,8 +363,8 @@
       ]
     },
     "listings": {
-      "heading": "All {listings} entries in the official Photo Days map",
-      "headingZh": "Photo Days 官方地图全部 {listings} 个条目",
+      "heading": "Other listings: all {listings} entries of the Photo Days map",
+      "headingZh": "其他条目：Photo Days 地图全部 {listings} 个条目",
       "paras": [
         {
           "text": "Includes suburban venues, appointment-only visits, fairs and events after 15 November. These remain in the directory for completeness, not in the recommendation heat. Venue-level records may contain several exhibitions. Same-building programmes are kept separate. Individual festival pages were retrieved; detailed corrections below prioritise venue websites where checked.",
@@ -373,6 +373,10 @@
         {
           "text": "The official map list keeps the complete point inventory, including records outside 8–15 November. It does not raise all entries to recommended status. For the selected venues, use the corrected information in their own entries rather than an inconsistent map caption. Other captions remain reported festival facts; they have not all been independently verified against a venue website.",
           "textZh": "官方地图列表保留完整的点位清单，包括11月8日至15日以外的记录，但这并不意味着所有条目都被推荐。对于精选场馆，请以其各自条目中的更正信息为准，而不是前后不一的地图说明。其他说明仍是摄影节公布的信息，并未全部与场馆网站逐一核对。"
+        },
+        {
+          "text": "Where a map caption left out the address, dates or opening hours, the record has been completed from its own festival page (checked 7 November), and each record shows the picture that page publishes, with its credit. Records still without a building number are by appointment: the address comes with the booking.",
+          "textZh": "地图说明缺少地址、日期或开放时间的条目，已按该条目自己的摄影节页面补全（11月7日核对）；每个条目都显示该页面发布的图片及其署名。仍然没有门牌号的条目需要预约，预约时会告知地址。"
         }
       ]
     },

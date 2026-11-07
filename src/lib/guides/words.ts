@@ -5,6 +5,8 @@
 import type { Bi } from './types';
 
 const b = (en: string, zh: string): Bi => ({ en, zh });
+/** A guide's noun inside a sentence: "Other listings" → "other listings". With another capital in it ("MEP", "Photo Days map") it stays as written. */
+export const lowerFirst = (s: string) => (/^\p{Lu}[^\p{Lu}]*$/u.test(s) ? s[0].toLowerCase() + s.slice(1) : s);
 
 export const W = {
   program: b('Field Guide', '导览'),
@@ -32,7 +34,7 @@ export const W = {
   findPh: b('Name, street or keyword', '名称、街道或关键词'),
   findBtn: b('Find', '查找'),
   clear: b('Clear', '清除'),
-  showListings: b('Show', '显示'),
+  showListings: b('Show all', '显示全部'),
   // Panes.
   close: b('Close', '关闭'),
   ref: b('Ref', '编号'),
@@ -105,7 +107,7 @@ export const W = {
     b(`${open} of ${total} ${items.en.toLowerCase()} open - ${day.en}`, `${day.zh || day.en}：${total} 个${items.zh || items.en}中 ${open} 个开放`),
   countAll: (total: number, items: Bi) => b(`${total} ${items.en.toLowerCase()}`, `${total} 个${items.zh || items.en}`),
   matches: (n: number, q: string) => b(`${n} match "${q}"`, `${n} 个匹配“${q}”`),
-  plusListings: (n: number, listings: Bi) => b(` + ${n} ${listings.en.toLowerCase()}`, ` + ${n} 个${listings.zh || listings.en}`),
+  plusListings: (n: number, listings: Bi) => b(` + ${n} ${lowerFirst(listings.en)}`, ` + ${n} 个${listings.zh || listings.en}`),
   noMatch: b('Nothing matches. Try another day, or clear Find.', '没有匹配的地点。换一天试试，或清除查找。'),
   // Today note.
   before: (start: Bi, end: Bi, tz: Bi) => b(`This guide covers ${start.en} to ${end.en}. Days and opening times use ${tz.en || 'local time'}.`, `本导览涵盖 ${start.zh} 至 ${end.zh}。日期和开放时间均按${tz.zh || tz.en || '当地时间'}计算。`),

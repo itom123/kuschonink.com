@@ -674,7 +674,7 @@ await expectView('member cookie → members-only: the member view', get('/guides
   check('tileRange: the box\'s corners, both ends included', r18.x0 === tileOf(2.07, 49.05, 18).x && r18.x1 === tileOf(2.8, 48.63, 18).x && r18.y0 === tileOf(2.07, 49.05, 18).y && r18.y1 === tileOf(2.8, 48.63, 18).y && nd.x > r18.x0 && nd.x < r18.x1 && nd.y > r18.y0 && nd.y < r18.y1, r18);
   check('tileRange: never beyond the world', tileRange([-180, -85, 180, 85], 15).x1 === 2 ** 15 - 1 && tileRange([-180, -85, 180, 85], 15).x0 === 0);
   check('tileBounds: a guide\'s box, or null', tileBounds(ACCESS, 'city-one')?.join() === BOX.join() && tileBounds(ACCESS, 'open-day') === null && tileBounds(ACCESS, 'nowhere') === null && tileBounds({ ...ACCESS, tiles: { 'city-one': [2.8, 48.63, 2.07, 49.05] } }, 'city-one') === null && tileBounds({ ...ACCESS, tiles: { 'city-one': [2.07, 48.63, 2.8] as unknown as [number, number, number, number] } }, 'city-one') === null && tileBounds({ ...ACCESS, tiles: undefined }, 'city-one') === null);
-  check('TILE_Z is 14 to 19', TILE_Z.min === 14 && TILE_Z.max === 19);
+  check('TILE_Z is 12 to 19', TILE_Z.min === 12 && TILE_Z.max === 19);
   // The browser is told the same range (view.ts repeats it: the Worker may not import that file, but a test may).
   const { TILE_Z: browserZ } = await import('../src/lib/guides/view.ts');
   check('the Worker and the payload (view.ts) agree on the zoom range', browserZ.min === TILE_Z.min && browserZ.max === TILE_Z.max, browserZ);
@@ -738,14 +738,14 @@ await expectView('member cookie → members-only: the member view', get('/guides
   // Corner tiles: the first and last of the range are in, their neighbours out.
   const corners = await Promise.all([path(18, r18.x0, r18.y0), path(18, r18.x1, r18.y1), path(18, r18.x0 - 1, r18.y0), path(18, r18.x1 + 1, r18.y1), path(18, r18.x0, r18.y0 - 1), path(18, r18.x1, r18.y1 + 1)].map((p) => run(get(p, visitorCookie))));
   check('tile bounds: the box\'s corner tiles → 200; one tile beyond on any side → 404', corners.map((r) => r.status).join() === '200,200,404,404,404,404', corners.map((r) => r.status));
-  for (const z of [14, 15, 16, 17, 19]) {
+  for (const z of [12, 13, 14, 15, 16, 17, 19]) {
     const t = tileOf(2.3522, 48.8566, z);
     const r = await run(get(path(z, t.x, t.y), visitorCookie));
     check(`z${z} inside → 200`, r.status === 200, r.status);
   }
   upstream = [];
-  const outZ = await Promise.all([13, 20, 0, 99].map((z) => { const t = tileOf(2.3522, 48.8566, z); return run(get(path(z, t.x, t.y), visitorCookie)); }));
-  check('z13, z20, z0, z99 → 404', outZ.every((r) => r.status === 404), outZ.map((r) => r.status));
+  const outZ = await Promise.all([11, 20, 0, 99].map((z) => { const t = tileOf(2.3522, 48.8566, z); return run(get(path(z, t.x, t.y), visitorCookie)); }));
+  check('z11, z20, z0, z99 → 404', outZ.every((r) => r.status === 404), outZ.map((r) => r.status));
   const t17 = tileOf(2.3522, 48.8566, 17);
   const malformed = [path('7', 1, 1), path('018', nd.x, nd.y), path(18, `0${nd.x}`, nd.y), path(18, nd.x, `${nd.y}0000000`), path(18, '1.5', nd.y), path(18, '-1', nd.y), path(18, 'x', 'y'), path(18, nd.x, `${nd.y}.PNG`.replace('.png', '')), `${inside}/`, `/guides/city-one/tiles/18/${nd.x}.png`, `/guides/city-one/tiles/18/${nd.x}/${nd.y}.jpg`, `/guides/city-one/tiles/18/${nd.x}/${nd.y}.png?LAYER=other`, `/guides/city-one/tiles/18/${nd.x}/${nd.y}.png%2F..%2F..`, `/guides/city-one/tiles/18/${nd.x}/${nd.y}.png;TILEMATRIXSET=x`];
   const mal = await Promise.all(malformed.map((p) => run(get(p, visitorCookie))));
@@ -812,12 +812,12 @@ await expectView('member cookie → members-only: the member view', get('/guides
     run(get(inside, undefined, ip), deps({ allowTile: budget(false) })),
     run(get(inside, expired, ip), deps({ allowTile: budget(false) })),
     run(get(path(18, nd.x, nd.y, 'members-only'), visitorCookie, ip), deps({ allowTile: budget(false) })),
-    run(get(path(13, nd.x, nd.y), visitorCookie, ip), deps({ allowTile: budget(false) })),
+    run(get(path(11, nd.x, nd.y), visitorCookie, ip), deps({ allowTile: budget(false) })),
     run(get(path(18, r18.x1 + 1, r18.y1), visitorCookie, ip), deps({ allowTile: budget(false) })),
     run(get(path(17, t17.x, t17.y, 'open-day'), visitorCookie, ip), deps({ allowTile: budget(false) })),
     run(get(inside, visitorCookie, ip, 'POST'), deps({ allowTile: budget(false) })),
   ]);
-  check('no cookie, expired cookie, wrong audience, z13, outside the box, no bounds, POST → 403/403/403/404/404/404/405, budget never asked', early.map((r) => r.status).join() === '403,403,403,404,404,404,405' && asks.length === 0, { s: early.map((r) => r.status), asks });
+  check('no cookie, expired cookie, wrong audience, z11, outside the box, no bounds, POST → 403/403/403/404/404/404/405, budget never asked', early.map((r) => r.status).join() === '403,403,403,404,404,404,405' && asks.length === 0, { s: early.map((r) => r.status), asks });
   // No binding: the deps carry no allowTile (index.ts leaves it out), and every tile is allowed.
   upstream = [];
   const open = fresh();

@@ -614,7 +614,16 @@
       "coordinates": [
         2.313266,
         48.866211
-      ]
+      ],
+      "image": {
+        "file": "A13.jpg",
+        "credit": "Joseph Szabo. Courtesy of the artist & Jackson Fine Art",
+        "caption": "Night Owls, 1971",
+        "alt": "A black-and-white night photograph of two teenage boys sprawled on a pavement, one shoe kicked off, in front of a shop sign.",
+        "altZh": "一张黑白夜景照片：两个少年躺在人行道上，其中一人踢掉了一只鞋，背后是一块店铺招牌。",
+        "source": "Published by Paris Photo",
+        "sourceZh": "由 Paris Photo 发布"
+      }
     },
     {
       "id": "A14",
@@ -653,7 +662,15 @@
       "coordinates": [
         2.321836,
         48.86172
-      ]
+      ],
+      "image": {
+        "file": "A14.jpg",
+        "credit": "Photo © Olivier Kervern",
+        "alt": "A black-and-white photograph of three women standing on a rocky shore below wooded hills, one under an umbrella.",
+        "altZh": "一张黑白照片：三位女子站在树木覆盖的山丘下的岩岸上，其中一人撑着伞。",
+        "source": "From the Polycopies 2026 poster",
+        "sourceZh": "取自 Polycopies 2026 海报"
+      }
     },
     {
       "id": "A15",
@@ -695,7 +712,16 @@
       "coordinates": [
         2.3424,
         48.862946
-      ]
+      ],
+      "image": {
+        "file": "A15.jpg",
+        "credit": "© Tadao Ando Architect & Associates, Niney et Marca Architectes, agence Pierre-Antoine Gatier. Photo: Florent Michel",
+        "caption": "View of the exhibition “Remember Me”, Bourse de Commerce – Pinault Collection, Paris, 2026.",
+        "alt": "A gallery view: a blurred visitor walks past small framed seascapes hung in front of a huge black-and-white photograph of the sea.",
+        "altZh": "展厅一景：一位模糊的观众走过几幅小尺寸的海景照片，它们挂在一张巨幅黑白海面照片前。",
+        "source": "Published by the Pinault Collection",
+        "sourceZh": "由 Pinault Collection 发布"
+      }
     },
     {
       "id": "B1",
@@ -1406,7 +1432,16 @@
       "coordinates": [
         2.322309,
         48.869486
-      ]
+      ],
+      "image": {
+        "file": "B16.jpg",
+        "credit": "© Harry Gruyaert / Magnum Photos. Courtesy Gallery FIFTY ONE",
+        "caption": "France, Paris, 1985",
+        "alt": "A colour street photograph of a woman in a flowered dress walking past empty café tables and orange chairs, in deep shadow and hard sunlight.",
+        "altZh": "一张彩色街头照片：一位穿碎花裙的女子走过空着的咖啡桌和橙色椅子，画面里是浓重的阴影和强烈的阳光。",
+        "source": "Published by Leica Camera",
+        "sourceZh": "由 Leica Camera 发布"
+      }
     },
     {
       "id": "B17",
@@ -1445,7 +1480,16 @@
       "coordinates": [
         2.336415,
         48.857202
-      ]
+      ],
+      "image": {
+        "file": "B17.jpg",
+        "credit": "© Jean Marquis. Courtesy Galerie Roger-Viollet",
+        "caption": "Dockers in Liverpool. England, 1955.",
+        "alt": "A black-and-white photograph of two dockers in flat caps sitting on a chain railing on a quay, watching tugboats steer a liner through a misty harbour.",
+        "altZh": "一张黑白照片：两名戴鸭舌帽的码头工人坐在码头的铁链栏杆上，看着拖船引着一艘邮轮驶过雾中的港口。",
+        "source": "Published by Galerie Roger-Viollet",
+        "sourceZh": "由 Galerie Roger-Viollet 发布"
+      }
     },
     {
       "id": "B18",
@@ -1482,7 +1526,16 @@
       "coordinates": [
         2.354076,
         48.862034
-      ]
+      ],
+      "image": {
+        "file": "B18.jpg",
+        "credit": "Photo © Laurent Edeline",
+        "caption": "Pierre et Gilles, rose pour toi, rose pour moi, TEMPLON Paris, 2026.",
+        "alt": "A gallery view of three large, ornately framed, brightly coloured photo-paintings by Pierre et Gilles on white walls.",
+        "altZh": "展厅一景：白墙上挂着三幅 Pierre et Gilles 的大幅手绘照片，色彩鲜艳，配有华丽的画框。",
+        "source": "Published by Templon",
+        "sourceZh": "由 Templon 发布"
+      }
     },
     {
       "id": "B19",
@@ -1557,7 +1610,16 @@
       "coordinates": [
         2.365926,
         48.862781
-      ]
+      ],
+      "image": {
+        "file": "B20.jpg",
+        "credit": "© Julie Joubert. Courtesy Galerie Les Filles du Calvaire",
+        "caption": "Patria Nostra (Untitled), 2023",
+        "alt": "Seen from above, a young soldier in camouflage uniform swims through the clear blue water of a pool.",
+        "altZh": "俯视的画面：一名身穿迷彩服的年轻士兵在清澈的蓝色泳池里游泳。",
+        "source": "Published by Galerie Les Filles du Calvaire",
+        "sourceZh": "由 Galerie Les Filles du Calvaire 发布"
+      }
     },
     {
       "id": "B21",
@@ -1573,11 +1635,21 @@
       "why": "Five photographers who build environmental limits into how they work: plant-based developers, home-made cameras, anthotypes, polar ice. A direct way into the material questions this guide keeps asking.",
       "whyZh": "五位摄影师把环境的限制纳入创作方法：植物显影液、自制相机、花汁印相、极地冰。这是进入本导览反复提出的材质问题的一条直接途径。",
       "address": "Atelier 13, 13 Rue de Sévigné, 75004 Paris",
+      "hours": "Mon 9 Nov 15:00–20:00; Tue 10 – Sat 14 Nov 10:00–20:00",
+      "hoursZh": "11月9日（周一）15:00–20:00；11月10日（周二）至14日（周六）10:00–20:00",
       "start": "2026-11-09",
       "end": "2026-11-14",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
       "minutes": 30,
-      "note": "FUTURES gives both 8–14 and 9–15 Nov; this guide uses only 9–14 Nov. Opening hours aren’t published, so go during the talks on 12–14 Nov.",
-      "noteZh": "FUTURES 同时写了11月8日至14日和11月9日至15日；本导览只采用11月9日至14日。开放时间没有公布，最好在11月12日至14日有活动时前往。",
+      "note": "FUTURES gives both 8–14 and 9–15 Nov; this guide uses only 9–14 Nov. The hours are printed only in the programme picture on the FUTURES page.",
+      "noteZh": "FUTURES 同时写了11月8日至14日和11月9日至15日；本导览只采用11月9日至14日。开放时间只印在 FUTURES 网页上的节目单图片里。",
       "sourceUrl": "https://www.futures-photography.com/events/futures-presents-the-ecology-of-movement",
       "links": [
         "https://dergreif.org/event/der-greif-issue-19-official-launch-events"
@@ -1585,7 +1657,15 @@
       "coordinates": [
         2.362406,
         48.85627
-      ]
+      ],
+      "image": {
+        "file": "B21.jpg",
+        "credit": "© Benedetta Casagrande. Courtesy FUTURES",
+        "alt": "A black-and-white print, clipped to a wall, of a blackbird among leaves with a large white feather laid over it.",
+        "altZh": "一张用夹子固定在墙上的黑白照片：树叶间的一只乌鸫，上面覆着一根大大的白色羽毛。",
+        "source": "Published by FUTURES",
+        "sourceZh": "由 FUTURES 发布"
+      }
     },
     {
       "id": "B22",
@@ -1634,7 +1714,15 @@
       "coordinates": [
         2.334369,
         48.854264
-      ]
+      ],
+      "image": {
+        "file": "B22.jpg",
+        "credit": "© Rafal Milach",
+        "alt": "A raised hand holds a smoke flare pouring out a thick yellow cloud flecked with confetti against a dark night.",
+        "altZh": "一只举起的手握着烟火，喷出夹杂着彩纸屑的浓浓黄烟，背景是漆黑的夜空。",
+        "source": "Published by delpire & co",
+        "sourceZh": "由 delpire & co 发布"
+      }
     },
     {
       "id": "B23",
@@ -1681,7 +1769,16 @@
       "coordinates": [
         2.335859,
         48.861033
-      ]
+      ],
+      "image": {
+        "file": "B23.jpg",
+        "credit": "© 2020 Musée du Louvre / Anne Chauvet",
+        "caption": "René Dagron. Grand Ballon à vapeur d’Henri Giffard, 1878. Epreuve argentique",
+        "alt": "A sepia photograph of a crowd of men in top hats beneath the netted underside of a huge balloon, in front of the Louvre.",
+        "altZh": "一张深褐色调的老照片：一群戴高礼帽的男人站在一只巨大气球的网兜下方，背景是卢浮宫。",
+        "source": "Published by the Musée du Louvre",
+        "sourceZh": "由卢浮宫发布"
+      }
     },
     {
       "id": "B24",
@@ -1720,7 +1817,15 @@
       "coordinates": [
         2.317065,
         48.90381
-      ]
+      ],
+      "image": {
+        "file": "B24.jpg",
+        "credit": "© Gretta Sarfaty",
+        "alt": "A black-and-white print of four close-up frames of a wide-open mouth, as if screaming, arranged in a grid.",
+        "altZh": "一张黑白照片：四格特写排成方阵，都是张得大大的嘴，像在尖叫。",
+        "source": "Published by the Fondation Francès",
+        "sourceZh": "由 Fondation Francès 发布"
+      }
     },
     {
       "id": "C1",
@@ -1851,7 +1956,16 @@
       "coordinates": [
         2.328887,
         48.867956
-      ]
+      ],
+      "image": {
+        "file": "C3.jpg",
+        "credit": "© Cyrielle Dagneaud",
+        "caption": "Efflorescence Intemporelle",
+        "alt": "A soft, layered close-up of pale pink and white flowers against a dark patterned background.",
+        "altZh": "一张柔和、层次丰富的特写：深色花纹背景前的淡粉色和白色花朵。",
+        "source": "Published by GOBELINS Paris",
+        "sourceZh": "由 GOBELINS Paris 发布"
+      }
     },
     {
       "id": "C4",
@@ -1887,7 +2001,16 @@
       "coordinates": [
         2.275988,
         48.86737
-      ]
+      ],
+      "image": {
+        "file": "C4.jpg",
+        "credit": "Photo: 99 Cameras Museum",
+        "caption": "Leica I",
+        "alt": "A black 1925 Leica I camera with a silver lens, on a white background.",
+        "altZh": "一台黑色的 1925 年 Leica I 相机，配银色镜头，白色背景。",
+        "source": "Published by the 99 Cameras Museum",
+        "sourceZh": "由 99 Cameras Museum 发布"
+      }
     },
     {
       "id": "C5",
@@ -1919,7 +2042,15 @@
       "coordinates": [
         2.366163,
         48.862208
-      ]
+      ],
+      "image": {
+        "file": "C5.jpg",
+        "credit": "© Min Dai. Courtesy ECAL",
+        "alt": "A glossy orange-red sculpted form shaped like a pair of open lips, close up against a pale background.",
+        "altZh": "一件光亮的橙红色雕塑，形状像一双张开的嘴唇，浅色背景下的特写。",
+        "source": "Published by ECAL",
+        "sourceZh": "由 ECAL 发布"
+      }
     },
     {
       "id": "C6",
@@ -1950,7 +2081,16 @@
       "coordinates": [
         2.371811,
         48.863986
-      ]
+      ],
+      "image": {
+        "file": "C6.jpg",
+        "credit": "© Jean-Vincent Simonet. Courtesy Loose Joints",
+        "caption": "Jean-Vincent Simonet, Cyan Years, Loose Joints",
+        "alt": "An open copy of the book Cyan Years, its pages showing blue-and-green, ink-stained photographs of a printing works.",
+        "altZh": "摊开的《Cyan Years》一书，书页上是一家印刷厂的蓝绿色、带墨渍的照片。",
+        "source": "Published by Loose Joints",
+        "sourceZh": "由 Loose Joints 发布"
+      }
     },
     {
       "id": "C7",
@@ -1987,7 +2127,16 @@
       "coordinates": [
         2.337382,
         48.856079
-      ]
+      ],
+      "image": {
+        "file": "C7.jpg",
+        "credit": "© Maximiliano Tineo",
+        "caption": "El Rey Blanco",
+        "alt": "A heap of broken grey rock lit by a shaft of light, with dust hanging in the air.",
+        "altZh": "一堆碎裂的灰色岩石被一束光照亮，空气中悬浮着灰尘。",
+        "source": "Published by PhotoSaintGermain",
+        "sourceZh": "由 PhotoSaintGermain 发布"
+      }
     },
     {
       "id": "C8",
@@ -2037,7 +2186,16 @@
       "coordinates": [
         2.339672,
         48.845632
-      ]
+      ],
+      "image": {
+        "file": "C8.jpg",
+        "credit": "© Laure Winants",
+        "caption": "Time capsule, polarisation 1",
+        "alt": "A square slab of crystallised material glowing turquoise against black, its edges crusted with rainbow-coloured crystals.",
+        "altZh": "一块方形的结晶体在黑色背景前泛着青绿色的光，边缘结满彩虹色的晶体。",
+        "source": "Published by PhotoSaintGermain",
+        "sourceZh": "由 PhotoSaintGermain 发布"
+      }
     },
     {
       "id": "C9",
@@ -2073,7 +2231,16 @@
       "coordinates": [
         2.336801,
         48.852796
-      ]
+      ],
+      "image": {
+        "file": "C9.jpg",
+        "credit": "© Tomasz Jan Kawecki. Courtesy PhotoSaintGermain",
+        "caption": "from “FLUX”",
+        "alt": "A wooden house and a bare tree stand in floodwater at night, lit by a flash against a black sky.",
+        "altZh": "夜里，一座木屋和一棵光秃秃的树立在洪水中，闪光灯照亮了它们，背景是漆黑的天空。",
+        "source": "Published by PhotoSaintGermain",
+        "sourceZh": "由 PhotoSaintGermain 发布"
+      }
     },
     {
       "id": "C10",
@@ -2111,7 +2278,16 @@
       "coordinates": [
         2.393824,
         48.889311
-      ]
+      ],
+      "image": {
+        "file": "C10.jpg",
+        "credit": "© Joachim Bertrand",
+        "caption": "Hassan Hajjaj, My Rock Stars, installation view",
+        "alt": "Two large, brightly coloured Hassan Hajjaj portraits framed with rows of food tins hang on a gallery wall.",
+        "altZh": "展墙上挂着两幅 Hassan Hajjaj 的大幅彩色肖像，画框上镶着一排排食品罐头。",
+        "source": "Published by the Philharmonie de Paris",
+        "sourceZh": "由巴黎爱乐音乐厅发布"
+      }
     },
     {
       "id": "C11",
@@ -2152,7 +2328,16 @@
       "coordinates": [
         2.332506,
         48.833981
-      ]
+      ],
+      "image": {
+        "file": "C11.jpg",
+        "credit": "Musée Carnavalet – Histoire de Paris. CC0 Paris Musées",
+        "caption": "Nadar, Façade n°12. Catacombes de Paris, 1862",
+        "alt": "A sepia photograph of a stone cross with a Latin inscription between two obelisks, in front of walls of stacked skulls and bones.",
+        "altZh": "一张深褐色调的照片：两座方尖碑之间立着刻有拉丁文的石十字架，背后是堆叠的头骨和骨头砌成的墙。",
+        "source": "Published by the Catacombes de Paris",
+        "sourceZh": "由巴黎地下墓穴发布"
+      }
     },
     {
       "id": "C12",
@@ -2210,7 +2395,16 @@
       "coordinates": [
         2.287343,
         48.862207
-      ]
+      ],
+      "image": {
+        "file": "C12.jpg",
+        "credit": "© Nikos Aliagas",
+        "caption": "Pas vus, pas pris",
+        "alt": "A black-and-white street photograph of an elderly woman in sunglasses and a beret gesturing at a café table, while an elderly man behind her takes a picture.",
+        "altZh": "一张黑白街头照片：一位戴墨镜和贝雷帽的老妇人在咖啡桌旁比划着，她身后一位老先生正在拍照。",
+        "source": "Published by the Musée de l’Homme",
+        "sourceZh": "由人类博物馆发布"
+      }
     }
   ]
 }
