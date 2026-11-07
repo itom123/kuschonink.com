@@ -25,14 +25,17 @@
 // NOTION_API for the stand-in).
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { notion, P, R } from '../../worker/notion.ts';
 import { isStatus, logProps, readSuggestion, S, STATUSES, type SuggestionRow } from '../../worker/suggestions.ts';
 import { buildItem, forbiddenWord, nextId } from '../../worker/publish.ts';
-import { checkGuide, type RawGuide } from '../../src/lib/guides/check.ts';
+import { checkGuide, GUIDE_FILES, type RawGuide } from '../../src/lib/guides/check.ts';
 import { distanceM, findMatches, type Known } from '../../src/lib/guides/dedupe.ts';
 import type { AccessFile, ItemRecord } from '../../src/lib/guides/types';
 
-const ROOT = process.cwd();
+// The repository's files (wrangler.jsonc, the guides) are next to this one, in
+// a checkout or in the routine's download (download.mjs), whatever the folder.
+const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const args = process.argv.slice(2);
 const cmd = args.shift() ?? '';
 const flag = (name: string) => {
@@ -69,11 +72,11 @@ async function row(id: string | undefined): Promise<SuggestionRow> {
   return readSuggestion(await n.getPage(id));
 }
 
-/** The guide's files, from this checkout. */
+/** The guide's files, from the checkout or download this tool is in. */
 function guide(slug: string): RawGuide {
   if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug) || !(slug in access.guides)) die(`no guide "${slug}"`);
   const raw: RawGuide = {};
-  for (const f of ['guide', 'items', 'places', 'events', 'routes', 'listings', 'map'] as const) {
+  for (const f of GUIDE_FILES) {
     try {
       raw[f] = JSON.parse(readFileSync(join(ROOT, 'src/content/guides', slug, `${f}.json`), 'utf8'));
     } catch { /* optional files */ }
