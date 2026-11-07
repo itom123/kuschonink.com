@@ -263,6 +263,7 @@ function adminDeps(env: Env): AdminDeps {
     fireRoutine: routineOf(env),
     publish: n && githubOf(env) ? () => runPublisher(env, 'manual') : null,
     gh: githubOf(env),
+    liveBuild: () => liveBuild(env),
     repoUrl: `https://github.com/${env.GITHUB_REPO || 'itom123/kuschonink.com'}`,
     now: () => Date.now(),
     log: (...args) => console.error(...args),

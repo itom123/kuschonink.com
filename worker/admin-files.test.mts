@@ -190,11 +190,27 @@ const b64 = (b: Uint8Array) => Buffer.from(b).toString('base64');
   s.tagline = `${s.tagline} (edited)`;
   await saveFile({ path: 'src/content/site.json', text: JSON.stringify(s, null, 2), base: r2.body.sha }, d);
   const h2 = g.head();
-  g.checks.set(h2, [{ name: 'Workers Builds: kuschonink', status: 'completed', conclusion: 'success', html_url: 'https://x/1', output: {} }]);
+  type Row = { sha: string; build: string; buildUrl: string; message: string };
+  const rowsOf = async () => (await recentChanges(d)).body.commits as Row[];
+  // The running site's build id, as the Worker reads it from its own files.
+  let live: string | null = h1.slice(0, 12);
+  d.liveBuild = async () => live;
   const c = await recentChanges(d);
-  const rows = c.body.commits as { sha: string; build: string; message: string }[];
-  check('changes: newest first, with each build\'s result', c.status === 200 && rows[0].sha === h2 && rows[0].build === 'live' && rows[0].message.startsWith('Admin: edit src/content/site.json'), rows.slice(0, 3));
-  check('…a commit with no build yet says so', rows.find((x) => x.sha === h1)?.build === 'none' || rows.length > 0, rows.map((x) => x.build));
+  let rows = c.body.commits as Row[];
+  check('changes: newest first; the site runs an older one, so the newest is not live yet', c.status === 200 && rows[0].sha === h2 && rows[0].build === 'waiting' && rows.find((x) => x.sha === h1)?.build === 'live' && rows[0].message.startsWith('Admin: edit src/content/site.json'), rows.slice(0, 3));
+  g.checks.set(h2, [{ name: 'Workers Builds: kuschonink', status: 'completed', conclusion: 'failure', html_url: 'https://x/2', output: {} }]);
+  rows = await rowsOf();
+  check('…its build failed (the check run, read without the token): Build failed, with its link', rows[0].build === 'failed' && rows[0].buildUrl === 'https://x/2', rows[0]);
+  live = h2.slice(0, 12);
+  rows = await rowsOf();
+  check('…the site runs the newest: every change is live', rows.length > 1 && rows.every((x) => x.build === 'live'), rows.map((x) => x.build));
+  d.liveBuild = async () => null;
+  g.checks.set(h2, [{ name: 'Workers Builds: kuschonink', status: 'completed', conclusion: 'success', html_url: 'https://x/1', output: {} }]);
+  rows = await rowsOf();
+  check('…no build id: only what the check runs say', rows[0].build === 'live' && rows.slice(1).every((x) => x.build === 'none'), rows.map((x) => x.build));
+  g.limitAnonymous();
+  rows = await rowsOf();
+  check('…and when GitHub won\'t show them either: nothing is claimed', rows.every((x) => x.build === 'none'), rows.map((x) => x.build));
 }
 
 console.log(fails ? `\n${fails} failed` : '\nall passed');

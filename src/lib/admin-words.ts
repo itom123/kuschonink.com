@@ -142,7 +142,7 @@ export const AW = {
   projectMade: (url: string): Bi => ({ en: `Created. It will be at ${url} once the site has updated.`, zh: `已创建。网站更新后，它的地址是 ${url}。` }),
   projectExists: { en: 'There is already a project with that address.', zh: '已有使用这个地址的项目。' },
   changeCols: { when: { en: 'When', zh: '时间' }, what: { en: 'Change', zh: '更改' }, build: { en: 'Live?', zh: '已上线？' } },
-  build: { live: { en: 'Live', zh: '已上线' }, building: { en: 'Building…', zh: '构建中…' }, failed: { en: 'Build failed', zh: '构建失败' }, none: { en: '—', zh: '—' } } as Record<string, Bi>,
+  build: { live: { en: 'Live', zh: '已上线' }, waiting: { en: 'Not live yet', zh: '尚未上线' }, building: { en: 'Building…', zh: '构建中…' }, failed: { en: 'Build failed', zh: '构建失败' }, none: { en: '—', zh: '—' } } as Record<string, Bi>,
   changesLead: { en: 'The newest changes to the site. A failed build changes nothing: the site stays as it was until a fix.', zh: '网站最新的更改。构建失败时什么都不会改变：在修复之前，网站保持原样。' },
 } as const;
 

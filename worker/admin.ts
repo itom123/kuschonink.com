@@ -64,6 +64,8 @@ export interface AdminDeps {
   /** Run the publisher now; null without Notion and GitHub. */
   publish: (() => Promise<PublishReport | null>) | null;
   gh: GitHub | null;
+  /** The commit the running site was built from (12 characters), or null: Changes' "Live?". */
+  liveBuild?: () => Promise<string | null>;
   /** The repository's web address, for "Open on GitHub". */
   repoUrl?: string;
   now: () => number;
@@ -209,7 +211,7 @@ async function route(req: Request, deps: AdminDeps): Promise<Response> {
 
 async function siteFiles(path: string, req: Request, url: URL, deps: AdminDeps): Promise<Response> {
   if (!deps.gh) return fail('not_configured', 503, { what: 'github' });
-  const d = { gh: deps.gh, access: deps.access };
+  const d = { gh: deps.gh, access: deps.access, liveBuild: deps.liveBuild };
   const send = (o: Out) => json(o.body, o.status);
   const body = async (max: number) => readBody(req, max);
   const m = req.method;

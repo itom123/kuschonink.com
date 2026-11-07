@@ -19,6 +19,8 @@ import { forbiddenWord, readGuide } from './publish.ts';
 export interface FilesDeps {
   gh: GitHub;
   access: AccessFile;
+  /** The commit the running site was built from (12 characters), or null: Changes' "Live?". */
+  liveBuild?: () => Promise<string | null>;
 }
 export interface Out { status: number; body: Record<string, unknown> }
 
@@ -201,23 +203,46 @@ export async function newProject(body: Record<string, unknown>, d: FilesDeps): P
   return ok({ ok: true, slug, url: `/image/${slug}`, file: jsonPath, commit: { sha: done.sha, url: done.url } });
 }
 
-export type Build = 'live' | 'building' | 'failed' | 'none';
+export type Build = 'live' | 'waiting' | 'building' | 'failed' | 'none';
 
-/** The newest commits on main, and whether each one's build went live. */
+/** Check runs read without the token per Changes window (GitHub allows 60 an hour per address). */
+const CHECK_READS = 5;
+
+/**
+ * The newest commits on main, and whether the site runs each yet. The running
+ * site's build id and GitHub's compare say which are live; for the others,
+ * their build's check run says whether it failed, when GitHub lets it be read
+ * without the token (see checks() in github.ts).
+ */
 export async function recentChanges(d: FilesDeps, n = 15): Promise<Out> {
   const commits = await d.gh.recent(n);
+  const live = (await d.liveBuild?.().catch(() => null)) ?? null;
+  // What main has that the running site doesn't: the rest is live.
+  let notLive: Set<string> | null = null;
+  if (live && commits.length) {
+    try {
+      notLive = (await d.gh.compare(live, commits[0].sha))?.ahead ?? null;
+    } catch {
+      // GitHub said no: go by the check runs.
+    }
+  }
+  let reads = 0;
   const rows = await Promise.all(
     commits.map(async (c) => {
-      let build: Build = 'none';
+      let build: Build = notLive ? (notLive.has(c.sha) ? 'waiting' : 'live') : 'none';
       let buildUrl = '';
-      try {
-        const run = (await d.gh.checks(c.sha)).find((r) => /workers builds/i.test(r.name));
-        if (run) {
-          build = run.status !== 'completed' ? 'building' : run.conclusion === 'success' ? 'live' : 'failed';
-          buildUrl = run.url;
+      if (build !== 'live' && reads++ < CHECK_READS) {
+        try {
+          const run = (await d.gh.checks(c.sha)).find((r) => /workers builds/i.test(r.name));
+          if (run) {
+            buildUrl = run.url;
+            if (run.status !== 'completed') build = 'building';
+            else if (run.conclusion === 'success') build = 'live';
+            else if (run.conclusion === 'failure' || run.conclusion === 'timed_out') build = 'failed';
+          }
+        } catch {
+          // Not readable now (GitHub's allowance without a token): show what is known.
         }
-      } catch {
-        // No checks for this one (or GitHub said no): show it without.
       }
       return { sha: c.sha, message: c.message.split('\n')[0].slice(0, 200), date: c.date, url: c.url, build, buildUrl };
     }),

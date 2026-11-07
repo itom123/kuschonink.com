@@ -41,8 +41,8 @@ In admin mode:
 开始菜单 ▸ **编辑此页…** 用记事本打开最前面那个窗口所用的内容文件（`src/content` 里的 JSON）；管理文件夹里的
 **网站文件** 列出所有可以编辑的文件。
 
-- 保存（Ctrl+S）就是向 `main` 提交一次。构建检查通过后，大约一分钟网站更新；**更改记录** 显示每次更改是否已上线。
-  构建失败时网站保持原样，直到修好。
+- 保存（Ctrl+S）就是向 `main` 提交一次。构建检查通过后，大约一分钟网站更新；**更改记录** 显示网站是否已经换上
+  每次更改（已上线、尚未上线、构建失败；GitHub 不让查时显示“—”）。构建失败时网站保持原样，直到修好。
 - 保存前服务器会检查：只能改允许的文件（`src/content` 里的 JSON，`guides/access.json` 除外）；必须是有效的
   JSON；任何文字都不能含有可能运行代码的内容（`<script>`、`<iframe>`、`<style>`、`onclick=` 这类属性、
   `javascript:` 链接）；导览的文件还要通过导览自己的检查和敏感词检查。
@@ -51,14 +51,15 @@ In admin mode:
   `public/guides/<导览>/img/<编号>.jpg`。上传时去掉元数据；太大的图片先在浏览器里缩小。上传后会告诉你在页面里
   怎么写（例如 `projects/hanabi/new.jpg`）。
 - **新建项目**：标题、地址（`/image/<地址>`）和第一张图片；一次提交同时建好项目文件、图片和它在首页上的位置。
-- 需要 `GITHUB_TOKEN`（见 [GUIDES.md 第 11 节](GUIDES.md#11-读者推荐-suggestions)）。
+- 需要 `GITHUB_TOKEN`，`main` 上的规则集也不能挡住直接提交（两样都见 [GUIDES.md 第 11.4 节](GUIDES.md#114-设置-settings)）。
 
 Start menu ▸ **Edit This Page…** opens the content files behind the window in
 front (the JSON in `src/content`) in Notepad; **Site Files** in the admin
 folder lists every file you may edit.
 
 - Save (Ctrl+S) is one commit to `main`. The site updates in about a minute,
-  once the build has checked it; **Changes** shows whether each change is live.
+  once the build has checked it; **Changes** shows whether the site runs each
+  change yet (Live, Not live yet, Build failed; "—" when GitHub won't say).
   If a build fails, the site stays as it was until it is fixed.
 - Before saving, the server checks: only allowed files (the JSON in
   `src/content`, except `guides/access.json`); valid JSON; no text that could
@@ -75,7 +76,8 @@ folder lists every file you may edit.
 - **New Project**: a title, an address (`/image/<address>`) and a first
   picture; one commit makes the project's file, the picture and its place on the
   home page.
-- It needs `GITHUB_TOKEN` (see [GUIDES.md section 11](GUIDES.md#11-读者推荐-suggestions)).
+- It needs `GITHUB_TOKEN`, and a ruleset on `main` that lets it commit
+  straight there (both in [GUIDES.md section 11.4](GUIDES.md#114-设置-settings)).
 
 ## 3. 第一次设置 Setting it up
 
