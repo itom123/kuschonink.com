@@ -2,6 +2,7 @@
 import { aboutBox } from './aboutbox';
 import { api, type DesktopApi } from './api';
 import { commands, initCommands } from './commands';
+import { consent, keepAgain } from './consent';
 import { initContextMenus } from './contextmenu';
 import { initDesktopIcons } from './icons';
 import { initMenubars } from './menubar';
@@ -23,7 +24,7 @@ import { initScreensaver, startSaver } from './screensaver';
 import { initTrails } from './trails';
 import { initTray } from './tray';
 import { settings } from './settings';
-import { escapeHtml, html } from './util';
+import { emit, escapeHtml, html } from './util';
 import { explainFocused, initWhatsThis } from './whatsthis';
 import * as wm from './wm';
 
@@ -145,6 +146,29 @@ document.addEventListener('desktop:login', logOffLabel);
 
 commands.register('about-k98', () => aboutBox());
 commands.register('help', () => navigate('/help'));
+// Start ▸ Settings ▸ Cookies...: the Cookies dialog, to change the choice (cookies.ts).
+commands.register('cookies', () => api.consent.show());
+// Page content hears of a new choice (lang.ts keeps a language chosen before it).
+// `again`: what the page shows is to be kept again (keepAgain() in consent.ts).
+consent.on((level, was, here) => emit(document, 'consent:change', { level, again: keepAgain(level, was, here) }));
+
+/**
+ * Before any choice about cookies, the Cookies dialog asks once the desktop
+ * is ready: after start-up and log-on, or at once when they don't show (a
+ * guide's link). After a choice nothing asks here: the Information Bar comes
+ * back only when a feature that must have a cookie is used (cookies.ts),
+ * never after a start-up on its own. Never for bots and link previews.
+ */
+function askAboutCookies() {
+  if (html.hasAttribute('data-robot')) return;
+  const go = () => {
+    // Nothing to ask: a choice made, or none could be kept (site data blocked).
+    if (consent.decided() || !consent.lasts()) return;
+    import('./cookies').then((m) => m.atStart(), () => {});
+  };
+  if (html.dataset.boot) document.addEventListener('desktop:login', go, { once: true });
+  else go();
+}
 
 // F1 opens Help (where the browser lets the page have it). In a dialog, it
 // explains the control that has the focus (What's This?).
@@ -167,8 +191,8 @@ function ready() {
     }
   }
   document.dispatchEvent(new Event('astro:page-load'));
-  // After a refresh, the other windows come back as they were.
-  void restoreDesk();
+  // After a refresh, the other windows come back as they were; then the cookies are asked about.
+  void restoreDesk().finally(askAboutCookies);
 }
 const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
 if (document.readyState === 'complete' || (nav && nav.domContentLoadedEventStart > 0)) setTimeout(ready);

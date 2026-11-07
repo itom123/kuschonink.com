@@ -81,6 +81,8 @@ html[data-scheme="contrast"] {
 :where(html[data-scheme="contrast"]) .start-banner span { color: #fff; }
 :where(html[data-scheme="contrast"]) .menu-sep { border-top-color: #000; }
 :where(html[data-scheme="contrast"]) .tooltip { box-shadow: 2px 2px 0 #000; }
+/* The Information Bar (cookies.ts) has no yellow here, and the window under it is white too: a heavy black edge keeps it as plain to see. */
+html[data-scheme="contrast"] .infobar { border-width: 0 0 4px; box-shadow: none; }
 
 /* ---- Windows' own high contrast mode: real borders where 98.css draws shadows ---- */
 @media (forced-colors: active) {
@@ -91,4 +93,6 @@ html[data-scheme="contrast"] {
   .title-bar.inactive .title-bar-text { color: CanvasText; }
   .icon.selected .icon-label, .menu-item:hover, .menu-item:focus { forced-color-adjust: none; background: Highlight; color: HighlightText; }
   .ico { forced-color-adjust: none; }
+  /* Box shadows are dropped here and the yellow with them: the Information Bar keeps a heavy edge (see High Contrast above). */
+  html .infobar { border-width: 0 0 4px; }
 }

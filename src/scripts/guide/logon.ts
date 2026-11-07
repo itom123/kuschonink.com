@@ -230,6 +230,7 @@ function setUp(root: HTMLElement) {
       await fail('wrong');
       return;
     }
+    if (!(await cookiesAllowed()) || signal.aborted) return;
     const url = guideUrl();
     next.value = url.search;
     setBusy(true);
@@ -316,4 +317,23 @@ function setUp(root: HTMLElement) {
     tick();
     waitTimer = window.setInterval(tick, 1000);
   };
+}
+
+// ---- Cookies ----
+// The guide's cookie needs the visitor's leave (src/scripts/desktop/consent.ts).
+// Without it the desktop asks first, with a bar at the top of the screen; after
+// Allow the log-on goes ahead, the password still in its box. On its own,
+// without the desktop, it goes ahead at once, as the form does without
+// JavaScript: typing the password is asking for the cookie.
+let asking = false;
+async function cookiesAllowed(): Promise<boolean> {
+  const c = (window as unknown as { kus98?: { consent?: { ask(feature: string): Promise<boolean> } } }).kus98?.consent;
+  if (!c) return true;
+  if (asking) return false; // OK pressed again while the bar waits for an answer
+  asking = true;
+  try {
+    return await c.ask('guide');
+  } finally {
+    asking = false;
+  }
 }

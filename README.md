@@ -42,6 +42,16 @@ appears with the page they asked for open in a window.
   maximised, toolbars), "Show this screen each time Xiangyin 98 starts" holds
   on every load of the home page, and an unsent Contact message survives a
   reload until it's sent or the tab is closed.
+- **Cookies are asked about first.** After start-up and log-on, a message box,
+  *Cookies on Xiangyin 98*, lists what needs a cookie (a guide's password,
+  staying logged on) and what can do without (this tab's memory, lasting
+  preferences), and what happens without each, then offers **Allow All**,
+  **Necessary Only** or **None**. Nothing is written until the visitor
+  chooses, and a stricter choice removes what it no longer allows. Under None,
+  or after closing the box unanswered, logging on to a guide asks again with a
+  pale yellow Information Bar across the top of the screen. Start ▸ Settings ▸
+  Cookies... changes the choice; bots and link previews never see either. See
+  "Cookies" in [`docs/DESKTOP.md`](docs/DESKTOP.md#cookies-the-visitors-choice).
 - Sounds, pointers, icons and screens are made for the site: nothing is taken
   from Windows. No visible text says "kuschonink"; addresses read `C:\xiangyin\…`.
 
@@ -379,7 +389,8 @@ and English: [`docs/GUIDES.md`](docs/GUIDES.md).
 
 Cloudflare Web Analytics is enabled for the kuschonink.com zone with automatic
 setup: Cloudflare injects the beacon into every page as it passes through.
-There's no code in this repo and no cookie banner is needed.
+There's no code in this repo, and the beacon sets no cookies, so it isn't part
+of the Cookies dialog (which covers what the site itself keeps).
 
 ## How the project is organised
 

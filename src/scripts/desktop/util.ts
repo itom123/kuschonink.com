@@ -1,4 +1,5 @@
 // Small helpers shared by the desktop shell.
+import { consent, keepAgain } from './consent';
 
 export const html = document.documentElement;
 
@@ -95,18 +96,47 @@ export const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.ma
 export const escapeHtml = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-/** JSON in localStorage, never throwing (private mode, full storage…). */
+// Each stored() value, told when lasting storage is allowed ("Allow All", here
+// or in another tab): it writes what was set meanwhile, and with keepAgain()
+// (consent.ts) all it holds.
+const keepers = new Set<(all: boolean) => void>();
+consent.on((level, was, here) => {
+  if (!consent.allows('lasting')) return;
+  const all = keepAgain(level, was, here);
+  for (const k of keepers) k(all);
+});
+
+/**
+ * JSON in localStorage, never throwing (private mode, full storage…). Without
+ * the visitor's leave for lasting storage (consent.ts), the value is kept in
+ * memory only, for this page.
+ */
 export function stored<T>(key: string, fallback: T) {
   let mem: T = fallback;
+  // A value to keep (read at load, or set since); set while it couldn't be written.
+  let has = false;
+  let unsaved = false;
   try {
     const raw = localStorage.getItem(key);
-    if (raw) mem = JSON.parse(raw) as T;
+    if (raw) {
+      mem = JSON.parse(raw) as T;
+      has = true;
+    }
   } catch { /* keep fallback */ }
+  const write = () => {
+    unsaved = false;
+    try { localStorage.setItem(key, JSON.stringify(mem)); } catch { /* memory only */ }
+  };
+  keepers.add((all) => {
+    if (unsaved || (all && has)) write();
+  });
   return {
     get: () => mem,
     set(v: T) {
       mem = v;
-      try { localStorage.setItem(key, JSON.stringify(v)); } catch { /* memory only */ }
+      has = true;
+      if (consent.allows('lasting')) write();
+      else unsaved = true;
     },
   };
 }

@@ -13,7 +13,7 @@ import { desktop, dialog, h, message, setAttr, setText, tr, type Bi } from './do
 import type { MenuSpec } from '../desktop/menu';
 import { canvasOf, SelectTool } from './select';
 import { howItWorks, openSend } from './send';
-import { forget, keep, kept } from './store';
+import { forget, keep, kept, mayKeep } from './store';
 import { TextTool } from './text';
 import { makeTool, type Host, type Options, type Pt, type Tool } from './tools';
 
@@ -237,6 +237,7 @@ export class PaintApp {
   }
 
   private saveSettings() {
+    if (!mayKeep()) return; // lasting storage needs the visitor's leave (store.ts)
     const s: Saved = { tool: this.tool === 'picker' || this.tool === 'zoom' ? this.prevTool : this.tool, fg: this.fg, bg: this.bg, palette: this.palette, custom: this.custom, opts: this.opts, hide: [...this.hide] };
     try { localStorage.setItem(SETTINGS, JSON.stringify(s)); } catch { /* memory only */ }
   }
@@ -846,6 +847,10 @@ export class PaintApp {
     document.addEventListener('paste', (e) => this.onPaste(e), { signal });
     document.addEventListener('visibilitychange', () => { if (document.hidden) void this.keepNow(); }, { signal });
     window.addEventListener('pagehide', () => void this.keepNow(), { signal });
+    // Allow All chosen here after a stricter choice (consent.ts): the tools in hand are kept again.
+    document.addEventListener('consent:change', (e) => {
+      if ((e as CustomEvent<{ again?: boolean }>).detail?.again) this.saveSettings();
+    }, { signal });
     this.win.addEventListener('desktop:close', () => this.destroy(), { once: true });
     window.kus98?.menus?.(this.win, (name) => this.menu(name));
   }

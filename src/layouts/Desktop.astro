@@ -78,16 +78,24 @@ const { seo, image, noindex, path } = Astro.props;
         document.head.appendChild(ws);
       }
       var bot = navigator.webdriver || /bot|crawl|spider|slurp|lighthouse|pagespeed|headless|preview|facebookexternalhit|embedly|whatsapp|telegram|discord|slack/i.test(navigator.userAgent);
+      // Bots and link previews never see the Cookies dialog either (cookies.ts reads this).
+      if (bot) d.setAttribute('data-robot', '');
+      // The visitor's choice about cookies (consent.ts): the log-on cookie needs "Allow All" or "Necessary Only".
+      var cs = null, guide = location.pathname.indexOf('/guides/') === 0, on = /(?:^|;\s*)kus98_session=/.test(document.cookie);
+      try { cs = JSON.parse(localStorage.getItem('kus98:consent') || 'null'); } catch (e) {}
+      var cookies = !!cs && cs.v === 1 && typeof cs.at === 'number' && isFinite(cs.at) && (cs.level === 'all' || cs.level === 'necessary');
       // A visit that starts at a guide's link (/guides/<slug>) skips start-up, as bots do, and
       // counts as started, so the next page in this session doesn't start up either: logged on
       // under the last name typed, or Guest. The cookie is session.ts's, with its 30 minutes
-      // (AWAY_MINUTES) to run after the last page of the site was open.
-      if (location.pathname.indexOf('/guides/') === 0 && !/(?:^|;\s*)kus98_session=/.test(document.cookie)) {
+      // (AWAY_MINUTES) to run after the last page of the site was open. Without the leave for
+      // cookies, only this page skips start-up; session.ts sets the cookie once it's given.
+      if (guide && !on && cookies) {
         var who = 'Guest';
         try { who = localStorage.getItem('kus98:user') || 'Guest'; } catch (e) {}
         document.cookie = 'kus98_session=' + encodeURIComponent(who) + '; path=/; max-age=1800; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+        on = true;
       }
-      if (!bot && !/(?:^|;\s*)kus98_session=/.test(document.cookie)) d.setAttribute('data-boot', 'boot');
+      if (!bot && !on && !guide) d.setAttribute('data-boot', 'boot');
       setTimeout(function () { if (!window.__kus98) d.removeAttribute('data-boot'); }, 10000);
       // The home page without Welcome: "Show this screen each time Xiangyin 98 starts" is
       // unticked, or a refresh of a desktop where Welcome wasn't open. memory.ts decides and
