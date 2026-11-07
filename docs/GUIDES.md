@@ -427,8 +427,14 @@ both when the site is built.
 - 改了某类读者的密码，这一类读者都要重新输入；其他读者不受影响。
 - 改了签名用的密钥（`GUIDES_COOKIE_SECRET`，没设它时是 `TURNSTILE_SECRET`；它少于 24 个字符时两个都算），所有人都要重新输入密码。
   第一次设置 `GUIDES_COOKIE_SECRET` 也一样。
-- **只在没有比正式版更新的 PR 预览时修改 secret。** 在控制台改 secret，会把“最新上传的版本”部署上线；
-  如果最新的是某个 PR 的预览，那个预览就成了正式网站。先合并或关闭打开的 PR，等 `main` 部署完再改。
+- **PR 预览有自己的 secret，不用正式网站的。** 每个分支的预览（Worker Previews）只用 `wrangler.jsonc`
+  里 `previews` 部分的设置，加上预览自己的 secret，所以**预览里的导览密码和正式网站的不一样**，除非你把它们设成一样。
+  在自己电脑上设置一次，以后新建的预览都会用：
+  `npx wrangler preview base-config secret put GUIDES_PASSWORD`（`GUIDES_PASSWORD_FOTOFILMIC`、
+  `GUIDES_COOKIE_SECRET`、`TURNSTILE_SECRET` 同理；也可以在控制台的 Previews Base 里设置）。
+  已经存在的预览要单独改：`npx wrangler preview secret put 名字 --name <分支名>`。密码永远不写进仓库。
+- 在控制台改正式网站的 secret，不会再把哪个预览部署上线。（如果 **Settings → Builds** 里还显示
+  “Set up Worker Previews”，说明还没切换，旧规则仍然有效：只在没有比正式版更新的 PR 预览时修改 secret。）
 - 没设密码时，导览显示“尚未开放”，不会泄漏内容。
 - 微信内置浏览器有自己的 cookie，在微信里打开时会再问一次密码。
 - “记住此密码”保留 30 天；不勾的话，关掉浏览器就要重新输入（最长 12 小时）。
@@ -462,10 +468,20 @@ variables, not the Worker.
   while that isn't set; both, while it is under 24 characters) logs everyone
   out. So does setting
   `GUIDES_COOKIE_SECRET` for the first time.
-- **Change secrets only when no PR preview is newer than production.** A
-  secret edit in the dashboard deploys the *latest uploaded* version; if
-  that's a PR preview, the preview becomes the live site. Merge or close open
-  PRs first, and wait for `main` to deploy.
+- **PR previews have their own secrets, never production's.** Each branch's
+  preview (Worker Previews) gets only the settings in the `previews` block of
+  `wrangler.jsonc`, plus the previews' own secrets. So **a preview's guide
+  passwords are not the live site's**, unless you set them the same. Set them
+  once on your own computer, for every new preview:
+  `npx wrangler preview base-config secret put GUIDES_PASSWORD` (likewise
+  `GUIDES_PASSWORD_FOTOFILMIC`, `GUIDES_COOKIE_SECRET`, `TURNSTILE_SECRET`;
+  or in the dashboard's Previews Base). To change a preview that already
+  exists: `npx wrangler preview secret put NAME --name <branch>`. Passwords
+  never go in the repo.
+- Changing a production secret in the dashboard no longer puts a preview
+  live. (If **Settings → Builds** still shows "Set up Worker Previews", the
+  switch hasn't been made and the old rule holds: change secrets only when
+  no PR preview is newer than production.)
 - With no password set, the guide says it isn't open yet. Nothing leaks.
 - WeChat's built-in browser keeps its own cookies, so it asks again.
 - *Save this password* keeps you logged on for 30 days; without it, until the

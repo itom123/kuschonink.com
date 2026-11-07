@@ -51,6 +51,41 @@
     "NOTION_CONTACTS": "24e16407-40ea-4a3f-b1a1-a8d3159c36f1",
     "NOTION_LOG": "93ccb58c-07d5-435d-ba01-cef829ea5c5e"
   },
+  // Worker Previews: every branch gets its own preview, with only the settings
+  // in this block, never the top-level ones, and never production's secrets.
+  // Previews have their own secrets, set once for all of them with
+  // `npx wrangler preview base-config secret put NAME` (or in the dashboard's
+  // Previews Base): TURNSTILE_SECRET, GUIDES_PASSWORD, GUIDES_PASSWORD_FOTOFILMIC
+  // and GUIDES_COOKIE_SECRET, with test values. So a preview's guide passwords
+  // are not the live site's. Rate limits count apart (their own namespace ids;
+  // GUIDES_TILE_LIMIT is the guide's street-level tiles). Crons and routes
+  // never apply to previews. docs/GUIDES.md section 7.
+  // Suggestions in a preview: its own Guard (each preview gets its own Durable
+  // Object storage), the test copies of the three Notion databases, and
+  // Turnstile's test keys (they answer for example.com). Its secrets:
+  // NOTION_TOKEN of a Notion integration that sees only those test copies, and
+  // TURNSTILE_SECRET_SUGGEST, a test secret. No GITHUB_REPO and never a
+  // GITHUB_TOKEN: a preview never publishes to the repository.
+  "previews": {
+    "send_email": [
+      { "name": "EMAIL", "destination_address": "Xiangyin.Tom.Gu@gmail.com" }
+    ],
+    "ratelimits": [
+      { "name": "CONTACT_LIMIT", "namespace_id": "5242", "simple": { "limit": 5, "period": 60 } },
+      { "name": "GUIDES_LIMIT", "namespace_id": "5243", "simple": { "limit": 30, "period": 60 } },
+      { "name": "SUGGEST_LIMIT", "namespace_id": "5244", "simple": { "limit": 3, "period": 60 } },
+      { "name": "GUIDES_TILE_LIMIT", "namespace_id": "5245", "simple": { "limit": 600, "period": 60 } }
+    ],
+    "durable_objects": { "bindings": [{ "name": "GUARD", "class_name": "Guard" }] },
+    "vars": {
+      "CONTACT_TO": "Xiangyin.Tom.Gu@gmail.com",
+      "NOTION_SUGGESTIONS": "d2a5fe18-8031-425e-a123-3969fb32fbe7",
+      "NOTION_CONTACTS": "26a774fe-1de2-4760-a1c7-8700b1b62de5",
+      "NOTION_LOG": "652c23d0-b96b-4cee-a9a3-d4708c1207b8",
+      "TURNSTILE_HOSTNAMES": "example.com"
+    },
+    "observability": { "enabled": true }
+  },
   // Secrets, set in the dashboard (never in this file): TURNSTILE_SECRET, and
   // each Field Guide audience's password, named in
   // src/content/guides/access.json: GUIDES_PASSWORD (visitors) and
