@@ -119,6 +119,8 @@ const SCHEMA: Record<GuideFileName, S> = {
         image: obj({ file: str(), credit: zh, caption: opt(str()), ...tx('alt', false) }, { opt: true }),
         label: opt(bool),
         audience: aud,
+        // Published from the suggestions queue (worker/publish.ts): when, by whom (if they asked to be credited), their own show, the Notion page.
+        suggested: obj({ on: date, by: opt(str({ max: 80 })), own: opt(bool), ref: str({ max: 64 }) }, { opt: true }),
       }),
       { rec: 'id' },
     ),

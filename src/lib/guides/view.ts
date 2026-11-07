@@ -85,6 +85,8 @@ export function buildView(raw: RawGuide, slug: string, access: AccessFile, audie
       ? { image: { src: `/guides/${slug}/img/${r.image.file}`, credit: r.image.credit, caption: r.image.caption || '', alt: b(r.image.alt || r.name, r.image.altZh) } }
       : {}),
     label: r.label ?? r.tier === 'A',
+    // Who suggested it, never the Notion reference (`ref`): that stays in the repo.
+    ...(r.suggested ? { suggested: { on: r.suggested.on, by: r.suggested.by || '', own: !!r.suggested.own } } : {}),
     ...(r.start ? { start: r.start } : {}),
     ...(r.end ? { end: r.end } : {}),
     ...(r.open ? { open: [...r.open] } : {}),

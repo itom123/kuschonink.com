@@ -172,6 +172,13 @@ export interface ItemRecord {
   /** Label on the map at the opening zoom. Default: tier A. */
   label?: boolean;
   audience?: AudienceTag;
+  /**
+   * Suggested by someone using the guide, and published from the suggestions
+   * queue (worker/publish.ts): the day, the name they asked to be credited
+   * with, whether it is their own show, and the Notion page (`ref`, which
+   * matches entries across runs and never reaches browsers).
+   */
+  suggested?: { on: ISODate; by?: string; own?: boolean; ref: string };
 }
 
 /** places.json: reference points (a workshop, a gallery, a meeting point). */
@@ -311,6 +318,8 @@ export interface Item extends DayRule {
   coordinates: LonLat;
   image?: { src: string; credit: string; caption: string; alt: Bi };
   label: boolean;
+  /** Suggested by someone using the guide: `by` is "" unless they asked to be credited. */
+  suggested?: { on: ISODate; by: string; own: boolean };
 }
 
 export interface Place {
