@@ -37,8 +37,18 @@ const ENTRY_KEYS = new Set([
   'holiday', 'access', 'exceptions', 'minutes', 'price', 'priceZh', 'note', 'noteZh', 'sourceUrl', 'links', 'listing', 'coordinates', 'image',
 ]);
 const IMAGE_KEYS = new Set(['alt', 'altZh', 'caption']);
-/** Text an audience could read, for the sensitive-word check. */
-const TEXT_KEYS = ['name', 'short', 'subtitle', 'by', 'why', 'whyZh', 'address', 'hours', 'hoursZh', 'price', 'priceZh', 'note', 'noteZh', 'sourceUrl'] as const;
+/**
+ * Every string of an entry, for the sensitive-word check: whatever the views
+ * may show, captions, one-day notes and "Suggested by" included. Only the
+ * audience tags and the Notion reference are left out: they are never shown.
+ */
+function readable(v: unknown, key = ''): string[] {
+  if (key === 'audience' || key === 'ref') return [];
+  if (typeof v === 'string') return [v];
+  if (Array.isArray(v)) return v.flatMap((x) => readable(x, key));
+  if (v && typeof v === 'object') return Object.entries(v as Record<string, unknown>).flatMap(([k, x]) => readable(x, k));
+  return [];
+}
 
 export interface PublishDeps {
   notion: Notion;
@@ -94,10 +104,7 @@ export function forbiddenWord(item: ItemRecord, access: AccessFile, slug: string
   const readers = item.audience ? (Array.isArray(item.audience) ? item.audience : [item.audience]) : access.guides[slug] ?? [];
   // Everyone who sees the item: the audiences on the guide's list that include a reader tag.
   const seers = (access.guides[slug] ?? []).filter((a) => readers.some((r) => closure(access, a).has(r)));
-  const text = [...TEXT_KEYS.map((k) => (item as unknown as Record<string, unknown>)[k]), ...(item.links ?? []), item.image?.credit, item.image?.alt, item.image?.altZh]
-    .filter((x): x is string => typeof x === 'string')
-    .join('\n')
-    .toLowerCase();
+  const text = readable(item).join('\n').toLowerCase();
   for (const [aud, words] of Object.entries(sensitive)) {
     if (aud === 'public') continue;
     if (seers.every((s) => closure(access, s).has(aud))) continue; // all who see it may see these words
