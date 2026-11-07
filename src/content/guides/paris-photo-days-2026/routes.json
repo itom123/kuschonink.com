@@ -116,6 +116,46 @@
       "whenZh": "11月12日至15日。RosAlma 只展到11月15日。",
       "note": "The line shows visit order, not a walking track. Allow transport and sufficient time for moving-image works; do not rush three exhibitions.",
       "noteZh": "线条表示参观顺序，不是步行路径。请预留交通时间，并给动态影像作品足够的观看时间；不要匆忙赶完三个展览。"
+    },
+    {
+      "id": "fair-day",
+      "name": "Fair day",
+      "nameZh": "博览会一日",
+      "length": "A full afternoon",
+      "lengthZh": "一整个下午",
+      "stops": [
+        "A14",
+        "A13"
+      ],
+      "mode": "walking",
+      "duration": "Polycopies 1–2 h, a 15-minute walk across the Seine, then Paris Photo for at least 3 h.",
+      "durationZh": "Polycopies 1–2 小时，过塞纳河步行约15分钟，然后 Paris Photo 至少 3 小时。",
+      "when": "12–15 Nov. Polycopies opens at 11:00 and Paris Photo at 13:00, so start on the boat.",
+      "whenZh": "11月12日至15日。Polycopies 11:00 开门，Paris Photo 13:00 开门，所以先去船上。",
+      "note": "Book the Paris Photo ticket for that day in advance. Keep an eye on the talks listed under Days.",
+      "noteZh": "请提前买好当天的 Paris Photo 门票。留意“日程”里列出的讲座。"
+    },
+    {
+      "id": "saint-germain",
+      "name": "Saint-Germain: books and archives",
+      "nameZh": "圣日耳曼：书与档案",
+      "length": "2–3 hours",
+      "lengthZh": "2–3 小时",
+      "stops": [
+        "B17",
+        "C7",
+        "B22",
+        "B12",
+        "C9",
+        "C8"
+      ],
+      "mode": "walking",
+      "duration": "Six short stops; choose three or four.",
+      "durationZh": "六个小站点；选三四个即可。",
+      "when": "Wed–Fri 14:00–18:00 suits every stop. Not 11 Nov: several are closed.",
+      "whenZh": "周三至周五 14:00–18:00 每一站都开放。11月11日不要去：好几处闭馆。",
+      "note": "Madé opens by chance or appointment; the Musée de Minéralogie charges €7 and needs a ticket bought online. La Hune ends 15 Nov.",
+      "noteZh": "Madé 随缘或预约开放；矿物博物馆收费 €7，须在网上购票。La Hune 的展览11月15日结束。"
     }
   ]
 }

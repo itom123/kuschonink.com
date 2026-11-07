@@ -575,6 +575,129 @@
       "label": false
     },
     {
+      "id": "A13",
+      "tier": "A",
+      "name": "Paris Photo",
+      "short": "Paris Photo",
+      "subtitle": "29th edition",
+      "by": "199 galleries and 48 publishers; including a Thomas Ruff installation and “Revealing”, the Centre Pompidou’s collection",
+      "zone": "west-concorde",
+      "themes": [
+        "archive",
+        "material"
+      ],
+      "why": "The week’s largest photography fair, built this year around the bicentenary of photography. Choose two or three sections rather than every booth: the early processes in the Main Sector, the Centre Pompidou’s collection show, and the Book Sector upstairs.",
+      "whyZh": "本周规模最大的摄影博览会，今年以摄影术诞生两百周年为主线。不必走遍每个展位，挑两三个部分细看：主展区里的早期工艺、蓬皮杜中心的馆藏展，以及楼上的摄影书展区。",
+      "address": "Grand Palais, 3 Avenue du Général Eisenhower, 75008 Paris",
+      "hours": "Thu–Sat 13:00–20:00; Sun 13:00–19:00. The Wed 11 Nov vernissage is for pass holders only",
+      "hoursZh": "周四至周六 13:00–20:00；周日 13:00–19:00。11月11日（周三）的开幕预展只对持通行证者开放",
+      "start": "2026-11-12",
+      "end": "2026-11-15",
+      "open": [
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "minutes": 180,
+      "price": "Thu/Fri ticket €36; Sat/Sun €41; evening ticket from 17:00 €26; students €26 with proof. A ticket is for one chosen day and can’t be exchanged or refunded.",
+      "priceZh": "周四、周五票 €36；周六、周日票 €41；17:00 后的晚场票 €26；学生票 €26，需出示证明。门票只限所选的一天，不能更换或退款。",
+      "note": "Book online before the day. No backpacks; suitcases, scooters and helmets can’t be left in the cloakroom. Métro Champs-Élysées–Clemenceau or Franklin D. Roosevelt; RER C Invalides.",
+      "noteZh": "请提前在网上购票。不能带双肩包；行李箱、滑板车和头盔不能寄存。地铁 Champs-Élysées–Clemenceau 或 Franklin D. Roosevelt 站；RER C 线 Invalides 站。",
+      "sourceUrl": "https://www.parisphoto.com/en-gb/info/Visitor-information.html",
+      "links": [
+        "https://www.parisphoto.com/en-gb/info/tickets.html",
+        "https://www.parisphoto.com/en-gb/program.html",
+        "https://agenda.parisphoto.com/en"
+      ],
+      "listing": "D04",
+      "coordinates": [
+        2.313266,
+        48.866211
+      ]
+    },
+    {
+      "id": "A14",
+      "tier": "A",
+      "name": "Polycopies",
+      "short": "Polycopies",
+      "subtitle": "Photobook fair on the Seine",
+      "by": "Independent photobook publishers and booksellers; signings at their tables every day",
+      "zone": "west-left-bank",
+      "themes": [
+        "material",
+        "documentary"
+      ],
+      "why": "The independent photobook fair, on a boat below the Quai Anatole France. Compare how sequence, paper and binding change the same pictures, and meet photographers at their publishers’ tables.",
+      "whyZh": "独立摄影书博览会，设在 Quai Anatole France 下方的一艘船上。比较编排顺序、纸张和装帧如何改变同一组照片，并在出版社的桌前与摄影师交谈。",
+      "address": "Bateau Concorde-Atlantique, Port de Solférino (Berges de Seine), 75007 Paris",
+      "hours": "Wed 11 Nov 13:00–21:00; Thu–Sat 11:00–21:00; Sun 11:00–19:00",
+      "hoursZh": "11月11日（周三）13:00–21:00；周四至周六 11:00–21:00；周日 11:00–19:00",
+      "start": "2026-11-11",
+      "end": "2026-11-15",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "holiday": "open",
+      "minutes": 120,
+      "note": "Métro Assemblée Nationale or Concorde; RER C Musée d’Orsay. Some publishers come only Wed–Fri or Sat–Sun, and the signing list changes daily: see polycopies.net.",
+      "noteZh": "地铁 Assemblée Nationale 或 Concorde 站；RER C 线 Musée d’Orsay 站。部分出版社只在周三至周五或周六、周日到场，签售名单每天更新：见 polycopies.net。",
+      "sourceUrl": "https://www.instagram.com/polycopies/",
+      "links": [
+        "https://phmuseum.com/news/things-to-do-at-paris-photo-2026-and-beyond"
+      ],
+      "coordinates": [
+        2.321836,
+        48.86172
+      ]
+    },
+    {
+      "id": "A15",
+      "tier": "A",
+      "name": "Bourse de Commerce – Pinault Collection",
+      "short": "Bourse Pinault",
+      "subtitle": "Remember Me",
+      "by": "About 700 photographs from the Pinault Collection; including Irving Penn, Raymond Depardon, Cindy Sherman, Man Ray and Richard Avedon",
+      "zone": "central",
+      "themes": [
+        "portrait",
+        "archive"
+      ],
+      "why": "Two hundred years of photography hung without a timeline, so periods and styles meet on the same wall. The same ticket covers a third Irving Penn show this week, to compare with Ropac and MEP.",
+      "whyZh": "两百年的摄影不按时间顺序陈列，不同时代和风格在同一面墙上相遇。同一张门票还包括本周的第三个 Irving Penn 展，可以和 Ropac、MEP 的两个展对照着看。",
+      "address": "2 Rue de Viarmes, 75001 Paris",
+      "hours": "Wed–Mon 11:00–19:00, Fri until 21:00; closed Tue",
+      "hoursZh": "周三至周一 11:00–19:00，周五至 21:00；周二闭馆",
+      "start": "2026-10-07",
+      "end": "2027-01-18",
+      "open": [
+        "mon",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "holiday": "open",
+      "minutes": 120,
+      "price": "€15; €10 for ages 18–26 and students; free under 18. Everyone needs a timed ticket, booked online.",
+      "priceZh": "€15；18至26岁和学生 €10；18岁以下免费。所有人都需要在网上预约分时段门票。",
+      "note": "Nan Goldin’s film in the Auditorium is closed on Fri 13 Nov afternoon and Sun 15 Nov. Expect a queue for the Depardon gallery.",
+      "noteZh": "Nan Goldin 在礼堂放映的影片11月13日（周五）下午和11月15日（周日）不开放。Depardon 展厅可能要排队。",
+      "sourceUrl": "https://www.pinaultcollection.com/en/boursedecommerce/remember-me",
+      "links": [
+        "https://www.pinaultcollection.com/en/boursedecommerce/practical-info"
+      ],
+      "coordinates": [
+        2.3424,
+        48.862946
+      ]
+    },
+    {
       "id": "B1",
       "tier": "B",
       "name": "Institut suédois",
@@ -1246,6 +1369,360 @@
       }
     },
     {
+      "id": "B16",
+      "tier": "B",
+      "name": "Galerie Leica Paris",
+      "short": "Leica",
+      "subtitle": "Théâtre de la couleur",
+      "by": "Harry Gruyaert",
+      "zone": "west-concorde",
+      "themes": [
+        "everyday"
+      ],
+      "why": "Colour as the subject: ordinary streets and rooms turned into fields of light. Notice how much of each picture is colour before it is a scene.",
+      "whyZh": "色彩本身就是主题：普通的街道和房间变成一片片光。留意每张照片里，有多少先是色彩，然后才是场景。",
+      "address": "26 Rue Boissy d’Anglas, 75008 Paris",
+      "hours": "Mon–Fri 11:00–19:00; Sat 10:00–19:00; closed Sun",
+      "hoursZh": "周一至周五 11:00–19:00；周六 10:00–19:00；周日闭馆",
+      "start": "2026-10-03",
+      "end": "2027-01-09",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 30,
+      "price": "Free.",
+      "priceZh": "免费。",
+      "note": "Inside the Leica Store.",
+      "noteZh": "在 Leica 门店内。",
+      "sourceUrl": "https://leica-camera.com/fr-FR/event/galerie-paris-harry-gruyaert-theatre-de-la-couleur",
+      "links": [
+        "https://leica-camera.com/fr-FR/leica-stores/leica-store-paris-village-royal"
+      ],
+      "coordinates": [
+        2.322309,
+        48.869486
+      ]
+    },
+    {
+      "id": "B17",
+      "tier": "B",
+      "name": "Galerie Roger-Viollet",
+      "short": "Roger-Viollet",
+      "subtitle": "Jean Marquis, arpenteur du quotidien. Photographies 1951–1983",
+      "by": "Jean Marquis",
+      "zone": "left-bank",
+      "themes": [
+        "everyday",
+        "documentary"
+      ],
+      "why": "Thirty years of everyday life, from streets to farms and factories, by a Magnum photographer who took up the camera on Robert Capa’s advice. Compare his distance from people with the street pictures at Ithaque.",
+      "whyZh": "三十年的日常生活，从街道到农场和工厂；作者是一位听从 Robert Capa 的建议拿起相机的玛格南摄影师。把他与人的距离，和 Ithaque 展出的街头照片比较一下。",
+      "address": "6 Rue de Seine, 75006 Paris",
+      "hours": "Tue–Sat 11:00–19:00; closed on public holidays",
+      "hoursZh": "周二至周六 11:00–19:00；公共假日闭馆",
+      "start": "2026-10-08",
+      "end": "2027-01-23",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "holiday": "closed",
+      "minutes": 30,
+      "price": "Free, according to the Roger-Viollet agency.",
+      "priceZh": "免费（据 Roger-Viollet 图片社）。",
+      "sourceUrl": "https://www.galerie-roger-viollet.fr/en/exhibition-jean-marquis-surveyor-of-the-everyday-photographs-1951-1983-26",
+      "links": [
+        "https://www.roger-viollet.fr/"
+      ],
+      "coordinates": [
+        2.336415,
+        48.857202
+      ]
+    },
+    {
+      "id": "B18",
+      "tier": "B",
+      "name": "Templon",
+      "short": "Templon",
+      "subtitle": "rose pour toi, rose pour moi",
+      "by": "Pierre et Gilles",
+      "zone": "marais",
+      "themes": [
+        "staging",
+        "portrait",
+        "material"
+      ],
+      "why": "Staged portraits, each photograph painted by hand, marking fifty years of the duo’s work. Ask where the photograph ends and the painting begins.",
+      "whyZh": "精心布景的肖像，每张照片都经手工上色，纪念这对搭档合作五十年。想一想：照片在哪里结束，绘画又从哪里开始？",
+      "address": "30 Rue Beaubourg, 75003 Paris",
+      "hours": "Tue–Sat 10:00–19:00",
+      "hoursZh": "周二至周六 10:00–19:00",
+      "start": "2026-11-07",
+      "end": "2026-12-30",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 25,
+      "sourceUrl": "https://www.templon.com/exhibitions/rose-pour-toi-rose-pour-moi/",
+      "links": [
+        "https://www.templon.com/contact/"
+      ],
+      "coordinates": [
+        2.354076,
+        48.862034
+      ]
+    },
+    {
+      "id": "B19",
+      "tier": "B",
+      "name": "Sixteen",
+      "short": "Sixteen",
+      "subtitle": "Sixteen Photography Collection Show",
+      "by": "23 photographers, including Walker Evans, Mark Steinmetz, Ken Grant, Alys Tomlinson, Koji Onaka and Siân Davey",
+      "zone": "marais",
+      "themes": [
+        "everyday",
+        "portrait",
+        "documentary"
+      ],
+      "why": "A small collection show, from Walker Evans to photographers on their first books. Look for the thread a collector draws between generations, and compare Mark Steinmetz here with his show at Ithaque.",
+      "whyZh": "一个小型收藏展，从 Walker Evans 到刚出第一本书的摄影师。看看收藏者如何在几代人之间牵起一条线，并把这里的 Mark Steinmetz 和他在 Ithaque 的展览比较一下。",
+      "address": "24 Rue du Vertbois, 75003 Paris",
+      "hours": "Daily 10:00–19:00",
+      "hoursZh": "每天 10:00–19:00",
+      "start": "2026-11-05",
+      "end": "2026-11-15",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "minutes": 30,
+      "sourceUrl": "https://www.sixteen.world/",
+      "coordinates": [
+        2.358725,
+        48.866905
+      ]
+    },
+    {
+      "id": "B20",
+      "tier": "B",
+      "name": "Galerie Les Filles du Calvaire",
+      "short": "F. du Calvaire",
+      "subtitle": "Patria Nostra / La dernière plage",
+      "by": "Julie Joubert / Marie Quéau",
+      "zone": "marais",
+      "themes": [
+        "documentary",
+        "portrait"
+      ],
+      "why": "Three years with recruits of the French Foreign Legion, from selection to their regiments: a study of belonging, and of remaking oneself behind a uniform.",
+      "whyZh": "三年间跟随法国外籍军团的新兵，从选拔一直到分入各自的团：关于归属，也关于如何在一身制服之下重新塑造自己。",
+      "address": "17 Rue des Filles du Calvaire, 75003 Paris",
+      "hours": "Tue 14:00–18:30; Wed–Sat 11:00–18:30; closed on public holidays",
+      "hoursZh": "周二 14:00–18:30；周三至周六 11:00–18:30；公共假日闭馆",
+      "start": "2026-11-12",
+      "end": "2027-01-16",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "holiday": "closed",
+      "minutes": 30,
+      "note": "Opens Thu 12 Nov, 18:00–21:00. Patria Nostra is on the first floor.",
+      "noteZh": "11月12日（周四）18:00–21:00 开幕。Patria Nostra 在二楼（法国所说的“一楼”）。",
+      "sourceUrl": "https://www.fillesducalvaire.com/en/exhibitions/195-julie-joubert-patria-nostra/",
+      "links": [
+        "https://loosejoints.biz/blogs/current-events/julie-joubert-at-galerie-les-filles-du-calvaire-paris"
+      ],
+      "coordinates": [
+        2.365926,
+        48.862781
+      ]
+    },
+    {
+      "id": "B21",
+      "tier": "B",
+      "name": "Atelier 13 Sévigné · FUTURES",
+      "short": "FUTURES",
+      "subtitle": "The Ecology of Movement",
+      "by": "Alexandra Baumgartner, Benedetta Casagrande, Diana Lelonek, Santiago Martinez Benedetti, Laure Winants; curated by Julia Rajacic",
+      "zone": "south-marais",
+      "themes": [
+        "material"
+      ],
+      "why": "Five photographers who build environmental limits into how they work: plant-based developers, home-made cameras, anthotypes, polar ice. A direct way into the material questions this guide keeps asking.",
+      "whyZh": "五位摄影师把环境的限制纳入创作方法：植物显影液、自制相机、花汁印相、极地冰。这是进入本导览反复提出的材质问题的一条直接途径。",
+      "address": "Atelier 13, 13 Rue de Sévigné, 75004 Paris",
+      "start": "2026-11-09",
+      "end": "2026-11-14",
+      "minutes": 30,
+      "note": "FUTURES gives both 8–14 and 9–15 Nov; this guide uses only 9–14 Nov. Opening hours aren’t published, so go during the talks on 12–14 Nov.",
+      "noteZh": "FUTURES 同时写了11月8日至14日和11月9日至15日；本导览只采用11月9日至14日。开放时间没有公布，最好在11月12日至14日有活动时前往。",
+      "sourceUrl": "https://www.futures-photography.com/events/futures-presents-the-ecology-of-movement",
+      "links": [
+        "https://dergreif.org/event/der-greif-issue-19-official-launch-events"
+      ],
+      "coordinates": [
+        2.362406,
+        48.85627
+      ]
+    },
+    {
+      "id": "B22",
+      "tier": "B",
+      "name": "delpire & co",
+      "short": "delpire & co",
+      "subtitle": "Last Resort",
+      "by": "Rafał Milach",
+      "zone": "left-bank",
+      "themes": [
+        "documentary",
+        "material"
+      ],
+      "why": "Books, fanzines and posters made about protest. Ask whether a book can hold personal experience and political pressure at once, then browse the bookshop next to it.",
+      "whyZh": "为抗议而做的书、小志和海报。想一想：一本书能否同时承载个人经验和政治压力？看完再逛逛旁边的书店。",
+      "address": "13 Rue de l’Abbaye, 75006 Paris",
+      "hours": "Tue–Sat 11:00–19:00; open Sun 15 Nov 13:00–19:00",
+      "hoursZh": "周二至周六 11:00–19:00；11月15日（周日）13:00–19:00 开放",
+      "start": "2026-11-05",
+      "end": "2027-01-09",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "exceptions": [
+        {
+          "date": "2026-11-15",
+          "status": "open",
+          "note": "Open 13:00–19:00 for Paris Photo week.",
+          "noteZh": "Paris Photo 期间特别开放 13:00–19:00。"
+        }
+      ],
+      "minutes": 30,
+      "price": "Free; talks and breakfasts while places last.",
+      "priceZh": "免费；讲座和早餐活动名额有限，先到先得。",
+      "note": "Morning and evening events all week; the programme may change.",
+      "noteZh": "本周每天上午和傍晚都有活动；安排可能变动。",
+      "sourceUrl": "https://www.delpireandco.com/en/rafal-milach-last-resort/",
+      "links": [
+        "https://www.delpireandco.com/a-la-librairie-pendant-paris-photo-2026/",
+        "https://www.photosaintgermain.com/en/editions/2026/parcours/delpire-co"
+      ],
+      "coordinates": [
+        2.334369,
+        48.854264
+      ]
+    },
+    {
+      "id": "B23",
+      "tier": "B",
+      "name": "Musée du Louvre",
+      "short": "Louvre",
+      "subtitle": "Louvre Photo",
+      "by": "More than 300 photographs; curated by Quentin Bajac and Dominique de Font-Réaulx",
+      "zone": "central",
+      "themes": [
+        "archive"
+      ],
+      "why": "The museum as a photographic subject, from the first photographers to recent commissions: its works, rooms, visitors and staff. Watch how a camera turns an institution into a picture of itself.",
+      "whyZh": "把博物馆本身当作摄影题材，从最早的摄影师到近年的委托创作：它的藏品、展厅、观众和员工。看看相机如何把一座机构变成它自己的形象。",
+      "address": "Musée du Louvre, Mezzanine Napoléon; enter by the Pyramid, 75001 Paris",
+      "hours": "Mon, Thu, Sat, Sun 09:00–18:00; Wed, Fri 09:00–21:00; closed Tue; last entry one hour before closing",
+      "hoursZh": "周一、周四、周六、周日 09:00–18:00；周三、周五 09:00–21:00；周二闭馆；闭馆前一小时停止入场",
+      "start": "2026-11-04",
+      "end": "2027-05-03",
+      "open": [
+        "mon",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "holiday": "open",
+      "exceptions": [
+        {
+          "date": "2026-11-09",
+          "status": "confirm",
+          "note": "The Louvre may open later, and some rooms may stay closed.",
+          "noteZh": "卢浮宫可能推迟开门，部分展厅可能关闭。"
+        }
+      ],
+      "minutes": 90,
+      "price": "€22 for EEA citizens and residents, €32 otherwise; free under 18, and under 26 for EEA citizens and residents. Book a time slot.",
+      "priceZh": "欧洲经济区公民和居民 €22，其他人 €32；18岁以下免费，欧洲经济区公民和居民26岁以下免费。请预约时段。",
+      "sourceUrl": "https://www.louvre.fr/en/what-s-on/exhibitions/louvre-photo",
+      "links": [
+        "https://www.louvre.fr/en/visit/hours-admission"
+      ],
+      "coordinates": [
+        2.335859,
+        48.861033
+      ]
+    },
+    {
+      "id": "B24",
+      "tier": "B",
+      "name": "Fondation Francès",
+      "short": "Fond. Francès",
+      "subtitle": "FAIRE CORPS — Vingt ans de photographie dans la collection Francès",
+      "by": "Including Diane Arbus, Nan Goldin, Richard Avedon, Robert Mapplethorpe, Raymond Depardon and Annie Leibovitz",
+      "zone": "north-clichy",
+      "themes": [
+        "portrait",
+        "documentary"
+      ],
+      "why": "A private collection shows its photographs for the first time; the Clichy half is about the body, in portraits, documents and intimate pictures. Compare how close each photographer is allowed to come.",
+      "whyZh": "一家私人收藏首次展出它的摄影作品；克利希这一半关于身体，有肖像、纪实和私密的照片。比较每位摄影师被允许靠得多近。",
+      "address": "21 Rue Georges Boisseau, 92110 Clichy",
+      "hours": "Thu–Sat 11:00–19:00; last entry 18:00",
+      "hoursZh": "周四至周六 11:00–19:00；最晚入场 18:00",
+      "start": "2026-09-25",
+      "end": "2026-12-19",
+      "open": [
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 45,
+      "price": "Free; booking required.",
+      "priceZh": "免费；必须预约。",
+      "note": "Métro line 14, Saint-Ouen. Book through the foundation’s Billetweb page.",
+      "noteZh": "地铁14号线 Saint-Ouen 站。请通过基金会的 Billetweb 页面预约。",
+      "sourceUrl": "https://www.fondationfrances.com/exposition-faire-corps-a-clichy-et-senlis/",
+      "links": [
+        "https://www.fondationfrances.com/horaires-exposition-faire-corps/",
+        "https://www.billetweb.fr/exposition-faire-corps"
+      ],
+      "coordinates": [
+        2.317065,
+        48.90381
+      ]
+    },
+    {
       "id": "C1",
       "tier": "C",
       "name": "Editions Firmin-Didot",
@@ -1333,6 +1810,407 @@
         "alt": "Exhibition image: PARESSE",
         "altZh": "展览图片：PARESSE"
       }
+    },
+    {
+      "id": "C3",
+      "tier": "C",
+      "name": "Ritz Paris",
+      "short": "Ritz",
+      "subtitle": "Regards sur le Ritz Paris",
+      "by": "18 photo and video students of GOBELINS Paris",
+      "zone": "central",
+      "themes": [
+        "documentary",
+        "everyday"
+      ],
+      "why": "Students given a free hand inside a palace hotel: the staff behind the scenes, the building, and what luxury looks like to a new generation.",
+      "whyZh": "学生们在一家宫殿级酒店里自由拍摄：幕后的员工、建筑本身，以及新一代眼中的奢华。",
+      "address": "Ritz Paris, peristyle, 15 Place Vendôme, 75001 Paris",
+      "hours": "Daily 10:00–19:00",
+      "hoursZh": "每天 10:00–19:00",
+      "start": "2026-11-13",
+      "end": "2026-11-16",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "minutes": 20,
+      "price": "Free.",
+      "priceZh": "免费。",
+      "note": "In the hotel’s peristyle. Paris Photo’s page also mentions the salons, which host its VIP lounge, so not every room may be open.",
+      "noteZh": "在酒店的列柱廊。Paris Photo 的页面还提到酒店的沙龙厅，那里是它的贵宾休息室，所以不一定每个厅都开放。",
+      "sourceUrl": "https://www.gobelins.fr/actualites/exposition-photo-gobelins-ritz-paris-2026",
+      "links": [
+        "https://www.parisphoto.com/en-gb/program/Les_gobelins.html"
+      ],
+      "coordinates": [
+        2.328887,
+        48.867956
+      ]
+    },
+    {
+      "id": "C4",
+      "tier": "C",
+      "name": "99 Cameras Museum",
+      "short": "99 Cameras",
+      "subtitle": "99 appareils de légende",
+      "by": "At Studio Harcourt",
+      "zone": "west-16e",
+      "themes": [
+        "material",
+        "archive"
+      ],
+      "why": "A free room of about 99 famous cameras, from Leica and Hasselblad to lesser-known models. See the machines behind the pictures before or after the early processes at Paris Photo.",
+      "whyZh": "一间免费的小展厅，陈列约99台著名相机，从 Leica、Hasselblad 到不太知名的型号。在 Paris Photo 看早期工艺之前或之后，来看看照片背后的机器。",
+      "address": "Studio Harcourt, 6 Rue de Lota, 75116 Paris",
+      "hours": "Mon–Sat 10:00–17:30; last entry 17:00",
+      "hoursZh": "周一至周六 10:00–17:30；最晚入场 17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 30,
+      "price": "Free; donations welcome.",
+      "priceZh": "免费，欢迎捐款。",
+      "note": "Métro line 9, Rue de la Pompe. A free audio guide plays on your phone.",
+      "noteZh": "地铁9号线 Rue de la Pompe 站。手机上有免费语音导览。",
+      "sourceUrl": "https://99camerasmuseum.com/fr",
+      "coordinates": [
+        2.275988,
+        48.86737
+      ]
+    },
+    {
+      "id": "C5",
+      "tier": "C",
+      "name": "Espace Commines · ECAL",
+      "short": "ECAL",
+      "subtitle": "Soft Photography – Human Emotions and Machine-Generated Images",
+      "by": "ECAL Master Photography students",
+      "zone": "marais",
+      "themes": [
+        "moving-image",
+        "staging"
+      ],
+      "why": "Student research on how feeds make us feel: AI-made images, “oddly satisfying” clips, rage-bait. A short visit that sharpens the Digital Sector at Paris Photo.",
+      "whyZh": "学生们研究信息流如何影响我们的情绪：AI 生成的图像、“莫名舒适”的短片、激怒式内容。短短一看，会让你在 Paris Photo 的数字展区看得更清楚。",
+      "address": "17 Rue Commines, 75003 Paris",
+      "hours": "Fri 13 and Sat 14 Nov 11:00–19:00. Opening Thu 12 Nov from 18:00",
+      "hoursZh": "11月13日（周五）和14日（周六）11:00–19:00。11月12日（周四）18:00 起开幕",
+      "start": "2026-11-13",
+      "end": "2026-11-14",
+      "open": [
+        "fri",
+        "sat"
+      ],
+      "minutes": 25,
+      "note": "Guided tour in English, Sat 14 Nov at 11:00. ECAL also shows at Paris Photo.",
+      "noteZh": "11月14日（周六）11:00 有英语导览。ECAL 在 Paris Photo 也有展出。",
+      "sourceUrl": "https://ecal.ch/en/feed/events/1918/lecal-a-paris-photo-soft-photography/",
+      "coordinates": [
+        2.366163,
+        48.862208
+      ]
+    },
+    {
+      "id": "C6",
+      "tier": "C",
+      "name": "LSD · Laboratory Scan & Developing",
+      "short": "LSD",
+      "subtitle": "Cyan Years",
+      "by": "Jean-Vincent Simonet",
+      "zone": "republique",
+      "themes": [
+        "material"
+      ],
+      "why": "Pictures reworked on the presses of the family print works where the book itself was printed. A short show with the launch, for anyone curious about print as material.",
+      "whyZh": "作者在自家印刷厂的印刷机上重新加工图像，这本书也是在那里印的。展期很短，与新书发布同时，适合对“印刷即材质”感兴趣的人。",
+      "address": "47 Rue de la Folie-Méricourt, 75011 Paris",
+      "hours": "Fri 13 Nov 18:00–22:00 (launch). Sat 14 Nov: hours not published",
+      "hoursZh": "11月13日（周五）18:00–22:00（发布会）。11月14日（周六）：开放时间未公布",
+      "start": "2026-11-13",
+      "end": "2026-11-14",
+      "open": [
+        "fri",
+        "sat"
+      ],
+      "minutes": 25,
+      "note": "A photo lab, not a gallery: check the publisher’s page before going on Saturday.",
+      "noteZh": "这是一家冲印实验室，不是画廊：周六前往前请先查看出版社的页面。",
+      "sourceUrl": "https://loosejoints.biz/blogs/current-events/jean-vincent-simonet-paris-launch",
+      "coordinates": [
+        2.371811,
+        48.863986
+      ]
+    },
+    {
+      "id": "C7",
+      "tier": "C",
+      "name": "Galerie Madé",
+      "short": "Madé",
+      "subtitle": "El Rey Blanco",
+      "by": "Maximiliano Tineo",
+      "zone": "left-bank",
+      "themes": [
+        "documentary",
+        "archive"
+      ],
+      "why": "A colonial legend of a White King and a mountain of silver, read against today’s rush for lithium in the Andes. Watch how an old story is used to frame a present one.",
+      "whyZh": "一个关于“白色国王”和银山的殖民传说，对照今天安第斯山区对锂矿的争夺。看看一个古老的故事如何被用来讲述当下。",
+      "address": "30 Rue Mazarine, 75006 Paris",
+      "hours": "Wed–Sat 14:00–19:00, by chance or by appointment",
+      "hoursZh": "周三至周六 14:00–19:00，随缘或预约",
+      "start": "2026-11-05",
+      "end": "2026-11-28",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 20,
+      "note": "The festival lists Tue–Sat; the gallery says Wed–Sat. One of its posters gives 5–8 Nov, while the festival and press kit say until 28 Nov. Call before going.",
+      "noteZh": "摄影节写的是周二至周六，画廊自己写的是周三至周六。画廊的一张海报写11月5日至8日，而摄影节和新闻资料写展至11月28日。出发前请先打电话确认。",
+      "sourceUrl": "https://www.photosaintgermain.com/en/editions/2026/parcours/galerie-made",
+      "links": [
+        "https://galeriemade.com/en/exhibitions/en-cours/"
+      ],
+      "coordinates": [
+        2.337382,
+        48.856079
+      ]
+    },
+    {
+      "id": "C8",
+      "tier": "C",
+      "name": "Musée de Minéralogie Mines Paris – PSL",
+      "short": "Minéralogie",
+      "subtitle": "Temps profonds et autres lumières",
+      "by": "Laure Winants",
+      "zone": "left-bank",
+      "themes": [
+        "material",
+        "archive"
+      ],
+      "why": "Sculptures and images set among the museum’s fossils, weighing geological time against the changes happening now. Laure Winants is also in the FUTURES show in the Marais.",
+      "whyZh": "雕塑和图像放在博物馆的化石之间，把地质时间与眼下正在发生的变化放在一起衡量。Laure Winants 也参加了玛黑区的 FUTURES 展。",
+      "address": "60 Boulevard Saint-Michel, 75006 Paris (inside the École des Mines, second floor)",
+      "hours": "Tue 10:00–12:00 and 13:30–18:00; Wed–Fri 13:30–18:00; Sat 10:00–12:30 and 14:00–17:00; last entry one hour before closing",
+      "hoursZh": "周二 10:00–12:00、13:30–18:00；周三至周五 13:30–18:00；周六 10:00–12:30、14:00–17:00；闭馆前一小时停止入场",
+      "start": "2026-11-05",
+      "end": "2026-12-12",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "holiday": "closed",
+      "exceptions": [
+        {
+          "date": "2026-11-10",
+          "status": "closed",
+          "note": "Exceptional closure.",
+          "noteZh": "临时闭馆。"
+        }
+      ],
+      "minutes": 40,
+      "price": "€7; reduced €4; free under 26. Buy online: the ticket machine is out of order, and you need a ticket to pass the gates.",
+      "priceZh": "€7；优惠票 €4；26岁以下免费。请在网上购票：现场售票机故障，而且要凭票才能通过入口闸机。",
+      "note": "The festival’s English page gives 15 Nov as the start; the museum and the French page say 5 Nov.",
+      "noteZh": "摄影节英文页面写11月15日开展；博物馆和法文页面都写11月5日。",
+      "sourceUrl": "https://www.minesparis.psl.eu/musee/expos-evenements/expos-temporaires/photosaintgermain/",
+      "links": [
+        "https://www.minesparis.psl.eu/musee/le-musee/horaires-tarifs/",
+        "https://musee-de-mineralogie.billetterie.museum/"
+      ],
+      "coordinates": [
+        2.339672,
+        48.845632
+      ]
+    },
+    {
+      "id": "C9",
+      "tier": "C",
+      "name": "Librairie Polonaise",
+      "short": "Lib. Polonaise",
+      "subtitle": "Carte blanche aux éditions Rust Publishing",
+      "by": "Jakub Szachnowski / Tomasz Jan Kawecki",
+      "zone": "left-bank",
+      "themes": [
+        "material",
+        "documentary"
+      ],
+      "why": "A Polish–German photobook collective’s recent books and prints, in a bookshop. Useful after Polycopies, to see small-press making up close.",
+      "whyZh": "一个波兰与德国东部之间的摄影书团体，在书店里展出近期的书和版画。看过 Polycopies 之后再来，可以近距离看看小型出版是怎么做的。",
+      "address": "123 Boulevard Saint-Germain, 75006 Paris",
+      "hours": "Tue–Sat 11:00–19:00",
+      "hoursZh": "周二至周六 11:00–19:00",
+      "start": "2026-11-05",
+      "end": "2026-11-28",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "minutes": 20,
+      "sourceUrl": "https://www.photosaintgermain.com/en/editions/2026/parcours/librairie-polonaise",
+      "links": [
+        "https://weekendalest.com/CARTE-BLANCHE-A-RUST-PUBLISHING?lang=en"
+      ],
+      "coordinates": [
+        2.336801,
+        48.852796
+      ]
+    },
+    {
+      "id": "C10",
+      "tier": "C",
+      "name": "Musée de la musique – Philharmonie de Paris",
+      "short": "Philharmonie",
+      "subtitle": "My Rock Stars",
+      "by": "Hassan Hajjaj; music by Acid Arab",
+      "zone": "north-east-19e",
+      "themes": [
+        "portrait",
+        "staging"
+      ],
+      "why": "Pattern-filled studio portraits of musicians, with a soundtrack playing through the rooms. A lively contrast to the restraint of Penn’s portraits.",
+      "whyZh": "满是图案的音乐人棚拍肖像，展厅里一路播放配乐。与 Penn 肖像的克制形成鲜明对比。",
+      "address": "Cité de la musique, 221 Avenue Jean-Jaurès, 75019 Paris",
+      "hours": "Tue–Fri 12:00–18:00; Sat–Sun 10:00–18:00; closed Mon",
+      "hoursZh": "周二至周五 12:00–18:00；周六、周日 10:00–18:00；周一闭馆",
+      "start": "2026-09-22",
+      "end": "2027-04-25",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "minutes": 50,
+      "price": "€12, including the permanent collection; €6 under 26. Booking required.",
+      "priceZh": "€12，含常设展；26岁以下 €6。必须预约。",
+      "note": "Métro line 5, Porte de Pantin.",
+      "noteZh": "地铁5号线 Porte de Pantin 站。",
+      "sourceUrl": "https://philharmoniedeparis.fr/en/activity/exposition/30026-hassan-hajjaj-my-rock-stars",
+      "coordinates": [
+        2.393824,
+        48.889311
+      ]
+    },
+    {
+      "id": "C11",
+      "tier": "C",
+      "name": "Catacombes de Paris",
+      "short": "Catacombes",
+      "subtitle": "Nadar : inventer Paris, des profondeurs au ciel",
+      "by": "Nadar",
+      "zone": "south-14e",
+      "themes": [
+        "archive"
+      ],
+      "why": "About fifteen reproductions of Nadar’s 1860s pictures of the ossuary and sewers, made with electric light, beside his balloon views of Paris. Go only if you are visiting the Catacombs anyway.",
+      "whyZh": "约十五张复制品，是 Nadar 在1860年代用电光拍摄的地下骨库和下水道，旁边是他从热气球上拍的巴黎。只有本来就要去地下墓穴时才值得顺路一看。",
+      "address": "1 Avenue du Colonel Henri Rol-Tanguy, 75014 Paris (entrance building, ground floor)",
+      "hours": "Tue–Sun 09:45–20:30; last entry 19:30; closed Mon",
+      "hoursZh": "周二至周日 09:45–20:30；最晚入场 19:30；周一闭馆",
+      "start": "2026-09-29",
+      "end": "2027-01-31",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "holiday": "open",
+      "minutes": 20,
+      "price": "Only with a Catacombs ticket: €31, reduced €25 (ages 18–26 and students). Timed tickets online, on sale 7 days ahead.",
+      "priceZh": "只能凭地下墓穴门票参观：€31，优惠票 €25（18至26岁和学生）。分时段门票在网上出售，提前7天开售。",
+      "note": "The Catacombs visit has 131 steps down and 112 up and isn’t wheelchair accessible. The Musée de la Libération (Robert Capa) is across the road.",
+      "noteZh": "参观地下墓穴要下131级、上112级台阶，轮椅无法通行。马路对面是解放博物馆（Robert Capa 展）。",
+      "sourceUrl": "https://www.catacombes.paris.fr/en/discover/exhibition/nadar-inventing-paris-depths-sky",
+      "links": [
+        "https://www.catacombes.paris.fr/en/visit/useful-information"
+      ],
+      "coordinates": [
+        2.332506,
+        48.833981
+      ]
+    },
+    {
+      "id": "C12",
+      "tier": "C",
+      "name": "Musée de l’Homme",
+      "short": "Musée Homme",
+      "subtitle": "Les grands âges",
+      "by": "Nikos Aliagas",
+      "zone": "west-16e",
+      "themes": [
+        "portrait",
+        "everyday"
+      ],
+      "why": "Portraits and everyday scenes of very old people, set beside a researcher’s findings on ageing. Notice how science and portraiture each claim to describe a life.",
+      "whyZh": "高龄老人的肖像和日常场景，与一位研究者关于衰老的发现并置。留意科学与肖像各自如何声称能描述一个人的一生。",
+      "address": "17 Place du Trocadéro et du 11 Novembre, 75116 Paris",
+      "hours": "Wed–Mon 11:00–19:00; last entry 18:15; closed Tue. Closed 8–11 Nov 2026",
+      "hoursZh": "周三至周一 11:00–19:00；最晚入场 18:15；周二闭馆。2026年11月8日至11日闭馆",
+      "start": "2026-04-08",
+      "end": "2027-01-03",
+      "open": [
+        "mon",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "exceptions": [
+        {
+          "date": "2026-11-08",
+          "status": "closed",
+          "note": "Museum closed 8–11 Nov.",
+          "noteZh": "博物馆11月8日至11日闭馆。"
+        },
+        {
+          "date": "2026-11-09",
+          "status": "closed",
+          "note": "Museum closed 8–11 Nov.",
+          "noteZh": "博物馆11月8日至11日闭馆。"
+        },
+        {
+          "date": "2026-11-11",
+          "status": "closed",
+          "note": "Museum closed 8–11 Nov.",
+          "noteZh": "博物馆11月8日至11日闭馆。"
+        }
+      ],
+      "minutes": 45,
+      "price": "€15; reduced €12; one ticket covers the whole museum.",
+      "priceZh": "€15；优惠票 €12；一张票可参观整个博物馆。",
+      "note": "Métro Trocadéro, exit 6. Open 12–15 Nov this week.",
+      "noteZh": "地铁 Trocadéro 站6号出口。本周只在11月12日至15日开放。",
+      "sourceUrl": "https://www.museedelhomme.fr/fr/exposition/les-grands-ages",
+      "coordinates": [
+        2.287343,
+        48.862207
+      ]
     }
   ]
 }

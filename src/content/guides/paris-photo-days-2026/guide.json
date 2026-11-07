@@ -1,14 +1,14 @@
 {
-  "_comment": "Photo Days 2026 Paris: dates, texts, tiers, themes, credits. Mark participant-only content with \"audience\": \"fotofilmic\". See docs/GUIDES.md. 导览总设置；只给学员看的内容加 \"audience\": \"fotofilmic\"。",
-  "title": "Photo Days, at your own pace.",
-  "titleZh": "按自己的节奏逛 Photo Days。",
-  "subtitle": "A field guide to Photo Days 2026 in Paris. Search by keyword, choose a cluster, and leave time to look.",
-  "subtitleZh": "2026年巴黎 Photo Days 导览。可按关键词查找、选择一个片区，并留出时间慢慢看。",
+  "_comment": "Paris photography, 8–15 November 2026: dates, texts, tiers, themes, credits. Mark participant-only content with \"audience\": \"fotofilmic\". See docs/GUIDES.md. 导览总设置；只给学员看的内容加 \"audience\": \"fotofilmic\"。",
+  "title": "Paris photography, at your own pace.",
+  "titleZh": "按自己的节奏看巴黎摄影。",
+  "subtitle": "A field guide to photography in Paris, 8 to 15 November 2026. Search by keyword, choose a cluster, and leave time to look.",
+  "subtitleZh": "2026年11月8日至15日巴黎摄影导览。可按关键词查找、选择一个片区，并留出时间慢慢看。",
   "public": {
-    "title": "Photo Days 2026 Paris",
-    "titleZh": "巴黎 Photo Days 2026",
-    "subtitle": "Paris 8 to 15 November 2026",
-    "subtitleZh": "巴黎 2026年11月8日至15日"
+    "title": "Photography in Paris 2026",
+    "titleZh": "巴黎摄影 2026",
+    "subtitle": "8 to 15 November 2026",
+    "subtitleZh": "2026年11月8日至15日"
   },
   "listed": true,
   "city": "Paris",
@@ -16,17 +16,10 @@
   "timezone": "Europe/Paris",
   "timezoneLabel": "Paris time (CET, UTC+1)",
   "timezoneLabelZh": "巴黎时间（CET，UTC+1）",
-  "checked": "2026-11-06",
+  "checked": "2026-11-07",
   "window": {
     "start": "2026-11-08",
     "end": "2026-11-15"
-  },
-  "event": {
-    "name": "Photo Days",
-    "nameZh": "Photo Days 摄影节",
-    "start": "2026-11-02",
-    "end": "2026-11-30",
-    "url": "https://photodays.paris/"
   },
   "holidays": [
     {
@@ -117,6 +110,11 @@
       "nameZh": "塞纳河／13区"
     },
     {
+      "id": "south-14e",
+      "name": "South / 14th",
+      "nameZh": "南部／14区"
+    },
+    {
       "id": "west-left-bank",
       "name": "West / Left bank",
       "nameZh": "西部／左岸"
@@ -137,6 +135,11 @@
       "nameZh": "西部／协和广场"
     },
     {
+      "id": "west-16e",
+      "name": "West / 16th",
+      "nameZh": "西部／16区"
+    },
+    {
       "id": "north-clichy",
       "name": "North / Clichy",
       "nameZh": "北部／克利希"
@@ -145,6 +148,11 @@
       "id": "north-barbes",
       "name": "North / Barbès",
       "nameZh": "北部／巴尔贝斯"
+    },
+    {
+      "id": "north-east-19e",
+      "name": "North-east / 19th",
+      "nameZh": "东北部／19区"
     },
     {
       "id": "central",
@@ -204,12 +212,12 @@
       "headingZh": "关于本导览",
       "paras": [
         {
-          "text": "Prepared from the Photo Days programme and venue websites. This is an optional, independent guide for looking beyond the fair. No tickets, appointments or group visits have been booked.",
-          "textZh": "根据 Photo Days 节目单和各场馆网站整理。这是一份可选的独立导览，帮助你在博览会之外多看一些。本导览没有代为预订任何门票，也没有安排任何预约或团体参观。"
+          "text": "Prepared from venue websites, the Photo Days and PhotoSaintGermain programmes, the Paris Photo and Polycopies websites, and press round-ups checked against the venues. This is an optional, independent guide to photography in Paris this week, at the fairs and beyond them. No tickets, appointments or group visits have been booked.",
+          "textZh": "根据各场馆网站、Photo Days 和 PhotoSaintGermain 的节目单、Paris Photo 和 Polycopies 的网站，以及经场馆核对过的媒体推荐整理。这是一份可选的独立导览，帮助你在这一周看巴黎的摄影，博览会内外都有。本导览没有代为预订任何门票，也没有安排任何预约或团体参观。"
         },
         {
-          "text": "Unofficial guide; not a Photo Days publication.",
-          "textZh": "非官方导览，并非 Photo Days 出版物。"
+          "text": "Unofficial guide: not a publication of Photo Days, Paris Photo, Polycopies or any other festival or fair.",
+          "textZh": "非官方导览：不是 Photo Days、Paris Photo、Polycopies 或其他任何摄影节、博览会的出版物。"
         },
         {
           "text": "For FotoFilmic workshop participants, the map is centred on Hotel Moris, the workshop venue. The guide is not a scheduled workshop activity.",
@@ -225,6 +233,10 @@
         {
           "text": "The Marais is the strongest recommendation cluster: it combines controlled portraiture, staging, documentary work and material experimentation within a relatively compact walk. Choose two or three exhibitions and spend time with them. Add one larger museum on a free day rather than trying to complete the whole map.",
           "textZh": "玛黑区是最值得推荐的片区：在相对紧凑的步行范围内，汇集了严谨控制的肖像、场景编排、纪实作品和材质实验。挑两三个展览，花时间细看。有空闲的一天再加一座大型博物馆，而不是试图把整张地图走完。"
+        },
+        {
+          "text": "On 12–15 November, pair Paris Photo with Polycopies: the photobook boat is a 15-minute walk across the Seine and opens two hours earlier. On the Left Bank, the PhotoSaintGermain shows around Rue de l’Abbaye make a short walk of their own.",
+          "textZh": "11月12日至15日，可以把 Paris Photo 和 Polycopies 放在同一天：摄影书展船过塞纳河步行约15分钟，而且早两小时开门。左岸 Rue de l’Abbaye 一带的 PhotoSaintGermain 展览也可以单独走一小段。"
         }
       ]
     },
@@ -237,8 +249,8 @@
           "textZh": "暖色区域表示所选展览的集中程度，按权重计算：A = 起点，B = 深入主题，C = 顺路可选。各场馆有各自的入场规定。"
         },
         {
-          "text": "The map contains 29 selected exhibitions and the 88 point records of the official Photo Days map, plus the FotoFilmic gallery as a reference point. The 88 records include distinct programmes at the same building, appointment-only visits, fairs and events beyond 15 November; they are not 88 separate recommendations. This is a complete directory of the official map snapshot, not a claim to catalogue every exhibition in Paris.",
-          "textZh": "地图包含 29 个精选展览和 Photo Days 官方地图的 88 条点位记录，另有 FotoFilmic 画廊作为参考点。这 88 条记录包括同一建筑内的不同展览项目、仅限预约的参观、博览会以及11月15日之后的活动；它们不是 88 条独立的推荐。这是官方地图快照的完整名录，并不声称收录巴黎的所有展览。"
+          "text": "The map contains {items} selected exhibitions and fairs and the {listings} point records of the official Photo Days map, plus the FotoFilmic gallery as a reference point. The {listings} records include distinct programmes at the same building, appointment-only visits, fairs and events beyond 15 November; they are not {listings} separate recommendations. This is a complete directory of the official map snapshot, not a claim to catalogue every exhibition in Paris.",
+          "textZh": "地图包含 {items} 个精选展览和博览会，以及 Photo Days 官方地图的 {listings} 条点位记录，另有 FotoFilmic 画廊作为参考点。这 {listings} 条记录包括同一建筑内的不同展览项目、仅限预约的参观、博览会以及11月15日之后的活动；它们不是 {listings} 条独立的推荐。这是官方地图快照的完整名录，并不声称收录巴黎的所有展览。"
         }
       ],
       "items": [
@@ -351,16 +363,16 @@
       ]
     },
     "listings": {
-      "heading": "All 88 entries in the official Photo Days map",
-      "headingZh": "Photo Days 官方地图全部 88 个条目",
+      "heading": "All {listings} entries in the official Photo Days map",
+      "headingZh": "Photo Days 官方地图全部 {listings} 个条目",
       "paras": [
         {
           "text": "Includes suburban venues, appointment-only visits, fairs and events after 15 November. These remain in the directory for completeness, not in the recommendation heat. Venue-level records may contain several exhibitions. Same-building programmes are kept separate. Individual festival pages were retrieved; detailed corrections below prioritise venue websites where checked.",
           "textZh": "包括郊区场馆、仅限预约的参观、博览会和11月15日之后的活动。为完整起见，它们保留在名录中，但不计入推荐热力。以场馆为单位的记录可能包含多个展览。同一建筑内的不同项目分别列出。已获取摄影节的各个详情页；下文的详细更正在已核实之处优先采用场馆网站的信息。"
         },
         {
-          "text": "The official map list keeps the complete point inventory, including records outside 8–15 November. It does not raise all entries to recommended status. For the 29 selected venues, use the corrected information in their own entries rather than an inconsistent map caption. Other captions remain reported festival facts; they have not all been independently verified against a venue website.",
-          "textZh": "官方地图列表保留完整的点位清单，包括11月8日至15日以外的记录，但这并不意味着所有条目都被推荐。对于 29 个精选场馆，请以其各自条目中的更正信息为准，而不是前后不一的地图说明。其他说明仍是摄影节公布的信息，并未全部与场馆网站逐一核对。"
+          "text": "The official map list keeps the complete point inventory, including records outside 8–15 November. It does not raise all entries to recommended status. For the selected venues, use the corrected information in their own entries rather than an inconsistent map caption. Other captions remain reported festival facts; they have not all been independently verified against a venue website.",
+          "textZh": "官方地图列表保留完整的点位清单，包括11月8日至15日以外的记录，但这并不意味着所有条目都被推荐。对于精选场馆，请以其各自条目中的更正信息为准，而不是前后不一的地图说明。其他说明仍是摄影节公布的信息，并未全部与场馆网站逐一核对。"
         }
       ]
     },
@@ -427,6 +439,36 @@
           "leadZh": "Barnor 展",
           "text": "festival page says Tue–Sat, map says Mon–Sat. Do not rely on Monday.",
           "textZh": "摄影节页面写周二至周六，地图写周一至周六。不要指望周一开放。"
+        },
+        {
+          "lead": "Paris Photo",
+          "leadZh": "Paris Photo 博览会",
+          "text": "its pages give both 3 Avenue du Général Eisenhower and Avenue Winston-Churchill; both border the Grand Palais. No talk time is published for the PhotoBook Awards ceremony.",
+          "textZh": "其网页同时写了 3 Avenue du Général Eisenhower 和 Avenue Winston-Churchill，两条街都紧邻大皇宫。摄影书奖颁奖仪式的时间尚未公布。"
+        },
+        {
+          "lead": "Musée de Minéralogie",
+          "leadZh": "矿物博物馆",
+          "text": "PhotoSaintGermain’s English page gives 15 Nov as the start; the museum and the festival’s French page say 5 Nov. Closed 10 and 11 Nov.",
+          "textZh": "PhotoSaintGermain 英文页面写11月15日开展；博物馆和摄影节法文页面都写11月5日。11月10日和11日闭馆。"
+        },
+        {
+          "lead": "Galerie Madé",
+          "leadZh": "Madé 画廊",
+          "text": "the festival lists Tue–Sat, the gallery Wed–Sat by chance or appointment; one poster says 5–8 Nov. This guide follows the festival and press kit (until 28 Nov).",
+          "textZh": "摄影节写周二至周六，画廊写周三至周六，随缘或预约；一张海报写11月5日至8日。本导览采用摄影节和新闻资料的说法（展至11月28日）。"
+        },
+        {
+          "lead": "FUTURES",
+          "leadZh": "FUTURES 展",
+          "text": "its page gives both 8–14 and 9–15 Nov; this guide uses only 9–14 Nov.",
+          "textZh": "其页面同时写了11月8日至14日和11月9日至15日；本导览只采用11月9日至14日。"
+        },
+        {
+          "lead": "Musée de l’Homme",
+          "leadZh": "人类博物馆",
+          "text": "closed 8–11 Nov 2026 by a notice on its home page; the exhibition page doesn’t say so.",
+          "textZh": "首页通知2026年11月8日至11日闭馆；展览页面没有提到。"
         }
       ]
     },
@@ -469,8 +511,8 @@
       "headingZh": "资料来源",
       "paras": [
         {
-          "text": "Source boundary: 88 official point records, 29 selected exhibitions and the FotoFilmic gallery as a reference point. The directory covers the official map snapshot checked on 6 November. Exhibition preview images remain © their respective artists/rightsholders; each links to its official exhibition source.",
-          "textZh": "资料范围：88 条官方点位记录、29 个精选展览和 FotoFilmic 画廊这一参考点。名录涵盖11月6日核实的官方地图快照。展览预览图版权归各自的艺术家或权利人所有；每张图都链接到对应展览的官方来源。"
+          "text": "Source boundary: {listings} official point records, {items} selected exhibitions and fairs, and the FotoFilmic gallery as a reference point. The directory covers the official map snapshot checked on 6 November; the entries added on 7 November were checked against their venues’ own pages. Exhibition preview images remain © their respective artists/rightsholders; each links to its official exhibition source.",
+          "textZh": "资料范围：{listings} 条官方点位记录、{items} 个精选展览和博览会，以及 FotoFilmic 画廊这一参考点。名录涵盖11月6日核实的官方地图快照；11月7日新增的条目已与各场馆自己的网页核对。展览预览图版权归各自的艺术家或权利人所有；每张图都链接到对应展览的官方来源。"
         },
         {
           "text": "Participants also see two more reference points: the workshop venue (W) and the meet-up place (M).",
@@ -494,6 +536,14 @@
         {
           "text": "MEP current hours and admission, LE BAL special hours, Quai winter access.",
           "textZh": "MEP 当前开放时间和门票、LE BAL 特别开放时间、Quai 冬季开放信息。"
+        },
+        {
+          "text": "Press round-ups for Paris Photo week 2026 (Sortir à Paris, PhMuseum, Flo London); every entry taken from them was checked against the venue’s own page on 7 November.",
+          "textZh": "2026年 Paris Photo 周的媒体推荐（Sortir à Paris、PhMuseum、Flo London）；从中选取的每个条目都已在11月7日与场馆自己的网页核对。"
+        },
+        {
+          "text": "Paris Photo visitor information, tickets and talks; the Polycopies programme and meet-ups; the PhotoSaintGermain 2026 itinerary.",
+          "textZh": "Paris Photo 参观信息、门票和讲座；Polycopies 的节目和见面安排；PhotoSaintGermain 2026 路线。"
         },
         {
           "text": "Street-level map tiles: Plan IGN v2, IGN / Géoplateforme, under the Etalab 2.0 open licence, fetched through kuschonink.com.",
@@ -537,11 +587,31 @@
       "label": "Quai de la Photo winter access",
       "labelZh": "Quai de la Photo 冬季开放信息",
       "url": "https://quaidelaphoto.fr/venez/acces-horaires/"
+    },
+    {
+      "label": "Paris Photo visitor information",
+      "labelZh": "Paris Photo 参观信息",
+      "url": "https://www.parisphoto.com/en-gb/info/Visitor-information.html"
+    },
+    {
+      "label": "Paris Photo talks and events",
+      "labelZh": "Paris Photo 讲座与活动",
+      "url": "https://agenda.parisphoto.com/en"
+    },
+    {
+      "label": "Polycopies (Instagram)",
+      "labelZh": "Polycopies（Instagram）",
+      "url": "https://www.instagram.com/polycopies/"
+    },
+    {
+      "label": "PhotoSaintGermain 2026 itinerary",
+      "labelZh": "PhotoSaintGermain 2026 路线",
+      "url": "https://www.photosaintgermain.com/en/editions/2026/parcours"
     }
   ],
   "credits": {
-    "points": "Points: Photo Days / Camille Gajate, official uMap #1453094",
-    "pointsZh": "点位：Photo Days／Camille Gajate，官方 uMap #1453094",
+    "points": "Points: Photo Days / Camille Gajate, official uMap #1453094; other points from the Base Adresse Nationale",
+    "pointsZh": "点位：Photo Days／Camille Gajate，官方 uMap #1453094；其他点位来自法国国家地址库（BAN）",
     "image": "Published by Photo Days",
     "imageZh": "由 Photo Days 发布"
   },

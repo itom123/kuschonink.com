@@ -26,6 +26,11 @@ const DIR = `src/content/guides/${SLUG}`;
 const files: Record<string, string> = { 'README.md': 'repo' };
 for (const f of readdirSync(DIR)) if (f.endsWith('.json')) files[`${DIR}/${f}`] = readFileSync(`${DIR}/${f}`, 'utf8');
 const ACCESS = access as unknown as AccessFile;
+// The id a new entry gets depends on the real guide, so work it out from its items.
+const REAL = (JSON.parse(files[`${DIR}/items.json`]) as ItemsFile).items;
+const NEXT_C = nextId(REAL, 'C');
+const NEXT_B = nextId(REAL, 'B');
+const LAST_C = REAL.filter((i) => i.tier === 'C').at(-1)!.id;
 let now = Date.UTC(2026, 10, 9, 9, 0, 0);
 
 const pic640 = await sharp({ create: { width: 640, height: 427, channels: 3, background: '#556' } }).withExif({ IFD0: { Artist: 'Private Person' } }).jpeg({ quality: 70 }).toBuffer();
@@ -98,20 +103,20 @@ check('nextId: one more than the highest in the tier', nextId([{ id: 'C1', tier:
   const r = await publish(w.deps);
   const item = w.items().find((i) => i.suggested?.ref === id);
   check('a READY entry is committed to main', r.committed.length === 1 && !!item, r);
-  check('… as the next C id, with suggested (by, own, ref) and no audience', item?.id === 'C3' && item.tier === 'C' && item.suggested?.by === 'Ana Silva' && item.suggested?.own === true && item.audience === undefined, item);
-  check('… the picture saved as img/C3.jpg, without EXIF, with its credit and alt', !!w.g.files({ bytes: true })[`public/guides/${SLUG}/img/C3.jpg`] && !Buffer.from(w.g.files({ bytes: true })[`public/guides/${SLUG}/img/C3.jpg`]).includes(Buffer.from('Private Person')) && item?.image?.file === 'C3.jpg' && item.image.credit === 'Photo: Ana Silva' && item.image.alt === 'A large winter photograph', item?.image);
-  check('… only items.json and the picture changed', Object.keys(w.g.files()).filter((p) => !(p in files)).join() === `public/guides/${SLUG}/img/C3.jpg` && Object.entries(files).every(([p, t]) => p.endsWith('items.json') || w.g.files()[p] === t));
-  check('… items.json is formatted like the rest (2 spaces, final newline), C3 after C2', w.g.files()[`${DIR}/items.json`].endsWith('}\n') && w.items().findIndex((i) => i.id === 'C3') === w.items().findIndex((i) => i.id === 'C2') + 1);
-  check('… the commit says what it added', /^Field Guide: add Galerie Exemple \(S-\w+ C3\) to paris-photo-days-2026$/.test(w.g.message() ?? ''), w.g.message());
+  check('… as the next C id, with suggested (by, own, ref) and no audience', item?.id === NEXT_C && item.tier === 'C' && item.suggested?.by === 'Ana Silva' && item.suggested?.own === true && item.audience === undefined, item);
+  check(`… the picture saved as img/${NEXT_C}.jpg, without EXIF, with its credit and alt`, !!w.g.files({ bytes: true })[`public/guides/${SLUG}/img/${NEXT_C}.jpg`] && !Buffer.from(w.g.files({ bytes: true })[`public/guides/${SLUG}/img/${NEXT_C}.jpg`]).includes(Buffer.from('Private Person')) && item?.image?.file === `${NEXT_C}.jpg` && item.image.credit === 'Photo: Ana Silva' && item.image.alt === 'A large winter photograph', item?.image);
+  check('… only items.json and the picture changed', Object.keys(w.g.files()).filter((p) => !(p in files)).join() === `public/guides/${SLUG}/img/${NEXT_C}.jpg` && Object.entries(files).every(([p, t]) => p.endsWith('items.json') || w.g.files()[p] === t));
+  check(`… items.json is formatted like the rest (2 spaces, final newline), ${NEXT_C} after ${LAST_C}`, w.g.files()[`${DIR}/items.json`].endsWith('}\n') && w.items().findIndex((i) => i.id === NEXT_C) === w.items().findIndex((i) => i.id === LAST_C) + 1);
+  check('… the commit says what it added', new RegExp(`^Field Guide: add Galerie Exemple \\(S-\\w+ ${NEXT_C}\\) to paris-photo-days-2026$`).test(w.g.message() ?? ''), w.g.message());
   const row = await w.row(id);
-  check('… Notion: PUBLISHING, Item id C3, the commit link', row.status === 'PUBLISHING' && row.itemId === 'C3' && /\/commit\/[0-9a-f]{40}$/.test(row.commit), row);
+  check(`… Notion: PUBLISHING, Item id ${NEXT_C}, the commit link`, row.status === 'PUBLISHING' && row.itemId === NEXT_C && /\/commit\/[0-9a-f]{40}$/.test(row.commit), row);
   check('… and a log entry', [...w.s.pages.values()].some((p: { parent: { data_source_id: string } }) => p.parent.data_source_id === 'ds-log'));
 
   const r2 = await publish(w.deps);
   check('no build check yet: still PUBLISHING, nothing committed', r2.committed.length === 0 && (await w.row(id)).status === 'PUBLISHING');
   w.g.checks.set(w.g.head(), [{ name: 'Workers Builds: kuschonink', status: 'completed', conclusion: 'success', html_url: 'https://dash', output: { title: 'Success' } }]);
   const r3 = await publish(w.deps);
-  check('the build passed: PUBLISHED', r3.live.length === 1 && (await w.row(id)).status === 'PUBLISHED' && (await w.row(id)).result.includes('C3'));
+  check('the build passed: PUBLISHED', r3.live.length === 1 && (await w.row(id)).status === 'PUBLISHED' && (await w.row(id)).result.includes(NEXT_C));
   check('… its check run read without the token (a fine-grained token is refused there)', w.g.calls.some((c: string) => c.endsWith('/check-runs (no token)')) && !w.g.calls.some((c: string) => c.endsWith('/check-runs')), w.g.calls.filter((c: string) => c.includes('check-runs')));
 
   await w.n.updatePage(id, { [S.status]: P.select('READY') });
@@ -123,7 +128,7 @@ check('nextId: one more than the highest in the tier', nextId([{ id: 'C1', tier:
   await publish(w.deps);
   const moved = w.items().find((i) => i.suggested?.ref === id);
   const all = w.g.files({ bytes: true });
-  check('a tier change: a new id (B16), the picture moves with it, C3 never comes back', moved?.id === 'B16' && moved.image?.file === 'B16.jpg' && !!all[`public/guides/${SLUG}/img/B16.jpg`] && !all[`public/guides/${SLUG}/img/C3.jpg`] && !w.items().some((i) => i.id === 'C3'), moved);
+  check(`a tier change: a new id (${NEXT_B}), the picture moves with it, ${NEXT_C} never comes back`, moved?.id === NEXT_B && moved.image?.file === `${NEXT_B}.jpg` && !!all[`public/guides/${SLUG}/img/${NEXT_B}.jpg`] && !all[`public/guides/${SLUG}/img/${NEXT_C}.jpg`] && !w.items().some((i) => i.id === NEXT_C), moved);
 }
 
 // ---- What is refused ----
@@ -162,7 +167,7 @@ check('nextId: one more than the highest in the tier', nextId([{ id: 'C1', tier:
   w.g.checks.set(sha, [{ name: 'Workers Builds: kuschonink', status: 'completed', conclusion: 'failure', html_url: 'https://dash/build/1', output: { title: 'Build failed', summary: 'Field Guide guard: leak' } }]);
   const r = await publish(w.deps);
   const row = await w.row(id);
-  check('the build failed: taken back in a new commit, item and picture gone', r.takenBack.length === 1 && w.g.head() !== sha && !w.items().some((i) => i.suggested?.ref === id) && !w.g.files()[`public/guides/${SLUG}/img/C3.jpg`], r);
+  check('the build failed: taken back in a new commit, item and picture gone', r.takenBack.length === 1 && w.g.head() !== sha && !w.items().some((i) => i.suggested?.ref === id) && !w.g.files()[`public/guides/${SLUG}/img/${NEXT_C}.jpg`], r);
   check('… ERROR, with the build\'s message and link', row.status === 'ERROR' && row.result.includes('leak') && row.result.includes('https://dash/build/1'), row.result);
 
   const x = await w.ready({}, { name: 'One' });

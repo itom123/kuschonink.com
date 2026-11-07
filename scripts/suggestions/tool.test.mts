@@ -14,6 +14,7 @@ import sharp from 'sharp';
 import { GUIDE_FILES } from '../../src/lib/guides/check.ts';
 import { notion, P } from '../../worker/notion.ts';
 import { readSuggestion, S, suggestionProps, type Suggestion } from '../../worker/suggestions.ts';
+import { nextId } from '../../worker/publish.ts';
 // @ts-expect-error: plain JS module
 import { standIn } from '../dev/notion-standin.mjs';
 // @ts-expect-error: plain JS module
@@ -26,6 +27,8 @@ function check(name: string, ok: boolean, detail: unknown = '') {
 }
 const REPO = fileURLToPath(new URL('../../', import.meta.url));
 const SLUG = 'paris-photo-days-2026';
+// The id a new entry gets depends on the real guide, so work it out from its items.
+const NEXT_C = nextId(JSON.parse(readFileSync(join(REPO, `src/content/guides/${SLUG}/items.json`), 'utf8')).items, 'C');
 const node = (args: string[], env: NodeJS.ProcessEnv, cwd?: string) =>
   new Promise<{ code: number; out: any; text: string }>((resolve) => {
     execFile(process.execPath, args, { env, cwd, maxBuffer: 1 << 24 }, (err, stdout, stderr) => {
@@ -155,7 +158,7 @@ for (const id of [dup.id, fresh.id]) await n.updatePage(id, { [S.status]: P.sele
   const word = await tool('check', fresh.id, write({ ...good, why: 'Meet at the workshop first.' }));
   check('check: a participants-only word in an entry for everyone', word.out?.ok === false && word.out.problems.some((p: string) => p.includes('NEEDS CHECK')), word.text.slice(0, 300));
   const ok = await tool('check', fresh.id, write(good), '--picture', web);
-  check('check: a good entry passes, as the next C id', ok.out?.ok === true && ok.out.item.id === 'C3' && ok.out.item.suggested.ref === fresh.id, ok.text.slice(0, 400));
+  check('check: a good entry passes, as the next C id', ok.out?.ok === true && ok.out.item.id === NEXT_C && ok.out.item.suggested.ref === fresh.id, ok.text.slice(0, 400));
   const refused = await tool('ready', fresh.id, write({ ...good, zone: 'nowhere' }), '--result', 'x');
   check('ready: refuses an entry that fails the checks (exit 2), nothing changes', refused.code === 2 && readSuggestion(await n.getPage(fresh.id)).status === 'PROCESSING', refused.text.slice(0, 200));
   const ready = await tool('ready', fresh.id, write(good), '--picture', web, '--result', 'Checked on exemple.fr');
