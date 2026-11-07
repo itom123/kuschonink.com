@@ -11,8 +11,14 @@ of the commit the live site runs and commits them here when they changed: the
 tool and the modules it imports, the guides' files, `package.json` and
 `scripts/suggestions/ROUTINE.md` (the task's instructions), with
 kuschonink.com's own `scripts/suggestions/download.mjs`, and this file,
-`.gitignore` and the workflow, from kuschonink.com's
-`scripts/suggestions/routine-repo/`. `.download.json` says which commit.
+`.gitignore`, `.claude/settings.json` and the workflow, from kuschonink.com's
+`scripts/suggestions/routine-repo/`. It also writes `package-lock.json`, so
+that the routine's `npm ci` installs sharp at exactly those versions.
+`.download.json` says which commit.
+
+`.claude/settings.json` lets a run use `./tool …` and
+`npm ci --no-audit --no-fund` as written, and refuses `git push`,
+`git commit`, `git remote` and `gh`.
 
 Nothing here is changed by hand: the workflow pushes with this repository's
 deploy key (the Actions secret `SYNC_DEPLOY_KEY`), and a ruleset lets nothing
@@ -22,4 +28,4 @@ kuschonink.com; the next sync brings them here.
 `.synced` changes once a month, so that the copy never goes 60 days without a
 commit: GitHub turns a public repository's scheduled workflows off after that.
 If the workflow was turned off anyway, turn it back on in Actions ▸ Sync ▸
-Enable workflow.
+Enable workflow (or `gh workflow enable sync.yml -R itom123/kuschonink-routine`).
