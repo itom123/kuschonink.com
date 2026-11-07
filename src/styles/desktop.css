@@ -54,6 +54,16 @@ html.js body.kus98 { height: 100%; overflow: hidden; overscroll-behavior: none; 
 button, input, select, textarea { font-family: var(--ui-font); }
 [hidden] { display: none !important; }
 html:not(.js) [data-js-only] { display: none !important; }
+/* The site's pictures can't be saved (scripts/desktop/nosave.ts): no press-and-hold menu
+   on an iPhone or iPad, no dragging one out, and selecting a page leaves them out. Not in
+   admin mode, nor on the visitor's own pictures ([data-savable]: Paint). No specificity,
+   like touch-action above. */
+:where(html:not([data-admin])) :where(img, canvas, svg image):not(:where([data-savable], [data-savable] *)) {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 .sr-only {
   position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;

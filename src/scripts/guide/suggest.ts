@@ -204,7 +204,8 @@ export function openSuggest(root: HTMLElement, onClosed?: () => void) {
   const thumb = h('span', { class: 'gs-thumb' }, SW.pictureNone);
   const pictureNote = h('small', { role: 'status' }, SW.pictureNote);
   const showPicture = () => {
-    thumb.replaceChildren(picture ? h('img', { src: picture.url, alt: '', width: picture.w, height: picture.h }) : h('span', {}, SW.pictureNone));
+    // The visitor's own picture: theirs to save (desktop/nosave.ts leaves [data-savable] alone).
+    thumb.replaceChildren(picture ? h('img', { src: picture.url, alt: '', width: picture.w, height: picture.h, 'data-savable': true }) : h('span', {}, SW.pictureNone));
     if (picture) thumb.append(h('span', {}, `${picture.w} × ${picture.h} · ${fileSize(picture.blob.size).en}`));
     remove.hidden = !picture;
   };

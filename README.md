@@ -34,6 +34,11 @@ separate, hidden log-on for admin mode, checked on the server
   Contact (`/contact`, a New Message window), Paint (`/paint`, for drawing
   something and sending it to the artist), The House (`/house/…`, a browser
   window), Field Guide (`/guides`, behind passwords) and Help (`/help`).
+- **Pictures can't be saved.** The photographs and drawings are protected by
+  copyright: no right-click, press-and-hold or drag will save one, and
+  *Save Picture As...* (and *Save* in the Image Viewer) says why. What a
+  visitor draws in Paint is theirs to keep, and admin mode is left alone. See
+  [`docs/DESKTOP.md`](docs/DESKTOP.md#pictures-cant-be-saved).
 - **The Control Panel**: Display (wallpaper, screen saver, colour schemes
   including High Contrast, window effects), Mouse (faint pointer trails, off to
   begin with; larger pointers; double-click speed), Sounds, and Folder Options

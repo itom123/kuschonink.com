@@ -130,7 +130,8 @@ export async function openSend(o: SendOpts) {
   const row = (key: Bi, field: Node) => h('label', { class: 'ps-row' }, [h('span', { class: 'ps-key' }, key), field]);
   const form = h('form', { class: 'paint-send', novalidate: true }, [
     h('div', { class: 'ps-picture' }, [
-      pic ? h('img', { class: 'ps-thumb', src: thumbUrl, alt: { en: 'Your picture', zh: '你的画' }, width: pic.w, height: pic.h }) : null,
+      // The visitor's own drawing: theirs to save (desktop/nosave.ts leaves [data-savable] alone).
+      pic ? h('img', { class: 'ps-thumb', src: thumbUrl, alt: { en: 'Your picture', zh: '你的画' }, width: pic.w, height: pic.h, 'data-savable': true }) : null,
       h('div', { class: 'ps-file' }, [
         h('b', {}, fileName),
         h('span', {}, pic ? { en: `${pic.w} × ${pic.h} pixels · ${sizeText.en} · PNG picture`, zh: `${pic.w} × ${pic.h} 像素 · ${sizeText.zh} · PNG 图片` } : ''),

@@ -6,6 +6,7 @@ import { aboutBox } from './aboutbox';
 import { commands } from './commands';
 import type { MenuSpec } from './menu';
 import { rememberBars } from './memory';
+import { guardedPicture, savePicture } from './nosave';
 import { showImageProperties, showPropertiesFor } from './properties';
 import { navigate } from './router';
 import { settings } from './settings';
@@ -199,29 +200,21 @@ export function linkMenu(a: Element, title: string): MenuSpec[] {
   ];
 }
 
-/** Right-click on a photograph. */
+/** Right-click on a photograph. Visitors can't save it: Save Picture As... says why (nosave.ts). */
 export function photoMenu(img: HTMLImageElement, extra: MenuSpec[] = []): MenuSpec[] {
   const largest = largestSrc(img);
   const file = decodeURIComponent(new URL(largest, location.href).pathname.split('/').pop() ?? 'picture');
   const link = img.closest('a[href]');
+  // The file's address is as good as the file: only where the picture may be kept (admin mode).
+  const shortcut: MenuSpec[] = guardedPicture(img)
+    ? []
+    : [{ sep: true }, { label: 'Copy Shor&tcut', zh: '复制快捷方式(&T)', action: () => copyText(new URL(largest, location.href).href) }];
   return [
     ...extra,
     ...(link ? [{ label: 'Open &Link', zh: '打开链接(&L)', action: () => (link as HTMLElement).click() } as MenuSpec, { sep: true } as MenuSpec] : []),
-    {
-      label: '&Save Picture As...', zh: '图片另存为(&S)...',
-      action: () => {
-        const a = document.createElement('a');
-        a.href = largest;
-        a.download = file;
-        a.setAttribute('data-native', '');
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      },
-    },
+    { label: '&Save Picture As...', zh: '图片另存为(&S)...', action: () => savePicture(img, largest, file) },
     { label: 'Set as &Wallpaper', zh: '设为墙纸(&W)', action: () => settings.set({ wallpaper: largest, wallpaperMode: 'stretch' }) },
-    { sep: true },
-    { label: 'Copy Shor&tcut', zh: '复制快捷方式(&T)', action: () => copyText(new URL(largest, location.href).href) },
+    ...shortcut,
     { sep: true },
     { label: 'P&roperties', zh: '属性(&R)', action: () => showImageProperties(img, img) },
   ];
