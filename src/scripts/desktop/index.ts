@@ -59,6 +59,7 @@ initTextZoom();
 initMyComputer();
 initViewer();
 initScreensaver();
+session.keepAlive();
 initWhatsThis();
 
 // Programs loaded the first time they're opened.
