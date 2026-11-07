@@ -8,9 +8,9 @@ name: Sync
 on:
   schedule:
     # Every 10 minutes, off the busy minute :00. GitHub runs a schedule for the
-    # account that last changed this line; the copy's own sync wrote it (as
-    # github-actions[bot]), since commits by an account without access to the
-    # copy left it never running.
+    # account that last changed this line, so the sync's commits are credited to
+    # the owner (below): commits by an account without access to the copy left
+    # it never running.
     - cron: '3,13,23,33,43,53 * * * *'
   workflow_dispatch:
 permissions:
@@ -50,6 +50,8 @@ jobs:
           cp -a "$RUNNER_TEMP/tree/." .
           git add -A
           if git diff --cached --quiet; then echo 'No change.'; exit 0; fi
-          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+          # Credited to the owner, itom123 (their GitHub no-reply address), with the owner's consent:
+          # these commits are the ones that change the cron line above.
+          git -c user.name='itom123' -c user.email='13485518+itom123@users.noreply.github.com' \
             commit -q -m "Files from kuschonink.com $(node -p 'require(process.argv[1]).commit' "$RUNNER_TEMP/took.json")"
           git push

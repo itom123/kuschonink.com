@@ -949,7 +949,8 @@ GitHub Action 每 10 分钟从这个仓库更新。所以例程推不了这个�
    引用的模块、各份导览的文件、`package.json` 和 ROUTINE.md），都来自网站当前运行的那个提交；`.download.json` 写着是哪个提交。
    它的工作流每 10 分钟运行一次，有变化才提交，副本自己的四样东西（`README.md`、`.gitignore`、`.claude/settings.json`、`.github/workflows/sync.yml`）
    也从这个仓库的 `scripts/suggestions/routine-repo/` 取。它用副本的部署密钥（deploy key，Actions secret `SYNC_DEPLOY_KEY`）
-   推送；一条规则（ruleset）只让部署密钥新建、更新、删除分支，你自己的推送和例程的推送都会被拒。所以不要手改副本：改这个仓库
+   推送，提交记在你（itom123）名下：GitHub 按最后改过定时那一行的账号来跑定时任务。一条规则（ruleset）只让部署密钥新建、
+   更新、删除分支，你自己的推送和例程的推送都会被拒。所以不要手改副本：改这个仓库
    里的那四样东西，下一次同步就会带过去。副本的 `.claude/settings.json` 让例程照写的 `./tool …` 和 `npm ci --no-audit --no-fund`
    直接运行，拒绝 `git push`、`git commit`、`git remote` 和 `gh`；每次同步还写一份 `package-lock.json`，让例程的 `npm ci` 装的
    正是锁定的 sharp。`.synced` 每月变一次，让副本不会 60 天没有提交（那样 GitHub 会关掉公开仓库的定时
@@ -1043,7 +1044,9 @@ Set it up once:
    copy's own four files (`README.md`, `.gitignore`, `.claude/settings.json`,
    `.github/workflows/sync.yml`) come from this repository's
    `scripts/suggestions/routine-repo/` too. It pushes with the copy's deploy
-   key (the Actions secret `SYNC_DEPLOY_KEY`), and a ruleset lets only deploy
+   key (the Actions secret `SYNC_DEPLOY_KEY`), with its commits credited to
+   you (itom123), since GitHub runs a schedule for the account that last
+   changed its cron line. A ruleset lets only deploy
    keys create, update or delete a branch, so your own pushes and a run's are
    refused. So don't edit the copy: change those four files here, and the
    next sync takes them there. The copy's `.claude/settings.json` lets a

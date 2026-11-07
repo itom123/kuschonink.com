@@ -21,8 +21,10 @@ that the routine's `npm ci` installs sharp at exactly those versions.
 `git commit`, `git remote` and `gh`.
 
 Nothing here is changed by hand: the workflow pushes with this repository's
-deploy key (the Actions secret `SYNC_DEPLOY_KEY`), and a ruleset lets nothing
-else create, update or delete a branch. To change these files, change them in
+deploy key (the Actions secret `SYNC_DEPLOY_KEY`), with its commits credited to
+the owner (itom123), since GitHub runs a schedule for the account that last
+changed its cron line; a ruleset lets nothing else create, update or delete a
+branch. To change these files, change them in
 kuschonink.com; the next sync brings them here.
 
 `.synced` changes once a month, so that the copy never goes 60 days without a
