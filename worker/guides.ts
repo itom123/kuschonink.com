@@ -92,6 +92,8 @@ export interface GuidesDeps {
   log: (...args: unknown[]) => void;
   /** POST /guides/<slug>/suggest (worker/suggest.ts); without it, that address is a 404. */
   suggest?: (request: Request, slug: string) => Promise<Response>;
+  /** A logged-on admin (worker/admin.ts) sees each guide's fullest view without its password. */
+  isAdmin?: (request: Request) => Promise<boolean>;
 }
 
 /** Mirrors run_worker_first "/guides" and "/guides/*". */
@@ -134,7 +136,7 @@ async function route(req: Request, deps: GuidesDeps): Promise<Response> {
   if (req.method !== 'GET' && req.method !== 'HEAD') return new Response(null, { status: 405, headers: { ...PRIVATE, allow: 'GET, HEAD' } });
 
   const pepper = pepperOf(deps); // none: closed, and no cookie counts
-  const view = pepper ? await viewFor(deps, pepper, slug, req.headers.get('cookie')) : null;
+  const view = (deps.isAdmin && (await deps.isAdmin(req)) ? topView(deps.access, slug) : null) ?? (pepper ? await viewFor(deps, pepper, slug, req.headers.get('cookie')) : null);
   if (isFile) {
     if (!view) return logOnFirst(slug); // assets are never read, and IGN is never asked
     if (isTile) return tile(req, url, sub, slug, deps);
@@ -248,6 +250,14 @@ export async function guideAudience(req: Request, slug: string, deps: GuidesDeps
   if (!SLUG.test(slug) || !isGuide(deps.access, slug)) return null;
   const pepper = pepperOf(deps);
   return pepper ? viewFor(deps, pepper, slug, req.headers.get('cookie')) : null;
+}
+
+/** The most privileged view of a guide: what an admin sees. */
+export function topView(access: AccessFile, slug: string): string | null {
+  const list = isGuide(access, slug) ? access.guides[slug] : [];
+  let best: string | null = null;
+  for (const a of access.audiences) if (list.includes(a.id)) best = a.id; // later = more privileged
+  return best;
 }
 
 /** The view of this guide that the request's cookie opens, or null. */

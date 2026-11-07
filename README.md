@@ -17,8 +17,10 @@ npm run deploy    # build and deploy to Cloudflare Workers
 
 The whole site works like a computer from 1998, called **Xiangyin 98**. The
 first page of a visit starts up (a short BIOS screen and a splash) and asks the
-visitor to log on: any name works, and there's no password. Then the desktop
-appears with the page they asked for open in a window.
+visitor to log on: everyone is Guest, and there's no password. Then the desktop
+appears with the page they asked for open in a window. The site's owner has a
+separate, hidden log-on for admin mode, checked on the server
+([`docs/ADMIN.md`](docs/ADMIN.md)).
 
 - **The desktop**: icons for My Computer, Projects, The House, About.doc,
   Contact, Help, Instagram and the Recycle Bin. Double-click to open; drag to

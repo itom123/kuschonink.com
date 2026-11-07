@@ -1,7 +1,7 @@
 // npm test: the Field Guide's password gate (worker/guides.ts), against a
 // stand-in ASSETS, made-up audiences and made-up passwords.
 import { createHmac, pbkdf2Sync } from 'node:crypto';
-import { COOKIE, MIN_PEPPER, REMEMBER_S, SESSION_S, TILE_BROWSER_S, TILE_EDGE_S, TILE_Z, cleanNext, closure, guideAudience, handleGuides, isGuidesPath, limitKey, makeToken, normalise, tileBounds, tileRange, viewOf, type GuidesDeps } from './guides.ts';
+import { COOKIE, MIN_PEPPER, REMEMBER_S, SESSION_S, TILE_BROWSER_S, TILE_EDGE_S, TILE_Z, cleanNext, closure, guideAudience, handleGuides, isGuidesPath, limitKey, makeToken, normalise, tileBounds, tileRange, topView, viewOf, type GuidesDeps } from './guides.ts';
 import type { AccessFile } from '../src/lib/guides/types';
 import realAccess from '../src/content/guides/access.json' with { type: 'json' };
 
@@ -830,6 +830,20 @@ await expectView('member cookie → members-only: the member view', get('/guides
       }
     }
   check(`access.json: each audience of each guide opens its own view (${slugs.join(', ')})`, all);
+}
+
+// ---- Admin (worker/admin.ts): the fullest view, without the guide's password ----
+{
+  const admin = deps({ isAdmin: async (req) => (req.headers.get('cookie') ?? '').includes('admin=yes') });
+  check('topView: the most privileged audience on the guide\'s list', topView(ACCESS, 'city-one') === 'member' && topView(ACCESS, 'open-day') === 'visitor' && topView(ACCESS, 'nowhere') === null);
+  await expectView('an admin, no guide cookie: the fullest view (member)', get('/guides/city-one', 'admin=yes'), 'city-one member', admin);
+  const vc = await cookieFor('city-one', PW.visitor);
+  await expectView('an admin with a visitor cookie still gets the fullest view', get('/guides/city-one', `${vc}; admin=yes`), 'city-one member', admin);
+  await expectView('not an admin, no cookie: the log-on page', get('/guides/city-one', 'admin=no'), null, admin);
+  const pic = await run(get('/guides/city-one/img/A1.jpg', 'admin=yes'), admin);
+  check('an admin gets the pictures too', pic.status === 200 && (await body(pic)) === 'JPEG');
+  const notPic = await run(get('/guides/city-one/img/A1.jpg', 'admin=no'), admin);
+  check('… and nobody else without a cookie', notPic.status === 403);
 }
 
 // ---- Suggestions from inside a guide (worker/suggest.ts) ----

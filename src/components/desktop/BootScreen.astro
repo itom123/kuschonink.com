@@ -31,17 +31,17 @@ import { attr } from '../../lib/i18n';
       <div class="title-bar">
         <div class="title-bar-text" id="login-title"><Bi t={{ en: 'Welcome to Xiangyin 98', zh: '欢迎使用 Xiangyin 98' }} /></div>
         <div class="title-bar-controls">
-          <button type="button" class="tb-btn tb-help" {...attr('aria-label', { en: 'Help', zh: '帮助' })} {...attr('title', { en: 'There is no account: any name will do.', zh: '没有帐户：任何名字都可以。' })} data-login-help></button>
+          <button type="button" class="tb-btn tb-help" {...attr('aria-label', { en: 'Help', zh: '帮助' })} {...attr('title', { en: 'There is no account: everyone logs on as Guest.', zh: '没有帐户：每个人都以 Guest 身份登录。' })} data-login-help></button>
           <button type="button" class="tb-btn tb-close" {...attr('aria-label', { en: 'Close', zh: '关闭' })} {...attr('title', { en: 'Close', zh: '关闭' })} data-login="cancel"></button>
         </div>
       </div>
       <form class="login-body" data-login-form autocomplete="off">
         <span class="ico ico-keys login-keys" aria-hidden="true"></span>
         <div class="login-fields">
-          <p id="login-intro"><Bi t={{ en: 'Type a user name and password to log on to Xiangyin 98.', zh: '键入用户名和密码以登录 Xiangyin 98。' }} /></p>
+          <p id="login-intro"><Bi t={{ en: 'Everyone logs on to Xiangyin 98 as Guest.', zh: '每个人都以 Guest 身份登录 Xiangyin 98。' }} /></p>
           <div class="login-row">
             <label for="login-name"><span data-l="en"><u>U</u>ser name:</span><span data-l="zh" lang="zh-Hans">用户名(<u>U</u>)：</span></label>
-            <input id="login-name" name="user" type="text" maxlength="32" spellcheck="false" autocapitalize="off" autocomplete="off" />
+            <input id="login-name" name="user" type="text" value="Guest" readonly aria-readonly="true" maxlength="32" spellcheck="false" autocapitalize="off" autocomplete="off" />
           </div>
           <div class="login-row">
             <label for="login-pass"><span data-l="en"><u>P</u>assword:</span><span data-l="zh" lang="zh-Hans">密码(<u>P</u>)：</span></label>

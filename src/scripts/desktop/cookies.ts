@@ -61,8 +61,8 @@ const SKIPS: [Bi, Bi][] = [
   [
     { en: 'Lasting: ', zh: '长期保存：' },
     {
-      en: 'your settings, where you put icons and windows, the Recycle Bin, Documents, your log-on name, what you typed in Run, Paint’s tools and picture, Field Guide’s heat map, labels and sorting, and the language. Without it, every visit starts with the defaults.',
-      zh: '你的设置、图标和窗口的位置、回收站、文档、登录名、在“运行”里键入过的内容、“画图”的工具和图画、导览的热图、标签和排序方式，以及语言。没有它，每次访问都从默认设置开始。',
+      en: 'your settings, where you put icons and windows, the Recycle Bin, Documents, what you typed in Run, Paint’s tools and picture, Field Guide’s heat map, labels and sorting, and the language. Without it, every visit starts with the defaults.',
+      zh: '你的设置、图标和窗口的位置、回收站、文档、在“运行”里键入过的内容、“画图”的工具和图画、导览的热图、标签和排序方式，以及语言。没有它，每次访问都从默认设置开始。',
     },
   ],
 ];

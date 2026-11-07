@@ -27,6 +27,7 @@ const g = new GuardCore(store, () => now);
   const a = await g.claim('idem:abc', 600);
   const b = await g.claim('idem:abc', 600);
   check('claim: the first is fresh, the second sees "pending"', a.fresh && !b.fresh && b.value === 'pending', { a, b });
+  check('held: what a key holds, without taking it', (await g.held('idem:abc')) === 'pending' && (await g.held('idem:none')) === null);
   await g.settle('idem:abc', 'S-7F3K', 600);
   check('settle: later claims see the reference', (await g.claim('idem:abc', 600)).value === 'S-7F3K');
   await g.release('idem:abc');

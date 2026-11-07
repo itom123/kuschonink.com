@@ -7,6 +7,7 @@ import { dayLabel } from '../../lib/guides/core';
 import type { GuideApp } from './app';
 import type { Sort, View } from './state';
 import { SW } from '../../lib/guides/suggest-words';
+import { AW } from '../../lib/admin-words';
 
 export function menuProvider(app: GuideApp) {
   return (name: string): MenuSpec[] | null => {
@@ -23,6 +24,8 @@ export function menuProvider(app: GuideApp) {
           { label: 'Get &Directions', zh: '获取路线(&D)', disabled: !s.place && !s.route, action: () => app.openLink(1) },
           { sep: true },
           { label: SW.menu.en, zh: SW.menu.zh, icon: 'guide', action: () => app.root.dispatchEvent(new Event('gd:suggest')) },
+          // Admin mode only (the queue checks the session on the server).
+          ...(document.documentElement.hasAttribute('data-admin') ? [{ label: AW.queueMenu.en, zh: AW.queueMenu.zh, icon: 'keys', action: () => void (window.kus98 as unknown as { open(u: string): Promise<void> } | undefined)?.open('/admin/suggestions') }] : []),
           { sep: true },
           { label: '&Print...', zh: '打印(&P)...', key: 'Ctrl+P', action: () => window.print() },
           { sep: true },

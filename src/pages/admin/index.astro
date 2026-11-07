@@ -1,0 +1,77 @@
+---
+// Administration: the hidden admin log-on and, once logged on, a folder of
+// the admin programs. Public and empty: no data is in this page, and it isn't
+// linked from anywhere a visitor sees (nor in the sitemap). The password and
+// the code are checked on the server (worker/admin.ts); this page only asks.
+import Desktop from '../../layouts/Desktop.astro';
+import Window from '../../components/desktop/Window.astro';
+import Bi from '../../components/Bi.astro';
+import { site } from '../../lib/content';
+import { attr, seoTitle } from '../../lib/i18n';
+import { AW } from '../../lib/admin-words';
+
+const seo = { ...seoTitle(AW.program, site.name), description: `${site.name}: administration.`, descriptionZh: `${site.name}：管理。` };
+const ak = (t: { en: string; zh: string }) => {
+  const one = (s: string) => {
+    const i = s.indexOf('&');
+    return i < 0 ? { pre: s, key: '', post: '' } : { pre: s.slice(0, i), key: s[i + 1], post: s.slice(i + 2) };
+  };
+  return { en: one(t.en), zh: one(t.zh) };
+};
+const label = (t: { en: string; zh: string }) => ak(t);
+const L = { res: label(AW.resource), pass: label(AW.password), code: label(AW.code) };
+---
+<Desktop seo={seo} noindex path="/admin">
+  <Window app="admin" title={AW.program} icon="keys" url="/admin" address="C:\xiangyin\Administration" menus={['&File', '&View', '&Help']} bodyClass="adm-body" status={[{ en: 'Administration', zh: '管理' }, '']}>
+    <div class="adm" data-adm data-adm-state="checking">
+      <div class="adm-logon" data-adm-logon>
+        <form class="gd-logon-form" data-adm-form autocomplete="on" novalidate>
+          <fieldset class="gd-logon-box">
+            <legend><Bi t={AW.logonTitle} /></legend>
+            <div class="gd-logon-grid">
+              <span class="ico ico-keys gd-logon-keys" aria-hidden="true"></span>
+              <div class="gd-logon-fields">
+                <p class="gd-logon-intro" id="adm-intro"><Bi t={AW.logonIntro} /></p>
+                <div class="gd-logon-row">
+                  <label for="adm-res"><span data-l="en">{L.res.en.pre}<u>{L.res.en.key}</u>{L.res.en.post}</span><span data-l="zh" lang="zh-Hans">{L.res.zh.pre}<u>{L.res.zh.key}</u>{L.res.zh.post}</span></label>
+                  {/* No name: not sent. It tells password managers which password this is. */}
+                  <input id="adm-res" type="text" value="\\XIANGYIN\ADMINISTRATION" readonly spellcheck="false" autocomplete="username" class="gd-logon-res" />
+                </div>
+                <div class="gd-logon-row">
+                  <label for="adm-pass"><span data-l="en">{L.pass.en.pre}<u>{L.pass.en.key}</u>{L.pass.en.post}</span><span data-l="zh" lang="zh-Hans">{L.pass.zh.pre}<u>{L.pass.zh.key}</u>{L.pass.zh.post}</span></label>
+                  <input id="adm-pass" type="password" name="password" maxlength="200" autocomplete="current-password" autocapitalize="off" spellcheck="false" aria-describedby="adm-intro adm-msg" required />
+                </div>
+                <div class="gd-logon-row">
+                  <label for="adm-code"><span data-l="en">{L.code.en.pre}<u>{L.code.en.key}</u>{L.code.en.post}</span><span data-l="zh" lang="zh-Hans">{L.code.zh.pre}<u>{L.code.zh.key}</u>{L.code.zh.post}</span></label>
+                  <input id="adm-code" type="text" name="code" inputmode="numeric" maxlength="7" autocomplete="one-time-code" spellcheck="false" aria-describedby="adm-intro adm-msg" required />
+                </div>
+              </div>
+              <div class="gd-logon-buttons">
+                <button type="submit" class="default" data-adm-ok><Bi t={AW.ok} /></button>
+                <a class="gd-logon-cancel" href="/" role="button"><Bi t={AW.cancel} /></a>
+              </div>
+            </div>
+            <p class="adm-msg" id="adm-msg" role="alert" aria-live="assertive" data-adm-msg hidden></p>
+          </fieldset>
+        </form>
+        <noscript><p class="adm-noscript"><Bi t={{ en: 'Administration needs JavaScript.', zh: '管理需要 JavaScript。' }} /></p></noscript>
+      </div>
+
+      <div class="folder-page adm-folder" data-adm-folder>
+        <ul class="adm-icons" {...attr('aria-label', AW.folder)}>
+          <li><a class="icon" href="/admin/suggestions" {...attr('title', AW.queueTip)}><span class="ico ico-folder-open" aria-hidden="true"></span><span class="icon-label"><Bi t={AW.queue} /></span></a></li>
+          <li><a class="icon" href="/admin/suggestions?view=log" {...attr('title', AW.logTip)}><span class="ico ico-documents" aria-hidden="true"></span><span class="icon-label"><Bi t={AW.log} /></span></a></li>
+          <li><button type="button" class="icon" data-adm-cmd="logoff" {...attr('title', AW.logOffTip)}><span class="ico ico-keys" aria-hidden="true"></span><span class="icon-label"><Bi t={AW.logOff} /></span></button></li>
+          <li><button type="button" class="icon" data-adm-cmd="logoff-all" {...attr('title', AW.logOffAllTip)}><span class="ico ico-shutdown" aria-hidden="true"></span><span class="icon-label"><Bi t={AW.logOffAll} /></span></button></li>
+        </ul>
+        <p class="adm-status" data-adm-status></p>
+      </div>
+    </div>
+  </Window>
+</Desktop>
+
+<script>
+  import { initAdminHome } from '../../scripts/admin/home';
+  initAdminHome();
+  document.addEventListener('astro:page-load', initAdminHome);
+</script>

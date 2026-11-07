@@ -45,6 +45,7 @@ Ground rules:
 | `src/lib/guides/` | Field Guide: the shapes of a guide (`types.ts`), day rules, dates and map maths safe for the browser (`core.ts`), the interface's words, the checks, and the server-only loader that builds each audience's view and its browser data |
 | `src/scripts/guide/` | Field Guide in the browser: the window, panes, details sheet, menus, the map engine (camera, pins, labels, routes, heat) and the log-on box. It imports only `types.ts`, `core.ts` and `words.ts`, never guide content |
 | `worker/guides.ts` | The Field Guide's password gate: the log-on and log-off, the signed cookie, and which audience's page (and pictures) a request gets. It also sends `/guides` to the first listed guide, whose log-on box has the Guide list. It proxies the street-level tiles at `/guides/<slug>/tiles/{z}/{x}/{y}.png` (zooms 14–19, logged-on viewers only, inside the `tiles` box in `access.json`), fetching them from IGN so that IGN never sees the visitor |
+| `worker/admin.ts`, `src/pages/admin/`, `src/scripts/admin/` | Admin mode: the hidden log-on at `/admin` (password and authenticator code, checked on the server), the suggestions queue, admin on the desktop ([`docs/ADMIN.md`](ADMIN.md)) |
 
 ### The shell: `src/scripts/desktop/`
 
@@ -57,7 +58,7 @@ Ground rules:
 | `menu.ts`, `menubar.ts`, `winmenus.ts`, `contextmenu.ts` | One menu engine for the Start menu, menu bars and right-click menus (press and hold on touch, Shift+F10) |
 | `icons.ts` | Icons on the desktop and in folders: select, double-click, drag, rubber band, arrow keys |
 | `dialogs.ts`, `properties.ts`, `aboutbox.ts` | Message boxes, dialog windows, Properties sheets |
-| `boot.ts`, `session.ts` | Start-up, log-on, log off, shut down, stand by |
+| `boot.ts`, `session.ts` | Start-up, log-on (everyone is Guest; the name can't be changed), log off, shut down, stand by |
 | `sound.ts`, `trails.ts`, `tooltips.ts` | Sounds, pointer trails, yellow tooltips |
 | `textzoom.ts` | iPhone and iPad: a text box in use doesn't zoom the page (the desktop's text is under the 16px that sets iOS zooming) |
 | `screensaver.ts`, `whatsthis.ts` | Idle timer for the screen saver; What's This? notes |
@@ -199,14 +200,15 @@ Kept in this browser only, and only as far as the visitor allows (see
 
 | Where | Key | Kind | Holds |
 | --- | --- | --- | --- |
-| Cookie (30 min, renewed) | `kus98_session` | Needed | Logged on (so new tabs and refreshes skip the start-up). Every open page renews it each minute and as it goes; 30 minutes (`AWAY_MINUTES` in `session.ts`) after the last page of the site was open it runs out, and the next visit starts up again, BIOS and log-on included. A visit that starts at `/guides/…` sets it too, to the last name typed or Guest |
+| Cookie (30 min, renewed) | `kus98_session` | Needed | Logged on (so new tabs and refreshes skip the start-up). Every open page renews it each minute and as it goes; 30 minutes (`AWAY_MINUTES` in `session.ts`) after the last page of the site was open it runs out, and the next visit starts up again, BIOS and log-on included. A visit that starts at `/guides/…` sets it too. Always `Guest` |
+| Cookie (`HttpOnly`, `Secure`) | `__Host-kus98_admin` | Needed | Admin mode: a random session id; the session is on the server (the Guard). 12 hours. Set and read only by `worker/admin.ts` |
+| Cookie | `kus98_admin_ui` | Needed | Admin mode is on: tells the desktop to load the admin scripts (`html[data-admin]`). Grants nothing; the server checks every admin call |
 | Cookie (`HttpOnly`, `Path=/guides`) | `kus98_guides` | Needed | Field Guide: logged on with a guide password, and as which audience. Set and read only by the Worker (`worker/guides.ts`), signed with `GUIDES_COOKIE_SECRET` (or `TURNSTILE_SECRET` when that isn't set; a secret under 24 characters signs together with `TURNSTILE_SECRET`): 30 days with *Save this password*, otherwise until the browser closes (12 hours at most). File ▸ Log Off clears it |
 | `localStorage` | `kus98:consent` | The choice | The visitor's choice about cookies (`consent.ts`): `{v: 1, level, at}`, with `level` `all`, `necessary` or `none` and `at` when it was made. Always written |
 |  | `kus98:settings` | Lasting | Settings that differ from the defaults (see `settings.ts`) |
 |  | `kus98:icons` | Lasting | Where desktop icons were dragged |
 |  | `kus98:bin` | Lasting | Icons in the Recycle Bin (`gone` once emptied) |
 |  | `kus98:recent` | Lasting | Start ▸ Documents |
-|  | `kus98:user` | Lasting | The last log-on name |
 |  | `kus98:run` | Lasting | What was typed in Run |
 |  | `kus98:paint` | Lasting | Paint: the tool in hand, colours, custom colours, tool options |
 |  | `kus98:windows` | Lasting | Each program's window as it was last left: place and size, maximised, the bars hidden with View ▸ Toolbars and Status Bar. Not written while the window shows a dialog-sized page (`data-fit="dialog"`) |
@@ -251,8 +253,8 @@ and `data-saver`.
 Start-up and log-on never show to search engines or link previews
 (`navigator.webdriver` and bot user agents; the head script marks them with
 `data-robot` on `<html>`), or on a visit that starts at `/guides/…` (with the
-visitor's leave for cookies it sets `kus98_session` to the last name typed, or
-Guest, so the rest of the session skips them too). Away from the site for more
+visitor's leave for cookies it sets `kus98_session` to Guest, so the rest of
+the session skips them too). Away from the site for more
 than 30 minutes (every tab of it closed), the computer counts as switched off:
 the next visit starts up and logs on again. A safety net removes the start-up
 screen after 10 seconds if the shell fails to load.
@@ -290,7 +292,9 @@ not even a full-size window's title bar on a phone. Page content calls
 the Field Guide's log-on box (`logon.ts`) does so before it posts the password,
 and the post waits; after **Allow** (which chooses Necessary Only, or keeps
 Allow All) it goes ahead with the password still in the box, and after × or
-Esc it doesn't. Only a feature being used asks again: a start-up under None
+Esc it doesn't. The hidden admin log-on (`src/scripts/admin/home.ts`) asks the
+same way with `ask('admin')`, which shows the bar's general wording, so nothing
+public names admin mode. Only a feature being used asks again: a start-up under None
 doesn't show the bar on its own. For bots `ask()` answers true at once, as
 without JavaScript.
 
@@ -302,7 +306,7 @@ itself). Page content asks through `window.kus98.consent` and writes when
 there's no desktop: Field Guide's `writeStore()`, the Contact draft, Paint's
 `store.ts` and tools, and `lang.ts`. When Allow All is chosen in a page after
 Necessary Only or None (`keepAgain()` in `consent.ts`), `stored()`, the
-language, the log-on name and Paint's tools are written again as the page
+language and Paint's tools are written again as the page
 shows them, since that choice removed them; another tab writes only what was
 set there meanwhile. Paint's picture is kept at the next change or when the
 page is left; Field Guide's preferences at their next change.
@@ -314,7 +318,10 @@ the `kus98-paint` database, and with None the `kus98:…` keys in
 never touched (on `localhost` other projects share it). At load, leftovers the
 choice doesn't allow go too, and a choice made in another tab is followed
 there (the `storage` event). `kus98_guides` is `HttpOnly`: only the guide's
-File ▸ Log Off removes it, so None doesn't log anyone out of a guide.
+File ▸ Log Off removes it, so None doesn't log anyone out of a guide. Nor out of
+admin mode: its two cookies (`__Host-kus98_admin`, `HttpOnly`, and
+`kus98_admin_ui`) stay until Start ▸ Log Off or Log Off at `/admin`, or until
+the 12 hours run out.
 
 **Without JavaScript** nothing is asked: posting the log-on form is itself the
 request for the guide's cookie.

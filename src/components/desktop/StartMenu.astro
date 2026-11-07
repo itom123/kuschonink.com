@@ -62,6 +62,8 @@ const items: MenuItem[] = [
   },
   { label: '&Help', zh: '帮助(&H)', href: '/help', icon: 'help', big: true },
   { label: '&Run...', zh: '运行(&R)...', cmd: 'run', icon: 'run', big: true, jsOnly: true },
+  // Only in admin mode (html[data-admin], admin.css); /admin itself checks on the server.
+  { label: 'A&dministration', zh: '管理(&D)', href: '/admin', icon: 'keys', big: true, jsOnly: true, attrs: { 'data-admin-only': '' } },
   { sep: true, jsOnly: true },
   { label: '&Log Off Guest...', zh: '注销 Guest(&L)...', cmd: 'logoff', icon: 'keys', big: true, jsOnly: true, attrs: { 'data-logoff': '' } },
   { label: 'Sh&ut Down...', zh: '关闭系统(&U)...', cmd: 'shutdown', icon: 'shutdown', big: true, jsOnly: true },
