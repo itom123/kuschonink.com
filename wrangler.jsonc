@@ -14,11 +14,15 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "drop-trailing-slash",
-    "run_worker_first": ["/v1/contact/*", "/guides/*"]
+    "run_worker_first": ["/v1/contact/*", "/guides/*", "/v1/admin/*"]
   },
   // Contact form email: can only ever send to this one verified inbox.
   "send_email": [
-    { "name": "EMAIL", "destination_address": "Xiangyin.Tom.Gu@gmail.com" }
+    { "name": "EMAIL", "destination_address": "Xiangyin.Tom.Gu@gmail.com" },
+    // Admin mode's emails to people who suggested something (worker/admin.ts): to
+    // any address, but only from noreply@kuschonink.com. The address always comes
+    // from Notion, with the person's consent, never from the browser.
+    { "name": "MAIL_OUT", "allowed_sender_addresses": ["noreply@kuschonink.com"] }
   ],
   // At most 5 messages a minute from one visitor; at most 30 Field Guide
   // password tries a minute from one visitor (a class on one Wi-Fi fits).
@@ -26,7 +30,9 @@
     { "name": "CONTACT_LIMIT", "namespace_id": "4242", "simple": { "limit": 5, "period": 60 } },
     { "name": "GUIDES_LIMIT", "namespace_id": "4243", "simple": { "limit": 30, "period": 60 } },
     // At most 3 suggestions a minute from one visitor (the Guard also counts 10 an hour, and 60 in all).
-    { "name": "SUGGEST_LIMIT", "namespace_id": "4244", "simple": { "limit": 3, "period": 60 } }
+    { "name": "SUGGEST_LIMIT", "namespace_id": "4244", "simple": { "limit": 3, "period": 60 } },
+    // Admin calls, 60 a minute from one visitor (wrong log-ons are also counted by the Guard).
+    { "name": "ADMIN_LIMIT", "namespace_id": "4245", "simple": { "limit": 60, "period": 60 } }
   ],
   // The Guard (worker/guard.ts): true counters, held keys, admin sessions and
   // locks, in one SQLite Durable Object.
@@ -56,7 +62,10 @@
   // Field Guide suggestions: NOTION_TOKEN (the site's Notion integration),
   // TURNSTILE_SECRET_SUGGEST (the suggestion form's own Turnstile widget) and
   // GITHUB_TOKEN (fine-grained, this repository only, Contents read/write) for
-  // the publisher. See docs/GUIDES.md, "Suggestions". No "secrets.required":
+  // the publisher. See docs/GUIDES.md, "Suggestions". Admin mode (docs/ADMIN.md):
+  // ADMIN_PASSWORD (16+ characters), ADMIN_TOTP_SECRET (the authenticator key;
+  // scripts/admin/totp.mjs makes one), ROUTINE_FIRE_URL and ROUTINE_TOKEN (the
+  // routine's API trigger). No "secrets.required":
   // it would limit what wrangler dev reads from .dev.vars.
   "observability": { "enabled": true }
 }

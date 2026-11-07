@@ -45,6 +45,7 @@ Ground rules:
 | `src/lib/guides/` | Field Guide: the shapes of a guide (`types.ts`), day rules, dates and map maths safe for the browser (`core.ts`), the interface's words, the checks, and the server-only loader that builds each audience's view and its browser data |
 | `src/scripts/guide/` | Field Guide in the browser: the window, panes, details sheet, menus, the map engine (camera, pins, labels, routes, heat) and the log-on box. It imports only `types.ts`, `core.ts` and `words.ts`, never guide content |
 | `worker/guides.ts` | The Field Guide's password gate: the log-on and log-off, the signed cookie, and which audience's page (and pictures) a request gets |
+| `worker/admin.ts`, `src/pages/admin/`, `src/scripts/admin/` | Admin mode: the hidden log-on at `/admin` (password and authenticator code, checked on the server), the suggestions queue, admin on the desktop ([`docs/ADMIN.md`](ADMIN.md)) |
 
 ### The shell: `src/scripts/desktop/`
 
@@ -57,7 +58,7 @@ Ground rules:
 | `menu.ts`, `menubar.ts`, `winmenus.ts`, `contextmenu.ts` | One menu engine for the Start menu, menu bars and right-click menus (press and hold on touch, Shift+F10) |
 | `icons.ts` | Icons on the desktop and in folders: select, double-click, drag, rubber band, arrow keys |
 | `dialogs.ts`, `properties.ts`, `aboutbox.ts` | Message boxes, dialog windows, Properties sheets |
-| `boot.ts`, `session.ts` | Start-up, log-on, log off, shut down, stand by |
+| `boot.ts`, `session.ts` | Start-up, log-on (everyone is Guest; the name can't be changed), log off, shut down, stand by |
 | `sound.ts`, `trails.ts`, `tooltips.ts` | Sounds, pointer trails, yellow tooltips |
 | `textzoom.ts` | iPhone and iPad: a text box in use doesn't zoom the page (the desktop's text is under the 16px that sets iOS zooming) |
 | `screensaver.ts`, `whatsthis.ts` | Idle timer for the screen saver; What's This? notes |
@@ -182,13 +183,14 @@ Kept in this browser only.
 
 | Where | Key | Holds |
 | --- | --- | --- |
-| Cookie (session) | `kus98_session` | Logged on in this browser session (so new tabs skip the start-up). A visit that starts at `/guides/…` sets it too, to the last name typed or Guest |
+| Cookie (session) | `kus98_session` | Logged on in this browser session (so new tabs skip the start-up). Always `Guest`. A visit that starts at `/guides/…` sets it too |
+| Cookie (`HttpOnly`, `Secure`) | `__Host-kus98_admin` | Admin mode: a random session id; the session is on the server (the Guard). 12 hours. Set and read only by `worker/admin.ts` |
+| Cookie | `kus98_admin_ui` | Admin mode is on: tells the desktop to load the admin scripts (`html[data-admin]`). Grants nothing; the server checks every admin call |
 | Cookie (`HttpOnly`, `Path=/guides`) | `kus98_guides` | Field Guide: logged on with a guide password, and as which audience. Set and read only by the Worker (`worker/guides.ts`), signed with `GUIDES_COOKIE_SECRET` (or `TURNSTILE_SECRET` when that isn't set): 30 days with *Save this password*, otherwise until the browser closes (12 hours at most). File ▸ Log Off clears it |
 | `localStorage` | `kus98:settings` | Settings that differ from the defaults (see `settings.ts`) |
 | | `kus98:icons` | Where desktop icons were dragged |
 | | `kus98:bin` | Icons in the Recycle Bin (`gone` once emptied) |
 | | `kus98:recent` | Start ▸ Documents |
-| | `kus98:user` | The last log-on name |
 | | `kus98:run` | What was typed in Run |
 | | `kus98:paint` | Paint: the tool in hand, colours, custom colours, tool options |
 | | `kus98:windows` | Each program's window as it was last left: place and size, maximised, the bars hidden with View ▸ Toolbars and Status Bar |
@@ -198,6 +200,7 @@ Kept in this browser only.
 | `sessionStorage` | `kus98:begun` | The "Click here to begin" hint was used |
 | | `kus98:desk` | For a refresh: the pages open in windows, front to back, minimised or not, how far each was scrolled, each one's Back and Forward |
 | | `kus98:draft` | Contact: a message not sent yet (cleared once it's sent) |
+| | `kus98:guide:suggest:<slug>` | Field Guide: the Suggest a Place wizard's text, not sent yet (no picture). Cleared once it is sent |
 | | `kus98:guide:view` | Field Guide: for a refresh, which guide was open, the map's camera and area, and how far the pane was scrolled (`{guide, cam, area, scroll}`). Log Off clears it |
 
 **What a refresh keeps.** Reloading the page (or a phone reloading a tab it put

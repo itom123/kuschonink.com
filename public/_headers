@@ -1,3 +1,9 @@
 # Pieces kept in drawers are unlisted: readable, but not for search engines.
 /house/drawer/*
   X-Robots-Tag: noindex, nofollow, noarchive
+
+# Administration: never for search engines (the pages are also noindex).
+/admin
+  X-Robots-Tag: noindex, nofollow, noarchive
+/admin/*
+  X-Robots-Tag: noindex, nofollow, noarchive

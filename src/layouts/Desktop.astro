@@ -14,6 +14,7 @@ import '../styles/guide-map.css';
 import '../styles/guide.css';
 import '../styles/guide-logon.css';
 import '../styles/guide-suggest.css';
+import '../styles/admin.css';
 import '../styles/system.css';
 import '../styles/schemes.css';
 import BootScreen from '../components/desktop/BootScreen.astro';
@@ -81,12 +82,13 @@ const { seo, image, noindex, path } = Astro.props;
       var bot = navigator.webdriver || /bot|crawl|spider|slurp|lighthouse|pagespeed|headless|preview|facebookexternalhit|embedly|whatsapp|telegram|discord|slack/i.test(navigator.userAgent);
       // A visit that starts at a guide's link (/guides/<slug>) skips start-up, as bots do, and
       // counts as started, so the next page in this session doesn't start up either: logged on
-      // under the last name typed, or Guest (the cookie session.ts sets).
+      // as Guest, as everyone is (the cookie session.ts sets).
       if (location.pathname.indexOf('/guides/') === 0 && !/(?:^|;\s*)kus98_session=/.test(document.cookie)) {
-        var who = 'Guest';
-        try { who = localStorage.getItem('kus98:user') || 'Guest'; } catch (e) {}
-        document.cookie = 'kus98_session=' + encodeURIComponent(who) + '; path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+        document.cookie = 'kus98_session=Guest; path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
       }
+      // Admin mode (worker/admin.ts): this cookie holds nothing secret; it only says to load the
+      // admin scripts, which ask the server. Every admin action is checked there.
+      if (/(?:^|;\s*)kus98_admin_ui=1/.test(document.cookie)) d.setAttribute('data-admin', '');
       if (!bot && !/(?:^|;\s*)kus98_session=/.test(document.cookie)) d.setAttribute('data-boot', 'boot');
       setTimeout(function () { if (!window.__kus98) d.removeAttribute('data-boot'); }, 10000);
       // The home page without Welcome: "Show this screen each time Xiangyin 98 starts" is

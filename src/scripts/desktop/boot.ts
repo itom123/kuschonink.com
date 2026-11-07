@@ -78,7 +78,9 @@ export function logOn(): Promise<string> {
   const form = b.querySelector<HTMLFormElement>('[data-login-form]')!;
   const name = b.querySelector<HTMLInputElement>('#login-name')!;
   const pass = b.querySelector<HTMLInputElement>('#login-pass')!;
+  // Everyone is Guest: the name can't be changed (admin has its own log-on, /admin).
   name.value = session.lastUser();
+  name.readOnly = true;
   pass.value = '';
   // The password box only ever shows stars and keeps nothing.
   pass.oninput = () => (pass.value = '*'.repeat(pass.value.length));
@@ -113,7 +115,7 @@ export function logOn(): Promise<string> {
       };
     });
     const help = b.querySelector<HTMLElement>('[data-login-help]');
-    if (help) help.onclick = () => tipFor(help, tr({ en: 'There is no account and no password. Type any name (or none) and press OK.', zh: '没有帐户，也没有密码。键入任意名称（或者不填），然后按“确定”。' }), 6000);
+    if (help) help.onclick = () => tipFor(help, tr({ en: 'There is no account and no password: everyone logs on as Guest. Press OK.', zh: '没有帐户，也没有密码：每个人都以 Guest 身份登录。请按“确定”。' }), 6000);
   });
 }
 
@@ -170,6 +172,12 @@ export async function logOff() {
     sound: false,
   });
   if (r !== 'Yes') return;
+  // Administrator logs off from admin mode too (the server ends the session).
+  if (html.hasAttribute('data-admin')) {
+    await fetch('/v1/admin/logout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}', credentials: 'same-origin' }).catch(() => {});
+    document.cookie = 'kus98_admin_ui=; path=/; max-age=0; SameSite=Lax';
+    html.removeAttribute('data-admin');
+  }
   play('logoff');
   closeAll();
   session.logOff();

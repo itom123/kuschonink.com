@@ -1,0 +1,61 @@
+---
+// Administration ▸ Suggestions: the Field Guide's suggestion queue, in the
+// manner of Outlook Express (folders, a list, a preview). An empty shell:
+// everything comes from /v1/admin/* (worker/admin.ts), which checks the admin
+// session on every call; Notion stays the one source of truth, so the queue
+// and Notion always agree. ?view=log shows the processing log.
+import Desktop from '../../layouts/Desktop.astro';
+import Window from '../../components/desktop/Window.astro';
+import Bi from '../../components/Bi.astro';
+import { site } from '../../lib/content';
+import { attr, seoTitle } from '../../lib/i18n';
+import { SEP, type Tool } from '../../lib/chrome';
+import { AW, FOLDERS } from '../../lib/admin-words';
+
+const title = { en: `${AW.queue.en} - ${AW.program.en}`, zh: `${AW.queue.zh} - ${AW.program.zh}` };
+const seo = { ...seoTitle(title, site.name), description: `${site.name}: administration.`, descriptionZh: `${site.name}：管理。` };
+const t = (cmd: string, label: { en: string; zh: string }, icon: string, tip?: { en: string; zh: string }): Tool => ({ cmd, label: label.en, zh: label.zh, icon, title: tip?.en, titleZh: tip?.zh });
+const tools: Tool[] = [
+  t('adm-refresh', AW.refresh, 'tb-refresh'),
+  SEP,
+  t('adm-approve', AW.approve, 'tb-save', { en: 'Approve: the routine prepares it, the site adds it', zh: '收录：例程准备，网站加入' }),
+  t('adm-refuse', AW.refuse, 'tb-stop'),
+  t('adm-ask', AW.ask, 'tb-send', { en: 'Email the sender (only if they agreed)', zh: '给推荐者发邮件（需对方同意）' }),
+  t('adm-edit', AW.edit, 'tb-open'),
+  t('adm-notion', AW.notion, 'tb-forward', { en: 'Open this suggestion in Notion', zh: '在 Notion 中打开这条推荐' }),
+  SEP,
+  t('adm-run', AW.runNow, 'tb-redo', { en: 'Start the routine now', zh: '立即运行例程' }),
+  t('adm-publish', AW.publishNow, 'tb-new', { en: 'Add READY entries to the guide now', zh: '立即把 READY 的条目加入导览' }),
+];
+---
+<Desktop seo={seo} noindex path="/admin/suggestions">
+  <Window app="admin" title={title} icon="keys" url="/admin/suggestions" menus={['&File', '&View', '&Help']} tools={tools} bodyClass="adm-body flat" status={[AW.loading, '']}>
+    <div class="adm-queue" data-adm-queue data-view="queue">
+      <nav class="adm-folders" {...attr('aria-label', { en: 'Folders', zh: '文件夹' })}>
+        <ul role="listbox" data-adm-folders>
+          {Object.keys(FOLDERS).map((f) => (
+            <li role="option" tabindex="-1" data-folder={f}><span class={`ico ico16 ${f === 'inbox' ? 'ico-mail' : f === 'published' ? 'ico-guide' : f === 'closed' ? 'ico-recycle' : 'ico-folder'}`} aria-hidden="true"></span><Bi t={AW.folders[f]} /><span class="adm-count" data-count={f}></span></li>
+          ))}
+          <li role="option" tabindex="-1" data-folder="log"><span class="ico ico16 ico-documents" aria-hidden="true"></span><Bi t={AW.log} /></li>
+        </ul>
+      </nav>
+      <section class="adm-list" {...attr('aria-label', AW.queue)}>
+        <table class="adm-table" data-adm-table>
+          <thead><tr><th><Bi t={AW.cols.ref} /></th><th><Bi t={AW.cols.status} /></th><th><Bi t={AW.cols.name} /></th><th><Bi t={AW.cols.show} /></th><th><Bi t={AW.cols.dates} /></th><th><Bi t={AW.cols.sentBy} /></th><th><Bi t={AW.cols.submitted} /></th></tr></thead>
+          <tbody data-adm-rows></tbody>
+        </table>
+        <p class="adm-empty" data-adm-empty hidden><Bi t={AW.empty} /></p>
+      </section>
+      <section class="adm-preview" data-adm-preview aria-live="polite">
+        <p class="adm-hint"><Bi t={AW.choose} /></p>
+      </section>
+      <noscript><p class="adm-noscript"><Bi t={{ en: 'Administration needs JavaScript.', zh: '管理需要 JavaScript。' }} /></p></noscript>
+    </div>
+  </Window>
+</Desktop>
+
+<script>
+  import { initQueue } from '../../scripts/admin/queue';
+  initQueue();
+  document.addEventListener('astro:page-load', initQueue);
+</script>

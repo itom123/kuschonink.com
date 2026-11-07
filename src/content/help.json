@@ -128,8 +128,8 @@
       "icon": "shutdown",
       "keywords": ["start-up", "log on", "password", "Log Off", "Shut Down", "Restart", "Stand by"],
       "keywordsZh": ["启动", "登录", "密码", "注销", "关闭系统", "重新启动", "待机"],
-      "html": "<p>The first time you visit in a browser session, Xiangyin 98 starts up and asks you to log on. There’s no account: type any name, or none, and press <b>OK</b> (<b>Cancel</b> works too). Click or press any key to skip the start-up screen.</p><p><b>Start → Log Off</b> shows the log-on box again. <b>Start → Shut Down</b> lets you shut the computer down (click to start again), restart it, or put it on stand-by.</p>",
-      "htmlZh": "<p>在一次浏览器会话中第一次访问时，Xiangyin 98 会启动并请你登录。这里没有帐户：键入任意名称，或者不填，然后按<b>确定</b>（按<b>取消</b>也可以）。单击或按任意键可以跳过启动画面。</p><p><b>开始 → 注销</b>会再次显示登录框。<b>开始 → 关闭系统</b>可以关闭计算机（单击即可重新开始）、重新启动，或者让它待机。</p>"
+      "html": "<p>The first time you visit in a browser session, Xiangyin 98 starts up and asks you to log on. There’s no account: everyone logs on as <b>Guest</b>, with no password. Press <b>OK</b> (<b>Cancel</b> works too). Click or press any key to skip the start-up screen.</p><p><b>Start → Log Off</b> shows the log-on box again. <b>Start → Shut Down</b> lets you shut the computer down (click to start again), restart it, or put it on stand-by.</p>",
+      "htmlZh": "<p>在一次浏览器会话中第一次访问时，Xiangyin 98 会启动并请你登录。这里没有帐户：每个人都以 <b>Guest</b> 身份登录，不需要密码。按<b>确定</b>即可（按<b>取消</b>也可以）。单击或按任意键可以跳过启动画面。</p><p><b>开始 → 注销</b>会再次显示登录框。<b>开始 → 关闭系统</b>可以关闭计算机（单击即可重新开始）、重新启动，或者让它待机。</p>"
     },
     {
       "id": "trouble",

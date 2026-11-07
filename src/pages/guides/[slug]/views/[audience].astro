@@ -135,7 +135,13 @@ const opt = (d: string) => {
 <script>
   import { initGuide } from '../../../../scripts/guide';
   import { initSuggest } from '../../../../scripts/guide/suggest';
+  // Admin mode (checked on the server): Edit… on each entry, loaded only then.
+  const initAdmin = () => {
+    if (document.documentElement.hasAttribute('data-admin')) import('../../../../scripts/guide/admin-edit').then((m) => m.initGuideAdmin());
+  };
   initGuide();
   initSuggest();
-  document.addEventListener('astro:page-load', () => { initGuide(); initSuggest(); });
+  initAdmin();
+  document.addEventListener('astro:page-load', () => { initGuide(); initSuggest(); initAdmin(); });
+  document.addEventListener('admin:change', initAdmin);
 </script>

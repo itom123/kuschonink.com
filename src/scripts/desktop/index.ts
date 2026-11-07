@@ -142,6 +142,11 @@ function logOffLabel() {
 logOffLabel();
 document.addEventListener('desktop:login', logOffLabel);
 
+// Admin mode (the hidden /admin log-on, checked on the server): its scripts load only when it is on.
+const adminMode = () => import('../admin/mode').then((m) => m.initAdminMode()).catch(() => {});
+if (html.hasAttribute('data-admin')) void adminMode();
+document.addEventListener('admin:change', () => void adminMode());
+
 commands.register('about-k98', () => aboutBox());
 commands.register('help', () => navigate('/help'));
 
