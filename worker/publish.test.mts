@@ -7,7 +7,7 @@ import { GuardCore, memoryStore } from './guard.ts';
 import { github } from './github.ts';
 import { notion, P } from './notion.ts';
 import { forbiddenWord, nextId, publish, type PublishDeps } from './publish.ts';
-import { readSuggestion, S, suggestionProps, type Suggestion } from './suggestions.ts';
+import { guideIs, readSuggestion, S, suggestionProps, type Suggestion } from './suggestions.ts';
 import type { AccessFile, ItemRecord, ItemsFile } from '../src/lib/guides/types';
 import access from '../src/content/guides/access.json' with { type: 'json' };
 // @ts-expect-error: plain JS module
@@ -21,7 +21,7 @@ function check(name: string, ok: boolean, detail: unknown = '') {
   console.log(ok ? 'PASS' : 'FAIL', name, ok ? '' : typeof detail === 'string' ? detail : JSON.stringify(detail));
 }
 
-const SLUG = 'paris-photo-days-2026';
+const SLUG = 'paris-2026-11';
 const DIR = `src/content/guides/${SLUG}`;
 const files: Record<string, string> = { 'README.md': 'repo' };
 for (const f of readdirSync(DIR)) if (f.endsWith('.json')) files[`${DIR}/${f}`] = readFileSync(`${DIR}/${f}`, 'utf8');
@@ -107,7 +107,7 @@ check('nextId: one more than the highest in the tier', nextId([{ id: 'C1', tier:
   check(`… the picture saved as img/${NEXT_C}.jpg, without EXIF, with its credit and alt`, !!w.g.files({ bytes: true })[`public/guides/${SLUG}/img/${NEXT_C}.jpg`] && !Buffer.from(w.g.files({ bytes: true })[`public/guides/${SLUG}/img/${NEXT_C}.jpg`]).includes(Buffer.from('Private Person')) && item?.image?.file === `${NEXT_C}.jpg` && item.image.credit === 'Photo: Ana Silva' && item.image.alt === 'A large winter photograph', item?.image);
   check('… only items.json and the picture changed', Object.keys(w.g.files()).filter((p) => !(p in files)).join() === `public/guides/${SLUG}/img/${NEXT_C}.jpg` && Object.entries(files).every(([p, t]) => p.endsWith('items.json') || w.g.files()[p] === t));
   check(`… items.json is formatted like the rest (2 spaces, final newline), ${NEXT_C} after ${LAST_C}`, w.g.files()[`${DIR}/items.json`].endsWith('}\n') && w.items().findIndex((i) => i.id === NEXT_C) === w.items().findIndex((i) => i.id === LAST_C) + 1);
-  check('… the commit says what it added', new RegExp(`^Field Guide: add Galerie Exemple \\(S-\\w+ ${NEXT_C}\\) to paris-photo-days-2026$`).test(w.g.message() ?? ''), w.g.message());
+  check('… the commit says what it added', new RegExp(`^Field Guide: add Galerie Exemple \\(S-\\w+ ${NEXT_C}\\) to paris-2026-11$`).test(w.g.message() ?? ''), w.g.message());
   const row = await w.row(id);
   check(`… Notion: PUBLISHING, Item id ${NEXT_C}, the commit link`, row.status === 'PUBLISHING' && row.itemId === NEXT_C && /\/commit\/[0-9a-f]{40}$/.test(row.commit), row);
   check('… and a log entry', [...w.s.pages.values()].some((p: { parent: { data_source_id: string } }) => p.parent.data_source_id === 'ds-log'));
@@ -129,6 +129,25 @@ check('nextId: one more than the highest in the tier', nextId([{ id: 'C1', tier:
   const moved = w.items().find((i) => i.suggested?.ref === id);
   const all = w.g.files({ bytes: true });
   check(`a tier change: a new id (${NEXT_B}), the picture moves with it, ${NEXT_C} never comes back`, moved?.id === NEXT_B && moved.image?.file === `${NEXT_B}.jpg` && !!all[`public/guides/${SLUG}/img/${NEXT_B}.jpg`] && !all[`public/guides/${SLUG}/img/${NEXT_C}.jpg`] && !w.items().some((i) => i.id === NEXT_C), moved);
+}
+
+// ---- A suggestion sent under the guide's old address (access.json "moved") ----
+{
+  const OLD = Object.entries(ACCESS.moved ?? {}).find(([, v]) => v === SLUG)?.[0];
+  check('access.json keeps the old Paris address', OLD === 'paris-photo-days-2026', ACCESS.moved);
+  if (OLD) {
+    const w = world();
+    const id = await w.ready();
+    await w.n.updatePage(id, { [S.guide]: P.select(OLD), [S.fingerprint]: P.text(`${OLD}|exemple-galerie|1-rue-exemple|exemple.fr`) } as never);
+    const r = await publish(w.deps);
+    const item = w.items().find((i) => i.suggested?.ref === id);
+    check('a READY suggestion under the old address is published into the guide', r.committed.length === 1 && item?.id === NEXT_C, r);
+    const held = readSuggestion(await w.n.getPage(id));
+    const now = readSuggestion(await w.n.getPage(id), ACCESS);
+    check('… read with access.json it names the guide now, fingerprint too; without, as Notion holds it', held.guide === OLD && now.guide === SLUG && now.fingerprint === `${SLUG}|exemple-galerie|1-rue-exemple|exemple.fr`, { held: held.guide, now: now.guide, fp: now.fingerprint });
+    const found = await w.n.queryAll('ds-s', { filter: guideIs(ACCESS, SLUG) }, 50);
+    check('guideIs finds it under either name', found.some((p: { id: string }) => p.id === id), found.length);
+  }
 }
 
 // ---- What is refused ----

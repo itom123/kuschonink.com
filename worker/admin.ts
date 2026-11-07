@@ -26,7 +26,7 @@ import type { GuardApi } from './guard.ts';
 import { commitOnMain, type Change, type GitHub } from './github.ts';
 import { P, R, type Notion, type NotionPage } from './notion.ts';
 import { ENTRY_KEYS, forbiddenWord, guideDir, imgPath, nextId, readGuide, renameRefs, stringify, type GuideFileChange, type PublishReport } from './publish.ts';
-import { C, isStatus, logProps, readSuggestion, S, STATUSES, type LogEntry, type Status, type SuggestionRow } from './suggestions.ts';
+import { C, guideIs, isStatus, logProps, readSuggestion, S, STATUSES, type LogEntry, type Status, type SuggestionRow } from './suggestions.ts';
 import { checkTotp, MIN_SECRET_BYTES, base32Decode } from './totp.ts';
 
 export const ADMIN_PREFIX = '/v1/admin';
@@ -281,9 +281,9 @@ async function list(url: URL, deps: AdminDeps): Promise<Response> {
   const statuses = status.split(',').filter((s) => (STATUSES as readonly string[]).includes(s)) as Status[];
   const and: unknown[] = [];
   if (statuses.length) and.push({ or: statuses.map((s) => isStatus(s)) });
-  if (guide) and.push({ property: S.guide, select: { equals: guide } });
+  if (guide) and.push(guideIs(deps.access, guide));
   const pages = await deps.notion!.queryAll(deps.db.suggestions, { ...(and.length ? { filter: { and } } : {}), sorts: [{ timestamp: 'created_time', direction: 'descending' }] }, 300);
-  return json({ rows: pages.map(readSuggestion) });
+  return json({ rows: pages.map((p) => readSuggestion(p, deps.access)) });
 }
 
 async function contactOf(deps: AdminDeps, row: SuggestionRow): Promise<{ submitter: string; email: string; mayContact: boolean } | null> {
@@ -310,7 +310,7 @@ async function detail(id: string, deps: AdminDeps): Promise<Response> {
   if (no) return no;
   const p = await page(deps, id);
   if (!p) return fail('not_found', 404);
-  const row = readSuggestion(p);
+  const row = readSuggestion(p, deps.access);
   return json({ row, contact: await contactOf(deps, row) });
 }
 
@@ -328,7 +328,7 @@ async function update(id: string, req: Request, deps: AdminDeps): Promise<Respon
   if (!body) return fail('invalid_request', 400);
   const p = await page(deps, id);
   if (!p) return fail('not_found', 404);
-  const before = readSuggestion(p);
+  const before = readSuggestion(p, deps.access);
   const props: Record<string, Record<string, unknown>> = {};
   if (body.status !== undefined) {
     if (typeof body.status !== 'string' || !['NEW', 'ASKED', 'APPROVED', 'REFUSED', 'SPAM', 'NEEDS CHECK'].includes(body.status)) return fail('invalid_field', 400, { field: 'status' });
@@ -363,7 +363,7 @@ async function update(id: string, req: Request, deps: AdminDeps): Promise<Respon
     props[S.dates] = P.date(start || end || null, start && end && end !== start ? end : null);
   }
   if (!Object.keys(props).length) return fail('nothing_to_change', 400);
-  const after = readSuggestion(await deps.notion!.updatePage(before.id, props));
+  const after = readSuggestion(await deps.notion!.updatePage(before.id, props), deps.access);
   const changed = Object.keys(body).filter((k) => k !== 'status').join(', ');
   await addLog(deps, { run: `${after.status !== before.status ? after.status : 'Edit'} ${before.reference}`, trigger: 'manual', actor: 'admin', outcome: 'OK', pages: `${before.reference} ${before.name}`, details: [after.status !== before.status ? `${before.status} → ${after.status}` : '', changed ? `changed: ${changed}` : ''].filter(Boolean).join('; ') });
   // Approved here: the routine runs now (at most once every ten minutes), not at the next hour.
@@ -377,14 +377,14 @@ async function matches(id: string, deps: AdminDeps): Promise<Response> {
   if (no) return no;
   const p = await page(deps, id);
   if (!p) return fail('not_found', 404);
-  const row = readSuggestion(p);
+  const row = readSuggestion(p, deps.access);
   const known: Known[] = [];
   if (deps.gh && Object.hasOwn(deps.access.guides, row.guide)) {
     const raw = await readGuide((path) => deps.gh!.file(path), row.guide);
     for (const i of ((raw.items as ItemsFile | undefined)?.items ?? [])) known.push({ id: i.id, kind: 'item', name: i.name, show: i.subtitle, artists: i.by, address: i.address, website: i.sourceUrl, links: i.links, coordinates: i.coordinates, start: i.start, end: i.end });
     for (const l of ((raw.listings as { records?: { id: string; name: string; url?: string; coordinates: [number, number]; start?: string; end?: string }[] } | undefined)?.records ?? [])) known.push({ id: l.id, kind: 'listing', name: l.name, website: l.url, coordinates: l.coordinates, start: l.start, end: l.end });
   }
-  const others = (await deps.notion!.queryAll(deps.db.suggestions, { filter: { property: S.guide, select: { equals: row.guide } } }, 500)).map(readSuggestion).filter((o) => o.id !== row.id && o.status !== 'SPAM');
+  const others = (await deps.notion!.queryAll(deps.db.suggestions, { filter: guideIs(deps.access, row.guide) }, 500)).map((p) => readSuggestion(p, deps.access)).filter((o) => o.id !== row.id && o.status !== 'SPAM');
   for (const o of others) known.push({ id: `${o.reference} (${o.status})`, kind: 'submission', name: o.name, show: o.show, artists: o.artists, address: o.address, website: o.website, links: o.links, start: o.start, end: o.end });
   return json({ matches: findMatches({ name: row.name, show: row.show, artists: row.artists, address: row.address, website: row.website, links: row.links, start: row.start, end: row.end }, known).slice(0, 10), guideChecked: !!deps.gh });
 }
@@ -408,7 +408,7 @@ async function email(id: string, req: Request, deps: AdminDeps): Promise<Respons
   if (!/^[0-9a-f-]{36}$/i.test(key)) return fail('invalid_field', 400, { field: 'key' });
   const p = await page(deps, id);
   if (!p) return fail('not_found', 404);
-  const row = readSuggestion(p);
+  const row = readSuggestion(p, deps.access);
   const contact = await contactOf(deps, row);
   // Only with an address and their consent; the address never comes from the browser.
   if (!contact?.email || !isEmail(contact.email)) return fail('no_email', 409);

@@ -2,9 +2,11 @@
 // Notion stand-in, the Guard on a Map, a stand-in Turnstile and a stand-in inbox.
 import sharp from 'sharp';
 import { GuardCore, memoryStore } from './guard.ts';
-import { notion } from './notion.ts';
+import { notion, P } from './notion.ts';
 import { handleSuggest, LIMITS, TURNSTILE_ACTION, type SuggestDeps } from './suggest.ts';
 import { readSuggestion, S } from './suggestions.ts';
+import type { AccessFile } from '../src/lib/guides/types';
+import accessJson from '../src/content/guides/access.json' with { type: 'json' };
 import { toBase64 } from './image.ts';
 import type { EmailOut, TurnstileResult } from './contact.ts';
 // @ts-expect-error: plain JS module
@@ -17,7 +19,7 @@ function check(name: string, ok: boolean, detail: unknown = '') {
 }
 
 const SITE = 'https://kuschonink.com';
-const SLUG = 'paris-photo-days-2026';
+const SLUG = 'paris-2026-11';
 const now = Date.UTC(2026, 10, 9, 9, 0, 0);
 const goodTurnstile: TurnstileResult = { success: true, hostname: 'kuschonink.com', action: TURNSTILE_ACTION };
 
@@ -96,6 +98,20 @@ const jpeg = await sharp({ create: { width: 80, height: 60, channels: 3, backgro
   const dupe = await send(w, { ...base, id: uuid(4) }, { ip: '9.9.9.9' });
   const dupeRow = readSuggestion(pagesIn(w, 'ds-s').at(-1));
   check('the same place from someone else: in, marked as a possible duplicate', dupe.status === 202 && dupeRow.duplicate.includes(String(r.body.reference)), dupeRow.duplicate);
+}
+
+// A place suggested before the guide moved (access.json "moved"): its fingerprint starts with the old address.
+{
+  const ACCESS = accessJson as unknown as AccessFile;
+  const OLD = Object.entries(ACCESS.moved ?? {}).find(([, v]) => v === SLUG)?.[0] ?? '';
+  const w = world({ access: ACCESS });
+  const first = await send(w, { ...base, id: uuid(20), website: '', links: [] });
+  const page = pagesIn(w, 'ds-s')[0] as { id: string };
+  const fp = readSuggestion(page as never).fingerprint;
+  await w.deps.notion!.updatePage(page.id, { [S.guide]: P.select(OLD), [S.fingerprint]: P.text(OLD + fp.slice(SLUG.length)) } as never);
+  const again = await send(w, { ...base, id: uuid(21), website: '', links: [], description: 'Seen again.' }, { ip: '7.7.7.7' });
+  const row = readSuggestion(pagesIn(w, 'ds-s').at(-1));
+  check('a place first suggested under the old address is still marked as a possible duplicate', !!OLD && fp.startsWith(`${SLUG}|`) && again.status === 202 && row.duplicate.includes(String(first.body.reference)), { fp, dup: row.duplicate });
 }
 
 // ---- Who may send ----

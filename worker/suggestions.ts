@@ -7,6 +7,11 @@
 // Contacts, which only the site's own Notion integration can read (the
 // routine's integration can't). See docs/GUIDES.md, "Suggestions".
 import { P, R, type NotionPage, type Prop } from './notion.ts';
+import { currentSlug, slugNames } from '../src/lib/guides/address.ts';
+import type { AccessFile } from '../src/lib/guides/types';
+
+/** What readSuggestion() and guideIs() need from access.json: the guides and their old addresses. */
+type GuideNames = Pick<AccessFile, 'guides' | 'moved'>;
 
 /** A suggestion's life, in the order it usually goes. */
 export const STATUSES = ['NEW', 'ASKED', 'APPROVED', 'REFUSED', 'PROCESSING', 'READY', 'PUBLISHING', 'PUBLISHED', 'DUPLICATE', 'NEEDS CHECK', 'ERROR', 'SPAM'] as const;
@@ -220,7 +225,28 @@ export interface SuggestionRow {
   processed: string;
 }
 
-export function readSuggestion(p: NotionPage): SuggestionRow {
+/**
+ * A Suggestions page as a row. With `access`, a row sent under a guide's old
+ * address (access.json "moved") reads as if it had always named the guide by
+ * its address now, fingerprint included, so it still publishes and is still
+ * found as a duplicate.
+ */
+export function readSuggestion(p: NotionPage, access?: GuideNames): SuggestionRow {
+  const row = rowOf(p);
+  const now = access ? currentSlug(access, row.guide) : null;
+  if (!now || now === row.guide) return row;
+  const fingerprint = row.fingerprint.startsWith(`${row.guide}|`) ? now + row.fingerprint.slice(row.guide.length) : row.fingerprint;
+  return { ...row, guide: now, fingerprint };
+}
+
+/** A Notion filter for a guide's suggestions, under every name it has had (access.json "moved"). */
+export function guideIs(access: GuideNames, slug: string): Record<string, unknown> {
+  const names = slugNames(access, slug);
+  const one = (n: string) => ({ property: S.guide, select: { equals: n } });
+  return names.length === 1 ? one(slug) : { or: names.map(one) };
+}
+
+function rowOf(p: NotionPage): SuggestionRow {
   const d = R.date(p, S.dates);
   return {
     id: p.id,

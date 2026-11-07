@@ -29,7 +29,7 @@ const KEY = new TextEncoder().encode('0123456789abcdefghij'); // 20 bytes
 const SECRET = base32Encode(KEY);
 let now = Date.UTC(2026, 10, 9, 9, 0, 0);
 const code = async (offset = 0) => hotp(KEY, stepAt(now) + offset);
-const SLUG = 'paris-photo-days-2026';
+const SLUG = 'paris-2026-11';
 const DIR = `src/content/guides/${SLUG}`;
 const files: Record<string, string> = {};
 for (const f of readdirSync(DIR)) if (f.endsWith('.json')) files[`${DIR}/${f}`] = readFileSync(`${DIR}/${f}`, 'utf8');

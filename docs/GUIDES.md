@@ -16,6 +16,7 @@ directly.
 - [9. 让云端 Claude Code 来改 Asking cloud Claude Code](#9-让云端-claude-code-来改-asking-cloud-claude-code)
 - [10. 字段说明 Field reference](#10-字段说明-field-reference)
 - [11. 读者推荐 Suggestions](#11-读者推荐-suggestions)
+- [12. 地址与存档 Addresses and the archive](#12-地址与存档-addresses-and-the-archive)
 
 ---
 
@@ -23,7 +24,8 @@ directly.
 
 **导览（Field Guide）** 是 Xiangyin 98 桌面上的一个程序，用来放有密码保护的城市导览：
 一张地图、推荐地点（分 A、B、C 三级）、路线、日程和说明文字。地址是
-`kuschonink.com/guides/<名字>`，第一份是 `paris-photo-days-2026`。
+`kuschonink.com/guides/<名字>`，名字写作 `<城市>-<年>-<月>`，第一份是 `paris-2026-11`。
+`kuschonink.com/guides/paris` 总是打开最新列出的巴黎导览；过去的导览留在原来的地址（第 12 节）。
 
 - 没有密码时，只能看到程序名“导览”和每份导览的中性标题，看不到任何地点或日程。
 - 没有选导览的中间页。从桌面图标、“开始 ▸ 程序 ▸ 导览”、“运行”或“查找”打开“导览”，
@@ -41,8 +43,10 @@ directly.
 
 **Field Guide (导览)** is a program on the Xiangyin 98 desktop for city guides
 behind a password: a map, recommended places in three tiers (A, B, C), routes,
-dates and texts. A guide lives at `kuschonink.com/guides/<slug>`; the first is
-`paris-photo-days-2026`.
+dates and texts. A guide lives at `kuschonink.com/guides/<slug>`, where the
+slug is `<city>-<yyyy>-<mm>`; the first is `paris-2026-11`.
+`kuschonink.com/guides/paris` always opens the newest listed Paris guide, and
+past guides stay at their own addresses (section 12).
 
 - Without a password, people see only the program's name and each guide's
   neutral public title. No places, no dates.
@@ -91,7 +95,7 @@ dates and texts. A guide lives at `kuschonink.com/guides/<slug>`; the first is
 ```
 src/content/guides/
   access.json                    谁能打开哪份导览 who may open which guide
-  paris-photo-days-2026/         一份导览一个文件夹 one folder per guide
+  paris-2026-11/         一份导览一个文件夹 one folder per guide
     guide.json                   标题、日期、假日、分级、主题、片区、说明文字 title, dates, holidays, tiers, themes, zones, texts
     items.json                   推荐地点 the recommended places
     places.json                  参考点（字母牌）reference points (letter plates)
@@ -100,7 +104,7 @@ src/content/guides/
     listings.json                官方来源的次要条目 secondary records from an official source
     map.json                     底图 base maps
     README.md                    速查表 a cheat-sheet
-public/guides/paris-photo-days-2026/
+public/guides/paris-2026-11/
   img/                           图片 pictures
   map/                           底图图片 base-map images
 ```
@@ -120,14 +124,14 @@ public/guides/paris-photo-days-2026/
 | 文件 File | 链接 Link |
 | --- | --- |
 | `access.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/access.json> |
-| `guide.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-photo-days-2026/guide.json> |
-| `items.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-photo-days-2026/items.json> |
-| `places.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-photo-days-2026/places.json> |
-| `events.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-photo-days-2026/events.json> |
-| `routes.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-photo-days-2026/routes.json> |
-| `listings.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-photo-days-2026/listings.json> |
-| `map.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-photo-days-2026/map.json> |
-| 上传图片 Upload pictures | <https://github.com/itom123/kuschonink.com/upload/main/public/guides/paris-photo-days-2026/img> |
+| `guide.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-2026-11/guide.json> |
+| `items.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-2026-11/items.json> |
+| `places.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-2026-11/places.json> |
+| `events.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-2026-11/events.json> |
+| `routes.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-2026-11/routes.json> |
+| `listings.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-2026-11/listings.json> |
+| `map.json` | <https://github.com/itom123/kuschonink.com/edit/main/src/content/guides/paris-2026-11/map.json> |
+| 上传图片 Upload pictures | <https://github.com/itom123/kuschonink.com/upload/main/public/guides/paris-2026-11/img> |
 
 ---
 
@@ -348,18 +352,21 @@ both when the site is built.
 
 ## 5. 新建一份导览 Adding a new guide
 
-1. 复制整个文件夹 `src/content/guides/paris-photo-days-2026/`，改名，比如 `lisbon-2027`（小写，连字符）。
+1. 复制整个文件夹 `src/content/guides/paris-2026-11/`，改名为 `<城市>-<年>-<月>`，比如 `lisbon-2027-06`（小写，连字符；没有日期的导览写 `<城市>-<主题>`，如 `paris-cafes`）。名字就是导览以后永久的地址，写法见第 12 节。
 2. 改 `guide.json`：标题、`public`（中性的公开标题，不写人名、地点或团体名）、`listed`（是否在密码对话框里供人选择）、
    `city`、`timezone`（如 `"Europe/Lisbon"`）、`checked`、日期、分级、主题、片区、`texts`、`sensitive`。
 3. 清空 `items.json`、`places.json`、`events.json`、`routes.json`、`listings.json` 里的旧内容，再填新的。
    每个文件都要留着，列表可以是空的。没有日期的导览（比如咖啡馆）不写 `window`，就没有日期筛选。
-4. 在 `access.json` 的 `guides` 里加一行：`"lisbon-2027": ["visitor"]`。顺序有用：打开“导览”时进入的是排在最前面的那份列出的导览。要街道级地图的话，再在 `tiles` 里加一行，范围要包住每一张底图（第 10 节）。
-5. 建 `public/guides/lisbon-2027/img/` 和 `map/`。
-6. **底图**：目前还没有自动生成底图的工具。请让 Claude 做（说明城市和范围），它会生成底图图片和 `map.json`。
+4. 在 `access.json` 的 `guides` 里加一行：`"lisbon-2027-06": ["visitor"]`。顺序有用：打开“导览”时进入的是排在最前面的那份列出的导览，`/guides/<城市>` 进入的是这个城市排在最前面的那份。新的一份放在最前面。要街道级地图的话，再在 `tiles` 里加一行，范围要包住每一张底图（第 10 节）。
+5. 建 `public/guides/lisbon-2027-06/img/` 和 `map/`。
+6. 同一城市的旧导览要存档的话，把它的 `"listed"` 改成 `false`（第 12 节）。
+7. **底图**：目前还没有自动生成底图的工具。请让 Claude 做（说明城市和范围），它会生成底图图片和 `map.json`。
    底图的中心不要正对任何只给部分读者看的地点（比如工作地点）：访客也拿得到底图，看得出它的中心。构建会检查这一点（`is too close to the centre of map view`）；要偏开，就裁掉一边，再在 `map.json` 里改 `originX`/`originY` 和 `width`/`height`。
 
-1. Copy the whole folder `src/content/guides/paris-photo-days-2026/` and
-   rename it, for example `lisbon-2027` (lower case, with hyphens).
+1. Copy the whole folder `src/content/guides/paris-2026-11/` and
+   rename it `<city>-<yyyy>-<mm>`, for example `lisbon-2027-06` (lower case,
+   with hyphens; a guide without dates is `<city>-<topic>`, such as
+   `paris-cafes`). The name is the guide's address for good: see section 12.
 2. Edit `guide.json`: the title, `public` (a neutral public title: no people,
    venues or group names), `listed` (offered in the password box or not), `city`,
    `timezone` (e.g. `"Europe/Lisbon"`), `checked`, the dates, tiers, themes,
@@ -367,12 +374,15 @@ both when the site is built.
 3. Empty `items.json`, `places.json`, `events.json`, `routes.json` and
    `listings.json`, then fill them. Keep every file, even with an empty list.
    A guide without dates (cafés, say) has no `window`, so no day filter.
-4. Add a line to `guides` in `access.json`: `"lisbon-2027": ["visitor"]`.
-   Its place matters: Field Guide opens the first listed guide in that list.
-   For street-level tiles, add a line to `tiles` as well, with a box that holds
-   every base map (section 10).
-5. Create `public/guides/lisbon-2027/img/` and `map/`.
-6. **Base maps**: there's no base-map tool yet. Ask Claude (name the city and
+4. Add a line to `guides` in `access.json`: `"lisbon-2027-06": ["visitor"]`.
+   Its place matters: Field Guide opens the first listed guide in that list,
+   and `/guides/<city>` the first listed one of that city, so put a new guide
+   first. For street-level tiles, add a line to `tiles` as well, with a box that
+   holds every base map (section 10).
+5. Create `public/guides/lisbon-2027-06/img/` and `map/`.
+6. To archive an older guide of the same city, set its `"listed"` to `false`
+   (section 12).
+7. **Base maps**: there's no base-map tool yet. Ask Claude (name the city and
    the area); it makes the images and `map.json`.
    Don't centre a base map on a place only some readers may see: visitors get
    the base maps too and can tell where the centre is. The build checks this
@@ -391,7 +401,7 @@ both when the site is built.
    ```
 
    `includes` 表示他们也看到哪些读者的内容。
-2. 在 `guides` 里把它加到能打开的导览后面：`"paris-photo-days-2026": ["visitor", "fotofilmic", "friends"]`。
+2. 在 `guides` 里把它加到能打开的导览后面：`"paris-2026-11": ["visitor", "fotofilmic", "friends"]`。
 3. 在 Cloudflare 加一个同名的 secret（见第 7 节）。
 4. 给只给他们看的内容加 `"audience": "friends"`。
 
@@ -399,7 +409,7 @@ both when the site is built.
    the example above). `includes` lists the audiences whose content they also
    see.
 2. Add it to each guide it may open in `guides`:
-   `"paris-photo-days-2026": ["visitor", "fotofilmic", "friends"]`.
+   `"paris-2026-11": ["visitor", "fotofilmic", "friends"]`.
 3. Add a Cloudflare secret with the same name (section 7).
 4. Mark their own content with `"audience": "friends"`.
 
@@ -504,7 +514,7 @@ variables, not the Worker.
 1. 在 GitHub 上，提交或 PR 旁边会有红色的 ✗ **Workers Builds: kuschonink**。点 **Details**。
 2. 在日志里找以 **`Field Guide:`** 开头的那一行，它说有几个问题。问题列在它下面，一行一个，
    每行以 `guides/<导览>/<文件>.json › 编号 › 字段:` 开头，例如
-   `guides/paris-photo-days-2026/items.json › B3 › end: "2026-11-31" is not a real date.`
+   `guides/paris-2026-11/items.json › B3 › end: "2026-11-31" is not a real date.`
    防泄漏检查的问题以 **`Field Guide guard:`** 开头，后面是文件和原因。
 3. 按提示改那个文件，再提交一次。
 
@@ -515,7 +525,7 @@ The site doesn't break: when a build fails, the live site stays as it was.
 2. In the log, find the line starting **`Field Guide:`**, which says how many
    problems there are. They're listed under it, one per line, each starting
    `guides/<slug>/<file>.json › id › field:`, e.g.
-   `guides/paris-photo-days-2026/items.json › B3 › end: "2026-11-31" is not a real date.`
+   `guides/paris-2026-11/items.json › B3 › end: "2026-11-31" is not a real date.`
    Leak-guard problems start with **`Field Guide guard:`**, then the file and
    the reason.
 3. Fix that file as it says and commit again.
@@ -552,6 +562,8 @@ The site doesn't break: when a build fails, the live site stays as it was.
 | `its size in pixels can't be read` (the guard) | 读不出底图的像素大小，文件可能坏了，或不是图片 The pixel size of a base map can't be read: the file may be damaged or not a picture | 重新导出为 JPEG、PNG 或 WebP Export it again as JPEG, PNG or WebP |
 | `not a Field Guide file` | 导览文件夹里有一个不认识的 `.json` 文件 A `.json` file in a guide's folder that the Field Guide doesn't use | 删掉它，或改成已知的文件名 Delete it, or rename it to a known file name |
 | `there is no folder`, `not in access.json` | `access.json` 和文件夹对不上 `access.json` and the folders disagree | 两边一起改 Change both |
+| `should start with its city` | 导览的名字（文件夹名、地址）没有以城市开头 A guide's name (its folder and address) doesn't start with its city | 按提示改名，或改 `city`；已经分享过的地址要加进 `moved`（第 12 节） Rename it as suggested, or fix `city`; add a shared address to `moved` (section 12) |
+| `is still a guide in "guides"`, `Send "…" to the guide's address now` | `moved` 里的旧地址还是一份导览，或者它指向的导览不存在 An old address in `moved` is still a guide, or points at no guide | 只写已经不用的旧地址，指向导览现在的名字 List only addresses no longer in use, each sent to a guide's name now |
 
 ---
 
@@ -562,7 +574,7 @@ The site doesn't break: when a build fails, the live site stays as it was.
 In Claude Code on claude.ai, pick this repo and say something like:
 
 ```text
-请先读 docs/GUIDES.md。然后在 src/content/guides/paris-photo-days-2026/ 里：
+请先读 docs/GUIDES.md。然后在 src/content/guides/paris-2026-11/ 里：
 把 B3 的结束日期改成 2026-11-20；给 A5 加一条 2026-11-12 闭馆的例外（原因：私人活动）。
 改完运行 npm test 和 npm run build，都通过后开一个 PR：gh pr create --base main。
 PR 说明用中文写清楚改了什么。只改需要改的文件，不要把任何密码写进仓库。
@@ -593,6 +605,7 @@ below). Any file may have a `_comment`, which is never shown.
 | `audiences[].secret` | Cloudflare secret 的名字（不是密码） | The Cloudflare secret's name (never the password) |
 | `audiences[].includes?` | 也能看到哪些读者的内容 | Audiences whose content this one also sees |
 | `guides` | 导览名 → 能打开它的读者 | Guide slug → the audiences that may open it |
+| `moved?` | 旧地址 → 导览现在的名字，如 `{"paris-photo-days-2026": "paris-2026-11"}`。旧地址永久转到新地址，用旧名发来的推荐照样送到这份导览（第 12 节） | Old address → the guide's slug now. The old address redirects for good, and suggestions sent under the old name still reach the guide (section 12) |
 | `tiles?` | 导览名 → 街道级地图瓦片的范围 `[西, 南, 东, 北]`（度），一般就是大区底图的范围；写了才有瓦片。只写数字，不写地点。东西、南北各跨不超过 3°，并且要包住这份导览的每一张底图 | Guide slug → the area of its street-level tiles, `[west, south, east, north]` in degrees (usually the region view's area); without it the guide has no tiles. Numbers only, never a place. Each side spans at most 3°, and the box must hold every base map |
 
 ### `guide.json`
@@ -601,8 +614,8 @@ below). Any file may have a `_comment`, which is never shown.
 | --- | --- | --- |
 | `title`/`titleZh?`, `subtitle?`/`subtitleZh?` | 打开后显示的完整标题 | The full title, once open |
 | `public` | `{ title, titleZh?, subtitle?, subtitleZh? }`：输入密码前显示的中性标题 | The neutral title shown before the password |
-| `listed` | 是否在密码对话框里供人选择；排在最前面（按 `access.json` 的顺序）的那份，就是打开“导览”时进入的导览 | Offered in the password box's choice of guides; the first listed one (in `access.json` order) is where Field Guide opens |
-| `city`/`cityZh?` | 城市 | The city |
+| `listed` | 是否在密码对话框里供人选择；排在最前面（按 `access.json` 的顺序）的那份，就是打开“导览”时进入的导览，也是 `/guides/<城市>` 进入的导览。`false` 就是存档：地址照样能用（第 12 节） | Offered in the password box's choice of guides; the first listed one (in `access.json` order) is where Field Guide and `/guides/<city>` open. `false` archives it: its address still works (section 12) |
+| `city`/`cityZh?` | 城市；导览的名字以它开头（`Paris` → `paris-…`） | The city; the guide's slug starts with it (`Paris` → `paris-…`) |
 | `timezone` | 时区（IANA），如 `Europe/Paris`；“今天”按它算 | IANA time zone; "today" follows it |
 | `timezoneLabel?`/`timezoneLabelZh?` | 给人看的时区说明 | The time zone as people read it |
 | `checked` | 信息最后核对的日期 | When the facts were last checked |
@@ -1078,3 +1091,47 @@ Safety:
   routine's integration is connected to (Suggestions and the Processing log;
   never Contacts). A `READY` entry still has to pass the publisher's checks
   to reach the guide, and touches only that guide's `items.json` and `img/`.
+
+---
+
+## 12. 地址与存档 Addresses and the archive
+
+每份导览都有一个永久的地址，过去的导览留在原处，新的导览按城市和年月往上加。
+
+- **写法**：`/guides/<城市>-<年>-<月>`，如 `paris-2026-11`（2026年11月的巴黎导览）、`lisbon-2027-06`。没有日期的导览写 `<城市>-<主题>`，如 `paris-cafes`。全部小写，用连字符，不带重音（`São Paulo` 写成 `sao-paulo`）。城市部分来自 `guide.json` 的 `city`，构建会检查名字是否以它开头。
+- **地址一经分享就不再改**。导览结束后也留在原来的地址：那是它的存档。
+- **`/guides`** 进入排在最前面的那份列出的导览（`"listed": true`，按 `access.json` 的顺序）。
+- **`/guides/<城市>`**，如 `kuschonink.com/guides/paris`，进入这个城市排在最前面的那份列出的导览。想分享“当前的巴黎导览”，就发这个链接：明年的巴黎导览列出、排到前面以后，它自己就会跟过去。
+- **新的一年**：复制文件夹，命名为 `paris-2027-11`，在 `access.json` 里把它放在最前面，`"listed": true`。
+- **存档**：把旧导览的 `"listed"` 改成 `false`。它不再出现在密码对话框的选择里，`/guides` 和 `/guides/paris` 也不再进入它；但原来的地址照样能用，凭密码照样能打开。
+- **完全下线**：删掉它的两个文件夹（`src/content/guides/<名字>/` 和 `public/guides/<名字>/`）以及 `access.json` 里它的几行。之后这个地址显示“网页不存在”。不要把旧地址再用在另一份导览上。
+- **不得不改名时**（很少）：把两个文件夹改名，改 `access.json` 里 `guides` 和 `tiles` 的名字，再在 `moved` 里加一行 `"<旧名>": "<新名>"`。旧地址（包括后面的图片、瓦片、登录）会永久转到新地址；用旧名发来、还在 Notion 里的推荐照样能发布。例如，这份巴黎导览原来叫 `paris-photo-days-2026`。
+
+Every guide has an address for good: past guides stay where they are, and new
+ones are added by city and month.
+
+- **The pattern**: `/guides/<city>-<yyyy>-<mm>`, such as `paris-2026-11` (the
+  Paris guide for November 2026) or `lisbon-2027-06`. A guide without dates is
+  `<city>-<topic>`, such as `paris-cafes`. All lower case, with hyphens and no
+  accents (`São Paulo` is `sao-paulo`). The city part comes from `city` in
+  `guide.json`, and the build checks that the slug starts with it.
+- **An address never changes once shared.** When a guide is over, it stays at
+  its address: that is its archive.
+- **`/guides`** opens the first listed guide (`"listed": true`, in
+  `access.json` order).
+- **`/guides/<city>`**, such as `kuschonink.com/guides/paris`, opens that
+  city's first listed guide. Share it for "the current Paris guide": once next
+  year's Paris guide is listed and first, the link follows by itself.
+- **A new year**: copy the folder as `paris-2027-11`, put it first in
+  `access.json`, with `"listed": true`.
+- **Archiving**: set the old guide's `"listed"` to `false`. It leaves the
+  password box's choice, and `/guides` and `/guides/paris` stop going there,
+  but its address still works and its password still opens it.
+- **Taking one offline**: delete its two folders (`src/content/guides/<slug>/`
+  and `public/guides/<slug>/`) and its lines in `access.json`. The address then
+  shows "page not found". Never reuse an old address for another guide.
+- **If a name must change** (rarely): rename both folders, change the name under
+  `guides` and `tiles` in `access.json`, and add `"<old>": "<new>"` under
+  `moved`. The old address, and everything under it (pictures, tiles, log-on),
+  redirects there for good, and suggestions still in Notion under the old name
+  still publish. This Paris guide, for example, was `paris-photo-days-2026`.

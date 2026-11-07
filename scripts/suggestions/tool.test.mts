@@ -26,7 +26,7 @@ function check(name: string, ok: boolean, detail: unknown = '') {
   console.log(ok ? 'PASS' : 'FAIL', name, ok ? '' : typeof detail === 'string' ? detail : JSON.stringify(detail));
 }
 const REPO = fileURLToPath(new URL('../../', import.meta.url));
-const SLUG = 'paris-photo-days-2026';
+const SLUG = 'paris-2026-11';
 // The id a new entry gets depends on the real guide, so work it out from its items.
 const NEXT_C = nextId(JSON.parse(readFileSync(join(REPO, `src/content/guides/${SLUG}/items.json`), 'utf8')).items, 'C');
 const node = (args: string[], env: NodeJS.ProcessEnv, cwd?: string) =>

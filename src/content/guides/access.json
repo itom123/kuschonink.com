@@ -5,10 +5,14 @@
     { "id": "fotofilmic", "label": "FotoFilmic participant", "labelZh": "FotoFilmic 学员", "secret": "GUIDES_PASSWORD_FOTOFILMIC", "includes": ["visitor"] }
   ],
   "guides": {
-    "paris-photo-days-2026": ["visitor", "fotofilmic"]
+    "paris-2026-11": ["visitor", "fotofilmic"]
   },
   "_tiles": "Street-level map tiles (Plan IGN, fetched by the Worker) for a guide: the area they cover as [west, south, east, north] in degrees, usually the region view's area. Only numbers here, never a place. 街道级地图瓦片（Plan IGN，由 Worker 代取）的覆盖范围：[西, 南, 东, 北]，单位为度，一般就是大区底图的范围。这里只写数字，不写地点。",
   "tiles": {
-    "paris-photo-days-2026": [2.07, 48.63, 2.8, 49.05]
+    "paris-2026-11": [2.07, 48.63, 2.8, 49.05]
+  },
+  "_moved": "Old addresses that still work: /guides/<old>/… goes to the guide's address now, for good, and suggestions sent under the old name still reach the guide. A guide's address is <city>-<yyyy>-<mm> and never changes once shared (docs/GUIDES.md, section 12); add a line here only if one ever has to. 旧地址：/guides/<旧名>/… 永久转到导览现在的地址，用旧名发来的推荐也照样送到这份导览。导览地址写作 <城市>-<年>-<月>，一经分享就不再改（docs/GUIDES.md 第12节）；只有地址不得不改时才在这里加一行。",
+  "moved": {
+    "paris-photo-days-2026": "paris-2026-11"
   }
 }
