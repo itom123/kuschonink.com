@@ -64,7 +64,7 @@ interface Env {
   NOTION_LOG?: string;
   /** Fine-grained token for this repository, Contents read/write (a secret): the publisher's commits. */
   GITHUB_TOKEN?: string;
-  /** "owner/name". */
+  /** "owner/name". Only production names one (wrangler.jsonc vars), so a preview never publishes, even with a token. */
   GITHUB_REPO?: string;
   /** Only for wrangler dev: a GitHub stand-in. */
   GITHUB_API?: string;
@@ -155,7 +155,8 @@ function notionOf(env: Env) {
   };
 }
 
-const githubOf = (env: Env) => (env.GITHUB_TOKEN ? github({ token: env.GITHUB_TOKEN, repo: env.GITHUB_REPO || 'itom123/kuschonink.com', fetch: (i, o) => fetch(i, o), base: env.GITHUB_API }) : null);
+/** GitHub, when it is set up: a token and the repository's name (a preview has no name, so no publishing). */
+const githubOf = (env: Env) => (env.GITHUB_TOKEN && env.GITHUB_REPO ? github({ token: env.GITHUB_TOKEN, repo: env.GITHUB_REPO, fetch: (i, o) => fetch(i, o), base: env.GITHUB_API }) : null);
 
 function suggestDeps(env: Env): SuggestDeps {
   const n = notionOf(env);
@@ -195,7 +196,7 @@ async function runPublisher(env: Env, trigger: 'scheduled' | 'manual') {
   const gh = githubOf(env);
   if (!n || !gh) return null;
   return publish(
-    { notion: n.api, db: n.db, gh, repoUrl: `https://github.com/${env.GITHUB_REPO || 'itom123/kuschonink.com'}`, guard: guardOf(env), access: access as AccessFile, download, now: () => Date.now(), log: (...a) => console.error(...a) },
+    { notion: n.api, db: n.db, gh, repoUrl: `https://github.com/${env.GITHUB_REPO}`, guard: guardOf(env), access: access as AccessFile, download, now: () => Date.now(), log: (...a) => console.error(...a) },
     trigger,
   );
 }

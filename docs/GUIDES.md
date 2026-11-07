@@ -789,16 +789,23 @@ Once only. Cloudflare secrets (never in the repo):
   previews use Cloudflare's test key.
 - The cloud routine: see [11.6](#116-云端例程-the-routine-in-claudes-cloud).
 
-Worker Previews (PR previews) get test values, never the real ones, in the
-dashboard's Preview settings: made-up guide passwords and cookie secret,
-`TURNSTILE_SECRET_SUGGEST=1x0000000000000000000000000000000AA` with
-`TURNSTILE_HOSTNAMES=example.com`, no `GITHUB_TOKEN`, and a test Notion
-integration shared only with the page "Field Guide suggestions (kuschonink) ·
-test copies", whose databases are:
+PR previews (Worker Previews, section 7) never get the real ones. The
+`previews` block in `wrangler.jsonc` already gives them the test copies of the
+databases (below) and accepts Turnstile's test keys
+(`TURNSTILE_HOSTNAMES=example.com`). Their two secrets, set once on your own
+computer with `npx wrangler preview base-config secret put NAME`:
+`NOTION_TOKEN`, from a test Notion integration shared only with the page
+"Field Guide suggestions (kuschonink) · test copies", and
+`TURNSTILE_SECRET_SUGGEST` set to Cloudflare's test secret
+`1x0000000000000000000000000000000AA`. Never a `GITHUB_TOKEN`: a preview names
+no repository, so it never publishes.
 
-预览（PR 预览）只用测试值：在控制台的 Preview 设置里，用编出来的导览密码和 cookie
-密钥、Turnstile 测试密钥、不设 `GITHUB_TOKEN`，以及一个只共享给“test copies”页面的测试
-Notion 集成：
+PR 预览（Worker Previews，见第 7 节）从不用正式的值。`wrangler.jsonc` 的 `previews` 部分已经让它们用下面的测试数据库，
+并接受 Turnstile 的测试密钥（`TURNSTILE_HOSTNAMES=example.com`）。它们的两个 secret 在自己电脑上用
+`npx wrangler preview base-config secret put 名字` 设置一次：`NOTION_TOKEN`（一个只共享给
+“Field Guide suggestions (kuschonink) · test copies”页面的测试 Notion 集成），以及
+`TURNSTILE_SECRET_SUGGEST`，设成 Cloudflare 的测试密钥 `1x0000000000000000000000000000000AA`。
+永远不给预览 `GITHUB_TOKEN`：预览没有仓库名，不会发布。
 
 | Var | Test data source |
 | --- | --- |
