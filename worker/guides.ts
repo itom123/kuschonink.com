@@ -77,6 +77,11 @@ export interface GuidesDeps {
   assets: (request: Request) => Promise<Response> | Response;
   /** False once this visitor has tried too many passwords. */
   allow: (key: string) => Promise<boolean> | boolean;
+  /**
+   * False once this visitor has had too many tiles fetched from IGN. Asked only
+   * on an edge-cache miss. Missing (a preview without the binding) allows every tile.
+   */
+  allowTile?: (key: string) => Promise<boolean> | boolean;
   /** Outbound fetch, for street-level tiles from IGN (the visitor's own request never reaches IGN). */
   fetch: (url: string, init?: RequestInit & { cf?: Record<string, unknown> }) => Promise<Response>;
   /** The edge cache for tiles (caches.default), if there is one. */
@@ -542,7 +547,9 @@ export function tileRange(b: [number, number, number, number], z: number): { x0:
  * by the Worker (so IGN sees the Worker, never the visitor), kept at the edge
  * for 30 days, and answered privately. Only tiles inside the guide's declared
  * bounds and between TILE_Z.min and TILE_Z.max exist; anything else is 404.
- * An upstream failure is a bare 502, never IGN's own error page.
+ * An upstream failure is a bare 502, never IGN's own error page. Only an
+ * edge-cache miss costs an IGN fetch, so only a miss spends the visitor's
+ * tile budget (deps.allowTile); over it, a bare 429.
  */
 async function tile(req: Request, url: URL, sub: string, slug: string, deps: GuidesDeps): Promise<Response> {
   const m = TILE_PATH.exec(sub);
@@ -562,13 +569,15 @@ async function tile(req: Request, url: URL, sub: string, slug: string, deps: Gui
     deps.log('guides: tile cache match failed', (e as Error)?.message ?? String(e));
   }
   if (!hit) {
+    if (!(await tileBudget(req, deps))) return new Response(null, { status: 429, headers: { ...PRIVATE, 'retry-after': '60' } });
     let up: Response;
     try {
       up = await deps.fetch(upstream, {
         method: 'GET',
         headers: { 'user-agent': TILE_UA, accept: 'image/png' },
         signal: AbortSignal.timeout(TILE_TIMEOUT_MS),
-        cf: { cacheEverything: true, cacheTtl: TILE_EDGE_S },
+        // Only a good tile is kept for 30 days: an IGN 404 or 5xx is never held (cacheTtl would cover those too).
+        cf: { cacheEverything: true, cacheTtlByStatus: { '200-299': TILE_EDGE_S, '400-599': 0 } },
       });
     } catch (e) {
       deps.log('guides: tile upstream failed', z, (e as Error)?.message ?? String(e));
@@ -615,6 +624,17 @@ async function tile(req: Request, url: URL, sub: string, slug: string, deps: Gui
 }
 
 const badGateway = () => new Response(null, { status: 502, headers: PRIVATE });
+
+/** May this visitor have one more tile fetched from IGN? No limiter, or one that fails, says yes (a map is not worth closing over it). */
+async function tileBudget(req: Request, deps: GuidesDeps): Promise<boolean> {
+  if (!deps.allowTile) return true;
+  try {
+    return await deps.allowTile(limitKey(req.headers.get('cf-connecting-ip')));
+  } catch (e) {
+    deps.log('guides: tile limiter failed', (e as Error)?.message ?? String(e));
+    return true;
+  }
+}
 
 /** Does this start with the PNG signature? */
 function isPng(b: ArrayBuffer): boolean {

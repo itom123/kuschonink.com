@@ -39,8 +39,9 @@ export const W = {
   day: b('Day', '日期'),
   area: b('Area', '区域'),
   status: b('Status', '状态'),
-  // Places: "Sort by:" ("&" marks the access key, as in the menus).
-  sortBy: b('&Sort by:', '排序方式(&S)：'),
+  // Places: "Sort by:" ("&" marks the access key, as in the menus). O, as on View > Sort By,
+  // where S belongs to Stop Showing My Location.
+  sortBy: b('S&ort by:', '排序方式(&O)：'),
   sortTier: b('Recommended (default)', '推荐（默认）'),
   sortName: b('Name', '名称'),
   sortZone: b('Area', '区域'),
@@ -115,6 +116,9 @@ export const W = {
   // Menus and dialogs.
   logOffAsk: b('Lock this guide on this device? You will need the password to open it again.', '要在这台设备上锁定本导览吗？再次打开需要输入密码。'),
   logOffFailed: b('Could not log off. Check your connection and try again.', '无法注销。请检查网络连接后重试。'),
+  openGuideTitle: b('Open Guide', '打开导览'),
+  openGuideAsk: b('Choose a guide to open:', '请选择要打开的导览：'),
+  cancel: b('Cancel', '取消'),
   about: (title: Bi) => b(`${title.en}\nin the Field Guide for Xiangyin 98\n\nAn unofficial guide. Opening times are as published, not live; check before you go.`, `${title.zh || title.en}\nXiangyin 98 导览\n\n非官方导览。开放时间为公布信息，非实时；出发前请先确认。`),
   heat: b('Heat map', '热力图'),
   labels: b('Labels', '标签'),

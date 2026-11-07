@@ -302,7 +302,12 @@ a document inside the program, at `/guides/<slug>` (`\\XIANGYIN\GUIDES\<SLUG>`
 in the log-on box). The first is `paris-photo-days-2026`. On a computer the window
 shows a list, the map and the details side by side; on a phone it shows one at a
 time, and tapping a pin raises a details sheet. It works without JavaScript as
-one readable page.
+one readable page. Zoomed in past the base picture, the map shows street-level
+tiles from IGN's Plan IGN. The Worker fetches them at
+`/guides/<slug>/tiles/{z}/{x}/{y}.png` (zooms 14 to 19), for logged-on viewers
+only and only inside the box `access.json` gives under `tiles` (in degrees, at
+most 3° each way, containing every base map), so IGN sees the Worker and never
+the visitor. Each visitor may fetch at most 600 tiles from IGN a minute.
 
 **Passwords and audiences.** Before the password, a visitor sees only neutral
 public titles, in an *Enter Network Password* box: `/guides` goes to the first
@@ -360,11 +365,15 @@ and English: [`docs/GUIDES.md`](docs/GUIDES.md).
   loading in `src/lib/guides/`; the program and its map in `src/scripts/guide/`
   and `src/components/guide/`; styles in `src/styles/guide*.css`; the gate in
   `worker/guides.ts`.
-- **Tests:** `npm test` runs `src/lib/guides/guides.test.mts` (day rules, time
-  zones, audience filtering, the real data, broken copies) and
-  `worker/guides.test.mts` (the gate: views, cookies, log-on, log-off) and
-  `src/scripts/guide/camera.test.mts` (the map's pan and zoom). The build
-  runs the guard and the Worker's tests as well.
+- **Tests:** `npm test` runs all eleven `*.test.mts` suites, in the order
+  `package.json` lists them. The Field Guide's are `src/lib/guides/guides.test.mts`
+  (day rules, time zones, audience filtering, the real data, broken copies),
+  `worker/guides.test.mts` (the gate: views, cookies, log-on, log-off, tiles) and,
+  in `src/scripts/guide/`, `camera.test.mts` (the map's pan and zoom),
+  `find.test.mts` (Find, and the distances of Where am I?), `heat.test.mts`,
+  `order.test.mts` (Sort by), `pins.test.mts` (how many pins show at each zoom)
+  and `tiles.test.mts` (the street-level tiles). The build runs the guard and
+  the Worker's tests as well.
 
 ### Analytics
 

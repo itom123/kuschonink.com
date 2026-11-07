@@ -39,7 +39,7 @@ const sorts: { v: string; t: BiT; off?: boolean }[] = [
   </div>
   <div class="gd-sortbar" data-js-only>
     <label class="gd-sort-field"><span class="gd-sort-label" set:html={biAccelHtml(W.sortBy.en, W.sortBy.zh)}></span>
-      <select data-gd-sort-select accesskey="s">
+      <select data-gd-sort-select accesskey="o">
         {sorts.map((o) => <option value={o.v} disabled={o.off} {...text(o.t)}>{o.t.en}</option>)}
       </select>
     </label>

@@ -25,7 +25,7 @@ directly.
 `kuschonink.com/guides/<名字>`，第一份是 `paris-photo-days-2026`。
 
 - 没有密码时，只能看到程序名“导览”和每份导览的中性标题，看不到任何地点或日程。
-- 没有选导览的中间页。从桌面图标、“开始 ▸ 程序 ▸ 导览”、“运行”、“查找”或帮助打开“导览”，
+- 没有选导览的中间页。从桌面图标、“开始 ▸ 程序 ▸ 导览”、“运行”或“查找”打开“导览”，
   或者直接输入 `kuschonink.com/guides`（有没有 JavaScript 都一样），都会直接进入第一份列出的导览
   （`guide.json` 里 `"listed": true`，按 `access.json` 里的顺序）：没登录时是密码对话框，已登录就是导览本身。
   有不止一份导览时，在密码对话框里选择要看哪一份。一份都没列出时，`/guides` 只显示“这里还没有导览”。
@@ -34,6 +34,9 @@ directly.
 - 导览页面不进搜索引擎（`noindex`，不在 sitemap 里）。
 - 内容全部是仓库里的 JSON 文件。改了 `main` 上的文件，大约一分钟后网站就更新。
   数据有错时构建会失败，网站保持原样，不会坏掉。
+- **地点的排序**：地点列表上方的“排序方式”默认是“推荐”（A、B、C 级依次排，同级按编号）。另外还有“名称”、“区域”（按导览里片区的顺序）、“当天开放的优先”（先在“日期”框里选定一天）和“离我最近”（先按“我在哪里？”）。选了别的排序后会出现“默认”按钮，单击即可恢复推荐顺序。“查看 ▸ 排序方式”菜单里是同样几种排序。排序只调整每一组之内的次序（参考点、当天闭馆的地点和官方条目各自是一组）。选择会记在这台设备上，“离我最近”除外。
+- **我在哪里？**：只有按下按钮时，浏览器才会询问位置。之后地图上会出现一个红色的圆点，并显示“实时位置”标签，旁边有“停止”按钮。再按一次按钮、单击“停止”，或者刷新页面、注销、关闭窗口，都会关掉它；刷新之后它是关着的。位置只留在设备上，从不发送出去。浏览器不允许时，导览会说明怎样开启。
+- **街道地图**：放大到底图放不下细节时，街道级的地图瓦片由 Worker 从 IGN（Plan IGN）代为取得，地址是 `/guides/<名字>/tiles/{z}/{x}/{y}.png`，缩放级别 14 至 19，只给已登录的读者。范围由 `access.json` 的 `tiles` 决定（见第 10 节）。IGN 只看到 Worker，看不到访客。每位访客每分钟从 IGN 取图最多 600 块（已在缓存里的不算），超出的瓦片返回 429。
 
 **Field Guide (导览)** is a program on the Xiangyin 98 desktop for city guides
 behind a password: a map, recommended places in three tiers (A, B, C), routes,
@@ -43,7 +46,7 @@ dates and texts. A guide lives at `kuschonink.com/guides/<slug>`; the first is
 - Without a password, people see only the program's name and each guide's
   neutral public title. No places, no dates.
 - There is no page for choosing a guide. The desktop icon, Start ▸ Programs ▸
-  Field Guide, Run, Find, Help and typing `kuschonink.com/guides` (with or
+  Field Guide, Run, Find and typing `kuschonink.com/guides` (with or
   without JavaScript) all go straight to the first listed guide
   (`"listed": true` in `guide.json`, in `access.json` order): its password box,
   or the guide itself once logged on. With more than one guide, people choose
@@ -57,6 +60,28 @@ dates and texts. A guide lives at `kuschonink.com/guides/<slug>`; the first is
 - Everything is JSON in this repo. A change on `main` is live in about a
   minute. If the data has a mistake, the build fails and the site stays as it
   was.
+- **Sorting the places.** The Places list has a **Sort by** box above it.
+  **Recommended** (the default) lists the A places, then B and C, each in number
+  order; **Name** sorts by name; **Area** follows the guide's own order of areas;
+  **Open that day first** needs a day chosen in the **When** box; **Nearest
+  first** needs **Where am I?**. Once another order is in use, a **Default**
+  button goes back to Recommended. **View ▸ Sort By** has the same orders.
+  Sorting only changes the order inside each group (reference points, places
+  closed that day and official entries each stay together), and the choice is
+  remembered on this device, except Nearest first.
+- **Where am I?** The browser asks for your position only when you press the
+  button. A red dot then follows you on the map, with a **Live location** chip
+  that has a **Stop** button. Pressing the button again, pressing **Stop**, or a
+  refresh, log off or closed window turns it off, and it stays off after a
+  refresh. Your position stays on your device and is never sent anywhere. If the
+  browser refuses, the guide says how to allow it.
+- **Street-level tiles.** Once you zoom in past the base picture, street tiles
+  from Plan IGN take over. The Worker fetches them at
+  `/guides/<slug>/tiles/{z}/{x}/{y}.png` for zooms 14 to 19, only for logged-on
+  viewers and only inside the box that `access.json` gives under `tiles`
+  (section 10). IGN sees the Worker, never the visitor. Each visitor may fetch at
+  most 600 tiles from IGN a minute (cached tiles don't count); beyond that a tile
+  answers 429.
 
 ---
 
@@ -327,7 +352,7 @@ both when the site is built.
    `city`、`timezone`（如 `"Europe/Lisbon"`）、`checked`、日期、分级、主题、片区、`texts`、`sensitive`。
 3. 清空 `items.json`、`places.json`、`events.json`、`routes.json`、`listings.json` 里的旧内容，再填新的。
    每个文件都要留着，列表可以是空的。没有日期的导览（比如咖啡馆）不写 `window`，就没有日期筛选。
-4. 在 `access.json` 的 `guides` 里加一行：`"lisbon-2027": ["visitor"]`。顺序有用：打开“导览”时进入的是排在最前面的那份列出的导览。
+4. 在 `access.json` 的 `guides` 里加一行：`"lisbon-2027": ["visitor"]`。顺序有用：打开“导览”时进入的是排在最前面的那份列出的导览。要街道级地图的话，再在 `tiles` 里加一行，范围要包住每一张底图（第 10 节）。
 5. 建 `public/guides/lisbon-2027/img/` 和 `map/`。
 6. **底图**：目前还没有自动生成底图的工具。请让 Claude 做（说明城市和范围），它会生成底图图片和 `map.json`。
    底图的中心不要正对任何只给部分读者看的地点（比如工作地点）：访客也拿得到底图，看得出它的中心。构建会检查这一点（`is too close to the centre of map view`）；要偏开，就裁掉一边，再在 `map.json` 里改 `originX`/`originY` 和 `width`/`height`。
@@ -343,6 +368,8 @@ both when the site is built.
    A guide without dates (cafés, say) has no `window`, so no day filter.
 4. Add a line to `guides` in `access.json`: `"lisbon-2027": ["visitor"]`.
    Its place matters: Field Guide opens the first listed guide in that list.
+   For street-level tiles, add a line to `tiles` as well, with a box that holds
+   every base map (section 10).
 5. Create `public/guides/lisbon-2027/img/` and `map/`.
 6. **Base maps**: there's no base-map tool yet. Ask Claude (name the city and
    the area); it makes the images and `map.json`.
@@ -487,6 +514,18 @@ The site doesn't break: when a build fails, the live site stays as it was.
 | `Unexpected token`, `Expected ','` | JSON 格式错：少了逗号、引号或括号 Broken JSON: a missing comma, quote or bracket | 看日志给的行号 Look at the line number given |
 | `contains guide text`, `contains sensitive.public words`, `doesn't include` | 不该公开的文字或词出现在公开页面，或别的读者的版本里 Private text or a private word reached a public page or another audience's view | 加 `audience`，或从公开标题里拿掉 Add `audience`, or take it out of the public title |
 | `missing, or its case differs`, `is over 1 MB`, `should be a file name` | 图片不存在、大小写不对、太大，或文件名不对 A picture missing, in the wrong case, too big, or badly named | 检查文件名，压缩图片 Check the file name; shrink it |
+| `is not a guide in "guides"` | `access.json` 的 `tiles` 里写了一个不在 `guides` 里的导览名 A guide named in `tiles` that isn't in `guides` | 改正导览名，或删掉这一行 Fix the name, or remove the line |
+| `should be [west, south, east, north] in degrees` | 瓦片范围不是四个数字 A tile box that isn't four numbers | 写成 `[西, 南, 东, 北]`，单位是度 Write `[west, south, east, north]`, in degrees |
+| `must be between -180 and 180`, `must be between -85.06 and 85.06` | 经度或纬度超出范围，多半是位数写错，或经纬度写反 A longitude or latitude out of range, often a slip or swapped numbers | 检查数字，经度在前 Check the numbers: longitude first |
+| `should be less than east`, `should be less than north` | 西边的数字比东边大，或南边比北边大 West and east, or south and north, are the wrong way round | 按 `[西, 南, 东, 北]` 的顺序改 Put them in the order `[west, south, east, north]` |
+| `spans more than 3°` | 瓦片范围东西或南北超过 3°：瓦片只为一个地区而设 A tile box more than 3° each way: tiles are for one region | 只框住大区底图的范围 Cover the region view's area, no more |
+| `reaches outside the tile bounds` | 某张底图伸到瓦片范围之外，放大后瓦片会在它的边缘停下 A base map reaches outside the tile box, so zoomed-in tiles stop at its edge | 扩大 `tiles` 里的范围，或裁小这张底图 Widen the box in `tiles`, or crop the base map |
+| `is next to`, `which not every reader sees` | 用 `[经度, 纬度]` 写的地图中心，离一个只给部分读者看的地点太近。写成地点的编号，每类读者就有各自的中心 A map centre written as a point lies near a place only some readers see | 把 `centre` 写成那个地点的编号，如 `"W"` Write `centre` as that place's id, e.g. `"W"` |
+| `placeholders such as {items} work only in the title` | 占位符只能用在标题、副标题和说明文字里，别处会原样显示 Placeholders work only in the title, subtitle and texts; elsewhere they show as written | 直接写出数字 Write the number out |
+| `write {items} without spaces` | 占位符的花括号里有空格，如 `{ items }` A placeholder with spaces inside its braces | 写成 `{items}` Write it without spaces |
+| `px but` (the guard) | 底图图片的像素大小和 `map.json` 里的 `width`、`height` 不一样，图钉会跑位 A base map's pixel size differs from `width` and `height` in `map.json`, so its pins would move | 改 `map.json` 的 `width`、`height`（和 `originX`、`originY`），或重新裁图 Fix `width`, `height` (and `originX`, `originY`) in `map.json`, or crop the picture to match |
+| `its size in pixels can't be read` (the guard) | 读不出底图的像素大小，文件可能坏了，或不是图片 The pixel size of a base map can't be read: the file may be damaged or not a picture | 重新导出为 JPEG、PNG 或 WebP Export it again as JPEG, PNG or WebP |
+| `not a Field Guide file` | 导览文件夹里有一个不认识的 `.json` 文件 A `.json` file in a guide's folder that the Field Guide doesn't use | 删掉它，或改成已知的文件名 Delete it, or rename it to a known file name |
 | `there is no folder`, `not in access.json` | `access.json` 和文件夹对不上 `access.json` and the folders disagree | 两边一起改 Change both |
 
 ---
@@ -529,7 +568,7 @@ below). Any file may have a `_comment`, which is never shown.
 | `audiences[].secret` | Cloudflare secret 的名字（不是密码） | The Cloudflare secret's name (never the password) |
 | `audiences[].includes?` | 也能看到哪些读者的内容 | Audiences whose content this one also sees |
 | `guides` | 导览名 → 能打开它的读者 | Guide slug → the audiences that may open it |
-| `tiles?` | 导览名 → 街道级地图瓦片的范围 `[西, 南, 东, 北]`（度），一般就是大区底图的范围；写了才有瓦片。只写数字，不写地点 | Guide slug → the area of its street-level tiles, `[west, south, east, north]` in degrees (usually the region view's area); without it the guide has no tiles. Numbers only, never a place |
+| `tiles?` | 导览名 → 街道级地图瓦片的范围 `[西, 南, 东, 北]`（度），一般就是大区底图的范围；写了才有瓦片。只写数字，不写地点。东西、南北各跨不超过 3°，并且要包住这份导览的每一张底图 | Guide slug → the area of its street-level tiles, `[west, south, east, north]` in degrees (usually the region view's area); without it the guide has no tiles. Numbers only, never a place. Each side spans at most 3°, and the box must hold every base map |
 
 ### `guide.json`
 

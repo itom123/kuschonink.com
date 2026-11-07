@@ -8,8 +8,10 @@
 // Density goes through a log curve, so dense cores keep their gradations. At
 // city zoom the reference is fixed, so days compare honestly; zoomed in, the
 // ramp stretches to the densest point drawn, so a close-up of a busy quarter
-// still shows several steps. At most MAX_COVER of the cells are lit, so the
-// map's streets and names show through.
+// still shows several steps. At most MAX_COVER of the cells are lit, and far
+// fewer at street level (attenuation()), so the map's streets and names show
+// through: there a blob is wider than the window, and the colour alone says
+// how hot the quarter is.
 
 export type RGB = [number, number, number];
 export interface HeatPt { x: number; y: number; w: number }
@@ -106,7 +108,13 @@ export function parseColour(css: string, fallback: RGB): RGB {
   return m ? [+m[1], +m[2], +m[3]] : fallback;
 }
 
-/** Thinner when zoomed in: 1 up to scale 1, down to .5 from 1.7 (street level), so names show through. */
-export const attenuation = (s: number) => Math.min(1, Math.max(0.5, (2.4 - s) / 1.4));
-/** Heat cells in CSS px: `base` (2) at city zoom, coarser close up (3, then 4), so each dot's step can be told apart. */
-export const cellSize = (s: number, base = 2) => Math.round(base * (s >= 2.5 ? 2 : s >= 1.75 ? 1.5 : 1));
+/** Past the picture's detail the lattice thins again, to this share by scale 6: at street level a zone's blob is wider than the window. */
+export const THIN = 0.25;
+/**
+ * Thinner when zoomed in: 1 up to scale 1, down to .5 from 1.7 (the picture's
+ * street level), then on down to THIN × .5 from scale 6 (the tiles' street
+ * level, where one blob fills the window), so street names show through.
+ */
+export const attenuation = (s: number) => Math.min(1, Math.max(0.5, (2.4 - s) / 1.4)) * (1 - (1 - THIN) * clamp01((s - 2) / 4));
+/** Heat cells in CSS px: `base` (2) at city zoom, coarser from scale 1.75 (3), so each dot's step can be told apart; never bigger, or a dot hides a letter. */
+export const cellSize = (s: number, base = 2) => Math.round(base * (s >= 1.75 ? 1.5 : 1));

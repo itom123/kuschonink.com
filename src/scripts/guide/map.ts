@@ -5,8 +5,9 @@
 //
 // Layers inside .gd-stage: base images (one per map view, coarser ones first,
 // the extra ones loaded when first wanted, under a white wash) → street-level
-// tiles (tiles.ts, over the finest view once past its 1:1) → heat canvas →
-// route SVG → pins (role=group, one roving tab stop) → labels (aria-hidden).
+// tiles (tiles.ts, over whichever view shows once its picture is magnified
+// past 1:1) → heat canvas → route SVG → pins (role=group, one roving tab
+// stop) → labels (aria-hidden).
 // The views zoom as one map with levels of detail (camera.ts zoomAcross):
 // zooming switches between them on the fly, and while a view shows beyond its
 // own map (an overhang) the coarser one is drawn round it.
@@ -17,7 +18,7 @@ import { cluster, compareIds, densityRadius, dressCluster, dressPin, makeCluster
 import { LABEL_GAP, makeMeasure, placeLabels, type Box, type Side } from './labels.ts';
 import { drawRoute, makeRouteSvg } from './route.ts';
 import { cellSize, heatPixels, readRamp, type RGB } from './heat.ts';
-import { TileLayer } from './tiles.ts';
+import { TileLayer, tileClip } from './tiles.ts';
 
 export interface MapPin { id: string; kind: 'item' | 'place' | 'listing'; tier?: TierId; letter?: string; coordinates: LonLat; short: string; aria: Bi; visible: boolean; dim?: boolean; hollow?: boolean; label?: boolean; step?: number }
 export interface MapHooks {
@@ -35,9 +36,9 @@ interface LabelRec { el: HTMLElement; key: string; dx: number; dy: number }
 
 /** Map views are drawn up to 3 screen px per image pixel. */
 const MAX_ZOOM = 3;
-/** With street-level tiles the finest view goes on to 16 screen px per z14 px: z18 tiles at 1:1, z19 on a 2× screen. */
+/** With street-level tiles every view goes on to 16 screen px per z14 px: z18 tiles at 1:1, z19 on a 2× screen. */
 const TILE_ZOOM = 16;
-/** Tiles show once that view's own picture is magnified past 1:1 (tiles.ts picks the tile zoom from there). */
+/** Tiles show once the view's own picture is magnified past 1:1 (tiles.ts picks the tile zoom from there, and waits for the first one to be worth it). */
 const TILES_FROM = 1;
 /** "Whole map" comes no closer than this. */
 const HOME_CAP = 1.6;
@@ -77,9 +78,10 @@ export class GuideMap {
   /** The view shown before the last switch: it stays up until the new view's picture has come. */
   private prev: string | null = null;
   private bases = new Map<string, HTMLElement>();
-  /** Street-level tiles over the finest view, when the guide has them (payload.tiles). */
+  /** Street-level tiles over the views, when the guide has them (payload.tiles). */
   private tiles: TileLayer | null = null;
-  private tileView: MapView | null = null;
+  /** Where tiles may go: the box round every view (the tile bounds hold them all), or null without tiles. */
+  private tileBox: K.Rect | null = null;
   private c: Cam = { cx: 0, cy: 0, s: 1 };
   private placed = false;
   /** A selection asked for before the map had a size: resize() places the camera on it. */
@@ -131,9 +133,9 @@ export class GuideMap {
     this.stage = root.querySelector<HTMLElement>('.gd-stage')!;
     this.pinsEl = root.querySelector<HTMLElement>('.gd-pins')!;
     this.views = payload.map.views;
-    // Tiles go over the finest view (the city plan), which may then come closer than its own picture.
-    this.tileView = payload.tiles && this.views.length ? this.views.reduce((a, v) => (v.z > a.z ? v : a)) : null;
-    this.levels = this.views.map((v) => ({ id: v.id, z: v.z, b: boundsOf(v), max: this.maxFor(v) }));
+    // Tiles go over every view, which may then come closer than its own picture.
+    this.tileBox = payload.tiles ? tileClip(this.views.map(boundsOf)) : null;
+    this.levels = this.views.map((v) => ({ id: v.id, z: v.z, b: boundsOf(v), max: this.maxFor(v), pic: MAX_ZOOM / factor(v) }));
     this.area = this.views[0];
     const lat = payload.centre[1];
     this.heatR = payload.heatRadius / metresPerPixel(lat, 14);
@@ -155,7 +157,7 @@ export class GuideMap {
     this.labelsEl.setAttribute('aria-hidden', 'true');
     this.pinsEl.before(this.heatCanvas, this.routeSvg);
     this.pinsEl.after(this.labelsEl);
-    if (payload.tiles && this.tileView) {
+    if (payload.tiles && this.tileBox) {
       this.tiles = new TileLayer(payload.tiles);
       this.heatCanvas.before(this.tiles.el); // above every base picture, below the heat
     }
@@ -296,12 +298,13 @@ export class GuideMap {
     this.flyTo(this.homeCam(), 450, true);
   }
 
+  /** Bring these pins into view together: no closer than 2 screen px per picture pixel (one pin would otherwise dive to street level). */
   fitTo(ids: string[]) {
     const pts = ids.map((id) => this.pins.get(id)).filter((r): r is PinRec => !!r);
     const box = K.bbox(pts);
     if (!box) return;
     const l = this.limits();
-    this.flyTo(K.fit(box, this.vp(), this.free, 48, this.bounds(), l, l.max), 450, true);
+    this.flyTo(K.fit(box, this.vp(), this.free, 48, this.bounds(), l, Math.min(l.max, 2 / factor(this.area))), 450, true);
   }
 
   /**
@@ -319,7 +322,8 @@ export class GuideMap {
     if (recs.length > 1 && sameSpot(recs, deepest, this.radius(this.vp(), deepest))) return this.hooks.onCluster?.(ids);
     const vp = this.vp(), l = this.limits();
     const here = K.fit(box, vp, this.free, 48, this.bounds(), l, l.max);
-    const d = here.s >= l.max * 0.98 ? K.deeper(this.levels, this.area.id, box) : null;
+    // Past this view's own picture (with tiles the camera may go on), a finer view's picture is the better map.
+    const d = here.s >= Math.min(l.max, MAX_ZOOM / factor(this.area)) * 0.98 ? K.deeper(this.levels, this.area.id, box) : null;
     if (d) {
       const dl = K.limitsFor(d.b, vp, d.max);
       return this.zoomTo({ id: d.id, cam: K.fit(box, vp, this.free, 48, d.b, dl, dl.max), soft: null, load: [] }, 450);
@@ -432,9 +436,9 @@ export class GuideMap {
   private limits() {
     return K.limitsFor(this.bounds(), this.vp(), this.maxFor(this.area));
   }
-  /** How close a view may come: 3 screen px per picture pixel, or TILE_ZOOM where street-level tiles take over. */
+  /** How close a view may come: 3 screen px per picture pixel, or TILE_ZOOM when street-level tiles take over past that. */
   private maxFor(v: MapView) {
-    return v === this.tileView ? TILE_ZOOM : MAX_ZOOM / factor(v);
+    return this.tileBox ? TILE_ZOOM : MAX_ZOOM / factor(v);
   }
   /** Keep the camera on the view's map, or within its overhang while it has one. */
   private clamp(c: Cam) {
@@ -574,19 +578,20 @@ export class GuideMap {
   }
 
   /**
-   * Street-level tiles over the finest view once its picture is magnified past
-   * 1:1, placed with the same maths as the pictures; while a gesture or flight
-   * is going no new tile zoom starts (tiles.ts). The picture's white wash gives
-   * way to the layer's own ([data-tiled] in guide-map.css).
+   * Street-level tiles over the view once its picture is magnified past 1:1
+   * (the region's z11 picture long before the city plan's), placed with the
+   * same maths as the pictures and only within the box round the base maps;
+   * while a gesture or flight is going no new tile zoom starts (tiles.ts).
+   * The pictures' white wash gives way to the layer's own ([data-tiled] in
+   * guide-map.css): every picture showing lies under the layer, the coarser
+   * one round an overhang too.
    */
   private placeTiles(vp: K.Vp) {
-    const t = this.tiles, v = this.tileView;
-    if (!t || !v) return;
-    const on = this.area === v && this.c.s * factor(v) > TILES_FROM && t.update(this.c, vp, boundsOf(v), window.devicePixelRatio || 1, !this.live());
+    const t = this.tiles, box = this.tileBox;
+    if (!t || !box) return;
+    const on = this.c.s * factor(this.area) > TILES_FROM && t.update(this.c, vp, box, window.devicePixelRatio || 1, !this.live());
     if (!on) t.hide();
-    this.root.toggleAttribute('data-tiles', on);
-    // Only this view's own picture gives up its wash: a coarser map round an overhang keeps its own.
-    this.bases.get(v.id)?.toggleAttribute('data-tiled', on);
+    for (const b of this.bases.values()) b.toggleAttribute('data-tiled', on);
   }
 
   private live() {

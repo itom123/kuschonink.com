@@ -150,7 +150,8 @@ export class PlacesPane {
     if (this.sortDefault) this.sortDefault.hidden = use === DEFAULT_SORT;
   }
 
-  private syncOptions() {
+  /** Grey the orders that can't apply (Open that day first, Nearest first). Also called when a position arrives or stops. */
+  syncOptions() {
     if (!this.sortSel) return;
     for (const o of this.sortSel.options) o.disabled = !this.can(o.value as Sort);
   }

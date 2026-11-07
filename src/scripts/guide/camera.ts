@@ -102,10 +102,20 @@ export const ease = (k: number) => (k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 
 // nearly holds) the point zoomed into; zooming out below a view's whole map
 // shows the coarser view round it (an "overhang"), then hands back to it.
 // The camera never jumps at a switch: an overhang lets the finer view show
-// what the coarser one showed, and narrows as you zoom in.
+// what the coarser one showed, and narrows as you zoom in. With street-level
+// tiles every view goes on to street level (Level.max), so zooming never
+// stops at a picture's edge: off the finer view, the coarse view zooms on
+// with tiles over its picture.
 
-/** A base-map view for the camera: its box (world units), its zoom level (an image pixel is 2^(14 - z) world pixels) and its own maximum scale. */
-export interface Level { id: string; z: number; b: Rect; max: number }
+/**
+ * A base-map view for the camera: its box (world units), its zoom level (an
+ * image pixel is 2^(14 - z) world pixels) and its own maximum scale. `pic` is
+ * the scale up to which its picture is the map in use (3 screen px per image
+ * pixel); with street-level tiles the camera may go on past it, to `max`, and
+ * zooming in then no longer hands over to a finer view (the tiles already show
+ * the streets). Without it, the picture's maximum is `max`.
+ */
+export interface Level { id: string; z: number; b: Rect; max: number; pic?: number }
 /**
  * A view shown beyond its own map, with the coarser view `under` drawn round
  * it: the camera may roam `box` and come out to `min`, below the view's whole
@@ -140,6 +150,8 @@ const meet = (a: Rect, b: Rect): Rect => {
   return { x, y, w: Math.max(0, Math.min(a.x + a.w, b.x + b.w) - x), h: Math.max(0, Math.min(a.y + a.h, b.y + b.h) - y) };
 };
 const own = (l: Level, vp: Vp) => limitsFor(l.b, vp, l.max);
+/** How far a view's own picture goes: its `pic`, never past `max`. */
+const picMax = (l: Level) => Math.min(l.max, l.pic ?? l.max);
 
 /** The scale at which a view's picture shows 1:1. */
 export const oneToOne = (z: number) => Math.pow(2, z - 14);
@@ -159,10 +171,13 @@ export function under(views: Level[], l: Level): Level | null {
 /**
  * Where zooming in hands over from a coarse view to a finer one: where the
  * finer view's whole map fits the window, but no later than the coarse view's
- * own maximum and no earlier than its 1:1.
+ * picture's own maximum and no earlier than its 1:1. (With tiles the camera
+ * may go further on the coarse view, but near the finer one its picture is the
+ * better map: sharp, and it loads faster than tiles.)
  */
 export function handover(coarse: Level, fine: Level, vp: Vp): number {
-  return Math.max(Math.min(oneToOne(coarse.z), coarse.max), Math.min(own(fine, vp).min, coarse.max));
+  const pic = picMax(coarse);
+  return Math.max(Math.min(oneToOne(coarse.z), pic), Math.min(own(fine, vp).min, pic));
 }
 
 /** How near (world units) to a finer view the point zoomed into must be for zooming in to hand over to it. */
@@ -223,6 +238,9 @@ export function zoomAcross(views: Level[], id: string, c: Cam, f: number, px: nu
         if (want >= PRELOAD * h) load.add(b.id);
         break;
       }
+      // Already past this view's own picture (street-level tiles show over it): the zoom goes on here,
+      // and the finer view's picture has nothing to add. The handover is for zooming in from the picture.
+      if (c.s > picMax(l) * (1 + 1e-9)) break;
       l = b;
       moved = true;
     }

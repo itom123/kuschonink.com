@@ -6,7 +6,7 @@
 import type { Bi, DayStatus, ISODate, Payload } from '../../lib/guides/types';
 import { dayLabel, dayStatus, normalise, project, todayIn } from '../../lib/guides/core';
 import { timeSpan, W } from '../../lib/guides/words';
-import { copyText, h, message, setAttr, setText, tr } from './dom';
+import { copyText, dialog, h, message, setAttr, setText, tr } from './dom';
 import { GuideMap, type MapPin } from './map';
 import { DaysPane, PlacesPane, RoutesPane } from './panes';
 import { Details } from './details';
@@ -33,6 +33,25 @@ const kus = () => window.kus98 as unknown as (undefined | {
 });
 const biData = (el: HTMLElement, k: string): Bi => ({ en: el.dataset[`${k}En`] ?? '', zh: el.dataset[`${k}Zh`] ?? '' });
 
+/** A listed guide, by its neutral public title (File ▸ Open Guide...). */
+export interface GuideLink { slug: string; title: Bi }
+
+/** The listed guides the page names (public titles only); empty if the page names none. */
+function listedGuides(root: HTMLElement): GuideLink[] {
+  try {
+    const raw: unknown = JSON.parse(root.querySelector('script[data-gd-guides]')?.textContent ?? '[]');
+    if (!Array.isArray(raw)) return [];
+    const out: GuideLink[] = [];
+    for (const g of raw as { slug?: unknown; title?: { en?: unknown; zh?: unknown } }[]) {
+      if (typeof g?.slug !== 'string' || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(g.slug) || typeof g.title?.en !== 'string') continue;
+      out.push({ slug: g.slug, title: { en: g.title.en, zh: typeof g.title.zh === 'string' && g.title.zh ? g.title.zh : g.title.en } });
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
 export class GuideApp {
   readonly root: HTMLElement;
   readonly win: HTMLElement;
@@ -53,6 +72,8 @@ export class GuideApp {
   private readonly items = new Map<string, Item>();
   private readonly names = new Map<string, string>();
   readonly labels: { items: Bi; listings: Bi; title: Bi };
+  /** The listed guides (public titles); File ▸ Open Guide... shows only when there are several. */
+  readonly guides: GuideLink[];
   private session: Session;
   private hintTimer = 0;
   private urlTimer = 0;
@@ -92,7 +113,9 @@ export class GuideApp {
     for (const i of this.p.items) { this.items.set(i.id, i); this.names.set(i.id, i.name); }
     for (const x of this.p.places) this.names.set(x.id, x.name);
     for (const l of this.p.listings) this.names.set(l.id, l.name);
-    this.labels = { items: biData(root, 'items'), listings: biData(root, 'listings'), title: biData(root, 'title') };
+    // data-guide-*, not data-title-*: the 中/EN switch (lang.ts) would turn those into a tooltip.
+    this.labels = { items: biData(root, 'items'), listings: biData(root, 'listings'), title: biData(root, 'guide') };
+    this.guides = listedGuides(root);
     this.fields = [...this.win.querySelectorAll<HTMLElement>(':scope > [data-window-inner] > .status-bar > .status-bar-field')];
     if (this.fields[1]) { this.fields[1].setAttribute('role', 'status'); this.fields[1].setAttribute('aria-live', 'polite'); }
     this.today = todayIn(this.p.timezone);
@@ -339,6 +362,8 @@ export class GuideApp {
     const area = this.store.get().area;
     if (first) {
       this.locHint = null;
+      // "Nearest first" in the Sort by: list can be chosen now; nothing else re-renders the pane.
+      this.places.syncOptions();
       if (!view) {
         const off = distanceText(offMaps(f.coordinates, this.p.map.views));
         this.stopLocating();
@@ -391,8 +416,10 @@ export class GuideApp {
       this.nearOpen = false;
       if (!this.store.get().place) this.closeDetails();
     }
-    // "Nearest first" needs a position: the Places list goes back to the default order.
+    // "Nearest first" needs a position: the Places list goes back to the default order,
+    // and the Sort by: list greys it again even when the order was something else.
     if (this.store.get().sort === 'near') this.store.set({ sort: 'tier' });
+    this.places.syncOptions();
     if (byUser && was) this.flash(W.liveOff);
     else this.say();
   }
@@ -892,11 +919,44 @@ export class GuideApp {
     else location.href = '/help#guides';
   }
 
-  home() {
-    const k = kus();
-    if (k) this.saveScroll();
-    if (k) void k.open('/guides');
-    else location.href = '/guides';
+  /**
+   * File ▸ Open Guide...: a small dialog with the listed guides' public titles
+   * as links. The one chosen opens in this window (its log-on box, or the guide
+   * itself if this device already holds its cookie). The current guide only closes the dialog.
+   */
+  openGuide() {
+    if (this.guides.length < 2) return;
+    const ask = h('p', { class: 'msg-text', id: `gd-open-ask-${this.slug}` }, W.openGuideAsk);
+    const list = h('ul', { class: 'tree-view gd-open-list', 'aria-labelledby': ask.id },
+      this.guides.map((g) => {
+        const here = g.slug === this.slug;
+        return h('li', {}, h('a', { href: `/guides/${g.slug}`, 'data-gd-open': g.slug, 'aria-current': here ? 'true' : null }, [
+          h('span', { class: 'ico ico16 ico-guide', 'aria-hidden': 'true' }),
+          ' ',
+          here ? h('b', {}, g.title) : g.title,
+        ]));
+      }));
+    const cancel = h('button', { type: 'button' }, W.cancel);
+    const win = dialog({
+      title: W.openGuideTitle,
+      icon: 'guide',
+      body: h('div', { class: 'msgbox gd-open' }, [ask, list, h('div', { class: 'msg-buttons' }, cancel)]),
+      owner: this.win,
+      className: 'gd-open-dialog',
+    });
+    cancel.addEventListener('click', () => win.close());
+    list.addEventListener('click', (e) => {
+      const a = (e.target as Element).closest<HTMLAnchorElement>('a[data-gd-open]');
+      const k = kus();
+      // A modified click, or no desktop: the browser follows the link itself.
+      if (!a || !k || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      win.close();
+      if (a.dataset.gdOpen === this.slug) return;
+      this.saveScroll();
+      void k.open(`/guides/${a.dataset.gdOpen}`);
+    });
+    (list.querySelector<HTMLElement>('a[aria-current]') ?? list.querySelector<HTMLElement>('a'))?.focus({ preventScroll: true });
   }
 
   refresh() {

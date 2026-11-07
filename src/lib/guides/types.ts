@@ -83,9 +83,9 @@ export interface GuideFile {
   titleZh?: string;
   subtitle?: string;
   subtitleZh?: string;
-  /** Neutral title and subtitle, shown before the password (home list, log-on box, window title). */
+  /** Neutral title and subtitle, shown before the password (the log-on box and its list of guides, the window title). */
   public: { title: string; titleZh?: string; subtitle?: string; subtitleZh?: string };
-  /** Shown in the Field Guide's home list (still locked). Unlisted guides open only from their link. */
+  /** Offered in the log-on box's list of guides (still locked). /guides opens the first listed guide, so an unlisted one opens only from its link. */
   listed: boolean;
   city: string;
   cityZh?: string;
@@ -416,7 +416,7 @@ export interface GuideView {
  */
 export interface TileSource { url: string; min: number; max: number }
 
-/** A listed guide on the Field Guide's home page (no password needed: neutral only). */
+/** A listed guide in the log-on box's list (no password needed: neutral only). */
 export interface GuideCard {
   slug: string;
   publicTitle: Bi;

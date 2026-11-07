@@ -44,7 +44,7 @@ Ground rules:
 | `src/styles/schemes.css` | Colour schemes (Standard, High Contrast White, Slate) |
 | `src/lib/guides/` | Field Guide: the shapes of a guide (`types.ts`), day rules, dates and map maths safe for the browser (`core.ts`), the interface's words, the checks, and the server-only loader that builds each audience's view and its browser data |
 | `src/scripts/guide/` | Field Guide in the browser: the window, panes, details sheet, menus, the map engine (camera, pins, labels, routes, heat) and the log-on box. It imports only `types.ts`, `core.ts` and `words.ts`, never guide content |
-| `worker/guides.ts` | The Field Guide's password gate: the log-on and log-off, the signed cookie, and which audience's page (and pictures) a request gets. It also sends `/guides` to the first listed guide, whose log-on box has the Guide list |
+| `worker/guides.ts` | The Field Guide's password gate: the log-on and log-off, the signed cookie, and which audience's page (and pictures) a request gets. It also sends `/guides` to the first listed guide, whose log-on box has the Guide list. It proxies the street-level tiles at `/guides/<slug>/tiles/{z}/{x}/{y}.png` (zooms 14–19, logged-on viewers only, inside the `tiles` box in `access.json`), fetching them from IGN so that IGN never sees the visitor |
 
 ### The shell: `src/scripts/desktop/`
 
@@ -193,7 +193,7 @@ Kept in this browser only.
 | Where | Key | Holds |
 | --- | --- | --- |
 | Cookie (30 min, renewed) | `kus98_session` | Logged on (so new tabs and refreshes skip the start-up). Every open page renews it each minute and as it goes; 30 minutes (`AWAY_MINUTES` in `session.ts`) after the last page of the site was open it runs out, and the next visit starts up again, BIOS and log-on included. A visit that starts at `/guides/…` sets it too, to the last name typed or Guest |
-| Cookie (`HttpOnly`, `Path=/guides`) | `kus98_guides` | Field Guide: logged on with a guide password, and as which audience. Set and read only by the Worker (`worker/guides.ts`), signed with `GUIDES_COOKIE_SECRET` (or `TURNSTILE_SECRET` when that isn't set): 30 days with *Save this password*, otherwise until the browser closes (12 hours at most). File ▸ Log Off clears it |
+| Cookie (`HttpOnly`, `Path=/guides`) | `kus98_guides` | Field Guide: logged on with a guide password, and as which audience. Set and read only by the Worker (`worker/guides.ts`), signed with `GUIDES_COOKIE_SECRET` (or `TURNSTILE_SECRET` when that isn't set; a secret under 24 characters signs together with `TURNSTILE_SECRET`): 30 days with *Save this password*, otherwise until the browser closes (12 hours at most). File ▸ Log Off clears it |
 | `localStorage` | `kus98:settings` | Settings that differ from the defaults (see `settings.ts`) |
 | | `kus98:icons` | Where desktop icons were dragged |
 | | `kus98:bin` | Icons in the Recycle Bin (`gone` once emptied) |

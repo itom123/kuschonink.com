@@ -100,12 +100,12 @@ const onMap = (r: Across) => {
   return axis(v.x, v.w, b.x, b.w) && axis(v.y, v.h, b.y, b.h);
 };
 /** Zoom n times by f about screen point (px, py); every step, how far the world point under it moved on screen. */
-function zoomRun(id: string, c: Cam, f: number, px: number, py: number, n: number, soft: Soft | null = null) {
+function zoomRun(id: string, c: Cam, f: number, px: number, py: number, n: number, soft: Soft | null = null, vs: Level[] = views) {
   const steps: (Across & { drift: number })[] = [];
   let r: Across = { id, cam: c, soft, load: [] };
   for (let i = 0; i < n; i++) {
     const w = toWorld(r.cam, win, px, py);
-    const next = zoomAcross(views, r.id, r.cam, f, px, py, win, r.soft);
+    const next = zoomAcross(vs, r.id, r.cam, f, px, py, win, r.soft);
     const p = toScreen(next.cam, win, w.x, w.y);
     steps.push({ ...next, drift: Math.hypot(p.x - px, p.y - py) });
     r = next;
@@ -267,6 +267,84 @@ const H = handover(region, city, win);
   ok(!past.length && r.id === 'region', '2560×1440: zooming out of the city near the region\'s edge never shows past the region map', past.join(', '));
   const held = softFor(views, 'city', { cx: region.b.x + 1000, cy: moris.y, s: 0.5 }, big);
   ok(!!held && held.box.x >= region.b.x && held.box.w * 0.5 >= big.w - 0.01,'2560×1440: an overhang held at the region\'s edge is as wide as the window', held ? `${held.box.w.toFixed(0)} wide` : '');
+}
+
+// ---- With street-level tiles (map.ts TILE_ZOOM): every view goes on to 16×, its picture's own maximum kept as `pic`.
+const cityT: Level = { ...city, max: 16, pic: 3 };
+const regionT: Level = { ...region, max: 16, pic: 3 / 8 };
+const viewsT = [cityT, regionT];
+/** A world point on the region map, well off the city plan (beyond NEAR's reach): Versailles way. */
+const off = { x: city.b.x - 1000, y: city.b.y + 600 };
+const onT = (r: Across) => {
+  const v = seen(r.cam, win), b = r.soft ? r.soft.box : viewsT.find((x) => x.id === r.id)!.b;
+  const axis = (a0: number, len: number, x0: number, l: number) => (l <= len + 1e-6 ? true : a0 >= x0 - 1e-6 && a0 + len <= x0 + l + 1e-6);
+  return axis(v.x, v.w, b.x, b.w) && axis(v.y, v.h, b.y, b.h);
+};
+{
+  ok(near(handover(regionT, cityT, win), H) && near(handover(regionT, cityT, { w: 375, h: 700 }), handover(region, city, { w: 375, h: 700 })), 'tiles: the handover to the city plan is where it was (the region picture\'s own maximum)', `${handover(regionT, cityT, win)}`);
+  // The owner's case: bird's-eye, then + with the window's middle off Paris. The region zooms on to street level.
+  const start = clamp({ cx: off.x, cy: off.y, s: 0.2 }, region.b, win, limitsFor(region.b, win, regionT.max));
+  const st = zoomRun('region', start, 1.6, 400, 300, 14, null, viewsT);
+  const last = st[st.length - 1];
+  ok(st.every((x) => x.id === 'region') && near(last.cam.s, 16), 'tiles: + off the city plan goes on to street level on the region map', trail(st));
+  ok(st.every((x, i) => i === 0 || x.cam.s >= st[i - 1].cam.s - 1e-12) && st.every((x) => onT(x) && !x.soft), 'tiles: … never back out, always on the region map');
+  ok(st.filter((x) => x.cam.s > region.max + 1e-9).every((x) => x.drift < 0.5), 'tiles: … and past the picture\'s old maximum no press moves the point under the middle', st.map((x) => x.drift.toFixed(2)).join(' '));
+  // The same without tiles: the old limit holds (the region picture stops at 3 screen px per image pixel).
+  const plain = zoomRun('region', start, 1.6, 400, 300, 14);
+  ok(plain.every((x) => x.id === 'region') && near(plain[plain.length - 1].cam.s, region.max), 'no tiles: + off the city plan still stops at the region picture\'s maximum', trail(plain));
+}
+{
+  // Every input, from points all over the region map: the wheel, +, the + key, a double-tap and a slow pinch all reach 16.
+  const pts = [off, { x: region.b.x + 300, y: region.b.y + 300 }, { x: region.b.x + region.b.w - 300, y: region.b.y + region.b.h - 300 }, { x: city.b.x + city.b.w + 1200, y: city.b.y - 500 }];
+  const fs: [string, number, number][] = [['wheel', Math.exp(0.1), 60], ['+', 1.6, 14], ['+ key', 1.4, 20], ['double-tap', 2, 10], ['pinch', 1.03, 180]];
+  const bad: string[] = [];
+  for (const p of pts) {
+    for (const [name, f, n] of fs) {
+      const start: Cam = { cx: p.x, cy: p.y, s: 0.3 };
+      const st = zoomRun('region', start, f, 400, 300, n, null, viewsT);
+      const last = st[st.length - 1];
+      if (!near(last.cam.s, 16) || !st.every((x) => onT(x))) bad.push(`${name} at (${(p.x - region.b.x).toFixed(0)}, ${(p.y - region.b.y).toFixed(0)}): ${trail(st.slice(-2))}`);
+    }
+  }
+  ok(!bad.length, 'tiles: wheel, +, the + key, a double-tap and a pinch all reach 16× from anywhere on the region map', bad.join('; '));
+  // A wheel over Versailles: no notch moves the map more than a little once the region's own clamp has let go.
+  const q = toScreen({ cx: off.x, cy: off.y, s: 0.3 }, win, off.x + 50, off.y + 40);
+  const wheel = zoomRun('region', { cx: off.x, cy: off.y, s: 0.3 }, Math.exp(0.1), q.x, q.y, 60, null, viewsT);
+  ok(wheel[wheel.length - 1].id === 'region' && near(wheel[wheel.length - 1].cam.s, 16) && wheel.every((x) => x.drift < 0.5), 'tiles: a wheel off the city plan reaches 16× on the region map without a jump', `worst ${Math.max(...wheel.map((x) => x.drift)).toFixed(2)} px`);
+}
+{
+  // Over Paris the city plan still takes over at the handover, then goes on to 16 (its picture is the better map there).
+  const start = clamp({ cx: moris.x, cy: moris.y, s: 0.2 }, region.b, win, limitsFor(region.b, win, regionT.max));
+  const st = zoomRun('region', start, 1.6, 400, 300, 14, null, viewsT);
+  const at = st.findIndex((x) => x.id === 'city');
+  ok(at > 0 && st[at - 1].cam.s <= region.max + 1e-12 && st[at].cam.s > region.max && near(st[st.length - 1].cam.s, 16) && st[st.length - 1].id === 'city', 'tiles: + over Paris hands over to the city plan past the region picture\'s maximum, then reaches 16×', trail(st));
+  ok(st.slice(0, at + 1).every((x) => x.drift < 0.5), 'tiles: … with no jump up to and at the switch');
+  const q = toScreen({ cx: moris.x, cy: moris.y, s: 0.2 }, win, moris.x, moris.y);
+  const wheel = zoomRun('region', { cx: moris.x, cy: moris.y, s: 0.2 }, Math.exp(0.1), q.x, q.y, 60, null, viewsT);
+  const sw = wheel.findIndex((x) => x.id === 'city');
+  ok(sw > 0 && near(wheel[sw - 1].cam.s, H, 0.04) && wheel[wheel.length - 1].id === 'city' && near(wheel[wheel.length - 1].cam.s, 16), 'tiles: a wheel over Moris switches at the handover, as without tiles', trail(wheel.filter((_, i) => i % 6 === 5)));
+  // Already past its picture (tiles over the region), the region keeps the zoom even over Paris: no switch, no jump, no pan limit appearing.
+  const deep = zoomRun('region', { cx: moris.x, cy: moris.y, s: 1 }, 1.6, 400, 300, 8, null, viewsT);
+  ok(deep.every((x) => x.id === 'region' && !x.soft && x.drift < 0.5) && near(deep[deep.length - 1].cam.s, 16), 'tiles: a region camera past its picture zooms on there, even over Paris', trail(deep));
+  // At the picture's own maximum (where the region used to stop) a press over Paris still hands over.
+  const edge = zoomAcross(viewsT, 'region', { cx: moris.x, cy: moris.y, s: region.max }, 1.6, 400, 300, win);
+  ok(edge.id === 'city' && near(edge.cam.s, region.max * 1.6), 'tiles: from the region picture\'s maximum a press over Paris hands over to the city plan', `${edge.id} ${edge.cam.s.toFixed(3)}`);
+  // Zooming out from street level on the city: the overhang, then the region, as before.
+  const out = zoomRun('city', { cx: moris.x, cy: moris.y, s: 16 }, 1 / 1.6, 400, 300, 14, null, viewsT);
+  const rmin = limitsFor(region.b, win, regionT.max).min;
+  ok(out[out.length - 1].id === 'region' && near(out[out.length - 1].cam.s, rmin) && out.every((x) => onT(x)), 'tiles: − from street level comes out through the city plan to the whole region', trail(out));
+}
+{
+  // On the city plan with the region round it (an overhang), zooming at a point well off the city goes back to the region, and on to 16 there.
+  const r = zoomAcross(viewsT, 'region', { cx: city.b.x + city.b.w, cy: moris.y, s: 0.3 }, 1.5, 400, 300, win);
+  ok(r.id === 'city' && !!r.soft, 'tiles: the city at its edge still shows the region beyond it');
+  const far = toScreen(r.cam, win, city.b.x + city.b.w + 900, moris.y);
+  const back = zoomAcross(viewsT, r.id, r.cam, 1.5, far.x, far.y, win, r.soft);
+  ok(back.id === 'region' && !back.soft, 'tiles: zooming into the region beside the city goes back to the region map', `${back.id} ${back.cam.s.toFixed(3)}`);
+  const on = zoomRun(back.id, back.cam, 1.6, far.x, far.y, 10, back.soft, viewsT);
+  ok(on.every((x) => x.id === 'region') && near(on[on.length - 1].cam.s, 16), 'tiles: … and goes on to street level there', trail(on));
+  // Clusters: the region can still hand a box inside the city plan to it.
+  ok(deeper(viewsT, 'region', { x: moris.x - 20, y: moris.y - 10, w: 40, h: 30 })?.id === 'city', 'tiles: a cluster on the city plan can still go to it');
 }
 
 console.log(fails ? `${fails} FAILED` : 'all passed');

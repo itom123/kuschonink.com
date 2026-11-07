@@ -26,6 +26,8 @@ interface Env {
   GUIDES_COOKIE_SECRET?: string;
   /** Rate limiting binding: Field Guide password tries per minute per visitor. */
   GUIDES_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
+  /** Rate limiting binding: street-level tiles fetched from IGN per minute per visitor. Optional: without it (a preview) every tile is allowed. */
+  GUIDES_TILE_LIMIT?: { limit(options: { key: string }): Promise<{ success: boolean }> };
   // Each Field Guide audience's password is a secret, set in the dashboard,
   // named in access.json ("secret": GUIDES_PASSWORD, GUIDES_PASSWORD_…).
 }
@@ -93,6 +95,8 @@ const guidesDeps = (env: Env): GuidesDeps => ({
   cookieSecret: () => cookieSecretOf(env),
   assets: (r) => env.ASSETS.fetch(r),
   allow: async (key) => (await env.GUIDES_LIMIT.limit({ key })).success,
+  // Tiles fetched from IGN per visitor; no binding (a preview) means no limit.
+  allowTile: env.GUIDES_TILE_LIMIT ? async (key) => (await env.GUIDES_TILE_LIMIT!.limit({ key })).success : undefined,
   // Street-level tiles: the Worker asks IGN and keeps the answer at the edge; the visitor never talks to IGN.
   fetch: (url, init) => fetch(url, init as RequestInit),
   cache: (caches as unknown as { default?: GuidesDeps['cache'] }).default,

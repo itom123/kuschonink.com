@@ -1,5 +1,5 @@
 // npm test: the Field Guide map's street-level tiles (src/scripts/guide/tiles.ts), the pure part.
-import { MAX_TILES, TILE_PX, screenBox, tileBox, tileKey, tileUrl, tileWorld, visibleTiles, zoomFor, type TileAt } from './tiles.ts';
+import { MAX_TILES, TILE_PX, screenBox, tileBox, tileClip, tileKey, tileUrl, tileWorld, visibleTiles, zoomFor, type TileAt } from './tiles.ts';
 import { toScreen, type Cam } from './camera.ts';
 
 let fails = 0;
@@ -93,6 +93,27 @@ const keys = (ts: TileAt[]) => ts.map(tileKey).sort().join(' ');
 {
   const src = { url: '/guides/paris/tiles/{z}/{x}/{y}.png', min: 15, max: 19 };
   ok(tileUrl(src, { z: 18, x: 132784, y: 90122 }) === '/guides/paris/tiles/18/132784/90122.png', 'tileUrl: the proxy address, same origin');
+}
+{
+  // Where tiles may go: the box round every base map (Paris's city plan lies inside its region map), so the region zooms to street level too.
+  const city = { x: 2123851.0056, y: 1442294.7188, w: 1510, h: 1146 };
+  const region = { x: 2121307.0056, y: 1439616.7188, w: 8432, h: 7216 };
+  const clip = tileClip([city, region])!;
+  ok(clip.x === region.x && clip.y === region.y && clip.w === region.w && clip.h === region.h, 'tileClip: the region map, which holds the city plan', JSON.stringify(clip));
+  const two = tileClip([{ x: 0, y: 0, w: 10, h: 10 }, { x: 20, y: -5, w: 10, h: 10 }])!;
+  ok(two.x === 0 && two.y === -5 && two.w === 30 && two.h === 15, 'tileClip: the smallest box round maps apart', JSON.stringify(two));
+  ok(tileClip([]) === null, 'tileClip: null without maps');
+  // On the region map at street level: a sane number of tiles for a desktop window and a phone, none beyond the region.
+  const desk = { w: 1366, h: 738 }, phone = { w: 390, h: 844 };
+  const versailles = { cx: region.x + 1200, cy: region.y + 4200 };
+  const first = visibleTiles({ ...versailles, s: 0.75 }, desk, clip, zoomFor(0.75, 1, R));
+  ok(first.length > 0 && first.length <= 60 && first.every((t) => t.z === 14), 'region at 0.75×: a window of z14 tiles', String(first.length));
+  const street = visibleTiles({ ...versailles, s: 16 }, phone, clip, zoomFor(16, 2, R));
+  ok(street.length > 0 && street.length <= 48 && street.every((t) => t.z === 19), 'region at 16× on a 2× phone: a window of z19 tiles', String(street.length));
+  const inside = (t: TileAt) => { const u = tileWorld(t.z); return (t.x + 1) * u > clip.x && t.x * u < clip.x + clip.w && (t.y + 1) * u > clip.y && t.y * u < clip.y + clip.h; };
+  const corner = visibleTiles({ cx: region.x + 100, cy: region.y + 100, s: 2 }, desk, clip, 15);
+  ok(corner.length > 0 && corner.every(inside), 'region\'s corner at 2×: no tile beyond the region map');
+  ok([...first, ...street].every(inside), 'region at street level: every tile lies on the region map');
 }
 
 {

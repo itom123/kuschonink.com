@@ -1,5 +1,5 @@
 // npm test: the Field Guide heat map (src/scripts/guide/heat.ts).
-import { attenuation, cellSize, DREF, heatPixels, MAX_COVER, MIN_REF, RAMP, readRamp, stretch, type HeatPt, type RGB } from './heat.ts';
+import { attenuation, cellSize, DREF, heatPixels, MAX_COVER, MIN_REF, RAMP, readRamp, stretch, THIN, type HeatPt, type RGB } from './heat.ts';
 
 let fails = 0;
 const ok = (cond: boolean, name: string, extra = '') => {
@@ -74,7 +74,31 @@ const pile = (k: number, x = 32, y = 32): HeatPt[] => Array.from({ length: k }, 
   ok(worst > 0.4 && worst <= MAX_COVER && MAX_COVER <= 0.6, 'cover: at most half a block, never above 60%', `${worst}`);
   ok(n.lit / (W * H) <= MAX_COVER, 'cover: never above MAX_COVER overall', (n.lit / (W * H)).toFixed(3));
   const thin = draw(pile(40), 40, 3);
-  ok(thin.lit < n.lit * 0.6 && thin.lit > n.lit * 0.3, 'cover: thinner but still there at street level', `${thin.lit} of ${n.lit}`);
+  ok(thin.lit < n.lit * 0.6 && thin.lit > n.lit * 0.25, 'cover: thinner but still there at the picture\'s street level', `${thin.lit} of ${n.lit}`);
+  // At the tiles' street level (a blob wider than the window) far fewer: one cell in sixteen, so street names show through.
+  const blocks = (m: { data: Uint8ClampedArray }) => {
+    let worst = 0;
+    for (let by = 0; by < H; by += 4) for (let bx = 0; bx < W; bx += 4) {
+      let lit = 0;
+      for (let y = by; y < by + 4; y++) for (let x = bx; x < bx + 4; x++) if (m.data[(y * W + x) * 4 + 3]) lit++;
+      worst = Math.max(worst, lit / 16);
+    }
+    return worst;
+  };
+  for (const s of [6, 16]) {
+    const street = draw(pile(40), 40, s);
+    ok(street.lit > 0 && street.lit < n.lit * 0.2 && blocks(street) <= 1 / 16 + 1e-9, `cover: at scale ${s} at most one cell in sixteen, and still there`, `${street.lit} of ${n.lit}, worst block ${blocks(street)}`);
+  }
+  const mid = draw(pile(40), 40, 4);
+  ok(blocks(mid) <= 2 / 16 + 1e-9 && mid.lit < thin.lit && mid.lit > draw(pile(40), 40, 6).lit, 'cover: thins steadily between scale 2 and 6', `${mid.lit}, worst block ${blocks(mid)}`);
+}
+{
+  // Street level still reads: the ramp's steps carry the heat (the core darker than the edge), with several of them in use.
+  const core = inCircle(32, 32, 8), rim = (x: number, y: number) => inCircle(32, 32, 28)(x, y) && !inCircle(32, 32, 20)(x, y);
+  for (const s of [6, 16]) {
+    const all = draw(pile(20), 30, s), c = draw(pile(20), 30, s, core), r = draw(pile(20), 30, s, rim);
+    ok(all.steps.size >= 4 && c.sum / Math.max(1, c.lit) > r.sum / Math.max(1, r.lit) + 1, `street level ${s}×: several steps, the core darker than the rim`, `${all.steps.size} steps, core ${(c.sum / Math.max(1, c.lit)).toFixed(2)} rim ${(r.sum / Math.max(1, r.lit)).toFixed(2)}`);
+  }
 }
 {
   // City zoom: the reference is fixed, so a lone place looks the same whatever else is on the map.
@@ -108,9 +132,11 @@ const pile = (k: number, x = 32, y = 32): HeatPt[] => Array.from({ length: k }, 
 }
 {
   ok(attenuation(0.5) === 1 && attenuation(1) === 1, 'attenuation: 1 up to scale 1');
-  ok(attenuation(10) === 0.5 && attenuation(1.7) === 0.5, 'attenuation: .5 at street level', `${attenuation(10)}`);
+  ok(attenuation(1.7) === 0.5 && attenuation(2) === 0.5, 'attenuation: .5 at the picture\'s street level', `${attenuation(1.7)}`);
+  ok(Math.abs(attenuation(4) - 0.5 * (1 + THIN) / 2) < 1e-9 && attenuation(6) === 0.5 * THIN && attenuation(16) === 0.5 * THIN && THIN >= 0.2 && THIN <= 0.4, 'attenuation: thins again from scale 2, to THIN × .5 from 6', `${attenuation(4)} ${attenuation(6)}`);
+  ok([1, 2, 3, 4, 5, 6, 8].every((s, i, a) => i === 0 || attenuation(s) <= attenuation(a[i - 1])), 'attenuation: never thicker when zooming in');
   ok(stretch(0.9) === 0 && stretch(1.5) === 0.5 && stretch(2.2) === 1, 'stretch: none to scale 1, all from 2');
-  ok(cellSize(0.5) === 2 && cellSize(2) === 3 && cellSize(3) === 4, 'cells: 2, 3 then 4 px as you zoom in');
+  ok(cellSize(0.5) === 2 && cellSize(2) === 3 && cellSize(3) === 3 && cellSize(16) === 3, 'cells: 2 px, then 3 px from scale 1.75, never bigger');
 }
 
 console.log(fails ? `${fails} FAILED` : 'all passed');

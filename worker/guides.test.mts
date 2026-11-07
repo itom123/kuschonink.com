@@ -552,7 +552,9 @@ await expectView('member cookie → members-only: the member view', get('/guides
   const up = upstream[0];
   check('… fetched once from IGN\'s WMTS with z, x and y only', upstream.length === 1 && up.url === `https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/png&TILEMATRIX=18&TILEROW=${nd.y}&TILECOL=${nd.x}`, upstream.map((u) => u.url));
   const h = new Headers(up?.init?.headers);
-  check('… with a neutral User-Agent naming kuschonink.com, no cookie, and a 30-day edge cache', /kuschonink\.com/.test(h.get('user-agent') ?? '') && !h.has('cookie') && up?.init?.cf?.cacheTtl === TILE_EDGE_S && up?.init?.cf?.cacheEverything === true && up?.init?.signal instanceof AbortSignal, { ua: h.get('user-agent'), cf: up?.init?.cf });
+  check('… with a neutral User-Agent naming kuschonink.com, no cookie, and a timeout', /kuschonink\.com/.test(h.get('user-agent') ?? '') && !h.has('cookie') && up?.init?.signal instanceof AbortSignal, { ua: h.get('user-agent') });
+  // Upstream caching: 30 days for a good tile only. cacheTtl would also keep an IGN 404 or 5xx that long.
+  check('… cached upstream 30 days for 2xx only (cacheTtlByStatus), never 4xx or 5xx, and no plain cacheTtl', up?.init?.cf?.cacheEverything === true && up?.init?.cf?.cacheTtl === undefined && JSON.stringify(up?.init?.cf?.cacheTtlByStatus) === JSON.stringify({ '200-299': TILE_EDGE_S, '400-599': 0 }), { cf: up?.init?.cf });
   const kept = store.get(up.url);
   check('… kept at the edge as public, max-age=2592000', !!kept && kept.headers.get('cache-control') === `public, max-age=${TILE_EDGE_S}` && kept.headers.get('content-type') === 'image/png' && kept.bytes.byteLength === PNG.length, kept ? [...kept.headers] : 'nothing cached');
   const again = await run(get(inside, memberCookie), deps({ cache }));
@@ -610,6 +612,55 @@ await expectView('member cookie → members-only: the member view', get('/guides
   const tearing = () => new Response(new ReadableStream({ start(c) { c.enqueue(PNG); c.error(new Error('reset')); } }), { status: 200, headers: { 'content-type': 'image/png' } });
   const torn = await run(get(inside, visitorCookie), deps({ cache: liar.c, fetch: async () => tearing() }));
   check('a 200 image/png that is not a PNG, is cut short, or breaks mid-body → 502, empty, nothing cached', [notPng, tiny, torn].every((r) => r.status === 502 && r.body === null) && liar.s.size === 0 && !(await Promise.all([notPng, tiny, torn].map((r) => body(r)))).some((b) => b.includes('IGN')), { s: [notPng.status, tiny.status, torn.status], cached: liar.s.size, logs });
+
+  // The request budget (allowTile): asked only on an edge-cache miss, just before IGN.
+  const ip = { 'cf-connecting-ip': '203.0.113.7' };
+  const asks: string[] = [];
+  const budget = (answer: boolean) => async (k: string) => (asks.push(k), answer);
+  const bucket = fresh();
+  upstream = [];
+  const allowed = await run(get(inside, visitorCookie, ip), deps({ cache: bucket.c, allowTile: budget(true) }));
+  check('tile budget left → 200, asked once with the visitor\'s own key, IGN asked once', allowed.status === 200 && tileHeaders(allowed) && asks.length === 1 && asks[0] === limitKey('203.0.113.7') && upstream.length === 1, { s: allowed.status, asks, n: upstream.length });
+  const t2 = tileOf(2.36, 48.86, 18);
+  const second = await run(get(path(18, t2.x, t2.y), visitorCookie, ip), deps({ cache: bucket.c, allowTile: budget(true) }));
+  check('… a second tile that is not cached yet is counted again', second.status === 200 && asks.length === 2 && upstream.length === 2, { s: second.status, asks, n: upstream.length });
+  // A cache hit is free, even for a visitor who is over the budget; so are HEAD and another audience.
+  const hits = await Promise.all([
+    run(get(inside, visitorCookie, ip), deps({ cache: bucket.c, allowTile: budget(false) })),
+    run(get(inside, memberCookie, ip), deps({ cache: bucket.c, allowTile: budget(false) })),
+    run(get(inside, visitorCookie, ip, 'HEAD'), deps({ cache: bucket.c, allowTile: budget(false) })),
+  ]);
+  check('edge-cache hits (GET, another audience, HEAD) are never counted, even over the budget → 200', hits.every((r) => r.status === 200 && tileHeaders(r)) && asks.length === 2 && upstream.length === 2, { s: hits.map((r) => r.status), asks, n: upstream.length });
+
+  const spent = fresh();
+  asks.length = 0;
+  upstream = [];
+  const over = await run(get(inside, visitorCookie, ip), deps({ cache: spent.c, allowTile: budget(false) }));
+  const overHead = await run(get(inside, visitorCookie, ip, 'HEAD'), deps({ cache: spent.c, allowTile: budget(false) }));
+  check('over the budget on a cache miss → 429 (GET and HEAD), Retry-After 60, private, no body, no content type', [over, overHead].every((r) => r.status === 429 && r.headers.get('retry-after') === '60' && r.headers.get('cache-control') === 'private, no-store' && r.headers.get('x-robots-tag') === 'noindex, nofollow, noarchive' && !r.headers.has('content-type') && r.body === null), { s: [over.status, overHead.status], h: [...over.headers] });
+  check('… IGN is never asked and nothing is cached', upstream.length === 0 && spent.s.size === 0 && asks.length === 2, { n: upstream.length, cached: spent.s.size, asks });
+  // The budget is asked after the cookie and the bounds, so those refusals never spend it.
+  asks.length = 0;
+  const early = await Promise.all([
+    run(get(inside, undefined, ip), deps({ allowTile: budget(false) })),
+    run(get(inside, expired, ip), deps({ allowTile: budget(false) })),
+    run(get(path(18, nd.x, nd.y, 'members-only'), visitorCookie, ip), deps({ allowTile: budget(false) })),
+    run(get(path(13, nd.x, nd.y), visitorCookie, ip), deps({ allowTile: budget(false) })),
+    run(get(path(18, r18.x1 + 1, r18.y1), visitorCookie, ip), deps({ allowTile: budget(false) })),
+    run(get(path(17, t17.x, t17.y, 'open-day'), visitorCookie, ip), deps({ allowTile: budget(false) })),
+    run(get(inside, visitorCookie, ip, 'POST'), deps({ allowTile: budget(false) })),
+  ]);
+  check('no cookie, expired cookie, wrong audience, z13, outside the box, no bounds, POST → 403/403/403/404/404/404/405, budget never asked', early.map((r) => r.status).join() === '403,403,403,404,404,404,405' && asks.length === 0, { s: early.map((r) => r.status), asks });
+  // No binding: the deps carry no allowTile (index.ts leaves it out), and every tile is allowed.
+  upstream = [];
+  const open = fresh();
+  const unlimited = await run(get(inside, visitorCookie, ip), deps({ cache: open.c }));
+  check('no tile limiter (a preview without the binding) → 200, nothing refused', deps().allowTile === undefined && unlimited.status === 200 && upstream.length === 1, { s: unlimited.status, n: upstream.length });
+  // A limiter that throws does not close the map; it is logged.
+  logs = [];
+  upstream = [];
+  const broke = await run(get(inside, visitorCookie, ip), deps({ allowTile: async () => { throw new Error('no binding'); } }));
+  check('tile limiter throws → 200 from IGN, logged', broke.status === 200 && upstream.length === 1 && logs.some((l) => l.includes('tile limiter')), { s: broke.status, logs });
 }
 
 // ---- Unexpected failures: a minimal neutral 503 ----

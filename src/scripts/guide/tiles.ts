@@ -1,8 +1,10 @@
-// Field Guide (导览): street-level tiles over the base picture. The maths is
+// Field Guide (导览): street-level tiles over the base pictures. The maths is
 // pure (node tests it in tiles.test.mts); TileLayer is the small DOM layer that
 // GuideMap (map.ts) drives from paint(). World units are z14 pixels, as in
 // camera.ts, so one tile at zoom z is 256 · 2^(14 − z) world px, and a tile is
-// put on screen with the same toScreen() as the base picture.
+// put on screen with the same toScreen() as the base pictures. The tiles cover
+// every base map (the city plan and the region round it), so any view zooms
+// on to street level.
 //
 // The tiles come from the Worker's proxy ("/guides/<slug>/tiles/{z}/{x}/{y}.png"),
 // never from IGN directly, so the visitor's browser talks only to kuschonink.com.
@@ -57,9 +59,10 @@ export function screenBox(r: Rect, c: Cam, vp: Vp, dpr = 1): { left: number; top
 }
 
 /**
- * The tiles at zoom z that a camera shows inside `clip` (the base picture's
- * box, so nothing is asked for beyond it), nearest the middle first so the
- * middle loads first. Empty when nothing shows, or when there would be too many.
+ * The tiles at zoom z that a camera shows inside `clip` (the box round the
+ * base maps, tileClip(), so nothing is asked for beyond it), nearest the
+ * middle first so the middle loads first. Empty when nothing shows, or when
+ * there would be too many.
  */
 export function visibleTiles(c: Cam, vp: Vp, clip: Rect, z: number): TileAt[] {
   if (!(c.s > 0) || !vp.w || !vp.h) return [];
@@ -80,6 +83,18 @@ export function visibleTiles(c: Cam, vp: Vp, clip: Rect, z: number): TileAt[] {
 
 /** The address of one tile. */
 export const tileUrl = (src: TileSource, t: TileAt) => src.url.replace('{z}', String(t.z)).replace('{x}', String(t.x)).replace('{y}', String(t.y));
+
+/**
+ * Where tiles may be asked for: the smallest box round every base map. The
+ * tile bounds in access.json hold every base map (check.ts sees to it), so
+ * tiles cover the whole of it; beyond it the proxy has none. Null without maps.
+ */
+export function tileClip(maps: Rect[]): Rect | null {
+  if (!maps.length) return null;
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const b of maps) { x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.w); y1 = Math.max(y1, b.y + b.h); }
+  return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+}
 
 const overlaps = (a: { left: number; top: number; w: number; h: number }, b: { left: number; top: number; w: number; h: number }) =>
   a.left < b.left + b.w && b.left < a.left + a.w && a.top < b.top + b.h && b.top < a.top + a.h;
@@ -112,10 +127,10 @@ export class TileLayer {
   }
 
   /**
-   * Lay the tiles over the base picture's box `clip` for this camera. While a
-   * gesture is still going (`settled` false) a new zoom level is not started:
-   * the tiles already there are moved, and the level changes when it settles.
-   * True while the layer shows.
+   * Lay the tiles over the box `clip` (round the base maps) for this camera.
+   * While a gesture is still going (`settled` false) a new zoom level is not
+   * started: the tiles already there are moved, and the level changes when it
+   * settles. True while the layer shows.
    */
   update(c: Cam, vp: Vp, clip: Rect, dpr: number, settled = true): boolean {
     if (this.gone) return false;

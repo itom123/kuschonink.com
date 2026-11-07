@@ -16,8 +16,8 @@ export function menuProvider(app: GuideApp) {
     switch (name) {
       case 'file':
         return [
-          { label: '&Open Guide...', zh: '打开导览(&O)...', icon: 'guide', action: () => app.home() },
-          { sep: true },
+          // A chooser only makes sense with several listed guides.
+          ...(app.guides.length > 1 ? [{ label: '&Open Guide...', zh: '打开导览(&O)...', icon: 'guide', action: () => app.openGuide() }, { sep: true }] : []),
           { label: 'Open in &Google Maps', zh: '在 Google 地图中打开(&G)', disabled: !s.place, action: () => app.openLink(0) },
           { label: 'Get &Directions', zh: '获取路线(&D)', disabled: !s.place && !s.route, action: () => app.openLink(1) },
           { sep: true },
@@ -61,6 +61,7 @@ export function menuProvider(app: GuideApp) {
           pane('info', '&Info', '说明(&I)'),
           { sep: true },
           ...(p.listings.some((l) => !l.item) ? [{ label: 'Official &Entries', zh: '官方条目(&E)', checked: s.listings, action: () => { app.store.set({ listings: !s.listings }); app.syncControls(); } }] : []),
+          // O, not S: Stop Showing My Location has S. The Sort by: list in the Places pane uses O too (words.ts).
           { label: 'S&ort By', zh: '排序方式(&O)', sub: sort },
           ...(p.map.views.length > 1 ? [{ label: '&Area', zh: '区域(&A)', sub: p.map.views.map((m) => ({ label: m.name.en, zh: m.name.zh || m.name.en, radio: true, checked: s.area === m.id, action: () => app.store.set({ area: m.id }) })) }] : []),
           { label: '&Heat Map', zh: '热力图(&H)', checked: s.heat, disabled: !app.map, action: () => app.store.set({ heat: !s.heat }) },
