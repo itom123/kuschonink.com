@@ -316,11 +316,18 @@ Each entry in `events` in `events.json` has an `id`, a `date`, an optional
 - **先去掉手机拍照的位置信息**：Windows 上右键图片 → 属性 → 详细信息 →“删除属性和个人信息”；
   iPhone 上分享时点“选项”，关掉“位置”。
 - 用上面的“上传图片”链接上传到 `public/guides/<名字>/img/`，然后在地点里加 `image`（见下面的例子）。
+- 图片说明后面会自动加上 `guide.json` 里 `credits.image` 写的发布者（巴黎导览是“由 Photo Days 发布”）。图片来自别处（比如场馆自己的网页）时，加 `"source": "Published by …"` 和 `"sourceZh": "由……发布"`，就会显示它。
+- `listings.json` 的条目也可以有同样的 `image`。
 
 - JPEG, at most 640 px wide and **no more than 1 MB**.
 - **Strip the phone's location data first**: on Windows, right-click the file
   → Properties → Details → *Remove Properties and Personal Information*; on an
   iPhone, tap *Options* when sharing and turn *Location* off.
+- The caption ends with who published the picture: `credits.image` in
+  `guide.json` (for Paris, "Published by Photo Days"). For a picture from
+  somewhere else, such as the venue's own page, add `"source": "Published by …"`
+  and `"sourceZh"`, and that shows instead.
+- A record in `listings.json` may have an `image` too, written the same way.
 - Upload it to `public/guides/<slug>/img/` with the upload link above, then
   add to the place:
 
@@ -645,7 +652,7 @@ below). Any file may have a `_comment`, which is never shown.
 | `sourceUrl?`, `links?[]` | 信息来源页、其他链接 | Source page, other links |
 | `listing?` | `listings.json` 里对应条目的 `id` | Its record in `listings.json` |
 | `coordinates` | `[经度, 纬度]` | `[longitude, latitude]` |
-| `image?` | `{ file, credit, caption?, alt?, altZh? }`；文件在 `img/` | Picture; the file is in `img/` |
+| `image?` | `{ file, credit, caption?, alt?, altZh?, source?, sourceZh? }`；文件在 `img/`；`source` 是发布者（不写就用 `credits.image`） | Picture; the file is in `img/`; `source` says who published it (default: `credits.image`) |
 | `label?` | 开场缩放时显示标签（默认 A 级显示） | Label at the opening zoom (default: tier A) |
 | `audience?` | 只给某些读者 | Only for some audiences |
 | `suggested?` | `{ on, by?, own?, ref }`：读者推荐，由发布器加入（第 11 节）；`ref` 是 Notion 页面编号，不会出现在网页里 | A reader's suggestion, added by the publisher (section 11); `ref` is the Notion page and never reaches browsers |
@@ -683,7 +690,7 @@ below). Any file may have a `_comment`, which is never shown.
 | 字段 Field | 说明 | Meaning |
 | --- | --- | --- |
 | `source` | `{ name, url?, checked, lang, credit? }`：官方来源 | The official source |
-| `records[]` | `{ id, name, category, coordinates, details, url?, start?, end? }`；`details` 是来源原文，用 `\n` 分行 | Records in the source's own words, lines split by `\n` |
+| `records[]` | `{ id, name, category, coordinates, details, url?, start?, end?, image? }`；`details` 是来源原文，用 `\n` 分行；`image` 和地点的一样 | Records in the source's own words, lines split by `\n`; `image` as for an item |
 
 ### `map.json`
 

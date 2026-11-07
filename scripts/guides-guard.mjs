@@ -183,6 +183,7 @@ for (const slug of Object.keys(guides)) {
   const eventsFile = readJson(join(dir, 'events.json'), rel('events.json'), false) ?? {};
   const routes = readJson(join(dir, 'routes.json'), rel('routes.json'), false)?.routes ?? [];
   const mapFile = readJson(join(dir, 'map.json'), rel('map.json'), false) ?? {};
+  const listingsFile = readJson(join(dir, 'listings.json'), rel('listings.json'), false) ?? {};
 
   const texts = [];
   const add = (chain, ...values) => {
@@ -239,6 +240,7 @@ for (const slug of Object.keys(guides)) {
   // Referenced images and base maps.
   const images = [];
   for (const it of items) if (it.image?.file) images.push({ folder: 'img', file: it.image.file, from: `${rel('items.json')} > ${it.id}` });
+  for (const r of listingsFile.records ?? []) if (r.image?.file) images.push({ folder: 'img', file: r.image.file, from: `${rel('listings.json')} > ${r.id}` });
   for (const v of mapFile.views ?? []) if (v.file) images.push({ folder: 'map', file: v.file, from: `${rel('map.json')} > ${v.id}`, width: v.width, height: v.height });
 
   data.set(slug, { texts: kept, sensitive, images });

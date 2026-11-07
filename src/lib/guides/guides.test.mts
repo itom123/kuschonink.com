@@ -93,7 +93,7 @@ const base = (): RawGuide => ({
   },
   items: { items: [
     item('A1', [2.3376, 48.8606], { listing: 'D01', image: { file: 'a1.jpg', credit: '© Someone' } }),
-    item('A2', [2.3266, 48.8662]),
+    item('A2', [2.3266, 48.8662], { image: { file: 'a2.jpg', credit: '© Venue Artist', source: 'Published by the venue', sourceZh: '由场馆发布' } }),
     item('A3', [2.37, 48.853], { start: '2026-10-01', end: '2026-12-01' }),
     item('B1', [2.349, 48.853], { open: ['tue', 'wed', 'thu', 'fri', 'sat'], holiday: 'closed' }),
     item('C1', [2.30, 48.87], { access: 'appointment' }),
@@ -121,7 +121,7 @@ const base = (): RawGuide => ({
     source: { name: 'Official map', checked: '2026-11-01', lang: 'fr' },
     records: [
       { id: 'D01', name: 'Galerie Un', category: 'galleries', coordinates: [2.3377, 48.8607], details: 'Galerie\nexpo' },
-      { id: 'D02', name: 'Galerie Deux', category: 'galleries', coordinates: [2.34, 48.86], details: 'Galerie deux' },
+      { id: 'D02', name: 'Galerie Deux', category: 'galleries', coordinates: [2.34, 48.86], details: 'Galerie deux', image: { file: 'd02.jpg', credit: '© Someone Else', caption: 'Untitled, 2026' } },
     ],
   },
   map: { views: [CITY, REGION], attribution: '© Base map' },
@@ -182,6 +182,8 @@ const base = (): RawGuide => ({
   ok(vv.items[0].why.zh === 'A1 的理由。' && vv.items[1].note.zh === '' && vv.items[0].image?.src === '/guides/fixture/img/a1.jpg', 'Bi filled; image src');
   ok(vv.map.views[0].src === '/guides/fixture/map/city.jpg', 'map view src');
   ok(vv.listings.records[0].item === 'A1' && vv.listings.records[1].item === undefined, 'listings link back to their item');
+  ok(vv.listings.records[1].image?.src === '/guides/fixture/img/d02.jpg' && vv.listings.records[1].image.caption === 'Untitled, 2026' && vv.listings.records[1].image.alt.en === 'Galerie Deux' && !vv.listings.records[0].image, 'a listing record\'s picture: src, caption, alt from its name');
+  ok(vv.items[1].image?.source?.en === 'Published by the venue' && vv.items[1].image.source.zh === '由场馆发布' && vv.items[0].image?.source === undefined, 'a picture\'s own "published by" comes through; without one, none');
   ok(vv.items[0].label && !vv.items[3].label && vv.items[3].holiday === 'closed' && vv.items[0].holiday === 'confirm', 'defaults: label for tier A, holiday confirm');
   ok(vv.audienceLabel.en === 'Visitor' && vv.window?.days.length === 8, 'audience label and window days');
   const pay = buildPayload(vv);
@@ -214,6 +216,9 @@ const base = (): RawGuide => ({
     ['unknown zone', (g) => { g.items.items[0].zone = 'north'; }, 'items.json › A1 › zone', 'not a zone'],
     ['unknown route stop', (g) => { g.routes.routes[1].stops[1] = 'B55'; }, 'routes.json › marais › stops[1]', 'not an item or place'],
     ['image without credit', (g) => { g.items.items[0].image = { file: 'a1.jpg' }; }, 'items.json › A1 › image.credit', 'needs a credit'],
+    ['listing image without credit', (g) => { g.listings.records[1].image = { file: 'd02.jpg', credit: ' ' }; }, 'listings.json › D02 › image.credit', 'needs a credit'],
+    ['listing image in a folder', (g) => { g.listings.records[1].image.file = 'x/d02.jpg'; }, 'listings.json › D02 › image.file', 'should be a file name'],
+    ['listing image typo', (g) => { g.listings.records[1].image.credt = 'x'; }, 'listings.json › D02 › image.credt', 'did you mean "credit"'],
     ['swapped [lat, lon]', (g) => { g.items.items[1].coordinates = [48.8662, 2.3266]; }, 'items.json › A2 › coordinates', 'swap'],
     ['outside the region', (g) => { g.places.places[1].coordinates = [10, 50]; }, 'places.json › F › coordinates', 'outside the map'],
     ['unknown listing link', (g) => { g.items.items[1].listing = 'D99'; }, 'items.json › A2 › listing', 'not a record'],

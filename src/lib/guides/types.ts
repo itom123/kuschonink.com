@@ -174,7 +174,7 @@ export interface ItemRecord {
   /** The id of this place's record in listings.json, if any. */
   listing?: string;
   coordinates: LonLat;
-  image?: { file: string; credit: string; caption?: string; alt?: string; altZh?: string };
+  image?: ImageRecord;
   /** Label on the map at the opening zoom. Default: tier A. */
   label?: boolean;
   audience?: AudienceTag;
@@ -249,6 +249,18 @@ export interface RouteRecord {
   audience?: AudienceTag;
 }
 
+/** A picture in img/: who made it (`credit`), and who published it when that isn't the guide's credits.image (`source`). */
+export interface ImageRecord {
+  file: string;
+  credit: string;
+  caption?: string;
+  alt?: string;
+  altZh?: string;
+  /** "Published by …": overrides guide.json credits.image for this picture (one from a venue's own page, say). */
+  source?: string;
+  sourceZh?: string;
+}
+
 /** listings.json: secondary records from an official source, in their own language. */
 export interface ListingsFile {
   _comment?: string;
@@ -266,6 +278,8 @@ export interface ListingRecord {
   /** Only where the source gives one clear date range. */
   start?: ISODate;
   end?: ISODate;
+  /** The picture the source publishes with this record. */
+  image?: ImageRecord;
 }
 
 /** map.json: base maps (Web-Mercator image crops). */
@@ -322,7 +336,7 @@ export interface Item extends DayRule {
   links: string[];
   listing?: string;
   coordinates: LonLat;
-  image?: { src: string; credit: string; caption: string; alt: Bi };
+  image?: Picture;
   label: boolean;
   /** Suggested by someone using the guide: `by` is "" unless they asked to be credited. */
   suggested?: { on: ISODate; by: string; own: boolean };
@@ -363,9 +377,13 @@ export interface Route {
   note: Bi;
 }
 
-export interface Listing extends ListingRecord {
+/** A picture as the page shows it: its address behind the password, and "Published by …" when it isn't credits.image. */
+export interface Picture { src: string; credit: string; caption: string; alt: Bi; source?: Bi }
+
+export interface Listing extends Omit<ListingRecord, 'image'> {
   /** The item that stands for this record, if any. */
   item?: string;
+  image?: Picture;
 }
 
 export interface MapView {
