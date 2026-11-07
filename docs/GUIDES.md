@@ -730,7 +730,7 @@ Notion and you decide.
 
 1. 推荐者填写向导：是什么、时间地点、链接和图片、关于自己（可不填）、确认发送。服务器（`worker/suggest.ts`）核对来源、登录、内容、频率和反垃圾验证，清除图片里的位置等信息，然后在 Notion 的 **Suggestions** 里新建一条（状态 `NEW`），并给你发一封通知邮件。Notion 出问题时，整条推荐改用邮件发给你，不会丢失。
 2. 你在 Notion 里（或网站的管理界面里）把状态改成 **APPROVED**（收录）或 **REFUSED**（不收录）。收录前可以设 **Tier**（A/B/C，默认 C）、**Show to**（`Everyone`，或某一类读者，如 `fotofilmic`）和 **Owner notes**（给云端例程的说明）。
-3. 云端例程（Claude Code 的定时任务，每天 08:00–22:00 巴黎时间每小时一次，你在网站上批准时也会立即运行一次）按 [`scripts/suggestions/ROUTINE.md`](../scripts/suggestions/ROUTINE.md) 处理每条 `APPROVED`：核对官网、补全链接和开放时间、定位、查重，写好条目，把状态改成 `READY`（或 `DUPLICATE`、`NEEDS CHECK`、`ERROR`）。**例程不能改仓库**（它的任务只挂工具的副本，从来不挂这个仓库，见 11.6）：它读的是陌生人写的文字和外部网页，可能被误导。
+3. 云端例程（Claude Code 的定时任务，每天巴黎时间 08:00 一次，你在网站上批准时也会立即运行一次）按 [`scripts/suggestions/ROUTINE.md`](../scripts/suggestions/ROUTINE.md) 处理每条 `APPROVED`：核对官网、补全链接和开放时间、定位、查重，写好条目，把状态改成 `READY`（或 `DUPLICATE`、`NEEDS CHECK`、`ERROR`）。**例程不能改仓库**（它的任务只挂工具的副本，从来不挂这个仓库，见 11.6）：它读的是陌生人写的文字和外部网页，可能被误导。
 4. 网站自己的代码（发布器，`worker/publish.ts`，每 10 分钟一次）把 `READY` 的条目再检查一遍（只能用已知字段、通过构建时的同一套检查、不能含某类读者不该看到的词），然后提交到 `main`：只改这份导览的 `items.json` 和 `img/` 里的图片。状态变成 `PUBLISHING`；网站换上这次提交的构建后（通常一两分钟）变成 `PUBLISHED`。构建失败，或者 45 分钟后网站还没换上，发布器会自动撤回这次提交，状态变成 `ERROR`。
 
 1. The sender goes through the wizard: what it is, when and where, links and
@@ -743,7 +743,7 @@ Notion and you decide.
    **REFUSED**. Before approving you can set **Tier** (A, B or C; C by
    default), **Show to** (`Everyone`, or one audience such as `fotofilmic`)
    and **Owner notes** (instructions for the routine).
-3. The cloud routine (a Claude Code scheduled task, hourly 08:00–22:00 Paris,
+3. The cloud routine (a Claude Code scheduled task, daily at 08:00 Paris,
    and at once when you approve on the site) follows
    [`scripts/suggestions/ROUTINE.md`](../scripts/suggestions/ROUTINE.md) for
    each `APPROVED` page: it checks the venue's own pages, fills in links and
@@ -978,15 +978,16 @@ GitHub Action 每 10 分钟从这个仓库更新。所以例程推不了这个�
      代码，提示词写明了那条命令也一样（2026 年 11 月 7 日，不挂仓库、自己下载工具的几次运行都被拒：“Code from External”）。
      副本让例程把工具当成自己的仓库，又不用挂这个仓库。
 
-   - **Trigger**：**API** 和 **Schedule** 都要（先选每小时，下面再改）。管理模式的“收录”和“立即运行”用 API 触发器。
+   - **Trigger**：**API** 和 **Schedule** 都要（选每天，下面再定时间）。管理模式的“收录”和“立即运行”用 API 触发器。
    - **仓库：只选 `itom123/kuschonink-routine`**，**永远不要**选 `itom123/kuschonink.com`。
    - **Cloud environment**：第 3 步的环境。
    - **Connectors**：全部去掉。
    - **Create**。弹出的 **API token** 只显示这一次：复制下来，第 5 步用。
 
-   时间：预设只有每小时、每天、每周，没有“几点到几点”。建好后在任务名旁边的菜单 ▸ **Edit** 里选 **Custom**，填
-   `CRON_TZ=Europe/Paris 7 8-22 * * *`（巴黎时间 8:07 到 22:07，每小时一次）。框里原来有别的 `CRON_TZ=` 就改成
-   `Europe/Paris`；不接受这个前缀的话写 UTC 时间：冬令时 `7 7-21 * * *`，夏令时 `7 6-20 * * *`。没事可做的运行会立刻结束，不记日志。
+   时间：建好后在任务名旁边的菜单 ▸ **Edit** 里选 **Custom**，填 `CRON_TZ=Europe/Paris 0 8 * * *`（每天巴黎时间 8:00；调度器
+   通常晚几分钟才开始）。框里原来有别的 `CRON_TZ=` 就改成 `Europe/Paris`；不接受这个前缀的话写 UTC 时间：冬令时 `0 7 * * *`，
+   夏令时 `0 6 * * *`。推荐不多，一天一次就够：你在管理模式里收录一条推荐时，例程会立刻运行，每天这一次只是兜底。没事可做的
+   运行会立刻结束，不记日志。
 5. **API 触发器**：任务菜单 ▸ **Edit** ▸ **Trigger** 那一行的 API 面板 ▸ 复制 **Fire URL**（建任务时没复制令牌的话，在这里
    **Generate token**，同样只显示一次；以后换令牌用 **Regenerate**，不要删：删掉令牌就删掉了 API 触发器）。把两者存成
    Cloudflare secret `ROUTINE_FIRE_URL` 和 `ROUTINE_TOKEN`，只给正式网站、不给预览（在切换到 Worker Previews 之后再存，
@@ -1091,7 +1092,7 @@ Set it up once:
      repository attached, was refused: "Code from External"). The copy gives
      the routine the tool as its own repository without attaching this one.
 
-   - **Trigger**: both **API** and **Schedule** (hourly for now, changed
+   - **Trigger**: both **API** and **Schedule** (daily, its time set
      below). Admin mode's Approve and Run Now use the API trigger.
    - **Repository: `itom123/kuschonink-routine` only.** Never
      `itom123/kuschonink.com`.
@@ -1100,13 +1101,15 @@ Set it up once:
    - **Create**. The **API token** it then shows is shown only once: copy it
      for step 5.
 
-   Schedule: the presets are hourly, daily or weekly, with no window of
-   hours. Once it exists, open the menu next to its name ▸ **Edit**, pick
-   **Custom** and enter `CRON_TZ=Europe/Paris 7 8-22 * * *` (every hour from
-   8:07 to 22:07, Paris time). If the field already starts with another
-   `CRON_TZ=`, change it to `Europe/Paris`; if it won't take the prefix,
-   write the hours in UTC: `7 7-21 * * *` in winter, `7 6-20 * * *` in
-   summer. A run with nothing to do stops at once and logs nothing.
+   Schedule: once it exists, open the menu next to its name ▸ **Edit**,
+   pick **Custom** and enter `CRON_TZ=Europe/Paris 0 8 * * *` (every day at
+   8:00, Paris time; the scheduler usually starts a few minutes later). If
+   the field already starts with another `CRON_TZ=`, change it to
+   `Europe/Paris`; if it won't take the prefix, write the hour in UTC:
+   `0 7 * * *` in winter, `0 6 * * *` in summer. Once a day is enough for
+   the few suggestions there are: approving one in admin mode starts a run
+   at once, and the daily run only catches what is left. A run with nothing
+   to do stops at once and logs nothing.
 5. **API trigger**: the task's menu ▸ **Edit** ▸ the API panel in the
    **Trigger** row ▸ copy the **Fire URL** (and **Generate token** there if
    you didn't copy one at **Create**; it too is shown once. To change the

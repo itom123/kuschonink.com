@@ -2,7 +2,7 @@
 
 This file is the routine's instructions. The routine is a Claude Code
 scheduled task on claude.ai: it runs in Anthropic's cloud, never on the owner's
-computer. It runs hourly from 08:00 to 22:00 Paris time, and also when the owner
+computer. It runs daily at 08:00 Paris time, and also when the owner
 approves a suggestion in admin mode (the Worker calls its API trigger). Its
 only repository is **itom123/kuschonink-routine**: a copy of this tool, this
 file and the guides' files, which its own GitHub Action makes from
