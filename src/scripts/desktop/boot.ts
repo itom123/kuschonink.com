@@ -93,26 +93,27 @@ export function logOn(): Promise<string> {
     }
   });
   return new Promise((resolve) => {
-    const done = (user: string) => {
+    // Every way out logs on as Guest: nothing typed counts (session.ts).
+    const done = () => {
       form.onsubmit = null;
       removeEventListener('keydown', esc, true);
-      resolve(finish(user));
+      resolve(finish());
     };
     const esc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        done(session.lastUser());
+        done();
       }
     };
     addEventListener('keydown', esc, true);
     form.onsubmit = (e) => {
       e.preventDefault();
-      done(name.value);
+      done();
     };
     b.querySelectorAll<HTMLElement>('[data-login="cancel"]').forEach((btn) => {
       btn.onclick = (e) => {
         e.preventDefault();
-        done(session.lastUser());
+        done();
       };
     });
     const help = b.querySelector<HTMLElement>('[data-login-help]');
@@ -120,9 +121,9 @@ export function logOn(): Promise<string> {
   });
 }
 
-function finish(user: string) {
+function finish() {
   unlockAudio();
-  const n = session.logOn(user);
+  const n = session.logOn();
   delete html.dataset.boot;
   box().dataset.step = 'bios';
   shield(false);

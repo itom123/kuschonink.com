@@ -95,6 +95,16 @@ Secrets), add these as **Secrets**:
 Admin mode opens only when both of the first two are set (a long enough
 password, a real key); otherwise `/admin` says it isn't set up.
 
+预览（Worker Previews）里的管理模式能看到那个分支导览的完整内容，而预览链接是公开的：预览不要设
+`ADMIN_PASSWORD` 和 `ADMIN_TOTP_SECRET`（这样预览里就没有管理模式），要设就用和正式网站一样强的值。
+预览不发邮件，也不会启动云端例程。
+
+In a preview (Worker Previews), admin mode shows the fullest view of that
+branch's guides, and preview links are public: leave `ADMIN_PASSWORD` and
+`ADMIN_TOTP_SECRET` unset for previews (admin is then off there), or give them
+values as strong as production's. Previews send no emails and never start the
+routine.
+
 和推荐有关的设置（`NOTION_TOKEN`、`GITHUB_TOKEN`、发信）见 [GUIDES.md 第 11 节](GUIDES.md#11-读者推荐-suggestions)。
 发给推荐者的邮件用 `MAIL_OUT`（只能从 `noreply@kuschonink.com` 发出，回复到 `hi@kuschonink.com`）。
 

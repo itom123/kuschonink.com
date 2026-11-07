@@ -293,7 +293,9 @@ not even a full-size window's title bar on a phone. Page content calls
 the Field Guide's log-on box (`logon.ts`) does so before it posts the password,
 and the post waits; after **Allow** (which chooses Necessary Only, or keeps
 Allow All) it goes ahead with the password still in the box, and after × or
-Esc it doesn't. Only a feature being used asks again: a start-up under None
+Esc it doesn't. The hidden admin log-on (`src/scripts/admin/home.ts`) asks the
+same way with `ask('admin')`, which shows the bar's general wording, so nothing
+public names admin mode. Only a feature being used asks again: a start-up under None
 doesn't show the bar on its own. For bots `ask()` answers true at once, as
 without JavaScript.
 
@@ -317,13 +319,17 @@ the `kus98-paint` database, and with None the `kus98:…` keys in
 never touched (on `localhost` other projects share it). At load, leftovers the
 choice doesn't allow go too, and a choice made in another tab is followed
 there (the `storage` event). `kus98_guides` is `HttpOnly`: only the guide's
-File ▸ Log Off removes it, so None doesn't log anyone out of a guide.
+File ▸ Log Off removes it, so None doesn't log anyone out of a guide. Nor out of
+admin mode: its two cookies (`__Host-kus98_admin`, `HttpOnly`, and
+`kus98_admin_ui`) stay until Start ▸ Log Off or Log Off at `/admin`, or until
+the 12 hours run out.
 
 **Without JavaScript** nothing is asked: posting the log-on form is itself the
 request for the guide's cookie.
 
-**Not covered:** Cloudflare's own pieces, the anti-spam check on Contact
-(Turnstile, in its own frame) and the analytics beacon (README, *Analytics*).
+**Not covered:** Cloudflare's own pieces, the anti-spam check on Contact,
+Paint's Send to Xiangyin and the Field Guide's Suggest a Place (Turnstile, in
+its own frame) and the analytics beacon (README, *Analytics*).
 
 **Keeping something new.** Decide its kind, ask `consent.allows()` (or use
 `stored()`), start its key with `kus98:` so a stricter choice removes it, write

@@ -438,43 +438,152 @@ await expectView('member cookie → members-only: the member view', get('/guides
   check('ASSETS throws on /guides → 503 neutral page', (await run(get('/guides'), deps({ assets: () => { throw new Error('boom'); } }))).status === 503);
 }
 
-// ---- The Worker never imports guide content: only access.json, types, and guide code that reads none ----
+// ---- The Worker never bundles guide content: only access.json, types, and guide code that reads none ----
+// Every module the bundle can reach from worker/ is followed the way esbuild follows it, so this holds
+// after edits by people (or AIs) who don't know the rule: static and dynamic imports, re-exports, side-
+// effect imports, require(), modules outside src/lib/guides, and worker/ subfolders. Comments and strings
+// never count. Anything that can't be resolved fails the check rather than slipping through.
 {
-  const { readdirSync, readFileSync } = await import('node:fs');
+  const { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { pathToFileURL } = await import('node:url');
   const dir = new URL('./', import.meta.url);
-  const IMPORTS = /^\s*(?:import|export)\s+(type\s+)?[^'"]*?from\s+['"]([^'"]+)['"]|\bimport\(\s*['"]([^'"]+)['"]/gm;
-  const isContent = (spec: string) => /content\/guides\//.test(spec) && !/content\/guides\/access\.json$/.test(spec);
-  const name = (u: URL) => u.pathname.split('/').slice(-2).join('/');
-  // A module from src/lib/guides may be bundled only if neither it nor anything
-  // it imports (types aside) reads guide content: load.ts does, check.ts doesn't.
-  const reaches = (file: URL, seen = new Set<string>()): string | null => {
-    if (seen.has(file.href) || file.pathname.endsWith('.json')) return null;
-    seen.add(file.href);
-    const src = readFileSync(file, 'utf8');
-    if (/import\.meta\.glob/.test(src)) return `${name(file)} reads every guide (import.meta.glob)`;
-    for (const m of src.matchAll(IMPORTS)) {
-      const spec = m[2] ?? m[3];
-      if (m[1] || !spec.startsWith('.')) continue;
-      if (isContent(spec)) return `${name(file)} imports ${spec}`;
-      const hit = reaches(new URL(/\.(ts|json)$/.test(spec) ? spec : `${spec}.ts`, file), seen);
-      if (hit) return hit;
+  const isFile = (u: URL) => { try { return statSync(u).isFile(); } catch { return false; } };
+  // Source with comments, strings, template literals and regex literals taken out, so that a mention in a
+  // comment or a string is never an import, and a quote inside a regex never hides one. Each string is
+  // replaced by "\u0001<n>" and kept in strs[n], since import specifiers live in strings.
+  const KW = /(?:^|[^\w$.])(?:return|typeof|case|do|else|in|of|throw|new|delete|void|yield|await|instanceof)\s*$/;
+  const code = (src: string): { text: string; strs: string[] } => {
+    const strs: string[] = [];
+    let text = '';
+    for (let i = 0; i < src.length; ) {
+      const c = src[i]!, d = src[i + 1];
+      if (c === '/' && d === '/') { const e = src.indexOf('\n', i); i = e < 0 ? src.length : e; continue; }
+      if (c === '/' && d === '*') { const e = src.indexOf('*/', i + 2); text += ' '; i = e < 0 ? src.length : e + 2; continue; }
+      if (c === "'" || c === '"') {
+        let j = i + 1;
+        while (j < src.length && src[j] !== c && src[j] !== '\n') j += src[j] === '\\' ? 2 : 1;
+        text += `"\u0001${strs.length}"`; strs.push(src.slice(i + 1, j)); i = j + 1; continue;
+      }
+      if (c === '`') {
+        let j = i + 1, depth = 0;
+        for (; j < src.length; j++) {
+          if (src[j] === '\\') { j++; continue; }
+          if (depth === 0 && src[j] === '`') break;
+          if (src[j] === '$' && src[j + 1] === '{') { depth++; j++; } else if (depth && src[j] === '{') depth++; else if (depth && src[j] === '}') depth--;
+        }
+        text += '``'; i = j + 1; continue;
+      }
+      if (c === '/') { // a regex literal, unless what precedes it makes this a division
+        const prev = text.trimEnd();
+        if (!prev || '(,=:[!&|?{};+-*%<>~^'.includes(prev.slice(-1)) || KW.test(prev)) {
+          let j = i + 1, cls = false;
+          for (; j < src.length && src[j] !== '\n'; j++) {
+            if (src[j] === '\\') { j++; continue; }
+            if (cls) cls = src[j] !== ']'; else if (src[j] === '[') cls = true; else if (src[j] === '/') break;
+          }
+          while (/[a-z]/.test(src[j + 1] ?? '')) j++;
+          text += '/./'; i = j + 1; continue;
+        }
+      }
+      text += c; i++;
     }
+    return { text, strs };
+  };
+  // import x from "s" | import "s" | export * from "s" | export { a } from "s", spaces optional
+  // (export*from"s" is legal): [1] = type-only, [2] = the string
+  const STATIC = /(?<![\w$.])(?:import|export)\s*(type\s+(?!from\b))?(?:(?:(?!\b(?:import|export)\b)[\w$*{}\s,])*?\s*from\s*)?"\u0001(\d+)"/g;
+  const DYNAMIC = /(?<![\w$.])import\s*\(\s*(?:"\u0001(\d+)"|(`)|([^\s)]))/g;
+  const REQUIRE = /(?<![\w$.])require\s*\(\s*"\u0001(\d+)"/g;
+  const EXTS = ['.ts', '.tsx', '.mts', '.js', '.mjs', '.json'];
+  // Resolve a relative specifier as esbuild does: the file itself, then with an extension, .js → .ts, then index.*
+  const resolve = (spec: string, from: URL): URL | null => {
+    const base = new URL(spec, from).href;
+    const tries = [base, ...EXTS.map((e) => base + e), base.replace(/\.m?js$/, '.ts'), base.replace(/\.m?js$/, '.tsx'), base.replace(/\.mjs$/, '.mts'), ...EXTS.map((e) => `${base.replace(/\/?$/, '/')}index${e}`)];
+    for (const t of tries) if (isFile(new URL(t))) return new URL(t);
     return null;
   };
-  const found: string[] = [];
-  for (const f of readdirSync(dir).filter((x) => x.endsWith('.ts'))) {
-    const src = readFileSync(new URL(f, dir), 'utf8');
-    for (const m of src.matchAll(IMPORTS)) {
-      const spec = m[2] ?? m[3];
-      if (isContent(spec)) found.push(`${f}: ${spec}`);
-      else if (/lib\/guides\//.test(spec) && !m[1]) {
-        const hit = reaches(new URL(/\.ts$/.test(spec) ? spec : `${spec}.ts`, new URL(f, dir)));
-        if (hit) found.push(`${f}: ${spec} → ${hit}`);
+  // Walk every module the Worker bundles from these entries; return why it would carry guide content.
+  // Guide content is anything under <root>/src/content/guides/ except access.json.
+  const scan = (entries: URL[], root: URL): string[] => {
+    const content = new URL('src/content/guides/', root).href.toLowerCase();
+    const name = (u: URL) => decodeURIComponent(u.href.startsWith(root.href) ? u.href.slice(root.href.length) : u.href);
+    const via = new Map<string, URL | null>(entries.map((e) => [e.href, null] as [string, URL | null]));
+    const chain = (u: URL): string => { const p = via.get(u.href); return p ? `${chain(p)} → ${name(u)}` : name(u); };
+    const found: string[] = [];
+    const queue = [...entries];
+    for (let f = queue.shift(); f; f = queue.shift()) {
+      const where = chain(f);
+      const edge = (spec: string) => {
+        if (!/^\.{1,2}(\/|$)/.test(spec)) {
+          if (/content[\\/]guides/i.test(spec)) found.push(`${where} imports ${spec}: a non-relative path into content/guides`);
+          else if (/^[/\\]|^[a-z]:/i.test(spec)) found.push(`${where} imports ${spec}: an absolute path, which may be anything`);
+          return; // a package, a builtin or cloudflare:*
+        }
+        const to = resolve(spec, f);
+        if (!to) found.push(`${where} imports ${spec}, which no file matches (fail closed: fix or remove it)`);
+        else if (to.href.toLowerCase().startsWith(content) && to.href.toLowerCase() !== `${content}access.json`) found.push(`${where} imports guide content: ${spec}`);
+        else if (/\.[cm]?[jt]sx?$/.test(to.pathname) && !via.has(to.href)) { via.set(to.href, f); queue.push(to); }
+      };
+      const { text, strs } = code(readFileSync(f, 'utf8'));
+      if (/\bimport\.meta\.glob\b/.test(text)) found.push(`${where} reads every guide (import.meta.glob)`);
+      for (const m of text.matchAll(DYNAMIC)) {
+        if (m[2]) found.push(`${where} has import(\`…\`): esbuild bundles every file the template can match`);
+        else if (m[3]) found.push(`${where} has import(…) of something other than a string literal`);
+        else edge(strs[+m[1]!]!);
       }
+      for (const m of text.matchAll(STATIC)) if (!m[1]) edge(strs[+m[2]!]!);
+      for (const m of text.matchAll(REQUIRE)) edge(strs[+m[1]!]!);
     }
+    return found;
+  };
+  // Every worker module, in subfolders too, test files aside: wrangler's main (index.ts) and the rest.
+  const modules = (d: URL) => (readdirSync(d, { recursive: true }) as string[]).map((p) => p.replace(/\\/g, '/')).filter((p) => /\.[cm]?tsx?$/.test(p) && !/\.(test|d)\.[cm]?tsx?$/.test(p) && !p.includes('node_modules/')).sort().map((p) => new URL(p, d));
+  const root = new URL('../', dir);
+  const found = scan(modules(dir), root);
+  check('the Worker bundles no guide content (access.json, types, and guide code that reads none)', !found.length, found);
+  check('… and the check would catch the module that loads every guide (load.ts)', scan([new URL('../src/lib/guides/load.ts', dir)], root).some((x) => x.includes('import.meta.glob')));
+  // The scanner against a made-up tree: the ways content could slip in, and the mentions that must not count.
+  const tmp = new URL(`${pathToFileURL(mkdtempSync(`${tmpdir()}/kus98-guard-`)).href}/`);
+  const put = (p: string, s: string) => { mkdirSync(new URL('./', new URL(p, tmp)), { recursive: true }); writeFileSync(new URL(p, tmp), s); };
+  try {
+    put('src/content/guides/access.json', '{}');
+    put('src/content/guides/g/items.json', '[]');
+    put('src/lib/x.ts', "import items from '../content/guides/g/items.json';\nexport const n = (items as unknown[]).length;\n");
+    put('src/lib/glob.ts', "export const files = import.meta.glob('../content/guides/*/*.json');\n");
+    put('worker/a.ts', "import '../src/content/guides/g/items.json';\n");
+    put('worker/b.ts', 'export const of = (s: string) => import(`../src/content/guides/${s}/items.json`);\n');
+    put('worker/d.ts', "import { n } from '../src/lib/x.ts';\nexport const m = n + 1;\n");
+    put('worker/d2.ts', "export * from '../src/lib/x';\n");
+    put('worker/sub/e.ts', "import items from '../../src/content/guides/g/items.json';\nexport const e = items;\n");
+    put('worker/f.ts', "import items from '../src/content/./guides/g/items.json';\nexport const f = items;\n");
+    put('worker/u.ts', "import { x } from './missing';\nexport const u = x;\n");
+    put('worker/c.ts', "import items from 'src/content/guides/g/items.json';\nexport const c = items;\n");
+    put('worker/ok.ts', [
+      '// load.ts reads every guide with import.meta.glob; this module reads none.',
+      "/*\nimport items from '../src/content/guides/g/items.json';\n*/",
+      "const hint = \"import('../src/content/guides/g/items.json')\";",
+      "const re = /['\"]/g; const tpl = `${hint} import('../src/content/guides/g/items.json')`;",
+      "import access from '../src/content/guides/access.json';",
+      "import type { files } from '../src/lib/glob.ts';",
+      'export const ok = [access, re, tpl, hint];',
+    ].join('\n'));
+    put('worker/t.ts', "import { type n as N } from '../src/lib/x.ts';\nexport const t = 1;\n"); // kept by verbatimModuleSyntax, so x.ts is bundled
+    put('worker/s.ts', "export*from'../src/lib/x.ts';\n");
+    put('worker/s2.ts', "import{n}from'../src/lib/x.ts';export const s2=n;\n");
+    const hit = (p: string, re: RegExp) => scan([new URL(p, tmp)], tmp).some((x) => re.test(x));
+    check('… it catches a side-effect import of guide content', hit('worker/a.ts', /a\.ts imports guide content/));
+    check('… a dynamic import with a template literal', hit('worker/b.ts', /b\.ts has import\(`…`\)/));
+    check('… content reached through a module outside src/lib/guides, and through export *', hit('worker/d.ts', /d\.ts → src\/lib\/x\.ts imports guide content/) && hit('worker/d2.ts', /d2\.ts → src\/lib\/x\.ts imports guide content/));
+    check('… a worker module in a subfolder', hit('worker/sub/e.ts', /sub\/e\.ts imports guide content/));
+    check('… a path to content that never spells content/guides/', hit('worker/f.ts', /f\.ts imports guide content/));
+    check('… a relative import that resolves to nothing, and a non-relative path into content/guides', hit('worker/u.ts', /u\.ts imports \.\/missing, which no file matches/) && hit('worker/c.ts', /c\.ts imports src\/content\/guides\/g\/items\.json: a non-relative/));
+    check('… and comments, strings, type-only imports and access.json never count', !hit('worker/ok.ts', /glob|import\(|items\.json|access\.json/));
+    check('… while an import kept for its side effects ({ type X }) does', hit('worker/t.ts', /t\.ts → src\/lib\/x\.ts imports guide content/));
+    check('… and so do statements written without spaces', hit('worker/s.ts', /s\.ts → src\/lib\/x\.ts imports guide content/) && hit('worker/s2.ts', /s2\.ts → src\/lib\/x\.ts imports guide content/));
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
   }
-  check('worker/*.ts bundle no guide content (access.json, types, and guide code that reads none)', !found.length, found);
-  check('… and the check would catch the module that loads every guide (load.ts)', reaches(new URL('../src/lib/guides/load.ts', dir)) !== null);
 }
 
 // ---- Log off ----
