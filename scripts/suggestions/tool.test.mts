@@ -43,7 +43,6 @@ const work = mkdtempSync(join(tmpdir(), 'kus-routine-'));
 // /<commit>/<path>), and the site's home page with or without a build id.
 const LIVE = '0123456789ab';
 const asked: string[] = []; // "<commit> <path>", in order
-let mainMovedOn = true; // main's ROUTINE.md is newer than the live commit's
 const files = createServer((req, res) => {
   const url = new URL(req.url ?? '/', 'http://x');
   if (url.pathname === '/site/') return void res.end(`<!doctype html><meta name="kus98-build" content="${LIVE}"><title>kuschonink.com</title>`);
@@ -55,8 +54,7 @@ const files = createServer((req, res) => {
     res.statusCode = 404;
     return void res.end('404: Not Found');
   }
-  const body = readFileSync(file);
-  res.end(mainMovedOn && m![1] === 'main' && m![2] === 'scripts/suggestions/ROUTINE.md' ? Buffer.concat([body, Buffer.from('\nA newer line, on main only.\n')]) : body);
+  res.end(readFileSync(file));
 });
 await new Promise<void>((r) => files.listen(0, '127.0.0.1', r));
 const filesAt = `http://127.0.0.1:${(files.address() as { port: number }).port}`;
@@ -66,23 +64,41 @@ const FG = join(work, 'field-guide');
 {
   const r = await download(FG, 'site');
   const got: string[] = r.out?.files ?? [];
-  check('download: every file from the commit the live site runs (its build id)', r.code === 0 && r.out.commit === LIVE && asked.length > 10 && asked.every((a) => a.startsWith(`${LIVE} `) || a === 'main scripts/suggestions/ROUTINE.md'), r.text.slice(0, 600));
+  check('download: every file from the commit the live site runs (its build id)', r.code === 0 && r.out.commit === LIVE && asked.length > 10 && asked.every((a) => a.startsWith(`${LIVE} `)), r.text.slice(0, 600));
   const need = ['scripts/suggestions/tool.mts', 'worker/notion.ts', 'worker/suggestions.ts', 'worker/publish.ts', 'src/lib/guides/check.ts', 'src/lib/guides/dedupe.ts', 'wrangler.jsonc', 'src/content/guides/access.json', `src/content/guides/${SLUG}/guide.json`, `src/content/guides/${SLUG}/items.json`, 'scripts/suggestions/ROUTINE.md'];
   check("download: the tool, the modules it loads (no type-only ones, no tests) and the guides' files", need.every((f) => got.includes(f) && existsSync(join(FG, ...f.split('/')))) && !got.some((f) => /\.test\.|\/types\.ts$|^worker\/(guard|index)\.ts$/.test(f)), got);
   const pkg = existsSync(join(FG, 'package.json')) ? JSON.parse(readFileSync(join(FG, 'package.json'), 'utf8')) : {};
   const repo = JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8'));
   check("download: package.json (ES modules, sharp at the repository's version) and a script that runs the tool", pkg.type === 'module' && JSON.stringify(pkg.dependencies) === JSON.stringify({ sharp: repo.dependencies.sharp }) && existsSync(join(FG, 'tool')) && readFileSync(join(FG, 'tool'), 'utf8').includes('tool.mts'), pkg);
-  check("download: when main's ROUTINE.md differs, it says to follow the commit's", /^different from main's: read .*ROUTINE\.md/.test(r.out?.instructions ?? ''), r.out?.instructions);
+  const routine = join('scripts', 'suggestions', 'ROUTINE.md');
+  check('download: the instructions are the ROUTINE.md it took, from the same commit', r.out?.instructions === `read ${join(FG, routine)} and follow it` && readFileSync(join(FG, routine)).equals(readFileSync(join(REPO, routine))), r.out?.instructions);
   check("download: a guide's files are the ones the guide check knows", JSON.stringify(DOWNLOADED_FILES) === JSON.stringify(GUIDE_FILES), [DOWNLOADED_FILES, GUIDE_FILES]);
 }
 {
-  mainMovedOn = false;
   asked.length = 0;
   const r = await download(join(work, 'from-main'), 'site-without-id');
   check('download: main, when the site gives no build id', r.code === 0 && r.out.commit === 'main' && /no build id/.test(r.out.why) && asked.every((a) => a.startsWith('main ')), r.text.slice(0, 300));
-  const full = await download(FG, 'site');
+  // A run's text arrives as a second message, and the run goes through the steps again.
+  asked.length = 0;
+  const again = await download(FG, 'site');
+  check('download: the same folder again (a second turn) goes on with the same files, taking none', again.code === 0 && again.out.commit === LIVE && /before/.test(again.out.reused ?? '') && again.out.tool === join(FG, 'tool') && asked.length === 0, again.text.slice(0, 300));
+  const other = await download(FG, 'site', '--commit', 'main');
+  mkdirSync(join(work, 'stray'));
+  writeFileSync(join(work, 'stray', 'notes.txt'), 'not a download');
+  const stray = await download(join(work, 'stray'), 'site');
   const odd = await download(join(work, 'odd'), 'site', '--commit', '../main');
-  check("download: refuses a folder that isn't empty, and a commit that isn't one", full.code === 1 && /not empty/.test(full.text) && odd.code === 1 && /not a commit/.test(odd.text) && !existsSync(join(work, 'odd')), [full.text, odd.text]);
+  check("download: refuses another commit in a folder it filled, a folder it didn't fill, and a commit that isn't one", other.code === 1 && /already holds/.test(other.text) && stray.code === 1 && /not empty/.test(stray.text) && odd.code === 1 && /not a commit/.test(odd.text) && !existsSync(join(work, 'odd')), [other.text, stray.text, odd.text]);
+}
+{
+  // Claude Code's permission check lets a run download and run code only when the task's prompt asks
+  // for those exact commands (it never sees what the run fetched), so the prompt in GUIDES.md 11.6
+  // must name them as ROUTINE.md writes them.
+  const steps = readFileSync(join(REPO, 'scripts', 'suggestions', 'ROUTINE.md'), 'utf8');
+  const docs = readFileSync(join(REPO, 'docs', 'GUIDES.md'), 'utf8');
+  const take = /^curl -fsS https:\/\/raw\.githubusercontent\.com\/\S+\/download\.mjs .+$/m.exec(steps)?.[0] ?? '';
+  const install = /npm install --prefix field-guide [^`]+/.exec(steps)?.[0] ?? '';
+  const prompts = docs.split('```text').slice(1).map((b) => b.split('```')[0]!).filter((b) => b.includes('download.mjs'));
+  check('the prompt in GUIDES.md 11.6 (both languages) names the download, the tool and npm install as ROUTINE.md does', take.length > 0 && install.length > 0 && prompts.length === 2 && prompts.every((p) => p.includes(take) && p.includes('field-guide/tool') && p.includes(install)), [take, install, prompts.length]);
 }
 // In the routine, npm install puts sharp in the folder; here a stand-in package hands over this checkout's.
 mkdirSync(join(FG, 'node_modules', 'sharp'), { recursive: true });
