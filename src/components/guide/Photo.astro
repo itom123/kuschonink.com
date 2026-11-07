@@ -1,0 +1,19 @@
+---
+// Field Guide: one picture in a details article (an item's or a listing
+// record's), with its caption, its credit and who published it: the picture's
+// own `source`, else the guide's credits.image.
+import Bi from '../Bi.astro';
+import { attr } from '../../lib/i18n';
+import { W } from '../../lib/guides/words';
+import type { Bi as BiT, Picture } from '../../lib/guides/types';
+
+interface Props { p: Picture; fallback: BiT }
+const { p, fallback } = Astro.props;
+const has = (t?: BiT) => !!t && !!(t.en || t.zh);
+const by = has(p.source) ? p.source! : has(fallback) ? fallback : null;
+---
+<figure class="gd-photo">
+  <img src={p.src} {...attr('alt', p.alt)} loading="lazy" decoding="async" draggable="false" data-credit={p.credit} />
+  <figcaption>{p.caption && <>{p.caption} </>}<span class="gd-credit">{p.credit}</span>{by && <> - <Bi t={by} /></>}</figcaption>
+  <p class="gd-photo-failed" hidden><Bi t={W.photoFailed} /></p>
+</figure>

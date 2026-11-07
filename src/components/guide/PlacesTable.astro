@@ -9,7 +9,7 @@ import Bi from '../Bi.astro';
 import { attr, text } from '../../lib/i18n';
 import { biAccelHtml } from '../../lib/menus';
 import { normalise } from '../../lib/guides/core';
-import { W, weekPattern } from '../../lib/guides/words';
+import { W, lowerFirst, weekPattern } from '../../lib/guides/words';
 import type { Bi as BiT, GuideView } from '../../lib/guides/types';
 
 interface Props { view: GuideView }
@@ -48,7 +48,7 @@ const sorts: { v: string; t: BiT; off?: boolean }[] = [
   {loose.length > 0 && (
     <p class="gd-scope" data-js-only>
       <input type="checkbox" id="gd-listings" data-gd-listings />
-      <label for="gd-listings"><Bi t={{ en: `${W.showListings.en} ${view.labels.listings.en} (${loose.length})`, zh: `${W.showListings.zh}${view.labels.listings.zh || view.labels.listings.en}（${loose.length}）` }} /></label>
+      <label for="gd-listings"><Bi t={{ en: `${W.showListings.en} ${lowerFirst(view.labels.listings.en)} (${loose.length})`, zh: `${W.showListings.zh}${view.labels.listings.zh || view.labels.listings.en}（${loose.length}）` }} /></label>
     </p>
   )}
   <div class="gd-pane-body">

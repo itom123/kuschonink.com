@@ -8,6 +8,7 @@ import type {
   EventsFile,
   GuideFile,
   GuideView,
+  ImageRecord,
   Item,
   ItemsFile,
   Listing,
@@ -17,6 +18,7 @@ import type {
   Payload,
   Place,
   PlacesFile,
+  Picture,
   RoutesFile,
   Section,
   TileSource,
@@ -49,6 +51,13 @@ function fill(s: Bi, counts: Record<string, number>): Bi {
 export function buildView(raw: RawGuide, slug: string, access: AccessFile, audience: string): GuideView {
   const allowed = access.guides[slug];
   if (!allowed) throw new Error(`Field Guide: "${slug}" is not in access.json.`);
+  const picture = (im: ImageRecord, name: string): Picture => ({
+    src: `/guides/${slug}/img/${im.file}`,
+    credit: im.credit,
+    caption: im.caption || '',
+    alt: b(im.alt || name, im.altZh),
+    ...(im.source ? { source: b(im.source, im.sourceZh) } : {}),
+  });
   if (!allowed.includes(audience)) throw new Error(`Field Guide: audience "${audience}" may not open "${slug}".`);
   const audRec = access.audiences.find((a) => a.id === audience);
   if (!audRec) throw new Error(`Field Guide: unknown audience "${audience}".`);
@@ -82,9 +91,7 @@ export function buildView(raw: RawGuide, slug: string, access: AccessFile, audie
     links: [...(r.links || [])],
     ...(r.listing ? { listing: r.listing } : {}),
     coordinates: [r.coordinates[0], r.coordinates[1]] as LonLat,
-    ...(r.image
-      ? { image: { src: `/guides/${slug}/img/${r.image.file}`, credit: r.image.credit, caption: r.image.caption || '', alt: b(r.image.alt || r.name, r.image.altZh) } }
-      : {}),
+    ...(r.image ? { image: picture(r.image, r.name) } : {}),
     label: r.label ?? r.tier === 'A',
     // Who suggested it, never the Notion reference (`ref`): that stays in the repo.
     ...(r.suggested ? { suggested: { on: r.suggested.on, by: r.suggested.by || '', own: !!r.suggested.own } } : {}),
@@ -143,9 +150,9 @@ export function buildView(raw: RawGuide, slug: string, access: AccessFile, audie
 
   const backLink = new Map<string, string>();
   for (const i of items) if (i.listing) backLink.set(i.listing, i.id);
-  const records: Listing[] = (lst?.records || []).map((r) => {
+  const records: Listing[] = (lst?.records || []).map(({ image, ...r }) => {
     const item = backLink.get(r.id);
-    return { ...r, ...(item ? { item } : {}) };
+    return { ...r, ...(item ? { item } : {}), ...(image ? { image: picture(image, r.name) } : {}) };
   });
 
   const counts = { items: items.length, listings: records.length, routes: routes.length };
@@ -233,7 +240,7 @@ export function buildView(raw: RawGuide, slug: string, access: AccessFile, audie
 }
 
 /** The zooms the Worker proxies tiles at (worker/guides.ts TILE_Z says the same; the Worker can't import this file). */
-export const TILE_Z = { min: 14, max: 19 };
+export const TILE_Z = { min: 12, max: 19 };
 
 /** Where the browser gets street-level tiles for a guide, or null when access.json declares no bounds for it. */
 export function tileSource(access: AccessFile, slug: string): TileSource | null {

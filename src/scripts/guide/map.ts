@@ -5,12 +5,14 @@
 //
 // Layers inside .gd-stage: base images (one per map view, coarser ones first,
 // the extra ones loaded when first wanted, under a white wash) → street-level
-// tiles (tiles.ts, over whichever view shows once its picture is magnified
-// past 1:1) → heat canvas → route SVG → pins (role=group, one roving tab
-// stop) → labels (aria-hidden).
+// tiles (tiles.ts, over every picture magnified past 1:1 and under any still
+// sharp) → heat canvas → route SVG → pins (role=group, one roving tab stop) →
+// labels (aria-hidden).
 // The views zoom as one map with levels of detail (camera.ts zoomAcross):
-// zooming switches between them on the fly, and while a view shows beyond its
-// own map (an overhang) the coarser one is drawn round it.
+// zooming switches between them on the fly. Wherever a view's own map stops
+// short of the window (an overhang, or a tall or wide window at its whole-map
+// zoom) the coarser one is drawn round it, with its pins, so no grey shows
+// where there is a map.
 import type { Bi, LonLat, MapView, Payload, RouteMode, TierId } from '../../lib/guides/types';
 import { metresPerPixel, project } from '../../lib/guides/core.ts';
 import * as K from './camera.ts';
@@ -38,7 +40,7 @@ interface LabelRec { el: HTMLElement; key: string; dx: number; dy: number }
 const MAX_ZOOM = 3;
 /** With street-level tiles every view goes on to 16 screen px per z14 px: z18 tiles at 1:1, z19 on a 2× screen. */
 const TILE_ZOOM = 16;
-/** Tiles show once the view's own picture is magnified past 1:1 (tiles.ts picks the tile zoom from there, and waits for the first one to be worth it). */
+/** Tiles show over a picture once it is magnified past 1:1 (tiles.ts picks the tile zoom from there, and waits for the first one to be worth it). */
 const TILES_FROM = 1;
 /** "Whole map" comes no closer than this. */
 const HOME_CAP = 1.6;
@@ -77,6 +79,8 @@ export class GuideMap {
   private soft: K.Soft | null = null;
   /** The view shown before the last switch: it stays up until the new view's picture has come. */
   private prev: string | null = null;
+  /** The coarser view drawn round this one while its picture shows (its pins show too), or null. */
+  private drawnRound: string | null = null;
   private bases = new Map<string, HTMLElement>();
   /** Street-level tiles over the views, when the guide has them (payload.tiles). */
   private tiles: TileLayer | null = null;
@@ -159,7 +163,7 @@ export class GuideMap {
     this.pinsEl.after(this.labelsEl);
     if (payload.tiles && this.tileBox) {
       this.tiles = new TileLayer(payload.tiles);
-      this.heatCanvas.before(this.tiles.el); // above every base picture, below the heat
+      this.heatCanvas.before(this.tiles.el); // below the heat; placeTiles() moves it among the pictures
     }
     if (!this.heatCtx) root.querySelectorAll<HTMLButtonElement>('[data-cmd="gd-heat"]').forEach((b) => { b.disabled = true; });
 
@@ -236,6 +240,7 @@ export class GuideMap {
     this.layout();
     if (!r) return;
     if (o.fly) {
+      this.holdPin(r);
       const vp = this.vp();
       // Not laid out yet: resize() centres on this pin instead of the whole map.
       if (!vp.w || !vp.h || !this.placed) {
@@ -357,6 +362,7 @@ export class GuideMap {
     if (r) {
       this.placed = true;
       this.soft = null;
+      this.holdPin(r);
       const l = this.limits();
       this.c = this.clamp(K.centreIn(r.x, r.y, Math.min(l.max, 1.2 / factor(this.area)), vp, this.free));
     } else if (!this.placed) {
@@ -433,6 +439,26 @@ export class GuideMap {
   private bounds() {
     return boundsOf(this.area);
   }
+  /** The map drawn: the view's own, or the coarser one round it while that shows. */
+  private extent() {
+    const v = this.drawnRound ? this.views.find((x) => x.id === this.drawnRound) : null;
+    return v ? boundsOf(v) : this.bounds();
+  }
+  /**
+   * The coarser view to draw round this one: round an overhang, and wherever
+   * the view's own map stops short of the window (a tall window at the whole
+   * city, say), so the window shows map, not grey. Null when the view's map
+   * covers the window, or there is no coarser view.
+   */
+  private roundId(): string | null {
+    if (this.soft) return this.soft.under;
+    const vp = this.vp();
+    if (!vp.w || !vp.h || !(this.c.s > 0)) return null;
+    const b = this.bounds(), r = K.seen(this.c, vp), e = 0.5 / this.c.s;
+    if (r.x >= b.x - e && r.y >= b.y - e && r.x + r.w <= b.x + b.w + e && r.y + r.h <= b.y + b.h + e) return null;
+    const l = this.levels.find((x) => x.id === this.area.id);
+    return (l && K.under(this.levels, l)?.id) || null;
+  }
   private limits() {
     return K.limitsFor(this.bounds(), this.vp(), this.maxFor(this.area));
   }
@@ -484,6 +510,23 @@ export class GuideMap {
     if (!switched) return;
     this.layout();
     this.hooks.onArea?.(v.id);
+  }
+
+  /**
+   * A pin to fly to that lies off this view's map (a venue in the suburbs, off
+   * the city plan): the finest view that holds it takes over first, so the
+   * flight can reach it. The program's area follows after this turn, as after
+   * a switch made by zooming.
+   */
+  private holdPin(r: PinRec) {
+    const on = (v: MapView) => { const b = boundsOf(v); return r.x >= b.x && r.y >= b.y && r.x <= b.x + b.w && r.y <= b.y + b.h; };
+    if (on(this.area)) return;
+    const v = this.views.filter(on).sort((a, b) => b.z - a.z)[0];
+    if (!v) return;
+    this.soft = null;
+    this.switchTo(v);
+    this.refreshShown();
+    queueMicrotask(() => { if (!this.off.signal.aborted && this.area === v) this.hooks.onArea?.(v.id); });
   }
 
   /** Make view v the one shown: pins, the red dot and the Area button follow; the camera stays. */
@@ -549,19 +592,31 @@ export class GuideMap {
     img.addEventListener('error', done, { once: true, signal: this.off.signal });
   }
 
-  /** Which base pictures show: the view's own; the coarser one round an overhang; the old one until the new picture has come. */
-  private showBases() {
+  /**
+   * Which base pictures show: the view's own; the coarser one round it where
+   * its own map stops short (roundId()); the old one until the new picture
+   * has come. True when the pins to show changed with it (the coarser map's
+   * pins come and go with its picture).
+   */
+  private showBases(): boolean {
     const ready = (id: string) => { const img = this.bases.get(id)?.querySelector('img'); return !img || img.complete; };
     const keep = !ready(this.area.id) ? this.prev : null;
+    const round = this.roundId();
+    if (round) this.base(round);
     let shown = false;
     for (const [id, b] of this.bases) {
-      const on = id === this.area.id || id === keep || (id === this.soft?.under && ready(id));
+      const on = id === this.area.id || id === keep || (id === round && ready(id));
       if (b.hidden === !on) continue;
       b.hidden = !on;
       if (on) shown = true;
     }
     // Placed at once, so a picture never shows a frame at an old place.
     if (shown) this.placeBases();
+    const drawn = round && ready(round) ? round : null;
+    if (drawn === this.drawnRound) return false;
+    this.drawnRound = drawn;
+    this.refreshShown();
+    return true;
   }
 
   /** Base pictures: one transform each, for those showing. */
@@ -578,20 +633,29 @@ export class GuideMap {
   }
 
   /**
-   * Street-level tiles over the view once its picture is magnified past 1:1
-   * (the region's z11 picture long before the city plan's), placed with the
-   * same maths as the pictures and only within the box round the base maps;
-   * while a gesture or flight is going no new tile zoom starts (tiles.ts).
-   * The pictures' white wash gives way to the layer's own ([data-tiled] in
-   * guide-map.css): every picture showing lies under the layer, the coarser
-   * one round an overhang too.
+   * Street-level tiles over every picture showing that is magnified past 1:1
+   * (the region's z11 picture long before the city plan's), and under any
+   * picture still sharp at this scale: round the city plan, the region is
+   * sharp too, and the plan itself stays as it is until it is magnified in
+   * turn. Placed with the same maths as the pictures and only within the box
+   * round the base maps; while a gesture or flight is going no new tile zoom
+   * starts (tiles.ts). The white wash of the pictures under the layer gives
+   * way to the layer's own ([data-tiled] in guide-map.css).
    */
   private placeTiles(vp: K.Vp) {
     const t = this.tiles, box = this.tileBox;
     if (!t || !box) return;
-    const on = this.c.s * factor(this.area) > TILES_FROM && t.update(this.c, vp, box, window.devicePixelRatio || 1, !this.live());
+    // The pictures showing, coarse to fine (the order they lie in), and those magnified past 1:1.
+    const showing = this.views.filter((v) => this.bases.get(v.id)?.hidden === false).sort((a, b) => a.z - b.z);
+    const over = showing.filter((v) => this.c.s * factor(v) > TILES_FROM);
+    const on = over.length > 0 && t.update(this.c, vp, box, window.devicePixelRatio || 1, !this.live());
     if (!on) t.hide();
-    for (const b of this.bases.values()) b.toggleAttribute('data-tiled', on);
+    else {
+      // Just above the finest picture it covers: the sharper ones lie over it.
+      const below = this.bases.get(over[over.length - 1].id)!;
+      if (below.nextElementSibling !== t.el) below.after(t.el);
+    }
+    for (const [id, b] of this.bases) b.toggleAttribute('data-tiled', on && over.some((v) => v.id === id));
   }
 
   private live() {
@@ -685,7 +749,9 @@ export class GuideMap {
     const vp = this.vp();
     if (!vp.w || !vp.h) return;
     const c = this.c;
-    // Base maps: one transform per picture showing.
+    // Base maps: the coarser one round the view where its own map stops short, then one transform per picture showing.
+    // When that brings the coarser map's pins in or out, they are clustered and labelled again.
+    if (this.showBases()) this.layout(false);
     this.placeBases();
     this.placeTiles(vp);
     // Pins, clusters and labels keep their size: only their place changes.
@@ -703,7 +769,7 @@ export class GuideMap {
     }
     // You: the dot keeps its size; the ring shows how sure the browser is.
     if (this.me && this.meEl) {
-      const b = this.bounds();
+      const b = this.extent();
       const on = this.me.x >= b.x && this.me.y >= b.y && this.me.x <= b.x + b.w && this.me.y <= b.y + b.h;
       this.meEl.hidden = !on;
       if (on) {
@@ -750,9 +816,9 @@ export class GuideMap {
 
   // ---------------------------------------------------------------- pins
 
-  /** Which pins show: visible in the data and on the current map. */
+  /** Which pins show: visible in the data and on the map drawn (the view's own, and the coarser one round it while that shows). */
   private refreshShown() {
-    const b = this.bounds();
+    const b = this.extent();
     for (const r of this.order) {
       const on = r.p.visible && r.x >= b.x && r.y >= b.y && r.x <= b.x + b.w && r.y <= b.y + b.h;
       r.shown = on;

@@ -54,6 +54,8 @@ const obj = (f: Record<string, S>, o: Partial<{ opt: boolean; rest: S }> = {}): 
 const tx = (k: string, required = true): Record<string, S> => ({ [k]: required ? str() : opt(str()), [k + 'Zh']: zh });
 
 const named = obj({ id: str(), ...tx('name') });
+/** A picture in img/ (items and listing records). */
+const picture = obj({ file: str(), credit: zh, caption: opt(str()), ...tx('alt', false), ...tx('source', false) }, { opt: true });
 
 const SCHEMA: Record<GuideFileName, S> = {
   guide: obj({
@@ -117,7 +119,7 @@ const SCHEMA: Record<GuideFileName, S> = {
         links: arr(url, { opt: true }),
         listing: opt(str()),
         coordinates: lonlat,
-        image: obj({ file: str(), credit: zh, caption: opt(str()), ...tx('alt', false) }, { opt: true }),
+        image: picture,
         label: opt(bool),
         audience: aud,
         // Published from the suggestions queue (worker/publish.ts): when, by whom (if they asked to be credited), their own show, the Notion page.
@@ -180,7 +182,7 @@ const SCHEMA: Record<GuideFileName, S> = {
   listings: obj({
     source: obj({ name: str(), url: opt(url), checked: date, lang: str(), credit: opt(str()) }),
     records: arr(
-      obj({ id: str(), name: str(), category: str(), coordinates: lonlat, details: str(), url: opt(url), start: opt(date), end: opt(date) }),
+      obj({ id: str(), name: str(), category: str(), coordinates: lonlat, details: str(), url: opt(url), start: opt(date), end: opt(date), image: picture }),
       { rec: 'id' },
     ),
   }),
@@ -509,6 +511,13 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
   let missingZh = 0;
   const audiences = auds(access);
   const ctx = (f: string): Ctx => ({ file: `guides/${slug}/${f}.json`, problems, missingZh: 0, audiences });
+  /** A picture (an item's or a listing record's): a plain file name in img/, and a credit. */
+  const checkPicture = (c: Ctx, f: (path: string) => Loc, img: unknown) => {
+    if (!isObj(img)) return;
+    if (isStr(img.file) && !/^[A-Za-z0-9][A-Za-z0-9._-]*\.(jpe?g|png|webp)$/i.test(img.file))
+      say(c, f('image.file'), `${q(img.file)} should be a file name in public/guides/${slug}/img/ (jpg, png or webp, no folders or spaces).`);
+    if (!isStr(img.credit) || !img.credit.trim()) say(c, f('image.credit'), 'a picture needs a credit (who made it, and where it came from).');
+  };
 
   for (const f of Object.keys(raw)) {
     if (!(GUIDE_FILES as readonly string[]).includes(f))
@@ -665,14 +674,7 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
       }
       checkPoint(c, f('coordinates'), r.coordinates, region);
       checkOffCentre(c, f('coordinates'), r, boxes);
-      const img = r.image;
-      if (isObj(img)) {
-        if (isStr(img.file) && !/^[A-Za-z0-9][A-Za-z0-9._-]*\.(jpe?g|png|webp)$/i.test(img.file))
-          say(c, f('image.file'), `${q(img.file)} should be a file name in public/guides/${slug}/img/ (jpg, png or webp, no folders or spaces).`);
-        if (!isStr(img.credit) || !img.credit.trim()) {
-          say(c, f('image.credit'), 'a picture needs a credit (who made it, and where it came from).');
-        }
-      }
+      checkPicture(c, f, r.image);
     });
   }
 
@@ -742,6 +744,7 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
         say(c, { ...at, path: 'category' }, `${q(r.category)} is not a category in guide.json. Known: ${[...cats].join(', ') || '(none: add "categories")'}.`);
       range(c, at, r.start, r.end);
       checkPoint(c, { ...at, path: 'coordinates' }, r.coordinates, region);
+      checkPicture(c, (path) => ({ ...at, path }), r.image);
     });
   }
 

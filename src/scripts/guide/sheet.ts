@@ -30,7 +30,9 @@ export class Sheet {
   covers(wide: boolean): { right?: number; bottom?: number } {
     if (wide || this.root.dataset.detail === 'closed') return {};
     const r = this.el.getBoundingClientRect();
-    const m = this.root.getBoundingClientRect();
+    // Measured against the box the sheet sits in (.gd-main, round the map), not the whole program:
+    // the note and filters above it would make a landscape phone's drawer look like a bottom sheet.
+    const m = (this.el.parentElement ?? this.root).getBoundingClientRect();
     if (!r.width || !r.height) return {};
     // Full covers the whole map, except on a landscape phone, where it is the same drawer as Half.
     if (this.root.dataset.detail === 'full' && r.width >= m.width * 0.9) return {};
