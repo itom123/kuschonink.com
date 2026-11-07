@@ -44,7 +44,7 @@ Ground rules:
 | `src/styles/schemes.css` | Colour schemes (Standard, High Contrast White, Slate) |
 | `src/lib/guides/` | Field Guide: the shapes of a guide (`types.ts`), day rules, dates and map maths safe for the browser (`core.ts`), the interface's words, the checks, and the server-only loader that builds each audience's view and its browser data |
 | `src/scripts/guide/` | Field Guide in the browser: the window, panes, details sheet, menus, the map engine (camera, pins, labels, routes, heat) and the log-on box. It imports only `types.ts`, `core.ts` and `words.ts`, never guide content |
-| `worker/guides.ts` | The Field Guide's password gate: the log-on and log-off, the signed cookie, and which audience's page (and pictures) a request gets |
+| `worker/guides.ts` | The Field Guide's password gate: the log-on and log-off, the signed cookie, and which audience's page (and pictures) a request gets. It also sends `/guides` to the first listed guide, whose log-on box has the Guide list. It proxies the street-level tiles at `/guides/<slug>/tiles/{z}/{x}/{y}.png` (zooms 14–19, logged-on viewers only, inside the `tiles` box in `access.json`), fetching them from IGN so that IGN never sees the visitor |
 
 ### The shell: `src/scripts/desktop/`
 
@@ -63,6 +63,7 @@ Ground rules:
 | `screensaver.ts`, `whatsthis.ts` | Idle timer for the screen saver; What's This? notes |
 | `settings.ts` | Visitor settings (Control Panel) |
 | `memory.ts` | What the desktop remembers between page loads: each program's window as it was left, the whole desktop for a refresh, and whether the home page opens Welcome |
+| `consent.ts`, `cookies.ts` | The visitor's choice about cookies and storage, which every write asks first; the Cookies dialog and the Information Bar that ask for it (see [Cookies](#cookies-the-visitors-choice)) |
 | `api.ts` | `window.kus98`, what page content may ask of the desktop |
 | `apps/` | Programs without a page of their own: Control Panel (Mouse, Sounds), Display Properties and Folder Options, My Computer, Recycle Bin, Run, Find, Image Viewer, screen savers |
 
@@ -84,6 +85,16 @@ from `src/scripts/guide/`.
   isn't rebuilt (the house map).
 - `[data-cmd="…"]` buttons: `minimize`, `maximize`, `close`, `back`, `forward`,
   `up`, `home`, `refresh`, `stop`, plus any registered command.
+- `[data-fit="dialog"]` (`Window`'s `fit="dialog"`): the page is a dialog box
+  in its program's window, the Field Guide's log-on box. On a computer the
+  window opens in the middle, `w` wide and as tall as what it holds, whatever
+  the program's remembered place or "Always maximize windows" say. It can't be
+  sized or maximised (`no-resize`, Maximize greyed out) and nothing remembers
+  its place. When the window moves on to a page without it (logging on), it
+  takes the program's remembered place, or else opens as that page does
+  (maximised, for the Field Guide); back to one with it (Log Off), it is the
+  small box in the middle again (`wm.swap`). On a phone it fills the screen like
+  every window. Its CSS is in `guide-logon.css`.
 
 Without JavaScript, the window is an ordinary page: the close button links to
 `/`, and minimise and maximise are hidden.
@@ -122,6 +133,7 @@ may run more than once, and their page may sit in a window next to others:
 | `settings` | `get()`, `set(patch)`, `on(listener)` |
 | `bindIcons(list)` | Give a list of `.icon` elements folder behaviour |
 | `menus(el, provider)` | The window's own menu bar: `provider(name)` gets `"file"`, `"edit"`… each time a menu opens and returns its items (`MenuSpec[]`), or null for the standard ones. Paint uses it for File, Edit, View, Image, Colors and Help |
+| `consent` | The visitor's choice about cookies and storage: `level()` (`'all'`, `'necessary'`, `'none'`, or null before any choice), `allows(kind)` before writing (`'cookie'`, `'tab'` for sessionStorage, `'lasting'` for localStorage and IndexedDB), `ask(feature)` before something that must have a cookie (resolves true once it may go ahead), `show()` for the Cookies dialog |
 
 ### Events
 
@@ -132,6 +144,7 @@ may run more than once, and their page may sit in a window next to others:
 | `desktop:resize` | the window | Minimised, maximised or restored |
 | `desktop:navigate` | `document` | A window opened a page (`detail`: url, app, title, icon) |
 | `desktop:login` | `document` | Someone logged on |
+| `consent:change` | `document` | The choice about cookies changed, here or in another tab (`detail.level`; `detail.again`: what the page shows is to be kept again, `keepAgain()` in `consent.ts`) |
 | `astro:page-load` | `document` | After each page opens (so existing component inits run) |
 | `wm:change`, `start:open`, `icons:select`, `bin:change` | | Window, Start menu, selection and Recycle Bin changes |
 
@@ -178,37 +191,47 @@ which one shows (`src/styles/lang.css`, `src/scripts/lang.ts`, words in
 
 ## State
 
-Kept in this browser only.
+Kept in this browser only, and only as far as the visitor allows (see
+[Cookies](#cookies-the-visitors-choice) below). Each key is of one kind:
+**needed** (a cookie that a feature the visitor asks for can't work without),
+**this tab** (`sessionStorage`, gone when the tab closes), **lasting**
+(`localStorage` and IndexedDB), or **the choice** itself.
 
-| Where | Key | Holds |
-| --- | --- | --- |
-| Cookie (session) | `kus98_session` | Logged on in this browser session (so new tabs skip the start-up). A visit that starts at `/guides/…` sets it too, to the last name typed or Guest |
-| Cookie (`HttpOnly`, `Path=/guides`) | `kus98_guides` | Field Guide: logged on with a guide password, and as which audience. Set and read only by the Worker (`worker/guides.ts`), signed with `GUIDES_COOKIE_SECRET` (or `TURNSTILE_SECRET` when that isn't set): 30 days with *Save this password*, otherwise until the browser closes (12 hours at most). File ▸ Log Off clears it |
-| `localStorage` | `kus98:settings` | Settings that differ from the defaults (see `settings.ts`) |
-| | `kus98:icons` | Where desktop icons were dragged |
-| | `kus98:bin` | Icons in the Recycle Bin (`gone` once emptied) |
-| | `kus98:recent` | Start ▸ Documents |
-| | `kus98:user` | The last log-on name |
-| | `kus98:run` | What was typed in Run |
-| | `kus98:paint` | Paint: the tool in hand, colours, custom colours, tool options |
-| | `kus98:windows` | Each program's window as it was last left: place and size, maximised, the bars hidden with View ▸ Toolbars and Status Bar |
-| | `kus98:guide` | Field Guide: heat map and labels on or off, how the Places table is sorted (`{heat, labels, sort}`). Log Off clears it |
-| IndexedDB | `kus98-paint` | Paint: the picture being drawn (a PNG), until File ▸ New |
-| | `lang` | The language chosen with the 中/EN switch |
-| `sessionStorage` | `kus98:begun` | The "Click here to begin" hint was used |
-| | `kus98:desk` | For a refresh: the pages open in windows, front to back, minimised or not, how far each was scrolled, each one's Back and Forward |
-| | `kus98:draft` | Contact: a message not sent yet (cleared once it's sent) |
-| | `kus98:guide:view` | Field Guide: for a refresh, which guide was open, the map's camera and area, and how far the pane was scrolled (`{guide, cam, area, scroll}`). Log Off clears it |
+| Where | Key | Kind | Holds |
+| --- | --- | --- | --- |
+| Cookie (30 min, renewed) | `kus98_session` | Needed | Logged on (so new tabs and refreshes skip the start-up). Every open page renews it each minute and as it goes; 30 minutes (`AWAY_MINUTES` in `session.ts`) after the last page of the site was open it runs out, and the next visit starts up again, BIOS and log-on included. A visit that starts at `/guides/…` sets it too, to the last name typed or Guest |
+| Cookie (`HttpOnly`, `Path=/guides`) | `kus98_guides` | Needed | Field Guide: logged on with a guide password, and as which audience. Set and read only by the Worker (`worker/guides.ts`), signed with `GUIDES_COOKIE_SECRET` (or `TURNSTILE_SECRET` when that isn't set; a secret under 24 characters signs together with `TURNSTILE_SECRET`): 30 days with *Save this password*, otherwise until the browser closes (12 hours at most). File ▸ Log Off clears it |
+| `localStorage` | `kus98:consent` | The choice | The visitor's choice about cookies (`consent.ts`): `{v: 1, level, at}`, with `level` `all`, `necessary` or `none` and `at` when it was made. Always written |
+|  | `kus98:settings` | Lasting | Settings that differ from the defaults (see `settings.ts`) |
+|  | `kus98:icons` | Lasting | Where desktop icons were dragged |
+|  | `kus98:bin` | Lasting | Icons in the Recycle Bin (`gone` once emptied) |
+|  | `kus98:recent` | Lasting | Start ▸ Documents |
+|  | `kus98:user` | Lasting | The last log-on name |
+|  | `kus98:run` | Lasting | What was typed in Run |
+|  | `kus98:paint` | Lasting | Paint: the tool in hand, colours, custom colours, tool options |
+|  | `kus98:windows` | Lasting | Each program's window as it was last left: place and size, maximised, the bars hidden with View ▸ Toolbars and Status Bar. Not written while the window shows a dialog-sized page (`data-fit="dialog"`) |
+|  | `kus98:guide` | Lasting | Field Guide: heat map and labels on or off, how the Places table is sorted (`{heat, labels, sort}`). Log Off clears it |
+|  | `lang` | Lasting | The language chosen with the 中/EN switch |
+| IndexedDB | `kus98-paint` | Lasting | Paint: the picture being drawn (a PNG), until File ▸ New |
+| `sessionStorage` | `kus98:begun` | This tab | The "Click here to begin" hint was used |
+|  | `kus98:desk` | This tab | For a refresh: the pages open in windows, front to back, minimised or not, how far each was scrolled, each one's Back and Forward |
+|  | `kus98:draft` | This tab | Contact: a message not sent yet (cleared once it's sent) |
+|  | `kus98:guide:view` | This tab | Field Guide: for a refresh, which guide was open, the map's camera and area, and how far the pane was scrolled (`{guide, cam, area, scroll}`). Log Off clears it |
 
 **What a refresh keeps.** Reloading the page (or a phone reloading a tab it put
 to sleep) brings the desktop back as it was: `memory.ts` writes `kus98:desk`
 whenever windows change and when the page is hidden or left, and after the next
 load reopens those pages in their windows (quietly: no caption animation, no
 sound, no error box if a page has gone, and Start ▸ Documents is left as it
-was). A new tab, or start-up and log-on in a new browser session, starts afresh.
+was). Only a reload or Back/Forward does this: typing the address again, a
+link from elsewhere, a new tab, or start-up and log-on in a new browser session
+starts afresh with the page asked for.
 A program's window opens where it was last left (`kus98:windows`), as Windows 98
-does for folders; dialog boxes always open in the middle, and on a phone every
-window fills the screen anyway.
+does for folders; dialog boxes, and dialog-sized pages such as the Field
+Guide's log-on box, always open in the middle, and on a phone every window
+fills the screen anyway. A refresh keeps no place for a dialog-sized page
+either: it comes back in the middle, or, if the page is the guide by then
+(logged on in another tab), where the Field Guide was last left.
 
 **Welcome.** "Show this screen each time Xiangyin 98 starts" decides at
 log-on (`boot.ts`) and at every load of the home page: unticked, `/` shows the
@@ -225,10 +248,88 @@ runs it also sets `data-busy` (hourglass), `data-dragging`, `data-help-mode`
 and `data-saver`.
 
 Start-up and log-on never show to search engines or link previews
-(`navigator.webdriver` and bot user agents), or on a visit that starts at
-`/guides/…` (it sets `kus98_session` to the last name typed, or Guest, so the
-rest of the session skips them too). A safety net removes the start-up screen
-after 10 seconds if the shell fails to load.
+(`navigator.webdriver` and bot user agents; the head script marks them with
+`data-robot` on `<html>`), or on a visit that starts at `/guides/…` (with the
+visitor's leave for cookies it sets `kus98_session` to the last name typed, or
+Guest, so the rest of the session skips them too). Away from the site for more
+than 30 minutes (every tab of it closed), the computer counts as switched off:
+the next visit starts up and logs on again. A safety net removes the start-up
+screen after 10 seconds if the shell fails to load.
+
+### Cookies: the visitor's choice
+
+Nothing in the table above is written without the visitor's leave, except the
+choice itself. `consent.ts` keeps it; `cookies.ts` asks for it.
+
+| Choice | Cookies | This tab | Lasting |
+| --- | --- | --- | --- |
+| **Allow All** (`all`) | Yes | Yes | Yes |
+| **Necessary Only** (`necessary`) | Yes | Yes | No |
+| **None** (`none`) | No | No | No |
+| Not chosen yet | No | No | No |
+
+**Asking.** The Cookies dialog (*Cookies on Xiangyin 98*, a message box with
+Allow All, Necessary Only and None) opens once a page until a choice is made:
+when the desktop is ready after start-up and log-on (`desktop:login`), or at
+once when they don't show (a guide's link). It lists what needs a cookie and
+what can do without, and what happens without each. Esc or the close box
+decides nothing, so it opens again on the next page load; until then the
+start-up comes back on every load, as it says. Start ▸ Settings ▸ Cookies...
+opens it again to change the choice, with the current choice as the default
+button. Bots and link previews (`data-robot`) never see it, and nor does a
+browser that blocks site data (`consent.lasts()` is false: no answer could be
+kept, so it would ask on every page).
+
+**Asking again.** After that first time, something that must have a cookie
+asks with the **Information Bar**, pale yellow across the top of the screen as
+in Internet Explorer, announced through `#k98-announcer`. The desktop and the
+windows move down below it while it shows (`--infobar-h`), so it hides nothing,
+not even a full-size window's title bar on a phone. Page content calls
+`window.kus98.consent.ask(feature)`, which resolves true once it may go ahead:
+the Field Guide's log-on box (`logon.ts`) does so before it posts the password,
+and the post waits; after **Allow** (which chooses Necessary Only, or keeps
+Allow All) it goes ahead with the password still in the box, and after × or
+Esc it doesn't. Only a feature being used asks again: a start-up under None
+doesn't show the bar on its own. For bots `ask()` answers true at once, as
+without JavaScript.
+
+**Writing.** Every write asks `consent.allows('cookie' | 'tab' | 'lasting')`
+first: `stored()` in `util.ts` (a value set without leave stays in memory for
+the page and is written once Allow All is chosen), `session.ts`, `memory.ts`,
+`boot.ts` and the head script in `Desktop.astro` (which reads `kus98:consent`
+itself). Page content asks through `window.kus98.consent` and writes when
+there's no desktop: Field Guide's `writeStore()`, the Contact draft, Paint's
+`store.ts` and tools, and `lang.ts`. When Allow All is chosen in a page after
+Necessary Only or None (`keepAgain()` in `consent.ts`), `stored()`, the
+language, the log-on name and Paint's tools are written again as the page
+shows them, since that choice removed them; another tab writes only what was
+set there meanwhile. Paint's picture is kept at the next change or when the
+page is left; Field Guide's preferences at their next change.
+
+**Clearing.** Choosing removes at once what the choice doesn't allow, and only
+the site's own: `kus98:…` (except `kus98:consent`) and `lang` in `localStorage`,
+the `kus98-paint` database, and with None the `kus98:…` keys in
+`sessionStorage` and the `kus98_session` cookie. Other keys on the origin are
+never touched (on `localhost` other projects share it). At load, leftovers the
+choice doesn't allow go too, and a choice made in another tab is followed
+there (the `storage` event). `kus98_guides` is `HttpOnly`: only the guide's
+File ▸ Log Off removes it, so None doesn't log anyone out of a guide.
+
+**Without JavaScript** nothing is asked: posting the log-on form is itself the
+request for the guide's cookie.
+
+**Not covered:** Cloudflare's own pieces, the anti-spam check on Contact
+(Turnstile, in its own frame) and the analytics beacon (README, *Analytics*).
+
+**Keeping something new.** Decide its kind, ask `consent.allows()` (or use
+`stored()`), start its key with `kus98:` so a stricter choice removes it, write
+a lasting value again on `consent:change` with `detail.again` (`stored()` does
+this itself), and add it to the table above and to the dialog's lists in
+`cookies.ts`.
+
+**Trying it.** Remove `kus98:consent` from `localStorage` and reload to be
+asked again. Automated browsers count as bots (`navigator.webdriver`): there
+Start ▸ Settings ▸ Cookies... still opens the dialog, but nothing asks by itself.
 
 ## How to…
 
@@ -269,6 +370,9 @@ to a handler with injected services, like `worker/guides.ts`. Build every
 locked version as its own page under a path the Worker serves only internally
 (`views/<audience>`), plus a neutral log-on page; both use the same `Window`
 props (app, variant, url, title, icon), so unlocking swaps the window in place.
+Give the log-on page `fit="dialog"` and the box's width (`w`): until the
+password is accepted it is a small window in the middle, the locked page then
+fills the window as the program's own pages do, and Log Off brings the box back.
 Send both with `Cache-Control: private, no-store` and `Vary: Cookie`: the
 router never caches such a page, so a log-on or log-off is never hidden by a
 copy it fetched before. The log-on form posts without JavaScript (a 303 back to

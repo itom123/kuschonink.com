@@ -115,6 +115,8 @@ const placeholder = (name: string) => (PLACEHOLDERS[name] ? attr('placeholder', 
     }
   }
   function writeDraft(form: HTMLFormElement) {
+    // This tab's memory needs the visitor's leave (src/scripts/desktop/consent.ts).
+    if (window.kus98 && !window.kus98.consent.allows('tab')) return;
     const d: Record<string, string> = {};
     for (const el of draftFields(form)) if (el.value.trim()) d[el.name] = el.value;
     try {

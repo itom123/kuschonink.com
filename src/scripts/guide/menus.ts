@@ -5,7 +5,7 @@
 import type { MenuSpec } from '../desktop/menu';
 import { dayLabel } from '../../lib/guides/core';
 import type { GuideApp } from './app';
-import type { View } from './state';
+import type { Sort, View } from './state';
 import { SW } from '../../lib/guides/suggest-words';
 
 export function menuProvider(app: GuideApp) {
@@ -17,8 +17,8 @@ export function menuProvider(app: GuideApp) {
     switch (name) {
       case 'file':
         return [
-          { label: '&Open Guide...', zh: '打开导览(&O)...', icon: 'guide', action: () => app.home() },
-          { sep: true },
+          // A chooser only makes sense with several listed guides.
+          ...(app.guides.length > 1 ? [{ label: '&Open Guide...', zh: '打开导览(&O)...', icon: 'guide', action: () => app.openGuide() }, { sep: true }] : []),
           { label: 'Open in &Google Maps', zh: '在 Google 地图中打开(&G)', disabled: !s.place, action: () => app.openLink(0) },
           { label: 'Get &Directions', zh: '获取路线(&D)', disabled: !s.place && !s.route, action: () => app.openLink(1) },
           { sep: true },
@@ -45,6 +45,17 @@ export function menuProvider(app: GuideApp) {
           { label: '&Whole Map', zh: '整个地图(&W)', key: 'Home', disabled: !app.map, action: () => app.map?.home() },
           ...(s.place ? [{ sep: true }, { label: '&Selected Place', zh: '所选地点(&S)', action: () => app.map?.fitTo([s.place!]) }] : []),
         ];
+        // The Places list's order, as "Sort by:" in its pane (Arrange Icons in Windows 98).
+        const inUse = app.places.inUse(s);
+        const by = (id: Sort, label: string, zh: string): MenuSpec => ({ label, zh, radio: true, checked: inUse === id, disabled: !app.places.can(id, s), action: () => app.places.pick(id) });
+        const sort: MenuSpec[] = [
+          by('tier', '&Default Order', '默认顺序(&D)'),
+          { sep: true },
+          by('name', 'by &Name', '按名称(&N)'),
+          by('zone', 'by &Area', '按区域(&A)'),
+          ...(hasDays ? [by('open', '&Open That Day First', '当天开放的优先(&O)')] : []),
+          by('near', 'Nearest &First', '离我最近(&F)'),
+        ];
         return [
           pane('map', '&Map', '地图(&M)'),
           pane('places', '&Places', '地点(&P)'),
@@ -53,13 +64,16 @@ export function menuProvider(app: GuideApp) {
           pane('info', '&Info', '说明(&I)'),
           { sep: true },
           ...(p.listings.some((l) => !l.item) ? [{ label: 'Official &Entries', zh: '官方条目(&E)', checked: s.listings, action: () => { app.store.set({ listings: !s.listings }); app.syncControls(); } }] : []),
+          // O, not S: Stop Showing My Location has S. The Sort by: list in the Places pane uses O too (words.ts).
+          { label: 'S&ort By', zh: '排序方式(&O)', sub: sort },
           ...(p.map.views.length > 1 ? [{ label: '&Area', zh: '区域(&A)', sub: p.map.views.map((m) => ({ label: m.name.en, zh: m.name.zh || m.name.en, radio: true, checked: s.area === m.id, action: () => app.store.set({ area: m.id }) })) }] : []),
           { label: '&Heat Map', zh: '热力图(&H)', checked: s.heat, disabled: !app.map, action: () => app.store.set({ heat: !s.heat }) },
           { label: '&Labels', zh: '标签(&L)', checked: s.labels, disabled: !app.map, action: () => app.store.set({ labels: !s.labels }) },
           { label: '&Zoom', zh: '缩放(&Z)', sub: zoom },
           { sep: true },
+          // Where Am I? starts following you; while it does, it shows you and the nearest again.
           { label: '&Where Am I?', zh: '我在哪里？(&W)', disabled: !app.map, action: () => app.whereAmI() },
-          { label: 'Stop &Showing My Location', zh: '不再显示我的位置(&S)', disabled: !app.locating, action: () => app.stopLocating() },
+          { label: 'Stop &Showing My Location', zh: '不再显示我的位置(&S)', disabled: !app.locating, action: () => app.stopLocating(true) },
           { sep: true },
           { label: '&Toolbar', zh: '工具栏(&T)', checked: !(app.win.dataset.hide ?? '').split(' ').includes('toolbar'), action: () => app.toggleBar('toolbar') },
           { label: 'Status &Bar', zh: '状态栏(&B)', checked: !(app.win.dataset.hide ?? '').split(' ').includes('status'), action: () => app.toggleBar('status') },

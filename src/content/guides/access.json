@@ -6,5 +6,9 @@
   ],
   "guides": {
     "paris-photo-days-2026": ["visitor", "fotofilmic"]
+  },
+  "_tiles": "Street-level map tiles (Plan IGN, fetched by the Worker) for a guide: the area they cover as [west, south, east, north] in degrees, usually the region view's area. Only numbers here, never a place. 街道级地图瓦片（Plan IGN，由 Worker 代取）的覆盖范围：[西, 南, 东, 北]，单位为度，一般就是大区底图的范围。这里只写数字，不写地点。",
+  "tiles": {
+    "paris-photo-days-2026": [2.07, 48.63, 2.8, 49.05]
   }
 }

@@ -1,5 +1,6 @@
 // What page content (the house map, drawers, the contact form) may ask of the
 // desktop, as window.kus98. Content checks it exists, so pages still work alone.
+import { consent, type Kind } from './consent';
 import { msgbox, openDialog } from './dialogs';
 import { bindIconGroup } from './icons';
 import { navigate } from './router';
@@ -8,6 +9,9 @@ import type { MenuSpec } from './menu';
 import { play } from './sound';
 import { ownMenus } from './winmenus';
 import * as wm from './wm';
+
+/** The Cookies dialog and the Information Bar, loaded the first time they're needed. */
+const cookies = () => import('./cookies');
 
 export const api = {
   /** A message box; resolves with the button pressed. */
@@ -50,6 +54,25 @@ export const api = {
   menus(el: Element, provider: (name: string) => MenuSpec[] | null) {
     const w = wm.byEl(el);
     if (w) ownMenus.set(w.el, provider);
+  },
+  /** The visitor's choice about cookies and storage (consent.ts). */
+  consent: {
+    /** 'all', 'necessary' or 'none'; null before any choice. */
+    level: () => consent.level(),
+    /** Before writing: 'cookie', 'tab' (sessionStorage) or 'lasting' (localStorage, IndexedDB). */
+    allows: (kind: Kind) => consent.allows(kind),
+    /**
+     * Before something that must have a cookie (a guide's log-on): resolves
+     * true once it may go ahead, after asking if need be (cookies.ts). If
+     * that can't load, it goes ahead as it would without JavaScript, unless
+     * the visitor has chosen None: that answer stands without asking again.
+     */
+    ask: (feature: string): Promise<boolean> =>
+      consent.allows('cookie') ? Promise.resolve(true) : cookies().then((m) => m.ask(feature), () => consent.level() !== 'none'),
+    /** The Cookies dialog, to change the choice (Start ▸ Settings ▸ Cookies...). */
+    show() {
+      cookies().then((m) => m.showDialog(), () => {});
+    },
   },
 };
 

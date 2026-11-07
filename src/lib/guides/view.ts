@@ -19,6 +19,7 @@ import type {
   PlacesFile,
   RoutesFile,
   Section,
+  TileSource,
 } from './types';
 import { daysBetween } from './core.ts';
 import type { RawGuide } from './check.ts';
@@ -173,6 +174,7 @@ export function buildView(raw: RawGuide, slug: string, access: AccessFile, audie
     if (pool.length) centre = [pool.reduce((s, i) => s + i.coordinates[0], 0) / pool.length, pool.reduce((s, i) => s + i.coordinates[1], 0) / pool.length];
   }
   if (!centre) centre = [0, 0];
+  const tiles = tileSource(access, slug);
 
   return {
     slug,
@@ -226,7 +228,18 @@ export function buildView(raw: RawGuide, slug: string, access: AccessFile, audie
       })),
       attribution: mp.attribution,
     },
+    ...(tiles ? { tiles } : {}),
   };
+}
+
+/** The zooms the Worker proxies tiles at (worker/guides.ts TILE_Z says the same; the Worker can't import this file). */
+export const TILE_Z = { min: 14, max: 19 };
+
+/** Where the browser gets street-level tiles for a guide, or null when access.json declares no bounds for it. */
+export function tileSource(access: AccessFile, slug: string): TileSource | null {
+  const b = access.tiles && Object.hasOwn(access.tiles, slug) ? access.tiles[slug] : null;
+  if (!Array.isArray(b) || b.length !== 4 || !b.every((n) => typeof n === 'number' && Number.isFinite(n))) return null;
+  return { url: `/guides/${slug}/tiles/{z}/{x}/{y}.png`, min: TILE_Z.min, max: TILE_Z.max };
 }
 
 /** What the browser gets: ids, points, rules, short names. No long texts. */
@@ -242,6 +255,7 @@ export function buildPayload(v: GuideView): Payload {
     centre: v.centre,
     heatRadius: v.heatRadius,
     map: { views: v.map.views },
+    ...(v.tiles ? { tiles: { ...v.tiles } } : {}),
     items: v.items.map((i) => ({
       id: i.id,
       tier: i.tier,
