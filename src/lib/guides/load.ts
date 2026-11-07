@@ -79,7 +79,7 @@ export function publicInfo(slug: string): GuideCard {
   };
 }
 
-/** The guides on the Field Guide's home list (listed ones only). */
+/** The listed guides, in access.json order: the log-on box's list. /guides opens the first of them (src/pages/guides/index.astro). */
 export function guideCards(): GuideCard[] {
   const s = load();
   return guideSlugs()

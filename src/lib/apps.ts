@@ -62,12 +62,14 @@ export function addressFor(path: string): string {
   return 'C:\\xiangyin' + p.replace(/\//g, '\\');
 }
 
-/** The toolbar's Up button: the folder a page sits in (null at the top). */
+/**
+ * The toolbar's Up button: the folder a page sits in (null at the top). A
+ * Field Guide guide has none: /guides is no folder, it goes to a guide.
+ */
 export function upOf(url: string): string | null {
   const p = cleanPath(url.split(/[?#]/)[0]);
   if (p.startsWith('/image/')) return '/image';
   if (p.startsWith('/house/') && p !== '/house/facade') return '/house';
-  if (p.startsWith('/guides/')) return '/guides';
   if (p.startsWith('/admin/')) return '/admin';
   return null;
 }

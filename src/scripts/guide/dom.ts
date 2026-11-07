@@ -66,6 +66,8 @@ interface DesktopLike {
   close(el: Element): void;
   play(name: string): void;
   menus?(el: Element, provider: (name: string) => unknown[] | null): void;
+  /** The visitor's choice about cookies and storage (src/scripts/desktop/consent.ts). */
+  consent?: { allows(kind: 'cookie' | 'tab' | 'lasting'): boolean };
 }
 export const desktop = () => (window as unknown as { kus98?: DesktopLike }).kus98;
 
@@ -141,10 +143,15 @@ export function readStore<T>(s: 'local' | 'session', key: string): T | null {
     return null;
   }
 }
+/**
+ * Write (or, with null, remove) a value. Writing needs the visitor's leave,
+ * asked by the desktop: lasting storage with "Allow All", this tab's with
+ * "Necessary Only" too. On its own, without the desktop, the guide writes.
+ */
 export function writeStore(s: 'local' | 'session', key: string, v: unknown | null) {
   try {
     const st = s === 'local' ? localStorage : sessionStorage;
     if (v === null) st.removeItem(key);
-    else st.setItem(key, JSON.stringify(v));
+    else if (desktop()?.consent?.allows(s === 'local' ? 'lasting' : 'tab') ?? true) st.setItem(key, JSON.stringify(v));
   } catch { /* ignore */ }
 }

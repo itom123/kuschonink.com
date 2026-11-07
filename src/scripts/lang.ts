@@ -28,8 +28,21 @@ export function applyLang(root: ParentNode = document) {
   document.querySelectorAll('[data-lang-toggle]').forEach((b) => b.setAttribute('aria-pressed', String(b.getAttribute('data-lang-toggle') === l)));
 }
 
+/** Remembering the language is a lasting preference: only with "Allow All" when the desktop asks (src/scripts/desktop/consent.ts). */
+const mayKeep = () => (window as unknown as { kus98?: { consent?: { allows(kind: 'lasting'): boolean } } }).kus98?.consent?.allows('lasting') ?? true;
+/** The language the visitor chose (kept, or switched in this page), and whether it waits to be kept. */
+let chosen: Lang | null = null;
+let unsaved = false;
+function keep() {
+  if (!chosen) return;
+  unsaved = !mayKeep();
+  if (unsaved) return;
+  try { localStorage.setItem('lang', chosen); } catch { /* private mode */ }
+}
+
 export function setLang(l: Lang) {
-  try { localStorage.setItem('lang', l); } catch { /* private mode */ }
+  chosen = l;
+  keep();
   const html = document.documentElement;
   html.dataset.lang = l;
   html.lang = l === 'zh' ? 'zh-Hans' : 'en-GB';
@@ -46,5 +59,14 @@ export function initLang() {
     if (b) setLang(b.getAttribute('data-lang-toggle') === 'zh' ? 'zh' : 'en');
   });
   document.addEventListener('astro:page-load', () => applyLang());
+  try {
+    const s = localStorage.getItem('lang');
+    if (s === 'en' || s === 'zh') chosen = s;
+  } catch { /* nothing kept */ }
+  // "Allow All": a language switched before it is kept now, and with `again`
+  // (chosen here after a stricter choice, which removed it) the one chosen before.
+  document.addEventListener('consent:change', (e) => {
+    if (mayKeep() && (unsaved || (e as CustomEvent<{ again?: boolean }>).detail?.again)) keep();
+  });
   applyLang();
 }

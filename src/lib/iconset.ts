@@ -371,6 +371,16 @@ export const ICONS: Record<string, Draw> = {
     c.rect(13, 10, 5, 2, 'b').rect(14, 12, 4, 7, 'b').rect(12, 19, 8, 2, 'b');
     return c;
   },
+  /** A biscuit with a bite out of it: the Cookies dialog (src/scripts/desktop/cookies.ts). */
+  cookie() {
+    const c = N();
+    c.disc(15.5, 17.5, 13.5, 'q');
+    c.disc(15, 17, 12.5, 'x');
+    for (const [x, y] of [[8, 9], [7, 10], [6, 11], [6, 12], [9, 8], [10, 7], [11, 7]]) c.set(x, y, 'h');
+    for (const [x, y] of [[9, 13], [15, 10], [19, 16], [11, 20], [17, 22], [23, 21], [6, 17], [13, 16]]) c.rect(x, y, 2, 2, 'd').set(x + 1, y + 1, 'k');
+    c.disc(25, 7, 4.5, '.').disc(28.5, 11.5, 4, '.').disc(21, 4.5, 3.5, '.');
+    return c.outline('k');
+  },
   question() {
     const c = balloon(N());
     c.stamp(11, 4, [

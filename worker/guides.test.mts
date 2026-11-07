@@ -1,7 +1,7 @@
 // npm test: the Field Guide's password gate (worker/guides.ts), against a
 // stand-in ASSETS, made-up audiences and made-up passwords.
 import { createHmac, pbkdf2Sync } from 'node:crypto';
-import { COOKIE, MIN_PEPPER, REMEMBER_S, SESSION_S, cleanNext, closure, guideAudience, handleGuides, isGuidesPath, topView, limitKey, makeToken, normalise, viewOf, type GuidesDeps } from './guides.ts';
+import { COOKIE, MIN_PEPPER, REMEMBER_S, SESSION_S, TILE_BROWSER_S, TILE_EDGE_S, TILE_Z, cleanNext, closure, guideAudience, handleGuides, isGuidesPath, limitKey, makeToken, normalise, tileBounds, tileRange, topView, viewOf, type GuidesDeps } from './guides.ts';
 import type { AccessFile } from '../src/lib/guides/types';
 import realAccess from '../src/content/guides/access.json' with { type: 'json' };
 
@@ -13,6 +13,8 @@ const ACCESS = {
     { id: 'staff', label: 'Staff', secret: 'GUIDES_PASSWORD_STAFF', includes: ['member'] },
   ],
   guides: { 'city-one': ['visitor', 'member'], 'members-only': ['member'], 'open-day': ['visitor'], _comment: 'not a guide' },
+  // Street-level tiles: the Paris region's box for two guides; open-day has none.
+  tiles: { 'city-one': [2.07, 48.63, 2.8, 49.05], 'members-only': [2.07, 48.63, 2.8, 49.05] },
 } as unknown as AccessFile;
 const PW = { visitor: 'Test only: ink paper rain', member: 'test only: brush stone wind', staff: 'test only: lamp river moss' };
 const SECRETS: Record<string, string | undefined> = { GUIDES_PASSWORD: PW.visitor, GUIDES_PASSWORD_MEMBER: PW.member, GUIDES_PASSWORD_STAFF: PW.staff };
@@ -41,6 +43,13 @@ function assets(req: Request): Response {
 }
 let logs: string[] = [];
 let limited: string[] = [];
+// Stand-in IGN: every call is recorded; a PNG with a few bytes after the signature, and headers of its own.
+const PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 7, 7, 7]);
+let upstream: { url: string; init?: RequestInit & { cf?: Record<string, unknown> } }[] = [];
+const ign: GuidesDeps['fetch'] = async (url, init) => {
+  upstream.push({ url, init });
+  return new Response(PNG, { headers: { 'content-type': 'image/png', 'cache-control': 'max-age=60', server: 'IGN-upstream', 'set-cookie': 'ign=1' } });
+};
 const deps = (o: Partial<GuidesDeps> & { secrets?: Record<string, string | undefined> } = {}): GuidesDeps => {
   const secrets = o.secrets ?? SECRETS;
   return {
@@ -49,6 +58,7 @@ const deps = (o: Partial<GuidesDeps> & { secrets?: Record<string, string | undef
     cookieSecret: () => PEPPER,
     assets,
     allow: async (k) => (limited.push(k), true),
+    fetch: ign,
     now: () => NOW,
     log: (...a) => logs.push(a.join(' ')),
     ...o,
@@ -103,7 +113,7 @@ async function expectView(name: string, req: Request, view: string | null, d = d
 }
 
 // ---- Helpers ----
-check('isGuidesPath: /guides/<slug> yes; /guides, /Guides/x, /guidesx no', isGuidesPath('/guides/x') && !isGuidesPath('/guides') && !isGuidesPath('/Guides/x') && !isGuidesPath('/guidesx'));
+check('isGuidesPath: /guides and /guides/<slug> yes; /Guides/x, /guidesx, /guides.html no', isGuidesPath('/guides/x') && isGuidesPath('/guides') && isGuidesPath('/guides/') && !isGuidesPath('/Guides/x') && !isGuidesPath('/guidesx') && !isGuidesPath('/guides.html'));
 check('normalise: case, spaces, full width', normalise('  ＴＥＳＴ　only:   Ink\tPAPER rain ') === 'test only: ink paper rain' && normalise(PW.visitor) === 'test only: ink paper rain');
 check('closure follows includes at any depth', [...closure(ACCESS, 'staff')].sort().join() === 'member,staff,visitor' && [...closure(ACCESS, 'visitor')].join() === 'visitor');
 check('viewOf: most privileged listed audience it includes', viewOf(ACCESS, 'city-one', 'staff') === 'member' && viewOf(ACCESS, 'open-day', 'member') === 'visitor' && viewOf(ACCESS, 'members-only', 'visitor') === null && viewOf(ACCESS, 'nowhere', 'staff') === null);
@@ -373,6 +383,100 @@ await expectView('member cookie → members-only: the member view', get('/guides
   check('http (not localhost) → 308 https', http.status === 308 && http.headers.get('location') === 'https://kuschonink.com/guides/city-one?place=A3', http.status);
 }
 
+// ---- /guides: no list to choose from; the first listed guide's own address ----
+{
+  // The built home page: index.astro writes data-gd-first="<slug>" while any guide is listed.
+  const HOME = (marker: string) => `<!doctype html><html><body><section data-window data-app="guide"><div class="folder-page"${marker}><p>HOME PAGE</p></div></section></body></html>`;
+  const withHome = (html: string | null) =>
+    deps({
+      assets: (req) => {
+        const p = new URL(req.url).pathname;
+        if (p !== '/guides' || html === null) return assets(req);
+        asked.push(p);
+        return new Response(req.method === 'HEAD' ? null : html, { headers: { 'content-type': 'text/html; charset=utf-8', etag: '"home"', 'cache-control': 'public, max-age=0, must-revalidate' } });
+      },
+    });
+  const to = async (req: Request, d: GuidesDeps) => {
+    const r = await run(req, d);
+    return `${r.status} ${r.headers.get('location')}`;
+  };
+
+  const one = withHome(HOME(' data-gd-first="city-one"'));
+  asked = [];
+  const r = await run(get('/guides'), one);
+  check('a listed guide → /guides 307 to its own address, private, no-store, no body', r.status === 307 && r.headers.get('location') === '/guides/city-one' && r.headers.get('cache-control') === 'private, no-store' && r.body === null, { s: r.status, loc: r.headers.get('location') });
+  check('… only the built home page is read: no view, no log-on page', asked.join() === '/guides', asked);
+  check('… the query is kept', (await to(get('/guides?place=A3&day=2026-11-10'), one)) === '307 /guides/city-one?place=A3&day=2026-11-10');
+  check('… /guides/ goes there in one step', (await to(get('/guides/?x=1'), one)) === '307 /guides/city-one?x=1');
+  check('… a cookie changes nothing (the guide decides what it shows)', (await to(get('/guides', memberCookie), one)) === '307 /guides/city-one');
+  const head = await run(get('/guides', undefined, {}, 'HEAD'), one);
+  check('HEAD /guides → the same 307, no body', head.status === 307 && head.headers.get('location') === '/guides/city-one' && head.body === null, head.status);
+  check('several listed guides: the build names the first, and /guides goes to it', (await to(get('/guides'), withHome(HOME(' data-gd-first="open-day"')))) === '307 /guides/open-day');
+
+  const none = withHome(HOME(''));
+  const n = await run(get('/guides'), none);
+  check('no guide listed (no marker) → /guides is the built page, as ASSETS serves it', n.status === 200 && n.headers.get('etag') === '"home"' && n.headers.get('cache-control') === 'public, max-age=0, must-revalidate' && (await body(n)).includes('HOME PAGE'), { s: n.status, h: [...n.headers] });
+  check('… /guides/ → 307 /guides, query kept', (await to(get('/guides/?x=1'), none)) === '307 /guides?x=1');
+  const nh = await run(get('/guides', undefined, {}, 'HEAD'), none);
+  check('… HEAD /guides → 200, no body', nh.status === 200 && nh.body === null, nh.status);
+
+  const odd = ['nowhere', 'constructor', '__proto__', '_comment', 'City-One', 'city-one/views/member', '../city-one', '-city-one', 'city--one', ''];
+  const followed: string[] = [];
+  for (const slug of odd) {
+    const res = await run(get('/guides'), withHome(HOME(` data-gd-first="${slug}"`)));
+    if (res.status !== 200 || !(await body(res)).includes('HOME PAGE')) followed.push(`${slug} → ${res.status} ${res.headers.get('location')}`);
+  }
+  check('a marker naming no guide in access.json, or not a slug → no redirect, the built page', !followed.length, followed);
+  const plain = await run(get('/guides'), withHome('<html><body><p data-gd-first-x="city-one">city-one</p></body></html>'));
+  check('… nor does the slug written anywhere else on the page', plain.status === 200, plain.status);
+  const missing = await run(get('/guides'));
+  check("the home page missing from the build → ASSETS' own answer (404), no redirect", missing.status === 404 && !missing.headers.has('location'), missing.status);
+  const bad = await run(get('/guides', undefined, {}, 'POST'), one);
+  check('POST /guides → 405, Allow: GET, HEAD', bad.status === 405 && bad.headers.get('allow') === 'GET, HEAD', bad.status);
+  check('http /guides (not localhost) → 308 https first', (await to(get('http://kuschonink.com/guides?x=1'), one)) === '308 https://kuschonink.com/guides?x=1');
+  check('localhost /guides → the guide, no https redirect', (await to(get('http://localhost:8787/guides'), one)) === '307 /guides/city-one');
+  check('ASSETS throws on /guides → 503 neutral page', (await run(get('/guides'), deps({ assets: () => { throw new Error('boom'); } }))).status === 503);
+}
+
+// ---- The Worker never imports guide content: only access.json, types, and guide code that reads none ----
+{
+  const { readdirSync, readFileSync } = await import('node:fs');
+  const dir = new URL('./', import.meta.url);
+  const IMPORTS = /^\s*(?:import|export)\s+(type\s+)?[^'"]*?from\s+['"]([^'"]+)['"]|\bimport\(\s*['"]([^'"]+)['"]/gm;
+  const isContent = (spec: string) => /content\/guides\//.test(spec) && !/content\/guides\/access\.json$/.test(spec);
+  const name = (u: URL) => u.pathname.split('/').slice(-2).join('/');
+  // A module from src/lib/guides may be bundled only if neither it nor anything
+  // it imports (types aside) reads guide content: load.ts does, check.ts doesn't.
+  const reaches = (file: URL, seen = new Set<string>()): string | null => {
+    if (seen.has(file.href) || file.pathname.endsWith('.json')) return null;
+    seen.add(file.href);
+    const src = readFileSync(file, 'utf8');
+    if (/import\.meta\.glob/.test(src)) return `${name(file)} reads every guide (import.meta.glob)`;
+    for (const m of src.matchAll(IMPORTS)) {
+      const spec = m[2] ?? m[3];
+      if (m[1] || !spec.startsWith('.')) continue;
+      if (isContent(spec)) return `${name(file)} imports ${spec}`;
+      const hit = reaches(new URL(/\.(ts|json)$/.test(spec) ? spec : `${spec}.ts`, file), seen);
+      if (hit) return hit;
+    }
+    return null;
+  };
+  const found: string[] = [];
+  for (const f of readdirSync(dir).filter((x) => x.endsWith('.ts'))) {
+    const src = readFileSync(new URL(f, dir), 'utf8');
+    for (const m of src.matchAll(IMPORTS)) {
+      const spec = m[2] ?? m[3];
+      if (isContent(spec)) found.push(`${f}: ${spec}`);
+      else if (/lib\/guides\//.test(spec) && !m[1]) {
+        const hit = reaches(new URL(/\.ts$/.test(spec) ? spec : `${spec}.ts`, new URL(f, dir)));
+        if (hit) found.push(`${f}: ${spec} → ${hit}`);
+      }
+    }
+  }
+  check('worker/*.ts bundle no guide content (access.json, types, and guide code that reads none)', !found.length, found);
+  check('… and the check would catch the module that loads every guide (load.ts)', reaches(new URL('../src/lib/guides/load.ts', dir)) !== null);
+}
+
 // ---- Log off ----
 {
   const r = await run(post('/guides/city-one/logout'));
@@ -411,6 +515,175 @@ await expectView('member cookie → members-only: the member view', get('/guides
   check('odd file names → 404, ASSETS never asked for them', bad.status === 404 && !asked.some((p) => p.includes('img')), { s: bad.status, asked });
   const post405 = await run(get('/guides/city-one/img/A1.jpg', visitorCookie, {}, 'POST'));
   check('POST to a picture → 405', post405.status === 405, post405.status);
+}
+
+// ---- Street-level tiles: IGN through the Worker, only with a cookie, only inside the guide's box ----
+{
+  // An independent reckoning of the tile that holds a point (OpenStreetMap's slippy-map formula).
+  const tileOf = (lon: number, lat: number, z: number) => {
+    const n = 2 ** z, r = (lat * Math.PI) / 180;
+    return { x: Math.floor(((lon + 180) / 360) * n), y: Math.floor(((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * n) };
+  };
+  const BOX: [number, number, number, number] = [2.07, 48.63, 2.8, 49.05];
+  const r18 = tileRange(BOX, 18);
+  const nd = tileOf(2.3522, 48.8566, 18); // a point in the middle of the box
+  check('tileRange: the box\'s corners, both ends included', r18.x0 === tileOf(2.07, 49.05, 18).x && r18.x1 === tileOf(2.8, 48.63, 18).x && r18.y0 === tileOf(2.07, 49.05, 18).y && r18.y1 === tileOf(2.8, 48.63, 18).y && nd.x > r18.x0 && nd.x < r18.x1 && nd.y > r18.y0 && nd.y < r18.y1, r18);
+  check('tileRange: never beyond the world', tileRange([-180, -85, 180, 85], 15).x1 === 2 ** 15 - 1 && tileRange([-180, -85, 180, 85], 15).x0 === 0);
+  check('tileBounds: a guide\'s box, or null', tileBounds(ACCESS, 'city-one')?.join() === BOX.join() && tileBounds(ACCESS, 'open-day') === null && tileBounds(ACCESS, 'nowhere') === null && tileBounds({ ...ACCESS, tiles: { 'city-one': [2.8, 48.63, 2.07, 49.05] } }, 'city-one') === null && tileBounds({ ...ACCESS, tiles: { 'city-one': [2.07, 48.63, 2.8] as unknown as [number, number, number, number] } }, 'city-one') === null && tileBounds({ ...ACCESS, tiles: undefined }, 'city-one') === null);
+  check('TILE_Z is 14 to 19', TILE_Z.min === 14 && TILE_Z.max === 19);
+  // The browser is told the same range (view.ts repeats it: the Worker may not import that file, but a test may).
+  const { TILE_Z: browserZ } = await import('../src/lib/guides/view.ts');
+  check('the Worker and the payload (view.ts) agree on the zoom range', browserZ.min === TILE_Z.min && browserZ.max === TILE_Z.max, browserZ);
+
+  const path = (z: number | string, x: number | string, y: number | string, slug = 'city-one') => `/guides/${slug}/tiles/${z}/${x}/${y}.png`;
+  const inside = path(18, nd.x, nd.y);
+  const tileHeaders = (r: Response) =>
+    r.headers.get('content-type') === 'image/png' &&
+    r.headers.get('cache-control') === `private, max-age=${TILE_BROWSER_S}` &&
+    r.headers.get('x-robots-tag') === 'noindex, nofollow, noarchive' &&
+    r.headers.get('x-content-type-options') === 'nosniff' &&
+    r.headers.get('cross-origin-resource-policy') === 'same-origin' &&
+    !r.headers.has('server') && !r.headers.has('set-cookie') && !r.headers.has('vary');
+  // A stand-in edge cache, like the real one: put() reads the body, match() gives a fresh Response each time.
+  type Kept = { bytes: ArrayBuffer; headers: Headers };
+  const fakeCache = (store: Map<string, Kept>): NonNullable<GuidesDeps['cache']> => ({
+    match: async (k) => { const e = store.get(k.url); return e && new Response(e.bytes.slice(0), { headers: e.headers }); },
+    put: async (k, r) => { store.set(k.url, { bytes: await r.arrayBuffer(), headers: new Headers(r.headers) }); },
+  });
+  const store = new Map<string, Kept>();
+  const cache = fakeCache(store);
+
+  // The cookie rules: the same as for pictures.
+  upstream = [];
+  const none = await run(get(inside));
+  const noneHead = await run(get(inside, undefined, {}, 'HEAD'));
+  check('no cookie → 403 (GET and HEAD), IGN never asked', none.status === 403 && noneHead.status === 403 && upstream.length === 0 && none.headers.get('cache-control') === 'private, no-store', { s: [none.status, noneHead.status], upstream });
+  check("a cookie for an audience the guide doesn't allow → 403, IGN never asked", (await run(get(path(18, nd.x, nd.y, 'members-only'), visitorCookie))).status === 403 && upstream.length === 0);
+  check('member cookie on members-only → 200', (await run(get(path(18, nd.x, nd.y, 'members-only'), memberCookie))).status === 200);
+  const noPepper = await run(get(inside, visitorCookie), deps({ cookieSecret: () => undefined }));
+  check('no pepper → 403, even with a once-valid cookie', noPepper.status === 403);
+  const expired = `${COOKIE}=${await makeToken(PEPPER, 'visitor', normalise(PW.visitor), Math.floor(NOW / 1000) - 1)}`;
+  check('expired cookie → 403', (await run(get(inside, expired))).status === 403);
+  upstream = [];
+  check('… none of those reached IGN', upstream.length === 0, upstream);
+
+  // The tile itself.
+  upstream = [];
+  const ok = await run(get(inside, visitorCookie), deps({ cache }));
+  const bytes = new Uint8Array(await ok.arrayBuffer());
+  check('valid cookie, z18 tile inside the box → 200 image/png, private max-age=604800, nosniff, same-origin; IGN\'s headers dropped', ok.status === 200 && tileHeaders(ok) && bytes.length === PNG.length && bytes.every((b, i) => b === PNG[i]), { s: ok.status, h: [...ok.headers] });
+  const up = upstream[0];
+  check('… fetched once from IGN\'s WMTS with z, x and y only', upstream.length === 1 && up.url === `https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/png&TILEMATRIX=18&TILEROW=${nd.y}&TILECOL=${nd.x}`, upstream.map((u) => u.url));
+  const h = new Headers(up?.init?.headers);
+  check('… with a neutral User-Agent naming kuschonink.com, no cookie, and a timeout', /kuschonink\.com/.test(h.get('user-agent') ?? '') && !h.has('cookie') && up?.init?.signal instanceof AbortSignal, { ua: h.get('user-agent') });
+  // Upstream caching: 30 days for a good tile only. cacheTtl would also keep an IGN 404 or 5xx that long.
+  check('… cached upstream 30 days for 2xx only (cacheTtlByStatus), never 4xx or 5xx, and no plain cacheTtl', up?.init?.cf?.cacheEverything === true && up?.init?.cf?.cacheTtl === undefined && JSON.stringify(up?.init?.cf?.cacheTtlByStatus) === JSON.stringify({ '200-299': TILE_EDGE_S, '400-599': 0 }), { cf: up?.init?.cf });
+  const kept = store.get(up.url);
+  check('… kept at the edge as public, max-age=2592000', !!kept && kept.headers.get('cache-control') === `public, max-age=${TILE_EDGE_S}` && kept.headers.get('content-type') === 'image/png' && kept.bytes.byteLength === PNG.length, kept ? [...kept.headers] : 'nothing cached');
+  const again = await run(get(inside, memberCookie), deps({ cache }));
+  check('the same tile again (another audience) → from the edge cache, IGN not asked again', again.status === 200 && tileHeaders(again) && upstream.length === 1 && (await again.arrayBuffer()).byteLength === PNG.length, { s: again.status, n: upstream.length });
+  const head = await run(get(inside, visitorCookie, {}, 'HEAD'), deps({ cache }));
+  check('HEAD with a cookie → 200, the same headers, no body', head.status === 200 && head.body === null && tileHeaders(head), head.status);
+  upstream = [];
+  const noCache = await run(get(inside, visitorCookie));
+  check('no edge cache at all → still served, straight from IGN', noCache.status === 200 && upstream.length === 1, noCache.status);
+  upstream = [];
+  logs = [];
+  const broken = await run(get(inside, visitorCookie), deps({ cache: { match: async () => { throw new Error('cache down'); }, put: async () => { throw new Error('cache down'); } } }));
+  check('edge cache failing → still served from IGN, logged', broken.status === 200 && upstream.length === 1 && logs.some((l) => l.includes('tile cache')), { s: broken.status, logs });
+  // Corner tiles: the first and last of the range are in, their neighbours out.
+  const corners = await Promise.all([path(18, r18.x0, r18.y0), path(18, r18.x1, r18.y1), path(18, r18.x0 - 1, r18.y0), path(18, r18.x1 + 1, r18.y1), path(18, r18.x0, r18.y0 - 1), path(18, r18.x1, r18.y1 + 1)].map((p) => run(get(p, visitorCookie))));
+  check('tile bounds: the box\'s corner tiles → 200; one tile beyond on any side → 404', corners.map((r) => r.status).join() === '200,200,404,404,404,404', corners.map((r) => r.status));
+  for (const z of [14, 15, 16, 17, 19]) {
+    const t = tileOf(2.3522, 48.8566, z);
+    const r = await run(get(path(z, t.x, t.y), visitorCookie));
+    check(`z${z} inside → 200`, r.status === 200, r.status);
+  }
+  upstream = [];
+  const outZ = await Promise.all([13, 20, 0, 99].map((z) => { const t = tileOf(2.3522, 48.8566, z); return run(get(path(z, t.x, t.y), visitorCookie)); }));
+  check('z13, z20, z0, z99 → 404', outZ.every((r) => r.status === 404), outZ.map((r) => r.status));
+  const t17 = tileOf(2.3522, 48.8566, 17);
+  const malformed = [path('7', 1, 1), path('018', nd.x, nd.y), path(18, `0${nd.x}`, nd.y), path(18, nd.x, `${nd.y}0000000`), path(18, '1.5', nd.y), path(18, '-1', nd.y), path(18, 'x', 'y'), path(18, nd.x, `${nd.y}.PNG`.replace('.png', '')), `${inside}/`, `/guides/city-one/tiles/18/${nd.x}.png`, `/guides/city-one/tiles/18/${nd.x}/${nd.y}.jpg`, `/guides/city-one/tiles/18/${nd.x}/${nd.y}.png?LAYER=other`, `/guides/city-one/tiles/18/${nd.x}/${nd.y}.png%2F..%2F..`, `/guides/city-one/tiles/18/${nd.x}/${nd.y}.png;TILEMATRIXSET=x`];
+  const mal = await Promise.all(malformed.map((p) => run(get(p, visitorCookie))));
+  const malOk = mal.map((r, i) => (malformed[i].includes('?LAYER=other') ? r.status === 200 : r.status === 404));
+  check('malformed tile paths → 404 (a query is ignored: the address alone names the tile)', malOk.every(Boolean), malformed.filter((_, i) => !malOk[i]).map((p, i) => `${p} → ${mal[i]?.status}`));
+  check('… and only the one with a query reached IGN, for its own tile', upstream.length === 1 && upstream[0].url.endsWith(`&TILEMATRIX=18&TILEROW=${nd.y}&TILECOL=${nd.x}`) && !upstream.some((u) => u.url.includes('other')), upstream.map((u) => u.url));
+  check('a guide without tile bounds → 404 even with a cookie', (await run(get(path(17, t17.x, t17.y, 'open-day'), visitorCookie))).status === 404);
+  check('POST to a tile → 405', (await run(get(inside, visitorCookie, {}, 'POST'))).status === 405);
+  check('tile paths of an unknown guide → 404', (await run(get(path(18, nd.x, nd.y, 'nowhere'), visitorCookie))).status === 404);
+
+  // Upstream failures: a bare 502, never IGN's page, nothing cached.
+  const fresh = () => { const s = new Map<string, Kept>(); return { s, c: fakeCache(s) }; };
+  const html = '<html><body>IGN error: tile not found</body></html>';
+  const down = fresh();
+  logs = [];
+  const f1 = await run(get(inside, visitorCookie), deps({ cache: down.c, fetch: async () => { throw new Error('ECONNRESET'); } }));
+  const f2 = await run(get(inside, visitorCookie), deps({ cache: down.c, fetch: async () => new Response(html, { status: 404, headers: { 'content-type': 'text/html' } }) }));
+  const f3 = await run(get(inside, visitorCookie), deps({ cache: down.c, fetch: async () => new Response(html, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8' } }) }));
+  const f4 = await run(get(inside, visitorCookie), deps({ cache: down.c, fetch: async () => new Response(PNG, { status: 500, headers: { 'content-type': 'image/png' } }) }));
+  const f5 = await run(get(inside, visitorCookie), deps({ cache: down.c, fetch: async () => new Response(PNG, { status: 200, headers: { 'content-type': 'image/png', 'content-length': String(5 * 1024 * 1024) } }) }));
+  const f6 = await run(get(inside, visitorCookie, {}, 'HEAD'), deps({ cache: down.c, fetch: async () => { throw new Error('timeout'); } }));
+  const bodies = await Promise.all([f1, f2, f3, f4, f5].map((r) => body(r)));
+  check('IGN unreachable, 404 page, HTML, 500, oversize → 502 with an empty body (HEAD too)', [f1, f2, f3, f4, f5, f6].every((r) => r.status === 502 && r.headers.get('cache-control') === 'private, no-store' && !r.headers.has('content-type')) && bodies.every((b) => b === ''), [f1, f2, f3, f4, f5, f6].map((r) => r.status));
+  check('… IGN\'s words never reach the visitor, and nothing is cached', !bodies.some((b) => b.includes('IGN')) && down.s.size === 0 && !logs.some((l) => l.includes('tile not found')), { logs, cached: down.s.size });
+  check('… each failure is logged by status or message, never with a cookie', logs.filter((l) => l.includes('tile upstream')).length === 6 && !logs.some((l) => l.includes(COOKIE)), logs);
+  // A 200 with an image type that is not a PNG, or a body that breaks half-way: a bare 502, and no 30-day copy of it.
+  const liar = fresh();
+  logs = [];
+  const notPng = await run(get(inside, visitorCookie), deps({ cache: liar.c, fetch: async () => new Response('<html>IGN: service down</html>', { status: 200, headers: { 'content-type': 'image/png' } }) }));
+  const tiny = await run(get(inside, visitorCookie), deps({ cache: liar.c, fetch: async () => new Response(PNG.slice(0, 5), { status: 200, headers: { 'content-type': 'image/png' } }) }));
+  const tearing = () => new Response(new ReadableStream({ start(c) { c.enqueue(PNG); c.error(new Error('reset')); } }), { status: 200, headers: { 'content-type': 'image/png' } });
+  const torn = await run(get(inside, visitorCookie), deps({ cache: liar.c, fetch: async () => tearing() }));
+  check('a 200 image/png that is not a PNG, is cut short, or breaks mid-body → 502, empty, nothing cached', [notPng, tiny, torn].every((r) => r.status === 502 && r.body === null) && liar.s.size === 0 && !(await Promise.all([notPng, tiny, torn].map((r) => body(r)))).some((b) => b.includes('IGN')), { s: [notPng.status, tiny.status, torn.status], cached: liar.s.size, logs });
+
+  // The request budget (allowTile): asked only on an edge-cache miss, just before IGN.
+  const ip = { 'cf-connecting-ip': '203.0.113.7' };
+  const asks: string[] = [];
+  const budget = (answer: boolean) => async (k: string) => (asks.push(k), answer);
+  const bucket = fresh();
+  upstream = [];
+  const allowed = await run(get(inside, visitorCookie, ip), deps({ cache: bucket.c, allowTile: budget(true) }));
+  check('tile budget left → 200, asked once with the visitor\'s own key, IGN asked once', allowed.status === 200 && tileHeaders(allowed) && asks.length === 1 && asks[0] === limitKey('203.0.113.7') && upstream.length === 1, { s: allowed.status, asks, n: upstream.length });
+  const t2 = tileOf(2.36, 48.86, 18);
+  const second = await run(get(path(18, t2.x, t2.y), visitorCookie, ip), deps({ cache: bucket.c, allowTile: budget(true) }));
+  check('… a second tile that is not cached yet is counted again', second.status === 200 && asks.length === 2 && upstream.length === 2, { s: second.status, asks, n: upstream.length });
+  // A cache hit is free, even for a visitor who is over the budget; so are HEAD and another audience.
+  const hits = await Promise.all([
+    run(get(inside, visitorCookie, ip), deps({ cache: bucket.c, allowTile: budget(false) })),
+    run(get(inside, memberCookie, ip), deps({ cache: bucket.c, allowTile: budget(false) })),
+    run(get(inside, visitorCookie, ip, 'HEAD'), deps({ cache: bucket.c, allowTile: budget(false) })),
+  ]);
+  check('edge-cache hits (GET, another audience, HEAD) are never counted, even over the budget → 200', hits.every((r) => r.status === 200 && tileHeaders(r)) && asks.length === 2 && upstream.length === 2, { s: hits.map((r) => r.status), asks, n: upstream.length });
+
+  const spent = fresh();
+  asks.length = 0;
+  upstream = [];
+  const over = await run(get(inside, visitorCookie, ip), deps({ cache: spent.c, allowTile: budget(false) }));
+  const overHead = await run(get(inside, visitorCookie, ip, 'HEAD'), deps({ cache: spent.c, allowTile: budget(false) }));
+  check('over the budget on a cache miss → 429 (GET and HEAD), Retry-After 60, private, no body, no content type', [over, overHead].every((r) => r.status === 429 && r.headers.get('retry-after') === '60' && r.headers.get('cache-control') === 'private, no-store' && r.headers.get('x-robots-tag') === 'noindex, nofollow, noarchive' && !r.headers.has('content-type') && r.body === null), { s: [over.status, overHead.status], h: [...over.headers] });
+  check('… IGN is never asked and nothing is cached', upstream.length === 0 && spent.s.size === 0 && asks.length === 2, { n: upstream.length, cached: spent.s.size, asks });
+  // The budget is asked after the cookie and the bounds, so those refusals never spend it.
+  asks.length = 0;
+  const early = await Promise.all([
+    run(get(inside, undefined, ip), deps({ allowTile: budget(false) })),
+    run(get(inside, expired, ip), deps({ allowTile: budget(false) })),
+    run(get(path(18, nd.x, nd.y, 'members-only'), visitorCookie, ip), deps({ allowTile: budget(false) })),
+    run(get(path(13, nd.x, nd.y), visitorCookie, ip), deps({ allowTile: budget(false) })),
+    run(get(path(18, r18.x1 + 1, r18.y1), visitorCookie, ip), deps({ allowTile: budget(false) })),
+    run(get(path(17, t17.x, t17.y, 'open-day'), visitorCookie, ip), deps({ allowTile: budget(false) })),
+    run(get(inside, visitorCookie, ip, 'POST'), deps({ allowTile: budget(false) })),
+  ]);
+  check('no cookie, expired cookie, wrong audience, z13, outside the box, no bounds, POST → 403/403/403/404/404/404/405, budget never asked', early.map((r) => r.status).join() === '403,403,403,404,404,404,405' && asks.length === 0, { s: early.map((r) => r.status), asks });
+  // No binding: the deps carry no allowTile (index.ts leaves it out), and every tile is allowed.
+  upstream = [];
+  const open = fresh();
+  const unlimited = await run(get(inside, visitorCookie, ip), deps({ cache: open.c }));
+  check('no tile limiter (a preview without the binding) → 200, nothing refused', deps().allowTile === undefined && unlimited.status === 200 && upstream.length === 1, { s: unlimited.status, n: upstream.length });
+  // A limiter that throws does not close the map; it is logged.
+  logs = [];
+  upstream = [];
+  const broke = await run(get(inside, visitorCookie, ip), deps({ allowTile: async () => { throw new Error('no binding'); } }));
+  check('tile limiter throws → 200 from IGN, logged', broke.status === 200 && upstream.length === 1 && logs.some((l) => l.includes('tile limiter')), { s: broke.status, logs });
 }
 
 // ---- Unexpected failures: a minimal neutral 503 ----

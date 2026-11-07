@@ -1,5 +1,6 @@
 // Starting up, logging on and off, shutting down, restarting, standing by.
 // Loaded only when needed (the first page of a session, or from the Start menu).
+import { consent } from './consent';
 import { msgbox, openDialog } from './dialogs';
 import { navigate } from './router';
 import { session } from './session';
@@ -70,7 +71,7 @@ export async function startUp() {
   await logOn();
 }
 
-/** The log-on box. OK or Cancel both log on (Cancel as the last name used), as in Windows 98. */
+/** The log-on box. OK or Cancel both log on, as Guest (everyone is), as in Windows 98. */
 export function logOn(): Promise<string> {
   html.dataset.boot = 'login';
   shield(true);
@@ -145,7 +146,9 @@ export function showBeginHint() {
   document.body.appendChild(hint);
   const done = () => {
     hint.remove();
-    try { sessionStorage.setItem('kus98:begun', '1'); } catch { /* ignore */ }
+    if (consent.allows('tab')) {
+      try { sessionStorage.setItem('kus98:begun', '1'); } catch { /* ignore */ }
+    }
     document.removeEventListener('start:open', done);
   };
   hint.addEventListener('click', () => {

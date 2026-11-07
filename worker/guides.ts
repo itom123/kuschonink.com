@@ -1,6 +1,7 @@
-// Field Guide (导览): the password gate. Every request under /guides/ runs
-// this code first (wrangler.jsonc run_worker_first); the home /guides is a
-// plain public page.
+// Field Guide (导览): the password gate. /guides and every request under
+// /guides/ run this code first (wrangler.jsonc run_worker_first). There is no
+// list of guides to choose from: /guides goes to the first listed guide's own
+// address, whose log-on box is where a guide is chosen (programHome() below).
 //
 // Who may open which guide is src/content/guides/access.json: the audiences,
 // least privileged first, each with the NAME of the Cloudflare secret that
@@ -36,8 +37,31 @@ const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const TOKEN = /^v1\.([a-z][a-z0-9-]{0,63})\.(\d{10})\.([A-Za-z0-9_-]{43})$/;
 /** One picture or base map: public/guides/<slug>/{img,map}/<file>. */
 const FILE = /^\/(?:img|map)\/[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/;
+/** One street-level tile: /tiles/<z>/<x>/<y>.png, whole numbers with no leading zeros (one spelling per tile). */
+const TILE_PATH = /^\/tiles\/(\d{2})\/(0|[1-9]\d{0,5})\/(0|[1-9]\d{0,5})\.png$/;
+/**
+ * Tiles are proxied at these Web-Mercator zooms only (src/lib/guides/view.ts tells the browser the same range).
+ * From 14, the base picture's own zoom: a tile pixel is then never much smaller than the picture's, so the lettering
+ * does not shrink where tiles take over just past 1:1.
+ */
+export const TILE_Z = { min: 14, max: 19 };
+/**
+ * Plan IGN v2 from IGN's Géoplateforme WMTS (Etalab 2.0 licence, no key). The
+ * layer and every other parameter are fixed here; only z, x and y come from
+ * the request, so this is not an open proxy.
+ */
+const TILE_UPSTREAM = 'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/png';
+const TILE_UA = 'kuschonink.com Field Guide tile proxy (+https://kuschonink.com)';
+/** The edge keeps a tile for 30 days; a browser for a week, privately (the cookie decides who gets it). */
+export const TILE_EDGE_S = 30 * 86400;
+export const TILE_BROWSER_S = 7 * 86400;
+/** A tile bigger than this is not a tile. */
+const TILE_MAX_BYTES = 1024 * 1024;
+const TILE_TIMEOUT_MS = 8000;
 /** Other spellings of a guide's address (after /guides/<slug>). */
 const CANONICAL = new Set(['/', '/index', '/index.html', '/views']);
+/** The first listed guide, as the build writes it on the home page (src/pages/guides/index.astro). */
+const FIRST = /\sdata-gd-first="([a-z0-9-]{1,100})"/;
 
 /** What the log-on page shows without JavaScript (its data-gd-state). */
 export type LogonState = 'none' | 'wrong' | 'wait' | 'off' | 'denied' | 'error';
@@ -53,6 +77,15 @@ export interface GuidesDeps {
   assets: (request: Request) => Promise<Response> | Response;
   /** False once this visitor has tried too many passwords. */
   allow: (key: string) => Promise<boolean> | boolean;
+  /**
+   * False once this visitor has had too many tiles fetched from IGN. Asked only
+   * on an edge-cache miss. Missing (a preview without the binding) allows every tile.
+   */
+  allowTile?: (key: string) => Promise<boolean> | boolean;
+  /** Outbound fetch, for street-level tiles from IGN (the visitor's own request never reaches IGN). */
+  fetch: (url: string, init?: RequestInit & { cf?: Record<string, unknown> }) => Promise<Response>;
+  /** The edge cache for tiles (caches.default), if there is one. */
+  cache?: { match(key: Request): Promise<Response | undefined>; put(key: Request, res: Response): Promise<unknown> };
   /** Milliseconds since 1970. */
   now: () => number;
   /** Codes and names only: never a password, a cookie or a request body. */
@@ -63,8 +96,8 @@ export interface GuidesDeps {
   isAdmin?: (request: Request) => Promise<boolean>;
 }
 
-/** Mirrors run_worker_first "/guides/*". */
-export const isGuidesPath = (p: string) => p.startsWith(`${PREFIX}/`);
+/** Mirrors run_worker_first "/guides" and "/guides/*". */
+export const isGuidesPath = (p: string) => p === PREFIX || p.startsWith(`${PREFIX}/`);
 
 const ROBOTS = 'noindex, nofollow, noarchive';
 const PRIVATE = { 'cache-control': 'private, no-store', vary: 'Cookie', 'x-robots-tag': ROBOTS, 'x-content-type-options': 'nosniff' };
@@ -87,7 +120,7 @@ async function route(req: Request, deps: GuidesDeps): Promise<Response> {
   const url = new URL(req.url);
   const p = url.pathname;
   if (url.protocol === 'http:' && !isLocal(url.hostname)) return redirect(`https://${url.host}${p}${url.search}`, 308);
-  if (p === `${PREFIX}/`) return redirect(PREFIX + url.search, 307);
+  if (p === PREFIX || p === `${PREFIX}/`) return programHome(req, url, deps);
   const at = parse(p);
   if (!at || !isGuide(deps.access, at.slug)) return notFound(url, deps);
   const { slug, sub } = at;
@@ -97,18 +130,38 @@ async function route(req: Request, deps: GuidesDeps): Promise<Response> {
   if (sub === '/login') return logOn(req, url, slug, deps);
   if (sub === '/logout') return logOff(req, url, slug);
   if (sub === '/suggest') return deps.suggest ? deps.suggest(req, slug) : notFound(url, deps);
-  const isFile = sub.startsWith('/img/') || sub.startsWith('/map/');
+  const isTile = sub.startsWith('/tiles/');
+  const isFile = sub.startsWith('/img/') || sub.startsWith('/map/') || isTile;
   if (sub && !isFile) return notFound(url, deps);
   if (req.method !== 'GET' && req.method !== 'HEAD') return new Response(null, { status: 405, headers: { ...PRIVATE, allow: 'GET, HEAD' } });
 
   const pepper = pepperOf(deps); // none: closed, and no cookie counts
   const view = (deps.isAdmin && (await deps.isAdmin(req)) ? topView(deps.access, slug) : null) ?? (pepper ? await viewFor(deps, pepper, slug, req.headers.get('cookie')) : null);
   if (isFile) {
-    if (!view) return logOnFirst(slug); // assets are never read
+    if (!view) return logOnFirst(slug); // assets are never read, and IGN is never asked
+    if (isTile) return tile(req, url, sub, slug, deps);
     return FILE.test(sub) ? asset(req, url, deps) : notFound(url, deps);
   }
   if (view) return page(req, url, `${home}/views/${view}`, 'none', 200, deps);
   return page(req, url, `${home}/locked`, pepper && openers(deps, slug).length ? 'none' : 'off', 200, deps);
+}
+
+/**
+ * /guides and /guides/: no page in between. While any guide is listed, both go
+ * to the first one's own address (307, the query kept): its log-on box, or the
+ * guide itself with a valid cookie. The build names that guide on the home page
+ * (data-gd-first), so the Worker reads no guide content, and it follows only a
+ * slug that access.json knows. With none listed, /guides is the built page that
+ * says so, served as ASSETS always served it, and /guides/ goes there.
+ */
+async function programHome(req: Request, url: URL, deps: GuidesDeps): Promise<Response> {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return new Response(null, { status: 405, headers: { ...PRIVATE, allow: 'GET, HEAD' } });
+  const built = await deps.assets(new Request(new URL(PREFIX, url)));
+  const text = await built.text();
+  const slug = built.ok ? FIRST.exec(text)?.[1] : undefined;
+  if (slug && SLUG.test(slug) && isGuide(deps.access, slug)) return redirect(`${PREFIX}/${slug}${url.search}`, 307);
+  if (url.pathname !== PREFIX) return redirect(PREFIX + url.search, 307);
+  return deps.assets(req);
 }
 
 /** "/guides/<slug>[.html][/<sub>]" → its parts; null when the slug can't be one. */
@@ -485,6 +538,131 @@ async function asset(req: Request, url: URL, deps: GuidesDeps): Promise<Response
   h.delete('set-cookie');
   const empty = req.method === 'HEAD' || res.status === 204 || res.status === 205 || res.status === 304;
   return new Response(empty ? null : res.body, { status: res.status, headers: h });
+}
+
+// ---- Street-level tiles ----
+
+/** A guide's tile bounds from access.json, [west, south, east, north] in degrees, when they make sense. */
+export function tileBounds(access: AccessFile, slug: string): [number, number, number, number] | null {
+  const tiles = access.tiles;
+  if (!tiles || !Object.hasOwn(tiles, slug)) return null;
+  const b = tiles[slug];
+  if (!Array.isArray(b) || b.length !== 4 || !b.every((n) => typeof n === 'number' && Number.isFinite(n))) return null;
+  const [w, s, e, n] = b;
+  if (!(w < e && s < n) || Math.abs(w) > 180 || Math.abs(e) > 180 || Math.abs(s) > 85.06 || Math.abs(n) > 85.06) return null;
+  return [w, s, e, n];
+}
+
+/** The tile numbers a box covers at zoom z, both ends included (Web-Mercator, 256-px tiles). */
+export function tileRange(b: [number, number, number, number], z: number): { x0: number; x1: number; y0: number; y1: number } {
+  const n = Math.pow(2, z);
+  const lim = (v: number) => Math.min(n - 1, Math.max(0, Math.floor(v)));
+  const tx = (lon: number) => lim(((lon + 180) / 360) * n);
+  const ty = (lat: number) => {
+    const r = (lat * Math.PI) / 180;
+    return lim(((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * n);
+  };
+  return { x0: tx(b[0]), x1: tx(b[2]), y0: ty(b[3]), y1: ty(b[1]) };
+}
+
+/**
+ * One tile of Plan IGN for a visitor who may open the guide: fetched from IGN
+ * by the Worker (so IGN sees the Worker, never the visitor), kept at the edge
+ * for 30 days, and answered privately. Only tiles inside the guide's declared
+ * bounds and between TILE_Z.min and TILE_Z.max exist; anything else is 404.
+ * An upstream failure is a bare 502, never IGN's own error page. Only an
+ * edge-cache miss costs an IGN fetch, so only a miss spends the visitor's
+ * tile budget (deps.allowTile); over it, a bare 429.
+ */
+async function tile(req: Request, url: URL, sub: string, slug: string, deps: GuidesDeps): Promise<Response> {
+  const m = TILE_PATH.exec(sub);
+  const box = tileBounds(deps.access, slug);
+  if (!m || !box) return notFound(url, deps);
+  const z = Number(m[1]), x = Number(m[2]), y = Number(m[3]);
+  if (z < TILE_Z.min || z > TILE_Z.max) return notFound(url, deps);
+  const r = tileRange(box, z);
+  if (x < r.x0 || x > r.x1 || y < r.y0 || y > r.y1) return notFound(url, deps);
+
+  const upstream = `${TILE_UPSTREAM}&TILEMATRIX=${z}&TILEROW=${y}&TILECOL=${x}`;
+  const key = new Request(upstream, { method: 'GET' });
+  let hit: Response | undefined;
+  try {
+    hit = await deps.cache?.match(key);
+  } catch (e) {
+    deps.log('guides: tile cache match failed', (e as Error)?.message ?? String(e));
+  }
+  if (!hit) {
+    if (!(await tileBudget(req, deps))) return new Response(null, { status: 429, headers: { ...PRIVATE, 'retry-after': '60' } });
+    let up: Response;
+    try {
+      up = await deps.fetch(upstream, {
+        method: 'GET',
+        headers: { 'user-agent': TILE_UA, accept: 'image/png' },
+        signal: AbortSignal.timeout(TILE_TIMEOUT_MS),
+        // Only a good tile is kept for 30 days: an IGN 404 or 5xx is never held (cacheTtl would cover those too).
+        cf: { cacheEverything: true, cacheTtlByStatus: { '200-299': TILE_EDGE_S, '400-599': 0 } },
+      });
+    } catch (e) {
+      deps.log('guides: tile upstream failed', z, (e as Error)?.message ?? String(e));
+      return badGateway();
+    }
+    const type = (up.headers.get('content-type') ?? '').toLowerCase();
+    if (!up.ok || !type.startsWith('image/png') || Number(up.headers.get('content-length') ?? 0) > TILE_MAX_BYTES) {
+      deps.log('guides: tile upstream', up.status, type || '(no type)');
+      void up.body?.cancel().catch(() => {}); // not awaited: a tee'd stream's cancel can wait on its twin
+      return badGateway();
+    }
+    let bytes: ArrayBuffer;
+    try {
+      bytes = await up.arrayBuffer(); // the 8 s timeout covers the body too
+    } catch (e) {
+      deps.log('guides: tile upstream body failed', z, (e as Error)?.message ?? String(e));
+      return badGateway();
+    }
+    // A tile is a whole PNG: the right size, and the PNG signature (an error page with an image type is not cached for 30 days).
+    if (bytes.byteLength > TILE_MAX_BYTES || !isPng(bytes)) {
+      deps.log('guides: tile upstream is not a tile', bytes.byteLength);
+      return badGateway();
+    }
+    // Only the bytes are kept: none of IGN's headers reach the visitor, and the edge copy carries its own lifetime.
+    hit = new Response(bytes, { status: 200, headers: { 'content-type': 'image/png', 'cache-control': `public, max-age=${TILE_EDGE_S}` } });
+    try {
+      await deps.cache?.put(key, hit.clone());
+    } catch (e) {
+      deps.log('guides: tile cache put failed', (e as Error)?.message ?? String(e));
+    }
+  }
+  const headers = {
+    'content-type': 'image/png',
+    'cache-control': `private, max-age=${TILE_BROWSER_S}`,
+    'x-robots-tag': ROBOTS,
+    'x-content-type-options': 'nosniff',
+    'cross-origin-resource-policy': 'same-origin',
+  };
+  if (req.method === 'HEAD') {
+    void hit.body?.cancel().catch(() => {});
+    return new Response(null, { status: 200, headers });
+  }
+  return new Response(hit.body, { status: 200, headers });
+}
+
+const badGateway = () => new Response(null, { status: 502, headers: PRIVATE });
+
+/** May this visitor have one more tile fetched from IGN? No limiter, or one that fails, says yes (a map is not worth closing over it). */
+async function tileBudget(req: Request, deps: GuidesDeps): Promise<boolean> {
+  if (!deps.allowTile) return true;
+  try {
+    return await deps.allowTile(limitKey(req.headers.get('cf-connecting-ip')));
+  } catch (e) {
+    deps.log('guides: tile limiter failed', (e as Error)?.message ?? String(e));
+    return true;
+  }
+}
+
+/** Does this start with the PNG signature? */
+function isPng(b: ArrayBuffer): boolean {
+  const s = new Uint8Array(b, 0, Math.min(8, b.byteLength));
+  return s.length === 8 && [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every((v, i) => s[i] === v);
 }
 
 /** The site's own 404 page, with status 404 (ASSETS serves /404 itself as a 200). */

@@ -6,8 +6,15 @@
    plates with a 1px black border, no radius, no blurred shadows. */
 
 .gd-map {
-  --gd-heat-lo: #ffff00;
-  --gd-heat-hi: #ff0000;
+  /* Heat: a ramp of web-safe colours, peach at the faint edge to deep maroon at the core (heat.ts reads
+     --gd-heat-1 … up to 8; a scheme may override them). The same in every scheme: all read on the grey High Contrast map. */
+  --gd-heat-1: #ffcc99;
+  --gd-heat-2: #ff9966;
+  --gd-heat-3: #ff6633;
+  --gd-heat-4: #ff3300;
+  --gd-heat-5: #cc0000;
+  --gd-heat-6: #990000;
+  --gd-heat-7: #660000;
   --gd-route: #000080;
   --gd-route-casing: #ffffff;
   --gd-desk: #808080;
@@ -16,7 +23,7 @@
   color: #000;
 }
 @media (pointer: coarse) { .gd-map { --gd-hit: 8px; } }
-:where(html[data-scheme="contrast"]) .gd-map { --gd-heat-lo: #808080; --gd-heat-hi: #000000; --gd-route: #000000; }
+:where(html[data-scheme="contrast"]) .gd-map { --gd-route: #000000; }
 
 /* ---- The map box ---- */
 .gd-viewport { position: relative; overflow: hidden; background: var(--gd-desk); touch-action: manipulation; }
@@ -52,6 +59,52 @@ html:not([data-pointers="system"]) body.kus98 :is(.gd-viewport.dragging, .gd-vie
 :where(html[data-scheme="contrast"]) .gd-me-ring { border-color: #000; background: none; }
 @media (forced-colors: active) { .gd-me-ring { border-color: CanvasText; background: none; } }
 html.js .gd-mapui-zoom [data-cmd="gd-locate"] { margin-bottom: 6px; }
+
+/* Live: a heartbeat round the dot, in three hard steps and a rest (Windows 98 has no smooth pulses). */
+.gd-me::after {
+  content: ""; position: absolute; left: -10px; top: -10px; width: 20px; height: 20px; box-sizing: border-box;
+  border: 2px solid #ff0000; border-radius: 50%; visibility: hidden;
+  animation: gd-beat 1.2s steps(1, end) infinite;
+}
+@keyframes gd-beat {
+  0% { visibility: visible; left: -10px; top: -10px; width: 20px; height: 20px; border-width: 2px; }
+  17% { visibility: visible; left: -13px; top: -13px; width: 26px; height: 26px; border-width: 2px; }
+  34% { visibility: visible; left: -16px; top: -16px; width: 32px; height: 32px; border-width: 1px; }
+  51%, 100% { visibility: hidden; }
+}
+:where(html[data-scheme="contrast"]) .gd-me::after { border-color: #000; }
+@media (forced-colors: active) { .gd-me::after { border-color: CanvasText; } }
+
+/* The live chip: a tooltip-yellow plate at the top of the map's free part, right of
+   the legend, with Stop. It sits under the map's own buttons, legend and credits. */
+html.js .gd-live {
+  position: absolute; z-index: 5; top: 6px; left: max(92px, calc((100% - var(--gd-free-right, 0px)) / 2 - 75px));
+  display: flex; align-items: center; max-width: calc(100% - var(--gd-free-right, 0px) - 104px);
+  background: var(--tip); color: #000; border: 1px solid #000; white-space: nowrap;
+  font: bold 11px Tahoma, Verdana, var(--ui-font);
+}
+.gd-live[hidden] { display: none; }
+/* html.js lifts these over 98.css and .gd button (guide.css loads later). */
+html.js .gd-live button { box-sizing: border-box; min-width: 0; min-height: 0; font: inherit; color: #000; text-shadow: none; }
+html.js .gd-live .gd-live-stop { font-weight: normal; }
+.gd-live-me { display: flex; align-items: center; gap: 5px; min-width: 0; height: 22px; padding: 0 6px; background: none; border: 0; box-shadow: none; overflow: hidden; }
+.gd-live-me:focus-visible, .gd-live-stop:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+.gd-live-dot { color: #ff0000; font-size: 13px; line-height: 1; }
+.gd-live-stop { flex: none; height: 18px; margin: 0 2px 0 0; padding: 0 6px; background: var(--face); border: 0; box-shadow: var(--raised); }
+.gd-live-stop:active { box-shadow: var(--pressed); }
+@media (pointer: coarse) {
+  .gd-live-me { height: 30px; }
+  .gd-live-stop { height: 26px; padding: 0 10px; }
+}
+:where(html[data-scheme="contrast"]) .gd-live-dot { color: #000; }
+:where(html[data-scheme="contrast"]) .gd-live-stop:active { box-shadow: inset 0 0 0 3px #000; }
+@media (forced-colors: active) {
+  .gd-live { border-color: CanvasText; }
+  .gd-live-dot { color: CanvasText; }
+  .gd-live-stop { border: 1px solid ButtonText; }
+}
+@media (prefers-reduced-motion: reduce) { .gd-me::after { animation: none; } }
+@media print { .gd-live { display: none !important; } }
 
 /* ---- Pins: 16px pixel icons, or letter plates for places ---- */
 .gd-pins { position: absolute; inset: 0; z-index: 3; }
@@ -146,10 +199,34 @@ html.js .gd-pin { left: 0; top: 0; will-change: transform; }
 /* ---- Heat: half-resolution dither, shown pixelated ---- */
 .gd-heat { position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; image-rendering: crisp-edges; image-rendering: pixelated; will-change: transform; }
 .gd-heat[hidden] { display: none; }
-.gd-heat-swatch {
+/* The swatch (map button, legend): the seven steps as 2px bands. The strip: "less → more", 8px a step. */
+.gd-heat-swatch, .gd-heat-ramp {
   display: inline-block; box-sizing: border-box; width: 16px; height: 16px; vertical-align: middle; border: 1px solid #000;
-  background: repeating-conic-gradient(var(--gd-heat-hi) 0 25%, var(--gd-heat-lo) 0 50%) 0 0 / 4px 4px;
+  --gd-heat-w: 2px;
+  background: linear-gradient(to right,
+    var(--gd-heat-1) 0 calc(var(--gd-heat-w) * 1), var(--gd-heat-2) 0 calc(var(--gd-heat-w) * 2),
+    var(--gd-heat-3) 0 calc(var(--gd-heat-w) * 3), var(--gd-heat-4) 0 calc(var(--gd-heat-w) * 4),
+    var(--gd-heat-5) 0 calc(var(--gd-heat-w) * 5), var(--gd-heat-6) 0 calc(var(--gd-heat-w) * 6),
+    var(--gd-heat-7) 0) 0 0 / 100% 100% no-repeat;
 }
+.gd-heat-ramp { --gd-heat-w: 8px; width: 58px; height: 10px; }
+.gd-key-ramp { font-size: 12px; }
+
+/* ---- Street-level tiles (src/scripts/guide/tiles.ts): Plan IGN through the Worker, over the picture, under the heat ---- */
+/* The layer is laid over the base picture's box; its tiles sit at whole pixels, so nothing is blurred or seamed. */
+.gd-tiles { position: absolute; left: 0; top: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.gd-tiles[hidden] { display: none; }
+.gd-tiles img {
+  position: absolute; left: 0; top: 0; display: block; max-width: none; border: 0; outline: none; pointer-events: none;
+  /* Smooth scaling on purpose: a tile shows at 0.7–1.4× its size and nearest-neighbour would break the lettering. */
+  image-rendering: auto; will-change: transform; backface-visibility: hidden;
+  -webkit-user-select: none; user-select: none; -webkit-user-drag: none; -webkit-touch-callout: none;
+}
+/* The same white wash as the base picture; the picture's own wash steps aside while tiles show, so a hole is washed once. */
+.gd-tiles::after { content: ""; position: absolute; inset: 0; z-index: 9; background: rgba(255, 255, 255, 0.35); pointer-events: none; }
+html.js .gd-base[data-tiled]::after { display: none; }
+:where(html[data-scheme="contrast"]) .gd-tiles img { filter: grayscale(1) contrast(1.1); }
+@media (forced-colors: active) { .gd-tiles img { forced-color-adjust: none; } }
 
 /* ---- Map buttons: 34×34 with the raised bevel ---- */
 html.js .gd-mapui-zoom { position: absolute; z-index: 5; right: calc(var(--gd-free-right, 0px) + 12px); bottom: calc(var(--gd-free-bottom, 0px) + 30px); display: flex; flex-direction: column; }
@@ -168,14 +245,18 @@ html.js .gd-mapui-layers { position: absolute; z-index: 5; left: 12px; bottom: c
 :where(html[data-scheme="contrast"]) .gd-mapui button[aria-pressed="true"],
 :where(html[data-scheme="contrast"]) .gd-mapui button:not(:disabled):active { background: #fff; box-shadow: inset 0 0 0 3px #000; }
 /* Low windows: the two groups go in one row. */
-@media (max-height: 320px) { html.js .gd-mapui-zoom { flex-direction: row; } }
+@media (max-height: 320px) { html.js .gd-mapui-zoom { flex-direction: row; } html.js .gd-mapui-zoom [data-cmd="gd-locate"] { margin: 0 6px 0 0; } }
+/* A short strip above a phone's half sheet (app.ts shortMap): the column becomes a row, a little lower. */
+html.js .gd-map[data-short] .gd-mapui-zoom { flex-direction: row; }
+html.js .gd-map[data-short] :is(.gd-mapui-zoom, .gd-mapui-layers) { bottom: calc(var(--gd-free-bottom, 0px) + 22px); }
+html.js .gd-map[data-short] .gd-mapui-zoom [data-cmd="gd-locate"] { margin: 0 6px 0 0; }
 
 /* ---- Legend plate ---- */
 .gd-legend { margin: 6px 0; padding: 2px 6px 4px; background: #fff; color: #000; border: 1px solid #000; font: 13px/1.35 "Times New Roman", Times, serif; }
 .gd-legend summary { cursor: pointer; font-weight: bold; }
 .gd-legend ul { list-style: none; margin: 2px 0 0; padding: 0; }
 .gd-legend li { display: flex; align-items: center; gap: 5px; min-height: 18px; }
-.gd-legend li > .ico, .gd-legend li > .gd-plate, .gd-legend li > .gd-heat-swatch, .gd-legend li > .gd-key-route { flex: none; }
+.gd-legend li > .ico, .gd-legend li > .gd-plate, .gd-legend li > .gd-heat-swatch, .gd-legend li > .gd-heat-ramp, .gd-legend li > .gd-key-route { flex: none; }
 .gd-key-route { display: inline-block; width: 24px; height: 5px; background: #fff; position: relative; }
 .gd-key-route::after { content: ""; position: absolute; left: 0; right: 0; top: 1px; border-top: 3px dashed var(--gd-route); }
 .gd-key-route[data-mode="transit"]::after { border-top-style: dotted; }
@@ -191,7 +272,7 @@ html.js .gd-attrib { position: absolute; z-index: 5; right: var(--gd-free-right,
 :where(html[data-scheme="contrast"]) .gd-label { background: #fff; color: #000; }
 :where(html[data-scheme="contrast"]) .gd-label.is-selected { background: #000; color: #fff; }
 @media (forced-colors: active) {
-  .gd-pin, .gd-pin .ico, .gd-cluster, .gd-heat, .gd-heat-swatch, .gd-base img { forced-color-adjust: none; }
+  .gd-pin, .gd-pin .ico, .gd-cluster, .gd-heat, .gd-heat-swatch, .gd-heat-ramp, .gd-base img { forced-color-adjust: none; }
   .gd-label, .gd-plate, .gd-count, .gd-legend, .gd-attrib, .gd-pin-label {
     forced-color-adjust: none; background: Canvas; color: CanvasText; border-color: CanvasText;
   }

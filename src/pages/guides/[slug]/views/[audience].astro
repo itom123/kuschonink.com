@@ -18,7 +18,7 @@ import InfoPane from '../../../../components/guide/InfoPane.astro';
 import { site } from '../../../../lib/content';
 import { attr, seoTitle } from '../../../../lib/i18n';
 import { SEP, type Tool } from '../../../../lib/chrome';
-import { loadView, payloadJson, viewPaths } from '../../../../lib/guides/load';
+import { guideCards, loadView, payloadJson, viewPaths } from '../../../../lib/guides/load';
 import { dayLabel } from '../../../../lib/guides/core';
 import { W } from '../../../../lib/guides/words';
 import { SW } from '../../../../lib/guides/suggest-words';
@@ -50,6 +50,13 @@ const tools: Tool[] = [
   { cmd: 'gd-print', label: W.print.en, zh: W.print.zh, icon: 'tb-print', title: W.printTip.en, titleZh: W.printTip.zh },
 ];
 const status = [W.hint, W.countAll(view.items.length, view.labels.items), W.loggedOnAs(view.audienceLabel)];
+// File > Open Guide...: the listed guides' neutral public titles (the ones the log-on box shows
+// before any password), only when there is more than one to choose from.
+const cards = guideCards();
+const guides = cards.length > 1
+  ? cards.map((c) => ({ slug: c.slug, title: { en: c.publicTitle.en, zh: c.publicTitle.zh || c.publicTitle.en } }))
+  : [];
+const guidesJson = JSON.stringify(guides).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
 const holiday = (d: string) => view.holidays.find((h) => h.date === d);
 const opt = (d: string) => {
   const l = dayLabel(d), h = holiday(d);
@@ -80,8 +87,8 @@ const opt = (d: string) => {
       data-items-zh={view.labels.items.zh || view.labels.items.en}
       data-listings-en={view.labels.listings.en}
       data-listings-zh={view.labels.listings.zh || view.labels.listings.en}
-      data-title-en={view.title.en}
-      data-title-zh={view.title.zh || view.title.en}
+      data-guide-en={view.title.en}
+      data-guide-zh={view.title.zh || view.title.en}
       data-tz-en={view.timezoneLabel.en}
       data-tz-zh={view.timezoneLabel.zh || view.timezoneLabel.en}
     >
@@ -128,6 +135,7 @@ const opt = (d: string) => {
         </aside>
       </div>
       <script type="application/json" data-gd-data set:html={payloadJson(view)}></script>
+      {guides.length > 1 && <script type="application/json" data-gd-guides set:html={guidesJson}></script>}
     </div>
   </Window>
 </Desktop>

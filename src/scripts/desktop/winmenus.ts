@@ -75,7 +75,7 @@ export function systemMenu(win: wm.Win): MenuSpec[] {
     { label: '&Move', zh: '移动(&M)', disabled: !normal || fixed, action: () => wm.keyboardMove(win, 'move') },
     { label: '&Size', zh: '大小(&S)', disabled: !normal || fixed || win.el.classList.contains('no-resize'), action: () => wm.keyboardMove(win, 'size') },
     { label: 'Mi&nimize', zh: '最小化(&N)', disabled: win.state === 'min' || !!win.dialog, action: () => wm.minimize(win) },
-    { label: 'Ma&ximize', zh: '最大化(&X)', disabled: win.state === 'max' || !!win.dialog || fixed, action: () => (win.state === 'min' ? wm.restore(win) : wm.toggleMax(win)) },
+    { label: 'Ma&ximize', zh: '最大化(&X)', disabled: win.state === 'max' || !!win.dialog || fixed || win.el.classList.contains('no-resize'), action: () => (win.state === 'min' ? wm.restore(win) : wm.toggleMax(win)) },
     { sep: true },
     { label: '&Close', zh: '关闭(&C)', key: 'Alt+F4', bold: true, action: () => wm.close(win) },
   ];

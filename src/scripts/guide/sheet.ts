@@ -28,10 +28,12 @@ export class Sheet {
 
   /** The part of the map the sheet or drawer covers, for GuideMap.setFree(). */
   covers(wide: boolean): { right?: number; bottom?: number } {
-    if (wide || this.root.dataset.detail === 'closed' || this.root.dataset.detail === 'full') return {};
+    if (wide || this.root.dataset.detail === 'closed') return {};
     const r = this.el.getBoundingClientRect();
     const m = this.root.getBoundingClientRect();
     if (!r.width || !r.height) return {};
+    // Full covers the whole map, except on a landscape phone, where it is the same drawer as Half.
+    if (this.root.dataset.detail === 'full' && r.width >= m.width * 0.9) return {};
     // A drawer on the right (landscape phone) or a sheet at the bottom.
     if (r.height >= m.height * 0.9) return { right: Math.round(r.width) };
     return { bottom: Math.round(r.height) };

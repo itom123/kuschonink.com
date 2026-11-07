@@ -2,7 +2,9 @@
 // With JavaScript the form posts with fetch and, once the Worker has set its
 // cookie, the same window opens the guide again (kus98.open with reload).
 // Errors come as Windows 98 message boxes. The password is never kept: it
-// lives only in the field and in the request.
+// lives only in the field and in the request. Choosing another guide in the
+// Guide list opens that guide's box in the same window, so the password always
+// goes to the guide chosen.
 //
 // This file imports no guide content: everything it knows (the slug, the
 // public title) comes from the page's own attributes.
@@ -54,6 +56,9 @@ function biNodes(t: Bi): Node[] {
 
 const fine = matchMedia('(pointer: fine)');
 
+/** The guide just chosen in a Guide list: its box starts on the list, not on the password. */
+let chosen = '';
+
 export function initLogOn() {
   for (const root of document.querySelectorAll<HTMLElement>('[data-gd-logon]:not([data-init])')) {
     root.dataset.init = '1';
@@ -67,6 +72,7 @@ function setUp(root: HTMLElement) {
   const ok = root.querySelector<HTMLButtonElement>('[data-gd-ok]');
   const next = root.querySelector<HTMLInputElement>('[data-gd-next]');
   const cancel = root.querySelector<HTMLAnchorElement>('[data-gd-cancel]');
+  const list = root.querySelector<HTMLSelectElement>('[data-gd-guide]');
   if (!form || !pass || !ok || !next) return;
 
   const win = root.closest<HTMLElement>('[data-window]');
@@ -84,6 +90,8 @@ function setUp(root: HTMLElement) {
     if (signal.aborted) return;
     clearInterval(waitTimer);
     ac.abort();
+    // The window now shows another page: it isn't busy with this box any more.
+    if (!root.isConnected) win?.removeAttribute('aria-busy');
   };
   win?.addEventListener('desktop:close', stop, { once: true, signal });
   document.addEventListener('desktop:content', () => {
@@ -140,7 +148,49 @@ function setUp(root: HTMLElement) {
   if (root.dataset.gdState === 'off') {
     ok.disabled = true;
     status(MSG.off.text);
-  } else focus();
+  }
+
+  // ---- First focus: the Guide list when a guide was just chosen in it (arrow keys go on choosing), else the password ----
+  const fromList = !!list && chosen === slug;
+  chosen = '';
+  if (fromList && fine.matches) requestAnimationFrame(() => list?.focus({ preventScroll: true }));
+  else focus();
+
+  // ---- Guide: another listed guide's box, in this window ----
+  let choosing = 0;
+  const choose = async (other: string) => {
+    const n = ++choosing;
+    const url = `/guides/${other}`;
+    const d = shell();
+    if (!d || !win) {
+      location.assign(url);
+      return;
+    }
+    // Until it opens, OK waits: the password is for the guide chosen.
+    busy = true;
+    root.toggleAttribute('data-busy', true);
+    chosen = other;
+    try {
+      await d.open(url);
+    } catch {
+      location.assign(url);
+      return;
+    }
+    if (n !== choosing) return; // another guide was chosen meanwhile
+    chosen = '';
+    // Still here (it couldn't open): back to this guide.
+    if (root.isConnected && !signal.aborted) {
+      busy = false;
+      root.removeAttribute('data-busy');
+      list!.value = slug;
+    }
+  };
+  if (list) {
+    list.value = slug; // not a choice the browser kept from an earlier visit
+    list.addEventListener('change', () => {
+      if (list.value && list.value !== slug) void choose(list.value);
+    }, { signal });
+  }
 
   // ---- Cancel closes the window (the link goes home without JavaScript) ----
   cancel?.addEventListener('click', (e) => {
@@ -159,6 +209,7 @@ function setUp(root: HTMLElement) {
   const setBusy = (on: boolean) => {
     busy = on;
     ok.disabled = on;
+    if (list) list.disabled = on; // no other guide while this one checks the password
     root.toggleAttribute('data-busy', on);
     if (on) win?.setAttribute('aria-busy', 'true');
     else win?.removeAttribute('aria-busy');
@@ -166,8 +217,11 @@ function setUp(root: HTMLElement) {
 
   /** The guide's address in this window, with the query it was opened with (?place=A3). */
   const guideUrl = () => {
-    const raw = win?.dataset.url || `/guides/${slug}${location.pathname.startsWith(`/guides/${slug}`) ? location.search : ''}`;
-    return new URL(raw, location.origin);
+    const home = `/guides/${slug}`;
+    const raw = win?.dataset.url || `${home}${location.pathname.startsWith(home) ? location.search : ''}`;
+    const url = new URL(raw, location.origin);
+    // Always this box's guide, the one the form logs on to.
+    return url.pathname === home ? url : new URL(home, location.origin);
   };
 
   const logOn = async () => {
@@ -176,6 +230,7 @@ function setUp(root: HTMLElement) {
       await fail('wrong');
       return;
     }
+    if (!(await cookiesAllowed()) || signal.aborted) return;
     const url = guideUrl();
     next.value = url.search;
     setBusy(true);
@@ -262,4 +317,23 @@ function setUp(root: HTMLElement) {
     tick();
     waitTimer = window.setInterval(tick, 1000);
   };
+}
+
+// ---- Cookies ----
+// The guide's cookie needs the visitor's leave (src/scripts/desktop/consent.ts).
+// Without it the desktop asks first, with a bar at the top of the screen; after
+// Allow the log-on goes ahead, the password still in its box. On its own,
+// without the desktop, it goes ahead at once, as the form does without
+// JavaScript: typing the password is asking for the cookie.
+let asking = false;
+async function cookiesAllowed(): Promise<boolean> {
+  const c = (window as unknown as { kus98?: { consent?: { ask(feature: string): Promise<boolean> } } }).kus98?.consent;
+  if (!c) return true;
+  if (asking) return false; // OK pressed again while the bar waits for an answer
+  asking = true;
+  try {
+    return await c.ask('guide');
+  } finally {
+    asking = false;
+  }
 }
