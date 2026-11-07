@@ -305,7 +305,8 @@ the page and is written once Allow All is chosen), `session.ts`, `memory.ts`,
 `boot.ts` and the head script in `Desktop.astro` (which reads `kus98:consent`
 itself). Page content asks through `window.kus98.consent` and writes when
 there's no desktop: Field Guide's `writeStore()`, the Contact draft, Paint's
-`store.ts` and tools, and `lang.ts`. When Allow All is chosen in a page after
+`store.ts` and tools, `lang.ts`, and admin mode's Notepad draft (`keepDraft()`
+in `src/scripts/admin/editor.ts`, This tab). When Allow All is chosen in a page after
 Necessary Only or None (`keepAgain()` in `consent.ts`), `stored()`, the
 language and Paint's tools are written again as the page
 shows them, since that choice removed them; another tab writes only what was
