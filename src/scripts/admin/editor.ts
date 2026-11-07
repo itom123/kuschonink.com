@@ -4,7 +4,8 @@
 // whether the JSON is valid as you type. Save is one commit to main through
 // /v1/admin/files (worker/admin-files.ts), which checks everything again; if
 // someone changed the file meanwhile it asks before overwriting. Unsaved text
-// is kept in this tab (sessionStorage) until it is saved.
+// is kept in this tab (sessionStorage) until it is saved, if the visitor's
+// choice about cookies allows this tab's memory (consent.ts).
 import { AW } from '../../lib/admin-words';
 import { jsonErrorAt } from '../../lib/admin-files';
 import { api, whoAmI, type AdminMe } from './api';
@@ -247,6 +248,7 @@ class Editor {
     }
   }
   keepDraft() {
+    if (!(kus()?.consent?.allows('tab') ?? true)) return;
     try { sessionStorage.setItem(DRAFT + this.path, JSON.stringify({ base: this.base, text: this.text.value })); } catch { /* full or blocked: fine */ }
   }
   dropDraft() {
