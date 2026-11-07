@@ -13,6 +13,7 @@ import { navigate } from './router';
 import { settings } from './settings';
 import { html, isCompact, stored } from './util';
 import * as wm from './wm';
+import { consent } from './consent';
 
 const windows = stored<Record<string, wm.Place>>('kus98:windows', {});
 
@@ -87,6 +88,8 @@ let timer = 0;
 function save() {
   clearTimeout(timer);
   if (!ready) return;
+  // This tab's memory needs the visitor's leave ("Allow All" or "Necessary Only", consent.ts).
+  if (!consent.allows('tab')) return;
   try {
     sessionStorage.setItem(DESK, JSON.stringify(snapshot()));
   } catch { /* private mode, full storage: a refresh starts afresh */ }
