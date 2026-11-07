@@ -16,7 +16,7 @@ const waits: number[] = [];
 const n = notion({ token: 'test-token', fetch: s.fetch, base: s.base, wait: async (ms) => { waits.push(ms); } });
 
 const sugg: Suggestion = {
-  guide: 'paris-photo-days-2026', kind: 'exhibition', name: 'Galerie Exemple', show: 'Winter Light', artists: 'Ana Silva / Bo Chen',
+  guide: 'paris-2026-11', kind: 'exhibition', name: 'Galerie Exemple', show: 'Winter Light', artists: 'Ana Silva / Bo Chen',
   start: '2026-11-08', end: '2026-12-20', hours: 'Tue–Sat 11:00–19:00', address: '1 rue Exemple, 75003 Paris', website: 'https://exemple.fr/',
   links: ['https://exemple.fr/winter', 'https://instagram.com/exemple'], description: 'x'.repeat(2500), own: true, pictureCredit: 'Photo: Ana Silva',
   rights: true, submitter: 'Ana Silva', email: 'ana@example.com', mayContact: true, creditAs: 'Ana Silva', lang: 'en',

@@ -88,41 +88,6 @@
       "optional": true
     },
     {
-      "id": "poly-hornstra",
-      "date": "2026-11-12",
-      "start": "14:00",
-      "place": "A14",
-      "title": "Polycopies talk: Rob Hornstra and Arnold van Bruggen, “Plastic Sea, Perfect Storm”",
-      "titleZh": "Polycopies 对谈：Rob Hornstra 与 Arnold van Bruggen，《Plastic Sea, Perfect Storm》",
-      "note": "In English.",
-      "noteZh": "英语进行。",
-      "optional": true
-    },
-    {
-      "id": "poly-magnum",
-      "date": "2026-11-12",
-      "start": "15:00",
-      "end": "18:00",
-      "place": "A14",
-      "title": "Polycopies signings at the Magnum Photos table: Susan Meiselas 15:00, Carolyn Drake 16:00, Bieke Depoorter 17:00",
-      "titleZh": "Polycopies 签售（Magnum Photos 桌）：Susan Meiselas 15:00、Carolyn Drake 16:00、Bieke Depoorter 17:00",
-      "note": "The signing list changes daily.",
-      "noteZh": "签售名单每天更新。",
-      "optional": true
-    },
-    {
-      "id": "pp-ruff",
-      "date": "2026-11-12",
-      "start": "14:00",
-      "end": "15:00",
-      "place": "A13",
-      "title": "Paris Photo talk: Thomas Ruff with Florian Ebner, “Artistic Practice as Expanded Theory”",
-      "titleZh": "Paris Photo 对谈：Thomas Ruff 与 Florian Ebner，“作为延伸理论的艺术实践”",
-      "note": "Auditorium. Included with a Paris Photo ticket for that day.",
-      "noteZh": "礼堂。凭当天的 Paris Photo 门票入场。",
-      "optional": true
-    },
-    {
       "id": "futures-opening",
       "date": "2026-11-12",
       "start": "17:30",
@@ -163,41 +128,6 @@
       "optional": true
     },
     {
-      "id": "pp-fletcher-perez",
-      "date": "2026-11-13",
-      "start": "15:30",
-      "end": "16:30",
-      "place": "A13",
-      "title": "Paris Photo talk: Gem Fletcher and Elle Pérez, “What is the work of photography today?”",
-      "titleZh": "Paris Photo 对谈：Gem Fletcher 与 Elle Pérez，“今天摄影的工作是什么？”",
-      "note": "Auditorium. Included with a Paris Photo ticket for that day.",
-      "noteZh": "礼堂。凭当天的 Paris Photo 门票入场。",
-      "optional": true
-    },
-    {
-      "id": "poly-petersen",
-      "date": "2026-11-13",
-      "start": "16:00",
-      "place": "A14",
-      "title": "Polycopies talk: Anders Petersen with David Campany, “The Institution Trilogy”",
-      "titleZh": "Polycopies 对谈：Anders Petersen 与 David Campany，《The Institution Trilogy》",
-      "note": "In English.",
-      "noteZh": "英语进行。",
-      "optional": true
-    },
-    {
-      "id": "pp-muholi",
-      "date": "2026-11-13",
-      "start": "17:00",
-      "end": "18:00",
-      "place": "A13",
-      "title": "Paris Photo talk: Zanele Muholi and Tina Campt in conversation with Pablo Larios",
-      "titleZh": "Paris Photo 对谈：Zanele Muholi 与 Tina Campt，主持 Pablo Larios",
-      "note": "Auditorium. Included with a Paris Photo ticket for that day.",
-      "noteZh": "礼堂。凭当天的 Paris Photo 门票入场。",
-      "optional": true
-    },
-    {
       "id": "delpire-shulman",
       "date": "2026-11-13",
       "start": "18:00",
@@ -216,53 +146,6 @@
       "place": "B21",
       "title": "Julia Rajacic in conversation with the five artists of “The Ecology of Movement”",
       "titleZh": "Julia Rajacic 与《The Ecology of Movement》五位艺术家对谈",
-      "optional": true
-    },
-    {
-      "id": "pp-coppola-mack",
-      "date": "2026-11-14",
-      "start": "14:00",
-      "end": "15:00",
-      "place": "A13",
-      "title": "Paris Photo book talk: Sofia Coppola and Michael Mack on photography, publishing and photobooks",
-      "titleZh": "Paris Photo 摄影书对谈：Sofia Coppola 与 Michael Mack 谈摄影、出版和摄影书",
-      "note": "Galerie Courbe. Included with a Paris Photo ticket for that day.",
-      "noteZh": "Galerie Courbe。凭当天的 Paris Photo 门票入场。",
-      "optional": true
-    },
-    {
-      "id": "pp-belin-jaar",
-      "date": "2026-11-14",
-      "start": "14:00",
-      "end": "15:00",
-      "place": "A13",
-      "title": "Paris Photo talk: Alfredo Jaar and Valérie Belin, “The cost of beauty” (Prix Pictet)",
-      "titleZh": "Paris Photo 对谈：Alfredo Jaar 与 Valérie Belin，“美的代价”（Prix Pictet）",
-      "note": "Auditorium. Included with a Paris Photo ticket for that day.",
-      "noteZh": "礼堂。凭当天的 Paris Photo 门票入场。",
-      "optional": true
-    },
-    {
-      "id": "poly-agency",
-      "date": "2026-11-14",
-      "start": "16:00",
-      "place": "A14",
-      "title": "Polycopies talk: Jenia Fridlyand and Raymond Meeks (the Agency)",
-      "titleZh": "Polycopies 对谈：Jenia Fridlyand 与 Raymond Meeks（the Agency）",
-      "note": "In English.",
-      "noteZh": "英语进行。",
-      "optional": true
-    },
-    {
-      "id": "pp-pound-cartagena",
-      "date": "2026-11-15",
-      "start": "14:00",
-      "end": "14:30",
-      "place": "A13",
-      "title": "Paris Photo book talk: Patrick Pound and Alejandro Cartagena, “Archives & Found Photos”",
-      "titleZh": "Paris Photo 摄影书对谈：Patrick Pound 与 Alejandro Cartagena，“档案与拾得照片”",
-      "note": "Galerie Courbe. Included with a Paris Photo ticket for that day.",
-      "noteZh": "Galerie Courbe。凭当天的 Paris Photo 门票入场。",
       "optional": true
     }
   ],

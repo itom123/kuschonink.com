@@ -3,6 +3,7 @@
 import { daysBetween, dayLabel, dayLabelLong, dayStatus, isISODate, mapsRouteUrls, mapsSearchUrl, metresPerPixel, normalise, project, timeIn, todayIn, weekdayOf } from './core.ts';
 import { checkAccess, checkAll, checkGuide, inspectGuide, type RawGuide } from './check.ts';
 import { buildPayload, buildView } from './view.ts';
+import { cityGuide, cityLine, citySlug, currentSlug, slugNames } from './address.ts';
 import type { AccessFile, DayRule } from './types';
 import accessJson from '../../content/guides/access.json' with { type: 'json' };
 
@@ -156,15 +157,15 @@ const base = (): RawGuide => ({
 // The fixture passes; views filter by audience.
 {
   const raw = base();
-  const probs = checkGuide(raw, 'fixture', { ...access, guides: { fixture: ['visitor', 'fotofilmic'] } });
+  const probs = checkGuide(raw, 'paris-fixture', { ...access, moved: undefined, guides: { 'paris-fixture': ['visitor', 'fotofilmic'] } });
   ok(probs.length === 0, 'the fixture guide passes the checks', probs.join('\n  '));
-  const acc: AccessFile = { ...access, guides: { fixture: ['visitor', 'fotofilmic'] }, tiles: { fixture: [2.07, 48.63, 2.8, 49.05] } };
-  ok(checkAccess(acc, ['fixture']).length === 0, 'access.json fixture passes', checkAccess(acc, ['fixture']).join('\n  '));
-  const rep = inspectGuide(raw, 'fixture', acc);
+  const acc: AccessFile = { ...access, moved: undefined, guides: { 'paris-fixture': ['visitor', 'fotofilmic'] }, tiles: { 'paris-fixture': [2.07, 48.63, 2.8, 49.05] } };
+  ok(checkAccess(acc, ['paris-fixture']).length === 0, 'access.json fixture passes', checkAccess(acc, ['paris-fixture']).join('\n  '));
+  const rep = inspectGuide(raw, 'paris-fixture', acc);
   ok(rep.missingZh > 0, 'texts without Chinese are counted', String(rep.missingZh));
 
-  const pv = buildView(raw, 'fixture', acc, P);
-  const vv = buildView(raw, 'fixture', acc, 'visitor');
+  const pv = buildView(raw, 'paris-fixture', acc, P);
+  const vv = buildView(raw, 'paris-fixture', acc, 'visitor');
   ok(pv.places.map((p) => p.id).join() === 'W,F,M', 'participants see W, F and M');
   ok(vv.places.map((p) => p.id).join() === 'F', 'visitors see only F (W and M dropped)', vv.places.map((p) => p.id).join());
   ok(Math.abs(pv.centre[0] - W[0]) < 1e-9 && Math.abs(pv.centre[1] - W[1]) < 1e-9, 'participants: centre is W');
@@ -179,8 +180,8 @@ const base = (): RawGuide => ({
   ok(!vv.texts.some((t) => t.id === 'protect') && pv.texts.some((t) => t.id === 'protect'), 'visitors lose a participants-only section');
   ok(vv.texts[0].paras.length === 1 && pv.texts[0].paras.length === 2, 'and a participants-only paragraph');
   ok(vv.texts[0].paras[0].en === '5 picks, 2 entries and 1 routes.' && vv.subtitle.en === '5 picks', 'placeholders become counts', vv.texts[0].paras[0].en);
-  ok(vv.items[0].why.zh === 'A1 的理由。' && vv.items[1].note.zh === '' && vv.items[0].image?.src === '/guides/fixture/img/a1.jpg', 'Bi filled; image src');
-  ok(vv.map.views[0].src === '/guides/fixture/map/city.jpg', 'map view src');
+  ok(vv.items[0].why.zh === 'A1 的理由。' && vv.items[1].note.zh === '' && vv.items[0].image?.src === '/guides/paris-fixture/img/a1.jpg', 'Bi filled; image src');
+  ok(vv.map.views[0].src === '/guides/paris-fixture/map/city.jpg', 'map view src');
   ok(vv.listings.records[0].item === 'A1' && vv.listings.records[1].item === undefined, 'listings link back to their item');
   ok(vv.items[0].label && !vv.items[3].label && vv.items[3].holiday === 'closed' && vv.items[0].holiday === 'confirm', 'defaults: label for tier A, holiday confirm');
   ok(vv.audienceLabel.en === 'Visitor' && vv.window?.days.length === 8, 'audience label and window days');
@@ -189,23 +190,23 @@ const base = (): RawGuide => ({
   ok(!js.includes('Hotel Fixture') && !js.includes(String(W[0])) && !js.includes('Why A1') && !js.includes('Galerie\\nexpo'), 'the visitor payload holds no hidden place and no long texts');
   ok(pay.items.length === 5 && pay.places.length === 1 && pay.routes.length === 1, 'payload counts');
   ok(js.includes('Opening <3') && !JSON.stringify(pay).replace(/</g, '\\u003c').includes('<'), 'payload "<" can be escaped (load.ts payloadJson)');
-  ok(pay.tiles?.url === '/guides/fixture/tiles/{z}/{x}/{y}.png' && pay.tiles.min === 14 && pay.tiles.max === 19 && vv.tiles?.url === pay.tiles.url, 'payload tiles: the Worker\'s proxy for this guide, z14 to z19', JSON.stringify(pay.tiles));
-  ok(buildPayload(buildView(raw, 'fixture', { ...acc, tiles: undefined }, 'visitor')).tiles === undefined && !('tiles' in buildPayload(buildView(raw, 'fixture', { ...acc, tiles: {} }, 'visitor'))), 'no tile bounds in access.json → no tiles in the payload');
+  ok(pay.tiles?.url === '/guides/paris-fixture/tiles/{z}/{x}/{y}.png' && pay.tiles.min === 14 && pay.tiles.max === 19 && vv.tiles?.url === pay.tiles.url, 'payload tiles: the Worker\'s proxy for this guide, z14 to z19', JSON.stringify(pay.tiles));
+  ok(buildPayload(buildView(raw, 'paris-fixture', { ...acc, tiles: undefined }, 'visitor')).tiles === undefined && !('tiles' in buildPayload(buildView(raw, 'paris-fixture', { ...acc, tiles: {} }, 'visitor'))), 'no tile bounds in access.json → no tiles in the payload');
   let threw = false;
-  try { buildView(raw, 'fixture', { ...acc, guides: { fixture: ['visitor'] } }, P); } catch { threw = true; }
+  try { buildView(raw, 'paris-fixture', { ...acc, guides: { 'paris-fixture': ['visitor'] } }, P); } catch { threw = true; }
   ok(threw, 'an audience not allowed on the guide throws');
   const noZh = base();
   delete (noZh.items as { items: Record<string, unknown>[] }).items[0].whyZh;
-  ok(checkGuide(noZh, 'fixture', acc).length === 0 && buildView(noZh, 'fixture', acc, 'visitor').items[0].why.zh === '', 'deleting whyZh passes, and why.zh is ""');
+  ok(checkGuide(noZh, 'paris-fixture', acc).length === 0 && buildView(noZh, 'paris-fixture', acc, 'visitor').items[0].why.zh === '', 'deleting whyZh passes, and why.zh is ""');
 }
 
 // ---------------------------------------------------------------------------
 // Broken copies: each must fail with file › id › field.
 {
-  const acc: AccessFile = { ...access, guides: { fixture: ['visitor', 'fotofilmic'] }, tiles: { fixture: [2.07, 48.63, 2.8, 49.05] } };
+  const acc: AccessFile = { ...access, moved: undefined, guides: { 'paris-fixture': ['visitor', 'fotofilmic'] }, tiles: { 'paris-fixture': [2.07, 48.63, 2.8, 49.05] } };
   type G = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   const cases: [string, (g: G) => void, string, string?][] = [
-    ['bad date', (g) => { g.items.items[3].end = '2026-11-31'; }, 'guides/fixture/items.json › B1 › end', 'not a real date'],
+    ['bad date', (g) => { g.items.items[3].end = '2026-11-31'; }, 'guides/paris-fixture/items.json › B1 › end', 'not a real date'],
     ['start after end', (g) => { Object.assign(g.items.items[1], { start: '2026-12-01', end: '2026-11-01' }); }, 'items.json › A2 › end', 'before the start'],
     ['wrong year', (g) => { Object.assign(g.items.items[2], { start: '2025-10-01', end: '2025-12-01' }); }, 'items.json › A3 › end', 'check the year'],
     ['duplicate id', (g) => { g.items.items[1].id = 'A1'; }, 'items.json › A1 › id', 'used twice'],
@@ -245,52 +246,52 @@ const base = (): RawGuide => ({
   for (const [name, mutate, where, what] of cases) {
     const g = structuredClone(base()) as G;
     mutate(g);
-    const probs = checkGuide(g as RawGuide, 'fixture', acc);
+    const probs = checkGuide(g as RawGuide, 'paris-fixture', acc);
     const hit = probs.find((p) => p.includes(where) && (!what || p.toLowerCase().includes(what.toLowerCase())));
     ok(!!hit, `broken copy: ${name}`, hit || probs.join(' | ') || '(no problems found)');
   }
   // Keys starting with _ are notes, not fields.
   const g = structuredClone(base()) as G;
   g.items.items[0]._todo = 'check hours';
-  ok(checkGuide(g as RawGuide, 'fixture', acc).length === 0, 'keys starting with _ are ignored');
+  ok(checkGuide(g as RawGuide, 'paris-fixture', acc).length === 0, 'keys starting with _ are ignored');
   // "1h30" is a duration, not a time, so its Chinese needs no "01:30".
   const dur = structuredClone(base()) as G;
   Object.assign(dur.routes.routes[1], { duration: 'Allow 1h30 between venues', durationZh: '留出1小时30分钟' });
-  ok(checkGuide(dur as RawGuide, 'fixture', acc).length === 0, '"1h30" is not read as a time', checkGuide(dur as RawGuide, 'fixture', acc).join(' | '));
+  ok(checkGuide(dur as RawGuide, 'paris-fixture', acc).length === 0, '"1h30" is not read as a time', checkGuide(dur as RawGuide, 'paris-fixture', acc).join(' | '));
   // access.json and folders.
-  const a2 = checkAccess({ ...acc, guides: { ...acc.guides, ghost: ['visitor'] } }, ['fixture', 'orphan']);
+  const a2 = checkAccess({ ...acc, guides: { ...acc.guides, ghost: ['visitor'] } }, ['paris-fixture', 'orphan']);
   ok(a2.some((p) => p.includes('access.json › guides › ghost')) && a2.some((p) => p.includes('guides/orphan/')), 'access.json and folders must agree', a2.join(' | '));
-  const a3 = checkAccess({ ...acc, audiences: [...acc.audiences, { id: 'staff', label: 'Staff', secret: 'hunter2', includes: ['nobody'] }] }, ['fixture']);
+  const a3 = checkAccess({ ...acc, audiences: [...acc.audiences, { id: 'staff', label: 'Staff', secret: 'hunter2', includes: ['nobody'] }] }, ['paris-fixture']);
   ok(a3.some((p) => p.includes('› staff › secret')) && a3.some((p) => p.includes('› staff › includes[0]')), 'audience secret names and includes are checked');
-  const a4 = checkAccess({ ...acc, audiences: [...acc.audiences].reverse() }, ['fixture']);
+  const a4 = checkAccess({ ...acc, audiences: [...acc.audiences].reverse() }, ['paris-fixture']);
   ok(a4.length === 1 && a4[0].includes('access.json › fotofilmic › includes[0]') && a4[0].includes('"visitor" must be listed before "fotofilmic"'), 'audiences must go from least to most privileged', a4.join(' | '));
   // Street-level tile bounds: [west, south, east, north], for a guide that exists, one region wide.
-  const t1 = checkAccess({ ...acc, tiles: { fixture: [2.8, 48.63, 2.07, 49.05] } }, ['fixture']);
-  ok(t1.length === 1 && t1[0].includes('access.json › tiles › fixture') && t1[0].includes('west 2.8 should be less than east 2.07'), 'tile bounds: west before east', t1.join(' | '));
-  const t2 = checkAccess({ ...acc, tiles: { fixture: [2.07, 49.05, 2.8, 48.63] } }, ['fixture']);
+  const t1 = checkAccess({ ...acc, tiles: { 'paris-fixture': [2.8, 48.63, 2.07, 49.05] } }, ['paris-fixture']);
+  ok(t1.length === 1 && t1[0].includes('access.json › tiles › paris-fixture') && t1[0].includes('west 2.8 should be less than east 2.07'), 'tile bounds: west before east', t1.join(' | '));
+  const t2 = checkAccess({ ...acc, tiles: { 'paris-fixture': [2.07, 49.05, 2.8, 48.63] } }, ['paris-fixture']);
   ok(t2.length === 1 && t2[0].includes('south 49.05 should be less than north 48.63'), 'tile bounds: south before north', t2.join(' | '));
-  const t3 = checkAccess({ ...acc, tiles: { ghost: [2.07, 48.63, 2.8, 49.05], fixture: [2.07, 48.63, 2.8], _comment: 'fine' } }, ['fixture']);
-  ok(t3.some((p) => p.includes('› tiles › ghost') && p.includes('not a guide')) && t3.some((p) => p.includes('› tiles › fixture') && p.includes('four numbers')) && !t3.some((p) => p.includes('_comment')), 'tile bounds: a known guide, four numbers; _comment allowed', t3.join(' | '));
-  const t4 = checkAccess({ ...acc, tiles: { fixture: [-1, 40, 5, 49] } }, ['fixture']);
+  const t3 = checkAccess({ ...acc, tiles: { ghost: [2.07, 48.63, 2.8, 49.05], 'paris-fixture': [2.07, 48.63, 2.8], _comment: 'fine' } }, ['paris-fixture']);
+  ok(t3.some((p) => p.includes('› tiles › ghost') && p.includes('not a guide')) && t3.some((p) => p.includes('› tiles › paris-fixture') && p.includes('four numbers')) && !t3.some((p) => p.includes('_comment')), 'tile bounds: a known guide, four numbers; _comment allowed', t3.join(' | '));
+  const t4 = checkAccess({ ...acc, tiles: { 'paris-fixture': [-1, 40, 5, 49] } }, ['paris-fixture']);
   ok(t4.length === 1 && t4[0].includes('spans more than 3°'), 'tile bounds: one region, not a country', t4.join(' | '));
-  const t5 = checkAccess({ ...acc, tiles: { fixture: [2.07, 48.63, 2.8, 91] } }, ['fixture']);
+  const t5 = checkAccess({ ...acc, tiles: { 'paris-fixture': [2.07, 48.63, 2.8, 91] } }, ['paris-fixture']);
   ok(t5.some((p) => p.includes('latitudes') && p.includes('85.06')), 'tile bounds: Web Mercator latitudes', t5.join(' | '));
-  const t6 = inspectGuide(base(), 'fixture', { ...acc, tiles: { fixture: [2.2, 48.8, 2.5, 48.9] } }).problems;
-  ok(t6.length === 1 && t6[0].includes('guides/fixture/map.json › region') && t6[0].includes('outside the tile bounds'), 'a base map reaching beyond the tile bounds is reported (the city map fits)', t6.join(' | '));
-  ok(checkAccess({ ...acc, tiles: undefined }, ['fixture']).length === 0 && inspectGuide(base(), 'fixture', { ...acc, tiles: undefined }).problems.length === 0, 'no tile bounds: nothing to report');
+  const t6 = inspectGuide(base(), 'paris-fixture', { ...acc, tiles: { 'paris-fixture': [2.2, 48.8, 2.5, 48.9] } }).problems;
+  ok(t6.length === 1 && t6[0].includes('guides/paris-fixture/map.json › region') && t6[0].includes('outside the tile bounds'), 'a base map reaching beyond the tile bounds is reported (the city map fits)', t6.join(' | '));
+  ok(checkAccess({ ...acc, tiles: undefined }, ['paris-fixture']).length === 0 && inspectGuide(base(), 'paris-fixture', { ...acc, tiles: undefined }).problems.length === 0, 'no tile bounds: nothing to report');
   // checkAll throws once with every line.
   const bad = structuredClone(base()) as G;
   bad.items.items[3].end = '2026-11-31';
   bad.routes.routes[1].stops[1] = 'B55';
   let msg = '';
-  try { checkAll({ fixture: bad as RawGuide }, acc); } catch (e) { msg = (e as Error).message; }
-  ok(/^Field Guide: 2 problems in src\/content\/guides\/\. The site was not updated\./.test(msg) && msg.includes('\n  guides/fixture/routes.json › marais › stops[1]'), 'checkAll throws one error with every line', msg.split('\n')[0]);
+  try { checkAll({ 'paris-fixture': bad as RawGuide }, acc); } catch (e) { msg = (e as Error).message; }
+  ok(/^Field Guide: 2 problems in src\/content\/guides\/\. The site was not updated\./.test(msg) && msg.includes('\n  guides/paris-fixture/routes.json › marais › stops[1]'), 'checkAll throws one error with every line', msg.split('\n')[0]);
 }
 
 // ---------------------------------------------------------------------------
 // The real data (A1 writes it); skipped until it exists.
 {
-  const dir = '../../content/guides/paris-photo-days-2026/';
+  const dir = '../../content/guides/paris-2026-11/';
   const files = ['guide', 'items', 'places', 'events', 'routes', 'listings', 'map'] as const;
   const raw: RawGuide = {};
   let missing = '';
@@ -303,15 +304,15 @@ const base = (): RawGuide => ({
   }
   if (missing) console.log('SKIP the real data: items.json is not there yet');
   else {
-    const rep = inspectGuide(raw, 'paris-photo-days-2026', access);
+    const rep = inspectGuide(raw, 'paris-2026-11', access);
     ok(rep.problems.length === 0, 'the real data passes the checks', rep.problems.slice(0, 40).join('\n  '));
     if (!rep.problems.length) {
       const counts = (aud: string) => {
-        const v = buildView(raw, 'paris-photo-days-2026', access, aud);
+        const v = buildView(raw, 'paris-2026-11', access, aud);
         return `${v.items.length} items, ${v.places.length} places, ${v.routes.length} routes, ${v.events.length} events, ${v.days.length} days`;
       };
-      const pv = buildView(raw, 'paris-photo-days-2026', access, P);
-      const vv = buildView(raw, 'paris-photo-days-2026', access, 'visitor');
+      const pv = buildView(raw, 'paris-2026-11', access, P);
+      const vv = buildView(raw, 'paris-2026-11', access, 'visitor');
       ok(!vv.places.some((p) => p.id === 'W' || p.id === 'M') && vv.days.length === 0 && !vv.routes.some((r) => r.id === 'after-class'), 'real visitor view drops W, M, day plans and after-class');
       ok(pv.places.some((p) => p.id === 'W') && vv.centre.join() !== pv.centre.join(), 'real centre moves for visitors');
       const vjs = JSON.stringify(buildPayload(vv));
@@ -320,6 +321,28 @@ const base = (): RawGuide => ({
       console.log(`  visitor: ${counts('visitor')}; ${P}: ${counts(P)}; ${rep.missingZh} texts without Chinese`);
     }
   }
+}
+
+// ---- Addresses: the city first, old addresses moved, /guides/<city> ----
+{
+  ok(citySlug('Paris') === 'paris' && citySlug('São Paulo') === 'sao-paulo' && citySlug(' Île-de-France ') === 'ile-de-france', 'citySlug: lower case, no accents, hyphens');
+  const acc = { guides: { 'paris-2026-11': ['visitor'], 'lisbon-2027-06': ['visitor'] }, moved: { 'paris-photo-days-2026': 'paris-2026-11', _comment: 'x' } } as unknown as AccessFile;
+  ok(currentSlug(acc, 'paris-2026-11') === 'paris-2026-11' && currentSlug(acc, 'paris-photo-days-2026') === 'paris-2026-11', 'currentSlug: a guide is itself; a moved address names its guide');
+  ok(currentSlug(acc, 'nowhere') === null && currentSlug(acc, '_comment') === null && currentSlug(acc, 'constructor') === null, 'currentSlug: null for anything else');
+  ok(slugNames(acc, 'paris-2026-11').join() === 'paris-2026-11,paris-photo-days-2026' && slugNames(acc, 'lisbon-2027-06').join() === 'lisbon-2027-06', 'slugNames: the slug, then its old names');
+  const line = cityLine([{ slug: 'paris-2027-11', city: 'Paris' }, { slug: 'lisbon-2027-06', city: 'Lisbon' }, { slug: 'paris-2026-11', city: 'Paris' }]);
+  ok(line === 'paris:paris-2027-11 lisbon:lisbon-2027-06', 'cityLine: the first listed guide of each city', line);
+  ok(cityGuide(line, 'paris') === 'paris-2027-11' && cityGuide(line, 'lisbon') === 'lisbon-2027-06' && cityGuide(line, 'rome') === null && cityGuide('', 'paris') === null, 'cityGuide reads the line back');
+
+  const g = base();
+  const wrong = checkGuide(g, 'photo-week-2026', { ...access, guides: { 'photo-week-2026': ['visitor', 'fotofilmic'] } });
+  ok(wrong.length === 1 && wrong[0].includes('guides/photo-week-2026/guide.json › guide › city') && wrong[0].includes('"paris-2026-11"'), 'an address that does not start with the city is reported, with the one to use', wrong.join(' | '));
+
+  const real = access as AccessFile;
+  const m1 = checkAccess({ ...real, moved: { 'paris-photo-days-2026': 'paris-2026-11', _comment: 'fine' } }, Object.keys(real.guides));
+  ok(m1.length === 0, 'moved: an old address sent to a guide passes', m1.join(' | '));
+  const m2 = checkAccess({ ...real, moved: { 'paris-2026-11': 'paris-2026-11', 'Old Name': 'paris-2026-11', gone: 'nowhere' } }, Object.keys(real.guides));
+  ok(m2.some((p) => p.includes('› moved › paris-2026-11') && p.includes('still a guide')) && m2.some((p) => p.includes('› moved › Old Name') && p.includes('lower-case-kebab')) && m2.some((p) => p.includes('› moved › gone') && p.includes('"nowhere" is not a guide')), 'moved: a guide still in use, a bad address and a missing target are reported', m2.join(' | '));
 }
 
 console.log(fails ? `${fails} FAILED` : 'all passed');

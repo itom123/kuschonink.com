@@ -29,7 +29,7 @@ const walk = (d: string) => {
 walk('src/content');
 files['src/assets/images/projects/hanabi/burst.jpg'] = new Uint8Array(readFileSync('src/assets/images/projects/hanabi/burst.jpg'));
 const ALL = Object.keys(files);
-const SLUG = 'paris-photo-days-2026';
+const SLUG = 'paris-2026-11';
 
 function world() {
   const g = githubStandIn({ files, token: 'gh' });

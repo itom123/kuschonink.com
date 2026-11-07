@@ -15,6 +15,8 @@ import { cleanImage, EXT, fromBase64 } from './image.ts';
 import { NotionError, R, type Notion } from './notion.ts';
 import { contactProps, KINDS, newReference, S, suggestionProps, type Kind, type Stamp, type Suggestion } from './suggestions.ts';
 import { fingerprint } from '../src/lib/guides/dedupe.ts';
+import { slugNames } from '../src/lib/guides/address.ts';
+import type { AccessFile } from '../src/lib/guides/types';
 
 export const TURNSTILE_ACTION = 'kuschonink-suggest';
 /** The picture, after base64: 4 MB. The browser sends ≤1600 px JPEGs, far smaller. */
@@ -47,12 +49,19 @@ export interface SuggestDeps {
   visitor: (ip: string | null) => string;
   now: () => number;
   log: (...args: unknown[]) => void;
+  /** access.json: the guide's old addresses ("moved"), so a place suggested before a guide moved is still found. */
+  access?: Pick<AccessFile, 'guides' | 'moved'>;
 }
 
 const PRIVATE = { 'cache-control': 'private, no-store', 'x-robots-tag': 'noindex', 'x-content-type-options': 'nosniff' };
 const json = (body: unknown, status: number, extra: Record<string, string> = {}) =>
   new Response(JSON.stringify(body), { status, headers: { ...PRIVATE, 'content-type': 'application/json; charset=utf-8', ...extra } });
 const fail = (error: string, status: number, field?: string) => json(field ? { error, field } : { error }, status);
+
+/** A place's fingerprint under each name its guide has had (fingerprint() starts with the guide). */
+function fingerprints(fp: string, slug: string, deps: Pick<SuggestDeps, 'access'>): string[] {
+  return deps.access ? slugNames(deps.access, slug).map((n) => n + fp.slice(slug.length)) : [fp];
+}
 
 /** "2026-11-08" and a real day; "" is allowed (not known). */
 export function isDate(s: string): boolean {
@@ -266,7 +275,7 @@ export async function handleSuggest(req: Request, slug: string, deps: SuggestDep
       const n = deps.notion;
       // A hint for the owner: the same fingerprint or website already in the queue.
       const same = await n.query(deps.db.suggestions, {
-        filter: { or: [{ property: S.fingerprint, rich_text: { equals: fp } }, ...(c.s.website ? [{ property: S.website, url: { equals: c.s.website } }] : [])] },
+        filter: { or: [...fingerprints(fp, slug, deps).map((f) => ({ property: S.fingerprint, rich_text: { equals: f } })), ...(c.s.website ? [{ property: S.website, url: { equals: c.s.website } }] : [])] },
         page_size: 3,
       });
       stamp.duplicate = same.results.map((p) => `${R.text(p, S.reference) || p.id} ${R.title(p, S.name)}`.trim()).join('; ').slice(0, 500);

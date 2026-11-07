@@ -27,7 +27,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { notion, P, R } from '../../worker/notion.ts';
-import { isStatus, logProps, readSuggestion, S, STATUSES, type SuggestionRow } from '../../worker/suggestions.ts';
+import { guideIs, isStatus, logProps, readSuggestion, S, STATUSES, type SuggestionRow } from '../../worker/suggestions.ts';
 import { buildItem, forbiddenWord, nextId } from '../../worker/publish.ts';
 import { checkGuide, GUIDE_FILES, type RawGuide } from '../../src/lib/guides/check.ts';
 import { distanceM, findMatches, type Known } from '../../src/lib/guides/dedupe.ts';
@@ -69,7 +69,7 @@ function needDb() {
 async function row(id: string | undefined): Promise<SuggestionRow> {
   if (!id) die('which page? (its id)');
   needDb();
-  return readSuggestion(await n.getPage(id));
+  return readSuggestion(await n.getPage(id), access);
 }
 
 /** The guide's files, from the checkout or download this tool is in. */
@@ -124,8 +124,8 @@ switch (cmd) {
     const status = flag('status');
     const slug = flag('guide');
     if (status && !(STATUSES as readonly string[]).includes(status)) die(`status is one of ${STATUSES.join(', ')}`);
-    const filter = { and: [...(status ? [isStatus(status as never)] : []), ...(slug ? [{ property: S.guide, select: { equals: slug } }] : [])] };
-    const rows = (await n.queryAll(DB.suggestions, { ...(filter.and.length ? { filter } : {}), sorts: [{ timestamp: 'created_time', direction: 'ascending' }] }, 500)).map(readSuggestion);
+    const filter = { and: [...(status ? [isStatus(status as never)] : []), ...(slug ? [guideIs(access, slug)] : [])] };
+    const rows = (await n.queryAll(DB.suggestions, { ...(filter.and.length ? { filter } : {}), sorts: [{ timestamp: 'created_time', direction: 'ascending' }] }, 500)).map((p) => readSuggestion(p, access));
     out(rows.map(({ pictures, webPictures, ...x }) => ({ ...x, pictures: pictures.length, webPictures: webPictures.length })));
     break;
   }
@@ -201,7 +201,7 @@ switch (cmd) {
       ...(((raw.places as { places?: { id: string; name: string; address: string; coordinates: [number, number] }[] })?.places) ?? []).map((x) => ({ id: x.id, kind: 'place' as const, name: x.name, address: x.address, coordinates: x.coordinates })),
     ];
     needDb();
-    const others = (await n.queryAll(DB.suggestions, { filter: { property: S.guide, select: { equals: r.guide } } }, 1000)).map(readSuggestion).filter((o) => o.id !== r.id && o.status !== 'SPAM');
+    const others = (await n.queryAll(DB.suggestions, { filter: guideIs(access, r.guide) }, 1000)).map((p) => readSuggestion(p, access)).filter((o) => o.id !== r.id && o.status !== 'SPAM');
     for (const o of others) known.push({ id: `${o.reference || o.id} (${o.status}${o.itemId ? ` ${o.itemId}` : ''})`, kind: 'submission', name: o.name, show: o.show, artists: o.artists, address: o.address, website: o.website, links: o.links, start: o.start, end: o.end });
     const coords = Array.isArray(entry.coordinates) ? (entry.coordinates as [number, number]) : undefined;
     const matches = findMatches({ name: String(entry.name ?? r.name), show: String(entry.subtitle ?? r.show), artists: String(entry.by ?? r.artists), address: String(entry.address ?? r.address), website: r.website, links: r.links, coordinates: coords, start: String(entry.start ?? r.start), end: String(entry.end ?? r.end) }, known);

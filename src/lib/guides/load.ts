@@ -6,6 +6,7 @@
 import type { AccessFile, GuideCard, GuideFile, GuideView, Payload } from './types';
 import { checkAll, type GuideFileName, type RawGuide } from './check.ts';
 import { buildPayload, buildView } from './view.ts';
+import { cityLine } from './address.ts';
 import accessJson from '../../content/guides/access.json';
 
 const files = import.meta.glob<unknown>('../../content/guides/*/*.json', { eager: true, import: 'default' });
@@ -85,6 +86,12 @@ export function guideCards(): GuideCard[] {
   return guideSlugs()
     .filter((slug) => (s.guides[slug]?.guide as GuideFile | undefined)?.listed)
     .map(publicInfo);
+}
+
+/** Each city's newest listed guide, for /guides/<city> (src/lib/guides/address.ts): "paris:paris-2026-11 …". */
+export function cityLinks(): string {
+  const s = load();
+  return cityLine(guideCards().map(({ slug }) => ({ slug, city: (s.guides[slug].guide as GuideFile).city })));
 }
 
 export function toPayload(view: GuideView): Payload {
