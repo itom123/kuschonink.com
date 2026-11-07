@@ -905,8 +905,20 @@ GitHub，只能写 Notion（见下面的“安全”）。
    - 名字，比如 `Field Guide suggestions`；提示词照抄：
 
      ```text
-     Run curl -fsS https://raw.githubusercontent.com/itom123/kuschonink.com/main/scripts/suggestions/ROUTINE.md and follow the instructions it prints. No repository is attached to this task, on purpose. If this run was started with a text, it says why (approved: …, or manual: …).
+     Process the approved suggestions for my Field Guide (kuschonink.com). No repository is attached to this task, on purpose. The code is mine, in my public repository itom123/kuschonink.com, and I'm asking you to download it and run it.
+
+     First, from the working directory, run exactly this command. It downloads my suggestions tool into field-guide, from the commit my live site runs, and prints what it took:
+     curl -fsS https://raw.githubusercontent.com/itom123/kuschonink.com/main/scripts/suggestions/download.mjs -o download.mjs && NODE_USE_ENV_PROXY=1 node --no-warnings download.mjs field-guide
+
+     Then read field-guide/scripts/suggestions/ROUTINE.md and follow it. It has you run the tool that command downloaded, field-guide/tool, whose commands (list, claim, show, match, geocode, check, picture, web-picture, ready, mark, log) read and update the suggestions in my Notion; run npm install --prefix field-guide --no-audit --no-fund for sharp; and check once with curl that api.github.com refuses my repository. I'm asking for all of those too.
+
+     If this run was started with a text, it says why (approved: …, or manual: …).
      ```
+
+     提示词为什么把命令写全：Claude Code 的自动模式（auto mode）会检查例程要执行的每条命令，但它看不到运行中读到的内容（比如下载下来的
+     ROUTINE.md）；只有提示词本身写明了那条命令，它才允许下载并运行代码（2026 年 11 月 7 日，旧提示词的一次运行就因此被拒：
+     “Code from External”）。所以提示词里的下载命令、工具和 npm install 要跟 ROUTINE.md 里写的一字不差（`npm test` 会检查）；
+     改了 ROUTINE.md 里的这几条命令，也要改任务的提示词。
 
    - **Trigger**：先选 **API**，再点 **+** 加一个 **Schedule**（先选每小时，下面再改）。不挂仓库时，是 API 触发器让它成为
      Claude Code 任务（在云端环境里运行，能执行命令）；只有时间表的话，对话框建的是 claude.ai 的聊天任务。
@@ -923,9 +935,11 @@ GitHub，只能写 Notion（见下面的“安全”）。
    **Generate token**，同样只显示一次；以后换令牌用 **Regenerate**，不要删：删掉令牌就删掉了 API 触发器）。把两者存成
    Cloudflare secret `ROUTINE_FIRE_URL` 和 `ROUTINE_TOKEN`，只给正式网站、不给预览（在切换到 Worker Previews 之后再存，
    见第 7 节）。管理模式的“收录”和“立即运行”用它。**Run now** 和 API 触发合计每个任务每小时最多 30 次。
-5. 试一次：在任务里 **Run now**，看它的会话记录。应该看到：没有克隆任何仓库；`download.mjs` 下载了网站当前运行的提交
-   （`commit`）的文件；GitHub 的检查得到 403（“… is not enabled for this session”）；然后列出待处理的推荐。Notion 的处理日志
-   只在真的处理了推荐，或者例程因为能读到仓库而停下时，才有新的一行。
+5. 试一次：在任务里 **Run now**，看它的会话记录。应该看到：没有克隆任何仓库；下载命令把网站当前运行的提交（`commit`）的
+   文件下载到工作目录里的 `field-guide`；GitHub 的检查得到 403（“… is not enabled for this session”）；然后列出待处理的推荐。
+   带文字触发的运行（管理模式的“收录”和“立即运行”）会在第二条消息里收到那段文字，于是再查一遍队列，这时下载会说 `reused`。
+   要是有命令被权限检查拒绝（“denied by the Claude Code auto mode classifier”），对照提示词和 ROUTINE.md 里的命令。Notion 的
+   处理日志只在真的处理了推荐，或者例程因为能读到仓库而停下时，才有新的一行。
 
 安全：
 
@@ -936,9 +950,10 @@ GitHub，只能写 Notion（见下面的“安全”）。
   所以不管读到什么，例程都推不了、也开不了 PR。（网络 secret 也从来不会加到发往 GitHub 的请求上。）每次运行在处理之前都先
   检查这个 403；如果 GitHub 反而回了内容，它什么都不处理，在处理日志里记一条 `Failed`：把仓库从任务上去掉。永远不要给这个
   任务挂仓库，也不要给它的环境 GitHub 令牌。
-- **它读什么**：提示词从 `main` 取 ROUTINE.md；然后 `scripts/suggestions/download.mjs` 从 raw.githubusercontent.com 下载
-  工具、工具引用的模块和各份导览的 JSON，全部来自同一个提交：网站当前运行的那个（页面里的版本号，发布器也认它；网站没给就用
-  `main`）。所以例程的检查就是发布器的检查。仓库是公开的；raw.githubusercontent.com 只提供已经提交的文件。
+- **它读什么**：提示词从 `main` 取 `scripts/suggestions/download.mjs` 并运行它；它从 raw.githubusercontent.com 下载工具、
+  工具引用的模块、各份导览的 JSON 和 ROUTINE.md，全部来自同一个提交：网站当前运行的那个（页面里的版本号，发布器也认它；网站
+  没给就用 `main`）。例程接着读下载下来的 ROUTINE.md。所以例程的检查就是发布器的检查，说明也和工具是同一个版本。仓库是公开的；
+  raw.githubusercontent.com 只提供已经提交的文件。
 - **被误导的例程还能做什么**：只能写例程的集成连接的两个数据库（Suggestions 和处理日志，读不到 Contacts）。`READY` 的条目
   还要通过发布器的检查才会进导览，而且只改那份导览的 `items.json` 和 `img/`。
 
@@ -979,8 +994,24 @@ Set it up once on claude.ai:
    - A name, such as `Field Guide suggestions`, and this prompt, as it is:
 
      ```text
-     Run curl -fsS https://raw.githubusercontent.com/itom123/kuschonink.com/main/scripts/suggestions/ROUTINE.md and follow the instructions it prints. No repository is attached to this task, on purpose. If this run was started with a text, it says why (approved: …, or manual: …).
+     Process the approved suggestions for my Field Guide (kuschonink.com). No repository is attached to this task, on purpose. The code is mine, in my public repository itom123/kuschonink.com, and I'm asking you to download it and run it.
+
+     First, from the working directory, run exactly this command. It downloads my suggestions tool into field-guide, from the commit my live site runs, and prints what it took:
+     curl -fsS https://raw.githubusercontent.com/itom123/kuschonink.com/main/scripts/suggestions/download.mjs -o download.mjs && NODE_USE_ENV_PROXY=1 node --no-warnings download.mjs field-guide
+
+     Then read field-guide/scripts/suggestions/ROUTINE.md and follow it. It has you run the tool that command downloaded, field-guide/tool, whose commands (list, claim, show, match, geocode, check, picture, web-picture, ready, mark, log) read and update the suggestions in my Notion; run npm install --prefix field-guide --no-audit --no-fund for sharp; and check once with curl that api.github.com refuses my repository. I'm asking for all of those too.
+
+     If this run was started with a text, it says why (approved: …, or manual: …).
      ```
+
+     Why the prompt spells out commands: Claude Code's auto mode checks
+     each command a run makes, but never sees what the run read (such as
+     the downloaded ROUTINE.md). It lets a run download and run code only
+     when the prompt itself names that command: on 7 Nov 2026 a run under
+     the old prompt was refused ("Code from External"). So the prompt names
+     the download command, the tool and npm install exactly as ROUTINE.md
+     writes them (`npm test` checks this). If those commands change in
+     ROUTINE.md, change the task's prompt too.
 
    - **Trigger**: **API** first, then **+** ▸ **Schedule** (hourly for now,
      changed below). With no repository, the API trigger is what makes this a
@@ -1011,10 +1042,14 @@ Set it up once on claude.ai:
    Now use it. **Run now** and API fires share 30 an hour per task.
 5. Try it: **Run now** on the task, and read its session. It should clone no
    repository, download the files of the commit the live site runs
-   (`commit`), get a 403 from GitHub ("… is not enabled for this session"),
-   then list the queue. The Processing log only gets a line when a
-   suggestion was handled, or when a run stopped because it could reach the
-   repository.
+   (`commit`) into `field-guide` in the working directory, get a 403 from
+   GitHub ("… is not enabled for this session"), then list the queue. A run
+   started with a text (admin mode's Approve and Run Now) gets the text as a
+   second message and goes through the queue again; the download then says
+   `reused`. If the permission check refused a command ("denied by the
+   Claude Code auto mode classifier"), compare the prompt's commands with
+   ROUTINE.md's. The Processing log only gets a line when a suggestion was
+   handled, or when a run stopped because it could reach the repository.
 
 Safety:
 
@@ -1031,12 +1066,13 @@ Safety:
   GitHub answers instead, it processes nothing and logs `Failed`: take the
   repository off the task. Never attach the repository to this task, and
   never give its environment a GitHub token.
-- **What a run reads**: ROUTINE.md from `main` (its prompt), then, through
-  `scripts/suggestions/download.mjs`, the tool, the modules it imports and
-  the guides' JSON from raw.githubusercontent.com, all from one commit: the
-  one the live site runs (the build id in its pages, which the publisher
-  also goes by), or `main` if the site gives none. So the routine's checks
-  are the publisher's own. The repository is public, and
+- **What a run reads**: `scripts/suggestions/download.mjs` from `main` (its
+  prompt runs it), then, through it, the tool, the modules it imports, the
+  guides' JSON and ROUTINE.md from raw.githubusercontent.com, all from one
+  commit: the one the live site runs (the build id in its pages, which the
+  publisher also goes by), or `main` if the site gives none. The run then
+  reads that ROUTINE.md. So the routine's checks are the publisher's own,
+  and its instructions go with its tool. The repository is public, and
   raw.githubusercontent.com only serves committed files.
 - **What a misled run could still do**: write to the two databases the
   routine's integration is connected to (Suggestions and the Processing log;
