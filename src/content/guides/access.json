@@ -1,0 +1,10 @@
+{
+  "_comment": "Who may open which guide. Each audience's password is a Cloudflare secret, named below (the name, never the password). List audiences from least to most privileged: a password that matches several opens the first. 谁可以打开哪份导览：每个受众的密码是 Cloudflare 里的一个 secret，这里只写它的名字，不写密码。受众按权限从低到高排列。See docs/GUIDES.md.",
+  "audiences": [
+    { "id": "visitor", "label": "Visitor", "labelZh": "访客", "secret": "GUIDES_PASSWORD" },
+    { "id": "fotofilmic", "label": "FotoFilmic participant", "labelZh": "FotoFilmic 学员", "secret": "GUIDES_PASSWORD_FOTOFILMIC", "includes": ["visitor"] }
+  ],
+  "guides": {
+    "paris-photo-days-2026": ["visitor", "fotofilmic"]
+  }
+}

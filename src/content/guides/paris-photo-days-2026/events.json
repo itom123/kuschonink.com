@@ -1,0 +1,130 @@
+{
+  "_comment": "Dated events and the day-by-day plan (participants only). Times are Paris time, HH:MM. 活动与每日安排（每日安排只给学员）；时间为巴黎时间。",
+  "events": [
+    {
+      "id": "meet-greet",
+      "date": "2026-11-08",
+      "start": "17:00",
+      "end": "18:00",
+      "place": "M",
+      "title": "FotoFilmic meet & greet",
+      "titleZh": "FotoFilmic 见面会",
+      "optional": true,
+      "audience": "fotofilmic"
+    },
+    {
+      "id": "class-1",
+      "date": "2026-11-09",
+      "start": "09:30",
+      "place": "W",
+      "title": "Workshop day 1",
+      "titleZh": "工作坊第1天",
+      "audience": "fotofilmic"
+    },
+    {
+      "id": "class-2",
+      "date": "2026-11-10",
+      "start": "09:00",
+      "place": "W",
+      "title": "Workshop day 2",
+      "titleZh": "工作坊第2天",
+      "audience": "fotofilmic"
+    },
+    {
+      "id": "class-3",
+      "date": "2026-11-11",
+      "start": "09:00",
+      "place": "W",
+      "title": "Workshop day 3",
+      "titleZh": "工作坊第3天",
+      "audience": "fotofilmic"
+    },
+    {
+      "id": "opening",
+      "date": "2026-11-10",
+      "start": "18:00",
+      "end": "20:00",
+      "place": "F",
+      "title": "FotoFilmic opening",
+      "titleZh": "FotoFilmic 开幕式"
+    },
+    {
+      "id": "gallery-hours",
+      "date": "2026-11-11",
+      "until": "2026-11-14",
+      "start": "11:00",
+      "end": "19:00",
+      "place": "F",
+      "title": "FotoFilmic exhibition open to the public",
+      "titleZh": "FotoFilmic 展览对公众开放"
+    },
+    {
+      "id": "jrnl",
+      "date": "2026-11-13",
+      "start": "18:00",
+      "end": "20:00",
+      "place": "F",
+      "title": "JRNL magazine launch",
+      "titleZh": "JRNL 杂志发布会"
+    },
+    {
+      "id": "closing",
+      "date": "2026-11-14",
+      "start": "18:00",
+      "end": "20:00",
+      "place": "F",
+      "title": "FotoFilmic closing reception",
+      "titleZh": "FotoFilmic 闭幕酒会"
+    }
+  ],
+  "days": [
+    {
+      "date": "2026-11-08",
+      "plan": "If already in Paris, choose one open institution: HCB, LE BAL or Quai. Leave time for the optional 17:00–18:00 FotoFilmic meet & greet at Le Sancerre, 87 Rue des Archives.",
+      "planZh": "如果已经在巴黎，挑一家开放的机构：HCB、LE BAL 或 Quai。为 17:00–18:00 在 Le Sancerre（87 Rue des Archives）举行的可选 FotoFilmic 见面会留出时间。",
+      "audience": "fotofilmic"
+    },
+    {
+      "date": "2026-11-09",
+      "plan": "Workshop first. Most museums/galleries are closed. Do not make a long cross-city plan after class.",
+      "planZh": "以工作坊为先。大多数博物馆和画廊闭馆。下课后不要安排横穿城市的长线。",
+      "audience": "fotofilmic"
+    },
+    {
+      "date": "2026-11-10",
+      "plan": "Workshop and FotoFilmic opening at 18:00. A nearby short stop only if the actual class schedule permits.",
+      "planZh": "工作坊，以及 18:00 的 FotoFilmic 开幕式。只有实际课程安排允许时，才在附近短暂停留一站。",
+      "audience": "fotofilmic"
+    },
+    {
+      "date": "2026-11-11",
+      "plan": "Final workshop day and public holiday. HCB is the strongest nearby institutional option; confirm access before relying on smaller galleries. BnF is closed.",
+      "planZh": "工作坊最后一天，也是公共假日。HCB 是附近最值得去的机构；去小画廊之前先确认能否入场。BnF 闭馆。",
+      "audience": "fotofilmic"
+    },
+    {
+      "date": "2026-11-12",
+      "plan": "Best gallery-walk day: Marais route, plus an optional opening. MEP stays open to 22:00.",
+      "planZh": "最适合逛画廊的一天：走玛黑路线，再加一场可选的开幕活动。MEP 开放到 22:00。",
+      "audience": "fotofilmic"
+    },
+    {
+      "date": "2026-11-13",
+      "plan": "Choose one museum or north-city route, then return for FotoFilmic JRNL at 18:00.",
+      "planZh": "选一座博物馆或北城路线，然后回来参加 18:00 的 FotoFilmic JRNL 活动。",
+      "audience": "fotofilmic"
+    },
+    {
+      "date": "2026-11-14",
+      "plan": "A half-day route; leave time for FotoFilmic closing at 18:00. LE BAL book signings are an alternative, not another obligation.",
+      "planZh": "走半天路线；为 18:00 的 FotoFilmic 闭幕留出时间。LE BAL 的签售会可作为替代选择，不是额外的任务。",
+      "audience": "fotofilmic"
+    },
+    {
+      "date": "2026-11-15",
+      "plan": "Institutions and riverbank route if departure permits; BnF opens at 13:00. Most galleries are shut. Check your own departure time; staff deinstallation duties are not participant requirements.",
+      "planZh": "如果离开的时间允许，可去各机构并走河岸路线；BnF 13:00 开门。大多数画廊不开门。请确认你自己的离开时间；工作人员的撤展工作不是学员的义务。",
+      "audience": "fotofilmic"
+    }
+  ]
+}

@@ -1,0 +1,580 @@
+{
+  "_comment": "Photo Days 2026 Paris: dates, texts, tiers, themes, credits. Mark participant-only content with \"audience\": \"fotofilmic\". See docs/GUIDES.md. 导览总设置；只给学员看的内容加 \"audience\": \"fotofilmic\"。",
+  "title": "Photo Days, at your own pace.",
+  "titleZh": "按自己的节奏逛 Photo Days。",
+  "subtitle": "A field guide to Photo Days 2026 in Paris. Search by keyword, choose a cluster, and leave time to look.",
+  "subtitleZh": "2026年巴黎 Photo Days 导览。可按关键词查找、选择一个片区，并留出时间慢慢看。",
+  "public": {
+    "title": "Photo Days 2026 Paris",
+    "titleZh": "巴黎 Photo Days 2026",
+    "subtitle": "Paris 8 to 15 November 2026",
+    "subtitleZh": "巴黎 2026年11月8日至15日"
+  },
+  "listed": true,
+  "city": "Paris",
+  "cityZh": "巴黎",
+  "timezone": "Europe/Paris",
+  "timezoneLabel": "Paris time (CET, UTC+1)",
+  "timezoneLabelZh": "巴黎时间（CET，UTC+1）",
+  "checked": "2026-11-06",
+  "window": {
+    "start": "2026-11-08",
+    "end": "2026-11-15"
+  },
+  "event": {
+    "name": "Photo Days",
+    "nameZh": "Photo Days 摄影节",
+    "start": "2026-11-02",
+    "end": "2026-11-30",
+    "url": "https://photodays.paris/"
+  },
+  "holidays": [
+    {
+      "date": "2026-11-11",
+      "name": "Armistice Day (public holiday)",
+      "nameZh": "停战纪念日（公共假日）",
+      "notice": "11 November is a public holiday. BnF is closed; galleries and appointment venues need specific confirmation.",
+      "noticeZh": "11月11日是公共假日。BnF（法国国家图书馆）闭馆；画廊和需预约的场馆须逐一确认。"
+    }
+  ],
+  "tiers": [
+    {
+      "id": "A",
+      "name": "Start here",
+      "nameZh": "先看这里",
+      "text": "Especially useful comparisons for photographers, or a major exhibition worth a dedicated visit.",
+      "textZh": "对摄影者尤其有参照价值的对比，或值得专程一看的重要展览。",
+      "weight": 3
+    },
+    {
+      "id": "B",
+      "name": "Deepen a theme",
+      "nameZh": "深入一个主题",
+      "text": "Select according to your interests and route.",
+      "textZh": "按自己的兴趣和路线挑选。",
+      "weight": 2
+    },
+    {
+      "id": "C",
+      "name": "Optional nearby stop",
+      "nameZh": "顺路可选",
+      "text": "Add only if time and access permit.",
+      "textZh": "时间和入场条件允许时再加上。",
+      "weight": 1
+    }
+  ],
+  "themes": [
+    {
+      "id": "staging",
+      "name": "Staging",
+      "nameZh": "场景编排"
+    },
+    {
+      "id": "portrait",
+      "name": "Portrait",
+      "nameZh": "肖像"
+    },
+    {
+      "id": "material",
+      "name": "Material",
+      "nameZh": "材质"
+    },
+    {
+      "id": "archive",
+      "name": "Archive",
+      "nameZh": "档案"
+    },
+    {
+      "id": "documentary",
+      "name": "Documentary",
+      "nameZh": "纪实"
+    },
+    {
+      "id": "moving-image",
+      "name": "Moving image",
+      "nameZh": "动态影像"
+    },
+    {
+      "id": "everyday",
+      "name": "Everyday",
+      "nameZh": "日常"
+    }
+  ],
+  "zones": [
+    {
+      "id": "marais",
+      "name": "Marais",
+      "nameZh": "玛黑区"
+    },
+    {
+      "id": "south-marais",
+      "name": "South Marais",
+      "nameZh": "南玛黑"
+    },
+    {
+      "id": "seine-13e",
+      "name": "Seine / 13th",
+      "nameZh": "塞纳河／13区"
+    },
+    {
+      "id": "west-left-bank",
+      "name": "West / Left bank",
+      "nameZh": "西部／左岸"
+    },
+    {
+      "id": "left-bank",
+      "name": "Left bank",
+      "nameZh": "左岸"
+    },
+    {
+      "id": "republique",
+      "name": "République / 10th",
+      "nameZh": "共和国广场／10区"
+    },
+    {
+      "id": "west-concorde",
+      "name": "West / Concorde",
+      "nameZh": "西部／协和广场"
+    },
+    {
+      "id": "north-clichy",
+      "name": "North / Clichy",
+      "nameZh": "北部／克利希"
+    },
+    {
+      "id": "north-barbes",
+      "name": "North / Barbès",
+      "nameZh": "北部／巴尔贝斯"
+    },
+    {
+      "id": "central",
+      "name": "Central",
+      "nameZh": "市中心"
+    }
+  ],
+  "categories": [
+    {
+      "id": "institutions",
+      "source": "INSTITUTIONS",
+      "name": "Institutions",
+      "nameZh": "机构"
+    },
+    {
+      "id": "atypical",
+      "source": "LIEUX ATYPIQUES",
+      "name": "Unusual venues",
+      "nameZh": "特色场所"
+    },
+    {
+      "id": "galleries",
+      "source": "GALERIES",
+      "name": "Galleries",
+      "nameZh": "画廊"
+    },
+    {
+      "id": "events",
+      "source": "ÉVÈNEMENTS",
+      "name": "Events",
+      "nameZh": "活动"
+    },
+    {
+      "id": "festival",
+      "source": "NOS EXPOSITIONS",
+      "name": "Photo Days exhibitions",
+      "nameZh": "Photo Days 展览"
+    }
+  ],
+  "labels": {
+    "item": "Exhibition",
+    "itemZh": "展览",
+    "items": "Exhibitions",
+    "itemsZh": "展览",
+    "subtitle": "Exhibition",
+    "subtitleZh": "展览名称",
+    "by": "Artist",
+    "byZh": "艺术家",
+    "listing": "Official map entry",
+    "listingZh": "官方地图条目",
+    "listings": "Official Photo Days map",
+    "listingsZh": "Photo Days 官方地图"
+  },
+  "texts": {
+    "about": {
+      "heading": "About this guide",
+      "headingZh": "关于本导览",
+      "paras": [
+        {
+          "text": "Prepared from the Photo Days programme and venue websites. This is an optional, independent guide for looking beyond the fair. No tickets, appointments or group visits have been booked.",
+          "textZh": "根据 Photo Days 节目单和各场馆网站整理。这是一份可选的独立导览，帮助你在博览会之外多看一些。本导览没有代为预订任何门票，也没有安排任何预约或团体参观。"
+        },
+        {
+          "text": "Unofficial guide; not a Photo Days publication.",
+          "textZh": "非官方导览，并非 Photo Days 出版物。"
+        },
+        {
+          "text": "For FotoFilmic workshop participants, the map is centred on Hotel Moris, the workshop venue. The guide is not a scheduled workshop activity.",
+          "textZh": "对 FotoFilmic 工作坊学员，地图以工作坊场地 Hotel Moris 为中心。本导览不是工作坊安排的活动。",
+          "audience": "fotofilmic"
+        }
+      ]
+    },
+    "cluster": {
+      "heading": "Start with a cluster",
+      "headingZh": "从一个片区开始",
+      "paras": [
+        {
+          "text": "The Marais is the strongest recommendation cluster: it combines controlled portraiture, staging, documentary work and material experimentation within a relatively compact walk. Choose two or three exhibitions and spend time with them. Add one larger museum on a free day rather than trying to complete the whole map.",
+          "textZh": "玛黑区是最值得推荐的片区：在相对紧凑的步行范围内，汇集了严谨控制的肖像、场景编排、纪实作品和材质实验。挑两三个展览，花时间细看。有空闲的一天再加一座大型博物馆，而不是试图把整张地图走完。"
+        }
+      ]
+    },
+    "reading": {
+      "heading": "How to read the map",
+      "headingZh": "如何看地图",
+      "paras": [
+        {
+          "text": "The warm areas show where the selected exhibitions concentrate, weighted A = starting points, B = deepen a theme, C = optional nearby stops. Each venue has its own admission policy.",
+          "textZh": "暖色区域表示所选展览的集中程度，按权重计算：A = 起点，B = 深入主题，C = 顺路可选。各场馆有各自的入场规定。"
+        },
+        {
+          "text": "The map contains 29 selected exhibitions and the 88 point records of the official Photo Days map, plus the FotoFilmic gallery as a reference point. The 88 records include distinct programmes at the same building, appointment-only visits, fairs and events beyond 15 November; they are not 88 separate recommendations. This is a complete directory of the official map snapshot, not a claim to catalogue every exhibition in Paris.",
+          "textZh": "地图包含 29 个精选展览和 Photo Days 官方地图的 88 条点位记录，另有 FotoFilmic 画廊作为参考点。这 88 条记录包括同一建筑内的不同展览项目、仅限预约的参观、博览会以及11月15日之后的活动；它们不是 88 条独立的推荐。这是官方地图快照的完整名录，并不声称收录巴黎的所有展览。"
+        }
+      ],
+      "items": [
+        {
+          "lead": "Heat",
+          "leadZh": "热力图",
+          "text": "shows recommendation density, not attendance, crowds, popularity, artistic quality or a measured social trend. The editorial kernel weights are A=3, B=2, C=1; grey official-map points do not generate heat.",
+          "textZh": "表示推荐密度，而不是参观人数、拥挤程度、受欢迎程度、艺术水准或测量得到的社会趋势。编辑权重为 A=3、B=2、C=1；灰色的官方地图点位不产生热力。"
+        },
+        {
+          "lead": "Days",
+          "leadZh": "日期",
+          "text": "Date filters use published weekdays and exhibition dates, not live access. Appointments remain appointments. The 11 November public holiday needs particular care.",
+          "textZh": "日期筛选依据公布的每周开放日和展期，而不是实时开放情况。需预约的仍须预约。11月11日公共假日尤其需要留意。"
+        },
+        {
+          "lead": "Routes",
+          "leadZh": "路线",
+          "text": "Route lines join stops in a suggested order. They are not surveyed walking tracks; use the navigation link for real streets and live travel.",
+          "textZh": "路线线条按建议顺序连接各站点。它们不是实测的步行路径；实际街道和实时交通请使用导航链接。"
+        },
+        {
+          "lead": "Map data",
+          "leadZh": "地图数据",
+          "text": "Map coordinates: the festival’s published uMap #1453094. Other addresses geocoded through France’s public address service. Basemap: © IGN 2026 / Géoplateforme (Plan IGN); stored as a dated offline snapshot.",
+          "textZh": "地图坐标：摄影节公布的 uMap #1453094。其他地址通过法国公共地址服务进行地理编码。底图：© IGN 2026／Géoplateforme（Plan IGN）；以注明日期的离线快照保存。"
+        }
+      ]
+    },
+    "keywords": {
+      "heading": "Keywords",
+      "headingZh": "关键词",
+      "paras": [
+        {
+          "text": "Portrait · Staging · Material · Archive · Documentary · Moving image · Everyday. These are curatorial indexing terms, not tags supplied by the artists.",
+          "textZh": "肖像 · 场景编排 · 材质 · 档案 · 纪实 · 动态影像 · 日常。这些是策展式的索引词，不是艺术家提供的标签。"
+        }
+      ]
+    },
+    "protect-time": {
+      "heading": "Protect the workshop time",
+      "headingZh": "留足工作坊时间",
+      "audience": "fotofilmic",
+      "paras": [
+        {
+          "text": "9–11 November: keep the daytime for class and reviews. Day 1 starts at 09:30; the next two days at 09:00. Allow for the final daily schedule. The FotoFilmic opening is 10 November, 18:00–20:00; JRNL launch 13 November, 18:00–20:00; closing reception 14 November, 18:00–20:00.",
+          "textZh": "11月9日至11日：白天留给课程和作品点评。第1天 09:30 开始；之后两天 09:00 开始。以最终的每日日程为准。FotoFilmic 开幕式为11月10日 18:00–20:00；JRNL 发布会为11月13日 18:00–20:00；闭幕酒会为11月14日 18:00–20:00。"
+        },
+        {
+          "text": "Finish and breaks depend on the workshop; the calendar is not permission to leave early.",
+          "textZh": "结束和休息时间以工作坊安排为准；这份日程并不代表可以提前离开。"
+        }
+      ]
+    },
+    "looking": {
+      "heading": "A small looking exercise",
+      "headingZh": "一个小小的观看练习",
+      "paras": [
+        {
+          "text": "Choose two works. What has been arranged? What remains ambiguous? How does the print or screen affect the encounter? Bring one observation back to your own practice, rather than collecting a long list of exhibitions.",
+          "textZh": "选两件作品。哪些是安排好的？哪些仍然模糊不清？纸本照片或屏幕如何影响你与作品的相遇？带一条观察回到自己的创作中，而不是收集一长串展览清单。"
+        }
+      ],
+      "items": [
+        {
+          "text": "What has been arranged, and what is allowed to remain unresolved?",
+          "textZh": "哪些是被安排好的，哪些被允许保持悬而未决？"
+        },
+        {
+          "text": "How do body, gesture, objects and the surrounding space work together?",
+          "textZh": "身体、姿态、物件和周围的空间如何共同起作用？"
+        },
+        {
+          "text": "What changes when an image becomes a print, an object, a book or a projected sequence?",
+          "textZh": "当图像变成纸本照片、物件、书或投影序列时，会发生什么变化？"
+        },
+        {
+          "text": "What is your position as a viewer — witness, participant, reader or spectator?",
+          "textZh": "你作为观看者处在什么位置——见证者、参与者、读者还是旁观者？"
+        }
+      ]
+    },
+    "routes": {
+      "heading": "Choose one route, not everything.",
+      "headingZh": "选一条路线就好，不必全走。",
+      "paras": [
+        {
+          "text": "Each route is optional and self-guided.",
+          "textZh": "每条路线都是可选的，自行游览。"
+        },
+        {
+          "text": "It is not a workshop assignment or an organised FotoFilmic tour.",
+          "textZh": "这不是工作坊作业，也不是 FotoFilmic 组织的导览。",
+          "audience": "fotofilmic"
+        }
+      ]
+    },
+    "items": {
+      "heading": "Selected exhibitions",
+      "headingZh": "精选展览",
+      "paras": [
+        {
+          "text": "A / B / C indicates this guide’s editorial priority, not an assessment of artistic quality. Day filters use published weekly hours, not live opening status. Appointments remain appointments.",
+          "textZh": "A／B／C 表示本导览的编辑优先级，而不是对艺术水准的评价。日期筛选依据公布的每周开放时间，而非实时开放状态。需预约的仍须预约。"
+        },
+        {
+          "text": "Addresses, dates and opening information in each entry are factual listings; the looking prompts and priorities are editorial recommendations. These are possibilities, not assignments.",
+          "textZh": "各条目中的地址、日期和开放信息属于事实信息；观看提示和优先级是编辑建议。这些是可供选择的去处，不是任务。"
+        }
+      ]
+    },
+    "listings": {
+      "heading": "All 88 entries in the official Photo Days map",
+      "headingZh": "Photo Days 官方地图全部 88 个条目",
+      "paras": [
+        {
+          "text": "Includes suburban venues, appointment-only visits, fairs and events after 15 November. These remain in the directory for completeness, not in the recommendation heat. Venue-level records may contain several exhibitions. Same-building programmes are kept separate. Individual festival pages were retrieved; detailed corrections below prioritise venue websites where checked.",
+          "textZh": "包括郊区场馆、仅限预约的参观、博览会和11月15日之后的活动。为完整起见，它们保留在名录中，但不计入推荐热力。以场馆为单位的记录可能包含多个展览。同一建筑内的不同项目分别列出。已获取摄影节的各个详情页；下文的详细更正在已核实之处优先采用场馆网站的信息。"
+        },
+        {
+          "text": "The official map list keeps the complete point inventory, including records outside 8–15 November. It does not raise all entries to recommended status. For the 29 selected venues, use the corrected information in their own entries rather than an inconsistent map caption. Other captions remain reported festival facts; they have not all been independently verified against a venue website.",
+          "textZh": "官方地图列表保留完整的点位清单，包括11月8日至15日以外的记录，但这并不意味着所有条目都被推荐。对于 29 个精选场馆，请以其各自条目中的更正信息为准，而不是前后不一的地图说明。其他说明仍是摄影节公布的信息，并未全部与场馆网站逐一核对。"
+        }
+      ]
+    },
+    "corrections": {
+      "heading": "Corrections",
+      "headingZh": "更正",
+      "paras": [
+        {
+          "text": "Some festival listings differ from venue websites. Notable corrections: MEP’s longer current opening hours; LE BAL opens 11:00–19:00 on 11–15 Nov; BnF is closed on public holidays; Quai de la Photo is at 9 Port de la Gare and ends 20 Dec; Firmin-Didot is appointment-only at 13 bis Rue Payenne. Institut suédois uses a conservative 13 Nov start because sources disagree.",
+          "textZh": "摄影节的部分信息与场馆网站不一致。主要更正：MEP 当前的开放时间更长；LE BAL 在11月11日至15日开放 11:00–19:00；BnF 公共假日闭馆；Quai de la Photo 位于 9 Port de la Gare，展期至12月20日；Firmin-Didot 位于 13 bis Rue Payenne，仅限预约。由于各来源说法不一，Institut suédois 保守地按11月13日开展计算。"
+        }
+      ],
+      "items": [
+        {
+          "lead": "MEP",
+          "leadZh": "MEP（欧洲摄影之家）",
+          "text": "its primary website and ticket office list Wed/Fri 11:00–20:00, Thu 11:00–22:00, weekend 10:00–20:00. These override Photo Days’ shorter hours. Check 11 Nov holiday access if that day is essential.",
+          "textZh": "其官网和售票处公布的时间为周三、周五 11:00–20:00，周四 11:00–22:00，周末 10:00–20:00。以此为准，取代 Photo Days 公布的较短时间。如果11月11日对你很重要，请确认假日能否入场。"
+        },
+        {
+          "lead": "LE BAL",
+          "leadZh": "LE BAL 展馆",
+          "text": "special opening 11–15 Nov is 11:00–19:00, last entry 18:30. Do not use its usual 12:00 start for this week.",
+          "textZh": "11月11日至15日特别开放时间为 11:00–19:00，最晚入场 18:30。本周不要按平时 12:00 开门来安排。"
+        },
+        {
+          "lead": "BnF",
+          "leadZh": "BnF（法国国家图书馆）",
+          "text": "closed Mondays and public holidays; 11 Nov is not a viewing day. Sunday begins at 13:00.",
+          "textZh": "周一和公共假日闭馆；11月11日不能观展。周日 13:00 开门。"
+        },
+        {
+          "lead": "Quai de la Photo",
+          "leadZh": "Quai de la Photo 展船",
+          "text": "venue is 9 Port de la Gare, exhibition ends 20 Dec; official-map wording differs. Winter late closing varies; the daytime is the reliable planning choice.",
+          "textZh": "场馆位于 9 Port de la Gare，展览至12月20日结束；官方地图上的写法不同。冬季晚间闭馆时间不固定，白天前往最稳妥。"
+        },
+        {
+          "lead": "Institut suédois",
+          "leadZh": "Institut suédois（瑞典文化中心）",
+          "text": "conflicting 11/12/13 Nov opening information; this guide conservatively recommends from 13 Nov. Earlier access is unconfirmed.",
+          "textZh": "开展日期有11月11日、12日、13日三种说法；本导览保守地建议从11月13日起前往。更早能否入场尚未确认。"
+        },
+        {
+          "lead": "Firmin-Didot",
+          "leadZh": "Firmin-Didot 出版社",
+          "text": "13 bis Rue Payenne, appointment only. Its map caption omits that restriction.",
+          "textZh": "13 bis Rue Payenne，仅限预约。其地图说明没有提到这一限制。"
+        },
+        {
+          "lead": "Klotz / chapel",
+          "leadZh": "Klotz／礼拜堂",
+          "text": "use split hours 07:00–12:00 and 14:30–18:00, stricter than the continuous hours in the map. Respect services.",
+          "textZh": "请按分段时间 07:00–12:00 和 14:30–18:00 安排，比地图上的连续开放时间更严格。礼拜进行时请保持尊重。"
+        },
+        {
+          "lead": "Ithaque",
+          "leadZh": "Ithaque 画廊",
+          "text": "gallery website lists an earlier start, while Photo Days lists 12 Nov. Its midday closure is 13:00–14:00. Verify early-week access.",
+          "textZh": "画廊网站公布的开展日期更早，而 Photo Days 写的是11月12日。午间 13:00–14:00 闭馆。本周前几天能否入场请先核实。"
+        },
+        {
+          "lead": "Barnor",
+          "leadZh": "Barnor 展",
+          "text": "festival page says Tue–Sat, map says Mon–Sat. Do not rely on Monday.",
+          "textZh": "摄影节页面写周二至周六，地图写周一至周六。不要指望周一开放。"
+        }
+      ]
+    },
+    "access": {
+      "heading": "Before you set off",
+      "headingZh": "出发之前",
+      "paras": [
+        {
+          "text": "Check the linked venue for admission, accessibility and final entry. Student discounts require proof and may depend on age or country. If visiting together, check group rules. Photo Days guided visits require separate reservations and have limited places.",
+          "textZh": "请查看所链接的场馆网站，了解入场、无障碍设施和最晚入场时间。学生优惠需出示证明，并可能受年龄或所在国家限制。如果结伴参观，请确认团体规定。Photo Days 导览参观需另行预约，名额有限。"
+        },
+        {
+          "text": "Being a workshop participant does not itself establish eligibility for a discount.",
+          "textZh": "工作坊学员身份本身并不能证明你有资格享受优惠。",
+          "audience": "fotofilmic"
+        }
+      ],
+      "items": [
+        {
+          "text": "Addresses missing a building number in the source are not completed by guessing. Appointment-only/limited events need their source checked before travel. An incomplete official-map address is not turn-by-turn navigation.",
+          "textZh": "来源中缺少门牌号的地址不会靠猜测补全。仅限预约或名额有限的活动，出发前请先查看来源。官方地图上不完整的地址不能用于逐路段导航。"
+        },
+        {
+          "text": "General public access does not establish group access. If travelling as one group, check capacity and booking with the venue. Photo Days guided visits are separately reserved and listed as limited to 15 people; no places have been reserved here.",
+          "textZh": "对公众开放并不代表接待团体。如果以团体形式前往，请与场馆确认容量和预约。Photo Days 导览参观需另行预约，标明每场限 15 人；本导览没有预留任何名额。"
+        },
+        {
+          "text": "Bring valid proof for any concession. Gallery admission is not marked free unless a source explicitly says so.",
+          "textZh": "享受任何优惠都请携带有效证明。除非来源明确注明，画廊不会被标为免费入场。"
+        },
+        {
+          "text": "Workshop attendance alone does not establish student status.",
+          "textZh": "仅参加工作坊并不能证明学生身份。",
+          "audience": "fotofilmic"
+        }
+      ]
+    },
+    "sources": {
+      "heading": "Sources",
+      "headingZh": "资料来源",
+      "paras": [
+        {
+          "text": "Source boundary: 88 official point records, 29 selected exhibitions and the FotoFilmic gallery as a reference point. The directory covers the official map snapshot checked on 6 November. Exhibition preview images remain © their respective artists/rightsholders; each links to its official exhibition source.",
+          "textZh": "资料范围：88 条官方点位记录、29 个精选展览和 FotoFilmic 画廊这一参考点。名录涵盖11月6日核实的官方地图快照。展览预览图版权归各自的艺术家或权利人所有；每张图都链接到对应展览的官方来源。"
+        },
+        {
+          "text": "Participants also see two more reference points: the workshop venue (W) and the meet-up place (M).",
+          "textZh": "学员另外可以看到两个参考点：工作坊场地（W）和集合地点（M）。",
+          "audience": "fotofilmic"
+        }
+      ],
+      "items": [
+        {
+          "text": "Photo Days official map and uMap snapshot.",
+          "textZh": "Photo Days 官方地图和 uMap 快照。"
+        },
+        {
+          "text": "Photo Days exhibitions / visits and agenda.",
+          "textZh": "Photo Days 展览／导览参观和活动日程。"
+        },
+        {
+          "text": "84 linked festival detail pages retrieved on 6 November 2026. Primary venue checks for MEP, LE BAL, Ithaque, Jeu de Paume, Fondation HCB, Quai de la Photo, Ropac and Maubert take priority where recorded in this guide.",
+          "textZh": "2026年11月6日获取的 84 个有链接的摄影节详情页。凡本导览有记录之处，以 MEP、LE BAL、Ithaque、Jeu de Paume、Fondation HCB、Quai de la Photo、Ropac 和 Maubert 场馆本身的核实为准。"
+        },
+        {
+          "text": "MEP current hours and admission, LE BAL special hours, Quai winter access.",
+          "textZh": "MEP 当前开放时间和门票、LE BAL 特别开放时间、Quai 冬季开放信息。"
+        }
+      ]
+    }
+  },
+  "links": [
+    {
+      "label": "Photo Days official map",
+      "labelZh": "Photo Days 官方地图",
+      "url": "https://photodays.paris/carte"
+    },
+    {
+      "label": "uMap snapshot",
+      "labelZh": "uMap 快照",
+      "url": "https://umap.openstreetmap.fr/fr/map/photo-days-2026_1453094"
+    },
+    {
+      "label": "Photo Days exhibitions and guided visits",
+      "labelZh": "Photo Days 展览与导览参观",
+      "url": "https://photodays.paris/visites"
+    },
+    {
+      "label": "Festival agenda",
+      "labelZh": "摄影节日程",
+      "url": "https://photodays.paris/agenda"
+    },
+    {
+      "label": "MEP current hours and admission",
+      "labelZh": "MEP 当前开放时间和门票",
+      "url": "https://www.mep-fr.org/venir/"
+    },
+    {
+      "label": "LE BAL special hours",
+      "labelZh": "LE BAL 特别开放时间",
+      "url": "https://www.le-bal.fr/horaires-et-acces"
+    },
+    {
+      "label": "Quai de la Photo winter access",
+      "labelZh": "Quai de la Photo 冬季开放信息",
+      "url": "https://quaidelaphoto.fr/venez/acces-horaires/"
+    }
+  ],
+  "credits": {
+    "points": "Points: Photo Days / Camille Gajate, official uMap #1453094",
+    "pointsZh": "点位：Photo Days／Camille Gajate，官方 uMap #1453094",
+    "image": "Published by Photo Days",
+    "imageZh": "由 Photo Days 发布"
+  },
+  "map": {
+    "centre": "W",
+    "heatRadius": 600
+  },
+  "sensitive": {
+    "public": [
+      "FotoFilmic",
+      "Hotel Moris",
+      "Moris",
+      "Sancerre",
+      "René Boulanger",
+      "Rene Boulanger",
+      "Notre-Dame-de-Nazareth",
+      "JRNL",
+      "workshop",
+      "Workshop",
+      "工作坊"
+    ],
+    "fotofilmic": [
+      "Hotel Moris",
+      "Moris",
+      "Sancerre",
+      "René Boulanger",
+      "Rene Boulanger",
+      "87 Rue des Archives",
+      "workshop",
+      "Workshop",
+      "工作坊"
+    ]
+  },
+  "defaults": {
+    "price": "Ticket information not stated in the festival listing; check the venue.",
+    "priceZh": "摄影节信息中未注明票价；请向场馆确认。",
+    "listingNote": "Official-map record. Opening hours and dates may differ from the venue website. Verify before travelling.",
+    "listingNoteZh": "官方地图记录。开放时间和日期可能与场馆网站不同。出发前请先核实。"
+  }
+}

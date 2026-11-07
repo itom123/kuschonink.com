@@ -1,0 +1,51 @@
+{
+  "_comment": "Reference points drawn as letter plates. W and M are for participants only (\"audience\"). 参考点；W 和 M 只给学员看。",
+  "places": [
+    {
+      "id": "W",
+      "label": "Workshop",
+      "labelZh": "工作坊",
+      "name": "Hotel Moris",
+      "short": "Hotel Moris",
+      "address": "13 Rue René Boulanger, 75010 Paris",
+      "coordinates": [
+        2.357512,
+        48.869191
+      ],
+      "note": "Workshop venue, 9–11 November. Day 1 starts at 09:30; days 2 and 3 at 09:00.",
+      "noteZh": "工作坊场地，11月9日至11日。第1天 09:30 开始；第2、3天 09:00 开始。",
+      "audience": "fotofilmic"
+    },
+    {
+      "id": "F",
+      "label": "FotoFilmic gallery",
+      "labelZh": "FotoFilmic 画廊",
+      "name": "FotoFilmic Paris Gallery",
+      "short": "FotoFilmic",
+      "address": "17 Rue Notre-Dame-de-Nazareth, 75003 Paris",
+      "coordinates": [
+        2.35991,
+        48.867155
+      ],
+      "hours": "Exhibition open to the public 11–14 Nov, 11:00–19:00",
+      "hoursZh": "展览11月11日至14日对公众开放，11:00–19:00",
+      "note": "Opening 10 Nov, 18:00–20:00; JRNL magazine launch 13 Nov, 18:00–20:00; closing 14 Nov, 18:00–20:00.",
+      "noteZh": "开幕式11月10日 18:00–20:00；JRNL 杂志发布会11月13日 18:00–20:00；闭幕11月14日 18:00–20:00。"
+    },
+    {
+      "id": "M",
+      "label": "Meet & greet",
+      "labelZh": "见面会",
+      "name": "Le Sancerre",
+      "short": "Le Sancerre",
+      "address": "87 Rue des Archives, 75003 Paris",
+      "coordinates": [
+        2.360865,
+        48.863591
+      ],
+      "note": "Optional FotoFilmic meet & greet, Sun 8 Nov, 17:00–18:00.",
+      "noteZh": "可选的 FotoFilmic 见面会，11月8日（周日）17:00–18:00。",
+      "audience": "fotofilmic"
+    }
+  ]
+}
