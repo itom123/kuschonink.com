@@ -21,6 +21,7 @@ import { buildMime, forBinding } from './mime';
 import { notion } from './notion';
 import { privacySweep } from './privacy';
 import { publish } from './publish';
+import { routineTrigger } from './routine';
 import { handleSuggest, type SuggestDeps } from './suggest';
 
 // The Durable Object class must be exported from the Worker's main module.
@@ -231,21 +232,9 @@ async function runPublisher(env: Env, trigger: 'scheduled' | 'manual') {
   );
 }
 
-/** The routine's trigger: only Anthropic's routine endpoint, with its own token. */
+/** The routine's trigger: only Anthropic's routine endpoint, with its own token (worker/routine.ts). */
 function routineOf(env: Env): AdminDeps['fireRoutine'] {
-  const url = env.ROUTINE_FIRE_URL?.trim() ?? '';
-  if (!env.ROUTINE_TOKEN || !/^https:\/\/api\.anthropic\.com\/v1\/claude_code\/routines\/trig_[A-Za-z0-9_-]+\/fire$/.test(url)) return null;
-  return async (text) => {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { authorization: `Bearer ${env.ROUTINE_TOKEN}`, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({ text }),
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!res.ok) throw new Error(`routine fire HTTP ${res.status}`);
-    const j = (await res.json().catch(() => ({}))) as { claude_code_session_url?: string };
-    return { url: j.claude_code_session_url };
-  };
+  return routineTrigger({ url: env.ROUTINE_FIRE_URL, token: env.ROUTINE_TOKEN, fetch: (i, o) => fetch(i, o) });
 }
 
 function adminDeps(env: Env): AdminDeps {

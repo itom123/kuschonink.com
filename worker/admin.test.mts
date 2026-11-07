@@ -6,6 +6,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { adminSession, COOKIE, COOKIE_LOCAL, EMAILS_PER_HOUR, FAILS, handleAdmin, UI_COOKIE, type AdminDeps, type OutMail } from './admin.ts';
 import { GuardCore, memoryStore } from './guard.ts';
 import { github } from './github.ts';
+import { ROUTINE_BETA, routineTrigger } from './routine.ts';
 import { notion, P } from './notion.ts';
 import { contactProps, readSuggestion, S, suggestionProps, type Suggestion } from './suggestions.ts';
 import { base32Encode, hotp, stepAt } from './totp.ts';
@@ -249,6 +250,26 @@ async function seed(w: W, o: Partial<Suggestion> = {}, ref = 'S-AAAA') {
   const t = await call(w, `/items/${SLUG}/C2`, { method: 'POST', cookie, body: { fields: { tier: 'B' } } });
   const after = (JSON.parse(w.g.files()[`${DIR}/items.json`]) as ItemsFile).items;
   check('a new tier: a new id (C2 → B16), never reusing one', t.status === 200 && t.body.id === `B${before + 1}` && after.some((i) => i.id === t.body.id && i.tier === 'B') && !after.some((i) => i.id === 'C2'), t.body);
+}
+
+// ---- The routine's trigger (worker/routine.ts) ----
+{
+  const FIRE = 'https://api.anthropic.com/v1/claude_code/routines/trig_01ABCDEFGHJKLMNOPQRSTUVW/fire';
+  const sent: { url: string; init: RequestInit }[] = [];
+  let reply = new Response(JSON.stringify({ type: 'routine_fire', claude_code_session_url: 'https://claude.ai/code/session_01X' }), { status: 200 });
+  const fetchMock = (async (url: string, init: RequestInit) => (sent.push({ url, init }), reply)) as unknown as typeof fetch;
+  const fire = routineTrigger({ url: ` ${FIRE} `, token: 'test-only-token', fetch: fetchMock })!;
+  const r = await fire('approved: S-ABCD');
+  const h = new Headers(sent[0]?.init.headers);
+  check('routine trigger: POST to the Fire URL with its own token', sent.length === 1 && sent[0].url === FIRE && sent[0].init.method === 'POST' && h.get('authorization') === 'Bearer test-only-token', sent[0]);
+  check('…with the beta header Anthropic requires on /fire, and the API version', h.get('anthropic-beta') === ROUTINE_BETA && ROUTINE_BETA === 'experimental-cc-routine-2026-04-01' && h.get('anthropic-version') === '2023-06-01', [...h]);
+  check('…the text in the body, and the session link back', sent[0].init.body === JSON.stringify({ text: 'approved: S-ABCD' }) && r.url === 'https://claude.ai/code/session_01X', r);
+  check('…none without a token, or for an address that isn\'t Anthropic\'s fire endpoint', routineTrigger({ url: FIRE, token: '', fetch: fetchMock }) === null
+    && ['https://evil.example/v1/claude_code/routines/trig_x/fire', 'http://api.anthropic.com/v1/claude_code/routines/trig_x/fire', `${FIRE}?x=1`, 'https://api.anthropic.com/v1/messages'].every((u) => routineTrigger({ url: u, token: 't', fetch: fetchMock }) === null));
+  reply = new Response('{"error":{"type":"rate_limit"}}', { status: 429 });
+  let threw = '';
+  try { await fire('manual: run now'); } catch (e) { threw = (e as Error).message; }
+  check('…a refused fire is an error (the caller shows it)', threw.includes('429'), threw);
 }
 
 console.log(fails ? `${fails} FAILED` : 'all passed');
