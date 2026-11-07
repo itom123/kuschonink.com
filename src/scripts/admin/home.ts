@@ -8,6 +8,23 @@ type Bi = { en: string; zh: string };
 const pick = (b: Bi) => (document.documentElement.dataset.lang === 'zh' && b.zh ? b.zh : b.en);
 const kus = () => (window as unknown as { kus98?: { alert(o: object): Promise<string>; play(n: string): void; open(u: string, o?: object): Promise<void> } }).kus98;
 
+// The admin cookies need the visitor's leave for cookies (consent.ts), as a
+// guide's log-on does: the Information Bar asks if need be, with its general
+// wording, so the public Cookies dialog never names admin mode. Without the
+// desktop it goes ahead: posting the form is asking for the cookie.
+let asking = false;
+async function cookiesAllowed(): Promise<boolean> {
+  const c = (window as unknown as { kus98?: { consent?: { ask(feature: string): Promise<boolean> } } }).kus98?.consent;
+  if (!c) return true;
+  if (asking) return false; // OK pressed again while the bar waits for an answer
+  asking = true;
+  try {
+    return await c.ask('admin');
+  } finally {
+    asking = false;
+  }
+}
+
 /** Both languages, as the 中/EN switch expects (two data-l spans). */
 export function setText(el: Element, b: Bi) {
   const en = document.createElement('span');
@@ -65,6 +82,7 @@ export function initAdminHome() {
         (pass.value ? code : pass).focus();
         return;
       }
+      if (!(await cookiesAllowed())) return;
       ok.disabled = true;
       say(AW.checking);
       const r = await api('/login', { password: pass.value, code: c });
