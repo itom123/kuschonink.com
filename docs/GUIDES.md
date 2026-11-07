@@ -388,6 +388,7 @@ both when the site is built.
   第一次设置 `GUIDES_COOKIE_SECRET` 也一样。
 - **PR 预览有自己的 secret，不用正式网站的。** 每个分支的预览（Worker Previews）只用 `wrangler.jsonc`
   里 `previews` 部分的设置，加上预览自己的 secret，所以**预览里的导览密码和正式网站的不一样**，除非你把它们设成一样。
+  预览里是那个分支真实的导览，而预览链接是公开的，所以这些密码要和正式网站的一样强，不要用简单的测试密码。
   在自己电脑上设置一次，以后新建的预览都会用：
   `npx wrangler preview base-config secret put GUIDES_PASSWORD`（`GUIDES_PASSWORD_FOTOFILMIC`、
   `GUIDES_COOKIE_SECRET`、`TURNSTILE_SECRET` 同理；也可以在控制台的 Previews Base 里设置）。
@@ -427,8 +428,10 @@ variables, not the Worker.
 - **PR previews have their own secrets, never production's.** Each branch's
   preview (Worker Previews) gets only the settings in the `previews` block of
   `wrangler.jsonc`, plus the previews' own secrets. So **a preview's guide
-  passwords are not the live site's**, unless you set them the same. Set them
-  once on your own computer, for every new preview:
+  passwords are not the live site's**, unless you set them the same. A
+  preview serves that branch's real guides at a public link, so make them as
+  strong as the live site's, never short test words. Set them once on your
+  own computer, for every new preview:
   `npx wrangler preview base-config secret put GUIDES_PASSWORD` (likewise
   `GUIDES_PASSWORD_FOTOFILMIC`, `GUIDES_COOKIE_SECRET`, `TURNSTILE_SECRET`;
   or in the dashboard's Previews Base). To change a preview that already
