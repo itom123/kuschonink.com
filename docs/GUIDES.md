@@ -707,7 +707,7 @@ Once only. Cloudflare secrets (never in the repo):
 
 - `wrangler.jsonc` 的 `vars`：三个 Notion 数据源的编号（`NOTION_SUGGESTIONS`、`NOTION_CONTACTS`、`NOTION_LOG`）。为空时推荐改用邮件。
 - `src/content/guides/suggest.json`：Turnstile 的公开站点密钥（不是 secret）。为空时正式网站上不能推荐；本机和预览用 Cloudflare 的测试密钥。
-- 云端例程的环境：完全联网（要打开画廊网站）；例程自己的 Notion 集成（只共享 Suggestions 和日志，不共享 Contacts），作为 `api.notion.com` 的网络 secret；不要连接器。
+- 云端例程：见 [11.6](#116-云端例程-the-routine-in-claudes-cloud)。
 
 - `vars` in `wrangler.jsonc`: the three Notion data-source ids
   (`NOTION_SUGGESTIONS`, `NOTION_CONTACTS`, `NOTION_LOG`). Empty: suggestions
@@ -715,9 +715,7 @@ Once only. Cloudflare secrets (never in the repo):
 - `src/content/guides/suggest.json`: the Turnstile widget's public site key
   (not a secret). Empty: no suggestions on the live site; `wrangler dev` and
   previews use Cloudflare's test key.
-- The routine's environment: full network access (for gallery sites); the
-  routine's own Notion integration (shared with Suggestions and the log only,
-  never Contacts) as a network secret for `api.notion.com`; no connectors.
+- The cloud routine: see [11.6](#116-云端例程-the-routine-in-claudes-cloud).
 
 Worker Previews (PR previews) get test values, never the real ones, in the
 dashboard's Preview settings: made-up guide passwords and cookie secret,
@@ -739,7 +737,7 @@ Notion 集成：
 ### 11.5 本机测试 Trying it locally
 
 ```bash
-node scripts/dev/notion-standin.mjs 8790
+node scripts/dev/notion-standin.mjs 8798
 ```
 
 `.dev.vars`（不进仓库 gitignored）里加：
@@ -748,7 +746,7 @@ Add to `.dev.vars` (gitignored):
 
 ```ini
 NOTION_TOKEN=dev
-NOTION_API=http://localhost:8790
+NOTION_API=http://127.0.0.1:8798
 NOTION_SUGGESTIONS=ds-suggestions
 NOTION_CONTACTS=ds-contacts
 NOTION_LOG=ds-log
@@ -756,7 +754,57 @@ TURNSTILE_SECRET_SUGGEST=1x0000000000000000000000000000000AA
 TURNSTILE_HOSTNAMES=example.com,localhost
 ```
 
-然后 `npm run build` 和 `npm run preview`，登录一份导览，用 **文件 ▸ 推荐地点…**。`http://localhost:8790/_dump` 显示存下了什么。
+然后 `npm run build` 和 `npm run preview`，登录一份导览，用 **文件 ▸ 推荐地点…**。`http://127.0.0.1:8798/_dump` 显示存下了什么。
 
 Then `npm run build` and `npm run preview`, log on to a guide and use **File ▸
-Suggest a Place…**. `http://localhost:8790/_dump` shows what was kept.
+Suggest a Place…**. `http://127.0.0.1:8798/_dump` shows what was kept.
+
+### 11.6 云端例程 The routine in Claude's cloud
+
+推荐流程**不需要你的电脑开着**：收推荐、批准和拒绝、发布（每 10 分钟）和到期删除联系方式（每天）都在 Cloudflare
+的 Worker 里；核对和补全由 Claude Code 的云端例程（routine）在 Anthropic 的服务器上完成。例程只读仓库、只写 Notion。
+
+在 claude.ai 上设置一次（在 `main` 合并了推荐功能之后）：
+
+1. **Notion**：新建一个集成“Field Guide routine”，只共享 **Suggestions** 和 **处理日志** 两个数据库（**不要**共享
+   Contacts），复制它的令牌。
+2. **环境**（claude.ai/code → Environments → New）：网络访问选 **Full**（要打开画廊网站和地理编码服务）；加一个
+   **network secret**：主机 `api.notion.com`，值是上一步的令牌（会话本身看不到它）；不需要环境变量（数据库编号在
+   `wrangler.jsonc` 里）；setup script 可以写 `npm ci --no-audit --no-fund`（不写也行，例程每次会自己装）。
+3. **例程**（claude.ai/code → Routines → New）：仓库 `itom123/kuschonink.com`，分支 `main`，用上面的环境；
+   **去掉所有连接器**；时间：每天 08:00–22:00（Europe/Paris）每小时一次，如果只能选“每小时”也可以（没事可做时
+   会立刻结束，不记日志）；提示词：
+   `Follow scripts/suggestions/ROUTINE.md in the repository, on main. If this run was started with a text, it says why (approved: …, or manual: …).`
+4. **API 触发器**：在例程里加一个 API trigger，把它的地址和令牌存成 Cloudflare secret `ROUTINE_FIRE_URL` 和
+   `ROUTINE_TOKEN`（在切换到 Worker Previews 之后再存，见第 7 节）。管理模式的“收录”和“立即运行”用它。
+5. 试一次：在例程里 **Run now**，看它的会话记录；Notion 的处理日志只在真的处理了推荐时才有新的一行。
+
+Nothing here needs your computer to be on: taking suggestions, approving and
+refusing, publishing (every 10 minutes) and deleting contact details when due
+(daily) all happen in the Cloudflare Worker; checking and completing them is
+a Claude Code routine on Anthropic's servers. The routine only reads the
+repository and only writes to Notion.
+
+Set it up once on claude.ai (after the suggestions are merged into `main`):
+
+1. **Notion**: a new integration, "Field Guide routine", shared with only the
+   **Suggestions** database and the **Processing log** (**not** Contacts).
+   Copy its token.
+2. **Environment** (claude.ai/code → Environments → New): network access
+   **Full** (for gallery sites and the geocoders); one **network secret** for
+   the host `api.notion.com`, with the token from step 1 (the session never
+   sees it); no environment variables (the database ids are in
+   `wrangler.jsonc`); setup script `npm ci --no-audit --no-fund` (optional:
+   the routine installs them itself).
+3. **Routine** (claude.ai/code → Routines → New): repository
+   `itom123/kuschonink.com`, branch `main`, the environment above, **no
+   connectors**; hourly from 08:00 to 22:00 (Europe/Paris), or simply hourly
+   if that is all the schedule offers (a run with nothing to do stops at once
+   and logs nothing); prompt:
+   `Follow scripts/suggestions/ROUTINE.md in the repository, on main. If this run was started with a text, it says why (approved: …, or manual: …).`
+4. **API trigger**: add one to the routine, and save its address and token as
+   the Cloudflare secrets `ROUTINE_FIRE_URL` and `ROUTINE_TOKEN` (after the
+   switch to Worker Previews, see section 7). Admin mode's Approve and Run Now
+   use it.
+5. Try it: **Run now** in the routine, and read its session. The Processing
+   log only gets a line when a suggestion was actually handled.
