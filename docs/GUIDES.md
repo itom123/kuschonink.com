@@ -428,8 +428,10 @@ both when the site is built.
 - 改了签名用的密钥（`GUIDES_COOKIE_SECRET`，没设它时是 `TURNSTILE_SECRET`；它少于 24 个字符时两个都算），所有人都要重新输入密码。
   第一次设置 `GUIDES_COOKIE_SECRET` 也一样。
 - **PR 预览有自己的 secret，不用正式网站的。** 每个分支的预览（Worker Previews）只用 `wrangler.jsonc`
-  里 `previews` 部分的设置，加上预览自己的 secret，所以**预览里的导览密码和正式网站的不一样**，除非你把它们设成一样。
-  预览里是那个分支真实的导览，而预览链接是公开的，所以这些密码要和正式网站的一样强，不要用简单的测试密码。
+  里 `previews` 部分的设置，加上预览自己的 secret，所以**预览里的导览密码和正式网站的不一样**。
+  预览里是那个分支真实的导览，而预览链接是公开的，所以这些密码要和正式网站的一样强，不要用简单的测试密码；
+  但一定要和正式网站的**不同**（`GUIDES_COOKIE_SECRET` 也是）：推到仓库的每个分支都会有预览、拿到这些 secret，
+  包括云端会话推的 `claude/…` 分支（见 11.6），分支里的代码读得到它们。
   在自己电脑上设置一次，以后新建的预览都会用：
   `npx wrangler preview base-config secret put GUIDES_PASSWORD`（`GUIDES_PASSWORD_FOTOFILMIC`、
   `GUIDES_COOKIE_SECRET`、`TURNSTILE_SECRET` 同理；也可以在控制台的 Previews Base 里设置）。
@@ -472,9 +474,12 @@ variables, not the Worker.
 - **PR previews have their own secrets, never production's.** Each branch's
   preview (Worker Previews) gets only the settings in the `previews` block of
   `wrangler.jsonc`, plus the previews' own secrets. So **a preview's guide
-  passwords are not the live site's**, unless you set them the same. A
-  preview serves that branch's real guides at a public link, so make them as
-  strong as the live site's, never short test words. Set them once on your
+  passwords are not the live site's**. A preview serves that branch's real
+  guides at a public link, so make them as strong as the live site's, never
+  short test words, but always **different** from the live site's
+  (`GUIDES_COOKIE_SECRET` too): every branch pushed to the repository gets a
+  preview with these secrets, a cloud session's `claude/…` branch included
+  (section 11.6), and that branch's code can read them. Set them once on your
   own computer, for every new preview:
   `npx wrangler preview base-config secret put GUIDES_PASSWORD` (likewise
   `GUIDES_PASSWORD_FOTOFILMIC`, `GUIDES_COOKIE_SECRET`, `TURNSTILE_SECRET`;
@@ -878,29 +883,49 @@ Suggest a Place…**. `http://127.0.0.1:8798/_dump` shows what was kept.
 ### 11.6 云端例程 The routine in Claude's cloud
 
 推荐流程**不需要你的电脑开着**：收推荐、批准和拒绝、发布（每 10 分钟）和到期删除联系方式（每天）都在 Cloudflare
-的 Worker 里；核对和补全由 Claude Code 的云端例程（routine）在 Anthropic 的服务器上完成。例程只读仓库、只写 Notion。
+的 Worker 里；核对和补全由 Claude Code 的云端定时任务（scheduled task，以前叫 routine，下面称“例程”）在 Anthropic
+的服务器上完成。ROUTINE.md 让它只读仓库、只写 Notion（见下面的“安全”）。
 
 在 claude.ai 上设置一次（在 `main` 合并了推荐功能之后）：
 
 1. **Notion**：新建一个内部集成“Field Guide routine”，权限和上面一样（Read、Update、Insert content，不要评论权限，
    No user information）。在 **Suggestions** 和 **处理日志** 两个数据库各自的 ••• ▸ Connections 里分别连接它；
    **不要**连接它们所在的页面（那个页面里还有 Contacts）。复制它的令牌。
-2. **环境**（claude.ai/code → Environments → New）：网络访问选 **Full**（要打开画廊网站和地理编码服务）；加一个
-   **network secret**：主机 `api.notion.com`，值是上一步的令牌（会话本身看不到它）；不需要环境变量（数据库编号在
-   `wrangler.jsonc` 里）；setup script 可以写 `npm ci --no-audit --no-fund`（不写也行，例程每次会自己装）。
-3. **例程**（claude.ai/code → Routines → New）：仓库 `itom123/kuschonink.com`，分支 `main`，用上面的环境；
-   **去掉所有连接器**；时间：每天 08:00–22:00（Europe/Paris）每小时一次，如果只能选“每小时”也可以（没事可做时
-   会立刻结束，不记日志）；提示词：
+2. **环境**：在 claude.ai/code 输入框下面的环境菜单里，点一个环境的齿轮 ▸ **Edit cloud environment**（或新建一个）：
+   - **Network access** 选 **Full**（要打开画廊网站和地理编码服务）；
+   - **Network secrets** ▸ **Add secret**：Secret type 用 **Bearer**，主机 `api.notion.com`，Header name `Authorization`、
+     Prefix `Bearer`（默认就是），Value 填上一步的令牌 ▸ **Add**；最后 **Save changes**。会话本身看不到这个令牌。
+     网络 secret 要 Pro、Max、Ultra、Team 或 Enterprise 套餐，而且是 Anthropic 托管的环境。
+   - **Setup script** 留空（项目依赖不放这里，例程每次自己装）；不需要环境变量（数据库编号在 `wrangler.jsonc` 里）。
+3. **定时任务**：[claude.ai/code/routines](https://claude.ai/code/routines) ▸ **New task**（有的账号显示 Routines 和
+   **New routine**）：仓库 `itom123/kuschonink.com`，分支 `main`，用上面的环境，**去掉所有连接器**；提示词：
    `Follow scripts/suggestions/ROUTINE.md in the repository, on main. If this run was started with a text, it says why (approved: …, or manual: …).`
-4. **API 触发器**：在例程里加一个 API trigger，把它的地址和令牌存成 Cloudflare secret `ROUTINE_FIRE_URL` 和
-   `ROUTINE_TOKEN`（在切换到 Worker Previews 之后再存，见第 7 节）。管理模式的“收录”和“立即运行”用它。
-5. 试一次：在例程里 **Run now**，看它的会话记录；Notion 的处理日志只在真的处理了推荐时才有新的一行。
+   时间：预设只有每小时、每天、每周，没有“几点到几点”。建好后在任务名旁边的菜单 ▸ **Edit** 里选 **Custom**，填
+   `CRON_TZ=Europe/Paris 7 8-22 * * *`（巴黎时间 8:07 到 22:07，每小时一次）。框里原来有别的 `CRON_TZ=` 就改成
+   `Europe/Paris`；不接受这个前缀的话写 UTC 时间：冬令时 `7 7-21 * * *`，夏令时 `7 6-20 * * *`。没事可做的运行会立刻结束，不记日志。
+4. **API 触发器**：任务菜单 ▸ **Edit** ▸ **Trigger** 那一行的 **+** ▸ **API** ▸ 复制 **Fire URL** ▸ **Generate token**
+   （令牌只显示一次）。把两者存成 Cloudflare secret `ROUTINE_FIRE_URL` 和 `ROUTINE_TOKEN`，只给正式网站、不给预览
+   （在切换到 Worker Previews 之后再存，见第 7 节）。管理模式的“收录”和“立即运行”用它。**Run now** 和 API 触发合计每个任务
+   每小时最多 30 次。
+5. 试一次：在任务里 **Run now**，看它的会话记录；Notion 的处理日志只在真的处理了推荐时才有新的一行。
+
+安全：
+
+- 触发时带的文字（`approved: …`、`manual: …`）会被包在 `<routine-fire-payload>` 里、标成不可信的数据；提示词只把它
+  当作说明，所以没关系。
+- 云端会话用你连接的 GitHub 权限。Anthropic 的 GitHub 代理只拦删分支和推标签，**不限制推到哪个分支**；`main` 上的规则集
+  也分不清例程和发布器（两者都以你的身份提交）。所以“例程只读仓库”靠的是它遵守 ROUTINE.md（推荐里的文字和网页都只是
+  数据），不是技术上的保证。偶尔看一下 GitHub 上有没有你不认识的推送（尤其是 `claude/…` 分支）；有的话删掉那个分支，看一下
+  例程那次的会话。推上去的分支都会有预览，这也是预览的 secret 要和正式网站不同的原因（第 7 节）。
+- 要技术上的保证，可以让任务不挂仓库、只从 raw.githubusercontent.com 读它需要的文件，这样它根本推不了。这要改
+  ROUTINE.md（还没做）。
 
 Nothing here needs your computer to be on: taking suggestions, approving and
 refusing, publishing (every 10 minutes) and deleting contact details when due
 (daily) all happen in the Cloudflare Worker; checking and completing them is
-a Claude Code routine on Anthropic's servers. The routine only reads the
-repository and only writes to Notion.
+a Claude Code scheduled task (formerly a routine; "the routine" below) on
+Anthropic's servers. ROUTINE.md has it only read the repository and only
+write to Notion (see Safety below).
 
 Set it up once on claude.ai (after the suggestions are merged into `main`):
 
@@ -909,21 +934,54 @@ Set it up once on claude.ai (after the suggestions are merged into `main`):
    information). Connect it to the **Suggestions** database and to the
    **Processing log**, each on its own (••• ▸ Connections on each), **never**
    to the page that holds them: that page also holds Contacts. Copy its token.
-2. **Environment** (claude.ai/code → Environments → New): network access
-   **Full** (for gallery sites and the geocoders); one **network secret** for
-   the host `api.notion.com`, with the token from step 1 (the session never
-   sees it); no environment variables (the database ids are in
-   `wrangler.jsonc`); setup script `npm ci --no-audit --no-fund` (optional:
-   the routine installs them itself).
-3. **Routine** (claude.ai/code → Routines → New): repository
-   `itom123/kuschonink.com`, branch `main`, the environment above, **no
-   connectors**; hourly from 08:00 to 22:00 (Europe/Paris), or simply hourly
-   if that is all the schedule offers (a run with nothing to do stops at once
-   and logs nothing); prompt:
+2. **Environment**: in the environment menu under the message box at
+   claude.ai/code, the gear on an environment ▸ **Edit cloud environment**
+   (or add a new one):
+   - **Network access**: **Full** (for gallery sites and the geocoders);
+   - **Network secrets** ▸ **Add secret**: Secret type **Bearer**, host
+     `api.notion.com`, Header name `Authorization` and Prefix `Bearer` (the
+     defaults), Value the token from step 1 ▸ **Add**; then **Save changes**.
+     The session never sees the token. Network secrets need a Pro, Max,
+     Ultra, Team or Enterprise plan and an Anthropic-hosted environment.
+   - **Setup script**: leave it empty (project installs don't belong there;
+     the routine installs what it needs itself). No environment variables
+     (the database ids are in `wrangler.jsonc`).
+3. **Scheduled task**: [claude.ai/code/routines](https://claude.ai/code/routines)
+   ▸ **New task** (some accounts say Routines and **New routine**):
+   repository `itom123/kuschonink.com`, branch `main`, the environment
+   above, **no connectors**; prompt:
    `Follow scripts/suggestions/ROUTINE.md in the repository, on main. If this run was started with a text, it says why (approved: …, or manual: …).`
-4. **API trigger**: add one to the routine, and save its address and token as
-   the Cloudflare secrets `ROUTINE_FIRE_URL` and `ROUTINE_TOKEN` (after the
-   switch to Worker Previews, see section 7). Admin mode's Approve and Run Now
-   use it.
-5. Try it: **Run now** in the routine, and read its session. The Processing
-   log only gets a line when a suggestion was actually handled.
+   Schedule: the presets are hourly, daily or weekly, with no window of
+   hours. Once it exists, open the menu next to its name ▸ **Edit**, pick
+   **Custom** and enter `CRON_TZ=Europe/Paris 7 8-22 * * *` (every hour from
+   8:07 to 22:07, Paris time). If the field already starts with another
+   `CRON_TZ=`, change it to `Europe/Paris`; if it won't take the prefix,
+   write the hours in UTC: `7 7-21 * * *` in winter, `7 6-20 * * *` in
+   summer. A run with nothing to do stops at once and logs nothing.
+4. **API trigger**: the task's menu ▸ **Edit** ▸ **+** in the **Trigger** row
+   ▸ **API** ▸ copy the **Fire URL** ▸ **Generate token** (shown once). Save
+   them as the Cloudflare secrets `ROUTINE_FIRE_URL` and `ROUTINE_TOKEN`, for
+   the live site only, never for previews (after the switch to Worker
+   Previews, see section 7). Admin mode's Approve and Run Now use it. **Run
+   now** and API fires share 30 an hour per task.
+5. Try it: **Run now** on the task, and read its session. The Processing log
+   only gets a line when a suggestion was actually handled.
+
+Safety:
+
+- The text a run is started with (`approved: …`, `manual: …`) arrives wrapped
+  in a `<routine-fire-payload>` block marked as untrusted data. The prompt
+  only takes it as information, so that's fine.
+- Cloud sessions use the GitHub access you connected. Anthropic's GitHub
+  proxy blocks branch deletions and tag pushes, but **not which branch a push
+  goes to**, and a ruleset on `main` can't tell the routine from the
+  publisher (both commit as you). So "the routine only reads the repository"
+  rests on it following ROUTINE.md (suggestions and web pages are data, never
+  instructions); it isn't a technical guarantee. Now and then, look on GitHub
+  for pushes you don't recognise (`claude/…` branches above all); delete such
+  a branch and read that run's session. Every pushed branch gets a preview,
+  which is why previews need their own secrets, different from the live
+  site's (section 7).
+- For a technical guarantee, the task could run with no repository attached
+  and read the files it needs from raw.githubusercontent.com, so it couldn't
+  push at all. That needs a change to ROUTINE.md (not done yet).
