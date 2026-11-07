@@ -182,7 +182,7 @@ Kept in this browser only.
 
 | Where | Key | Holds |
 | --- | --- | --- |
-| Cookie (session) | `kus98_session` | Logged on in this browser session (so new tabs skip the start-up). A visit that starts at `/guides/…` sets it too, to the last name typed or Guest |
+| Cookie (30 min, renewed) | `kus98_session` | Logged on (so new tabs and refreshes skip the start-up). Every open page renews it each minute and as it goes; 30 minutes (`AWAY_MINUTES` in `session.ts`) after the last page of the site was open it runs out, and the next visit starts up again, BIOS and log-on included. A visit that starts at `/guides/…` sets it too, to the last name typed or Guest |
 | Cookie (`HttpOnly`, `Path=/guides`) | `kus98_guides` | Field Guide: logged on with a guide password, and as which audience. Set and read only by the Worker (`worker/guides.ts`), signed with `GUIDES_COOKIE_SECRET` (or `TURNSTILE_SECRET` when that isn't set): 30 days with *Save this password*, otherwise until the browser closes (12 hours at most). File ▸ Log Off clears it |
 | `localStorage` | `kus98:settings` | Settings that differ from the defaults (see `settings.ts`) |
 | | `kus98:icons` | Where desktop icons were dragged |
@@ -229,7 +229,9 @@ and `data-saver`.
 Start-up and log-on never show to search engines or link previews
 (`navigator.webdriver` and bot user agents), or on a visit that starts at
 `/guides/…` (it sets `kus98_session` to the last name typed, or Guest, so the
-rest of the session skips them too). A safety net removes the start-up screen
+rest of the session skips them too). Away from the site for more than 30
+minutes (every tab of it closed), the computer counts as switched off: the next
+visit starts up and logs on again. A safety net removes the start-up screen
 after 10 seconds if the shell fails to load.
 
 ## How to…
