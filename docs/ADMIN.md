@@ -113,6 +113,22 @@ Settings for suggestions (`NOTION_TOKEN`, `GITHUB_TOKEN`, email) are in
 who suggested something go through `MAIL_OUT` (only from
 `noreply@kuschonink.com`, replies to `hi@kuschonink.com`).
 
+`MAIL_OUT` 用的是 Cloudflare Email Sending（Workers 付费版的功能），kuschonink.com 要接入过（Email Service ▸
+Email Sending ▸ Onboard Domain，它会在 `cf-bounce` 上加 MX、SPF 和 DKIM 记录，再加一条 `_dmarc`）。2026 年 11 月 7 日
+查过，这些 DNS 记录都已经在了（`_dmarc` 也有，留着它），所以应该已经接入：在 Email Sending 里看一眼 kuschonink.com
+是不是已接入就行。没接入时，**询问推荐者** 会说发不出去，什么都不会发出；接入以后再发一次。万一哪次部署因为
+`MAIL_OUT` 失败，把 `wrangler.jsonc` 里 `MAIL_OUT` 那一项删掉：询问推荐者会说邮件尚未设置，别的都照常。
+
+`MAIL_OUT` uses Cloudflare Email Sending (a Workers Paid feature), with
+kuschonink.com onboarded (Email Service ▸ Email Sending ▸ Onboard Domain,
+which adds MX, SPF and DKIM records on `cf-bounce` and a `_dmarc` record). On
+7 November 2026 those DNS records were all there (`_dmarc` too: keep it), so
+it should already be done: check that Email Sending lists kuschonink.com as
+onboarded. Until it is, **Ask the Sender** says the email couldn't be sent,
+and nothing goes out; send it again once it is. If a deploy ever fails on
+`MAIL_OUT`, take the `MAIL_OUT` entry out of `wrangler.jsonc`: Ask the Sender
+then says email isn't set up, and everything else works.
+
 ## 4. 安全 Safety
 
 - **密码和验证码两样都要**；同一个验证码只能用一次。The password **and** the code; a code works once.
@@ -120,8 +136,8 @@ who suggested something go through `MAIL_OUT` (only from
   Ten wrong tries from one place lock it for an hour; too many from everywhere at once lock everyone for an hour (you too).
 - 登录保持 12 小时。cookie 只是一个随机编号（`HttpOnly`、`Secure`），服务器端（Guard）保存会话，所以 **注销** 和 **在所有地方注销** 立即生效。
   A log-on lasts 12 hours. The cookie is only a random id (`HttpOnly`, `Secure`); the session lives on the server (the Guard), so **Log Off** and **Log Off Everywhere** work at once.
-- 管理模式的 cookie 需要访客同意使用 cookie（“全部允许”或“仅必要”）；还没同意时，按“确定”后顶部的信息栏会先问一次（用一般的措辞，公开的 Cookie 对话框里不提管理模式）。
-  Admin mode's cookies need the leave for cookies (Allow All or Necessary Only); without it, OK first asks once with the Information Bar (in its general wording: the public Cookies dialog never names admin mode).
+- 管理模式的 cookie 需要访客同意使用 cookie（“全部允许”或“仅必要”）；还没同意时，按“确定”后顶部的信息栏会先问一次（用一般的措辞，公开的 Cookie 对话框里不提管理模式）。选“全部允许”或“仅必要”就会接着登录；关掉信息栏（×）就不登录，什么都不发出。
+  Admin mode's cookies need the leave for cookies (Allow All or Necessary Only); without it, OK first asks once with the Information Bar (in its general wording: the public Cookies dialog never names admin mode). Allow All or Necessary Only goes on with the log-on; closing the bar (×) stops it, and nothing is sent.
 - 每个管理请求都在服务器上检查：会话、来自本站（`Sec-Fetch-Site: same-origin`、`Origin`）、JSON。别的网站无法借你的浏览器操作。
   Every admin request is checked on the server: the session, that it comes from this site (`Sec-Fetch-Site: same-origin`, `Origin`), JSON. Another site can't act through your browser.
 - 发邮件：浏览器只发“哪一条推荐”和正文；收件地址由服务器从 Notion（Contacts）里查，且只在对方同意时才发。同一封信不会发两次。

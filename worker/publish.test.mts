@@ -48,6 +48,8 @@ function world(o: { ghFetch?: (g: ReturnType<typeof githubStandIn>) => typeof fe
   const g = githubStandIn({ files, token: 'gh' });
   const n = notion({ token: 'nt', fetch: s.fetch, base: s.base, wait: async () => {} });
   const logs: string[] = [];
+  /** The commit the running site was built from (12 characters), as liveBuild reads it from the Worker's files. */
+  const site = { build: null as string | null };
   const deps: PublishDeps = {
     notion: n,
     db: { suggestions: 'ds-s', log: 'ds-log' },
@@ -56,6 +58,7 @@ function world(o: { ghFetch?: (g: ReturnType<typeof githubStandIn>) => typeof fe
     guard: new GuardCore(memoryStore(), () => now),
     access: ACCESS,
     download: async (u) => new Uint8Array(await (await s.fetch(u)).arrayBuffer()),
+    liveBuild: async () => site.build,
     now: () => now,
     log: (...a) => logs.push(a.map(String).join(' ')),
   };
@@ -68,7 +71,7 @@ function world(o: { ghFetch?: (g: ReturnType<typeof githubStandIn>) => typeof fe
   }
   const row = async (id: string) => readSuggestion(await n.getPage(id));
   const items = () => (JSON.parse(g.files()[`${DIR}/items.json`]) as ItemsFile).items;
-  return { s, g, n, deps, ready, row, items, logs };
+  return { s, g, n, deps, ready, row, items, logs, site };
 }
 
 // ---- Helpers ----
@@ -109,6 +112,7 @@ check('nextId: one more than the highest in the tier', nextId([{ id: 'C1', tier:
   w.g.checks.set(w.g.head(), [{ name: 'Workers Builds: kuschonink', status: 'completed', conclusion: 'success', html_url: 'https://dash', output: { title: 'Success' } }]);
   const r3 = await publish(w.deps);
   check('the build passed: PUBLISHED', r3.live.length === 1 && (await w.row(id)).status === 'PUBLISHED' && (await w.row(id)).result.includes('C3'));
+  check('… its check run read without the token (a fine-grained token is refused there)', w.g.calls.some((c: string) => c.endsWith('/check-runs (no token)')) && !w.g.calls.some((c: string) => c.endsWith('/check-runs')), w.g.calls.filter((c: string) => c.includes('check-runs')));
 
   await w.n.updatePage(id, { [S.status]: P.select('READY') });
   const before = w.g.head();
@@ -172,6 +176,76 @@ check('nextId: one more than the highest in the tier', nextId([{ id: 'C1', tier:
   w.g.checks.set(w.g.head(), [{ name: 'Workers Builds: kuschonink', status: 'completed', conclusion: 'success', html_url: 'https://dash/build/3', output: { title: 'Success' } }]);
   await publish(w.deps);
   check('… once its build passes, the second goes alone too', (await w.row(x)).status === 'PUBLISHED' && (await w.row(y)).status === 'PUBLISHING');
+}
+
+// ---- Watching the build: the site's own build id, and check runs GitHub won't always show ----
+{
+  const g = githubStandIn({ files, token: 'gh' });
+  const url = `${g.base}/repos/itom123/kuschonink.com/commits/${g.head()}/check-runs`;
+  check('the stand-in, like GitHub: check runs refuse a fine-grained token and are open without one', (await g.fetch(url, { headers: { authorization: 'Bearer gh' } })).status === 403 && (await g.fetch(url)).status === 200);
+}
+{
+  const w = world();
+  w.g.limitAnonymous(); // GitHub's allowance without a token is used up, all along
+  const a = await w.ready({}, { name: 'One' });
+  await publish(w.deps);
+  const shaA = w.g.head();
+  const b = await w.ready({ coordinates: [2.3611, 48.8629] }, { name: 'Two' });
+  const r = await publish(w.deps);
+  check('check runs unreadable: the first still PUBLISHING, and the next entry still goes in', (await w.row(a)).status === 'PUBLISHING' && r.committed.length === 1 && (await w.row(b)).status === 'PUBLISHING' && !r.errors.length, r);
+  w.site.build = shaA.slice(0, 12);
+  const r2 = await publish(w.deps);
+  check('the site runs the first commit: that one PUBLISHED, the second still waits', (await w.row(a)).status === 'PUBLISHED' && (await w.row(b)).status === 'PUBLISHING' && r2.live.length === 1, r2);
+  w.g.moveMain('README.md', 'a later change');
+  w.site.build = w.g.head().slice(0, 12);
+  const r3 = await publish(w.deps);
+  check('the site runs a later commit built on the second: PUBLISHED', (await w.row(b)).status === 'PUBLISHED' && r3.live.length === 1, r3);
+}
+{
+  // The site never takes the commit: its build failed, and GitHub won't say so.
+  const w = world();
+  w.g.limitAnonymous();
+  const older = w.g.head().slice(0, 12);
+  w.site.build = older;
+  const id = await w.ready();
+  await publish(w.deps);
+  const sha = w.g.head();
+  const start = now;
+  now += 30 * 60 * 1000;
+  await publish(w.deps);
+  check('not live 30 minutes on: still waiting', (await w.row(id)).status === 'PUBLISHING');
+  now += 20 * 60 * 1000;
+  const r = await publish(w.deps);
+  const row = await w.row(id);
+  check('not live 45 minutes on: taken back, ERROR saying the site still runs an older build', r.takenBack.length === 1 && row.status === 'ERROR' && row.result.includes('45 minutes') && row.result.includes(older) && w.g.head() !== sha && !w.items().some((i) => i.suggested?.ref === id), row.result);
+  now = start;
+}
+{
+  // A build made without a commit id (on a computer): nothing to go by.
+  const w = world();
+  w.g.limitAnonymous();
+  const id = await w.ready();
+  await publish(w.deps);
+  const start = now;
+  now += 46 * 60 * 1000;
+  await publish(w.deps);
+  const row = await w.row(id);
+  check('no build id and no check run 45 minutes on: PUBLISHED, saying it couldn\'t be checked', row.status === 'PUBLISHED' && row.result.includes('couldn\'t be checked'), row.result);
+  now = start;
+}
+{
+  // One commit that can't be checked holds up nothing else.
+  let broken = '';
+  const w = world({ ghFetch: (g) => async (input, init) => (broken && String(input).includes(`/compare/${broken}...`) ? new Response('{"message":"Server Error"}', { status: 502 }) : g.fetch(input, init)) });
+  const a = await w.ready({}, { name: 'One' });
+  await publish(w.deps);
+  broken = w.g.head();
+  const b = await w.ready({ coordinates: [2.3611, 48.8629] }, { name: 'Two' });
+  await publish(w.deps);
+  w.site.build = w.g.head().slice(0, 12);
+  const c = await w.ready({ coordinates: [2.3591, 48.8609] }, { name: 'Three' });
+  const r = await publish(w.deps);
+  check('GitHub fails on one commit: that one waits, the other goes live, a new entry still goes in', (await w.row(a)).status === 'PUBLISHING' && (await w.row(b)).status === 'PUBLISHED' && (await w.row(c)).status === 'PUBLISHING' && r.committed.length === 1 && r.errors.some((e) => e.includes(broken.slice(0, 12))), r);
 }
 
 // ---- Races ----

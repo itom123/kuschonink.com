@@ -704,7 +704,7 @@ Notion and you decide.
 1. 推荐者填写向导：是什么、时间地点、链接和图片、关于自己（可不填）、确认发送。服务器（`worker/suggest.ts`）核对来源、登录、内容、频率和反垃圾验证，清除图片里的位置等信息，然后在 Notion 的 **Suggestions** 里新建一条（状态 `NEW`），并给你发一封通知邮件。Notion 出问题时，整条推荐改用邮件发给你，不会丢失。
 2. 你在 Notion 里（或网站的管理界面里）把状态改成 **APPROVED**（收录）或 **REFUSED**（不收录）。收录前可以设 **Tier**（A/B/C，默认 C）、**Show to**（`Everyone`，或某一类读者，如 `fotofilmic`）和 **Owner notes**（给云端例程的说明）。
 3. 云端例程（Claude Code 的定时任务，每天 08:00–22:00 巴黎时间每小时一次，你在网站上批准时也会立即运行一次）按 [`scripts/suggestions/ROUTINE.md`](../scripts/suggestions/ROUTINE.md) 处理每条 `APPROVED`：核对官网、补全链接和开放时间、定位、查重，写好条目，把状态改成 `READY`（或 `DUPLICATE`、`NEEDS CHECK`、`ERROR`）。**例程不能改仓库**：它读的是陌生人写的文字和外部网页，可能被误导。
-4. 网站自己的代码（发布器，`worker/publish.ts`，每 10 分钟一次）把 `READY` 的条目再检查一遍（只能用已知字段、通过构建时的同一套检查、不能含某类读者不该看到的词），然后提交到 `main`：只改这份导览的 `items.json` 和 `img/` 里的图片。状态变成 `PUBLISHING`；构建通过后变成 `PUBLISHED`。构建失败的话，发布器会自动撤回这次提交，状态变成 `ERROR`。
+4. 网站自己的代码（发布器，`worker/publish.ts`，每 10 分钟一次）把 `READY` 的条目再检查一遍（只能用已知字段、通过构建时的同一套检查、不能含某类读者不该看到的词），然后提交到 `main`：只改这份导览的 `items.json` 和 `img/` 里的图片。状态变成 `PUBLISHING`；网站换上这次提交的构建后（通常一两分钟）变成 `PUBLISHED`。构建失败，或者 45 分钟后网站还没换上，发布器会自动撤回这次提交，状态变成 `ERROR`。
 
 1. The sender goes through the wizard: what it is, when and where, links and
    a picture, about them (optional), check and send. The server
@@ -728,8 +728,9 @@ Notion and you decide.
    checks each `READY` entry again (known fields only, the build's own checks,
    no word an audience mustn't see) and commits it to `main`, touching only
    the guide's `items.json` and its `img/`. The status becomes `PUBLISHING`,
-   then `PUBLISHED` once the build passes. If the build fails, the publisher
-   takes the commit back and sets `ERROR`.
+   then `PUBLISHED` once the site runs that commit's build (usually within a
+   couple of minutes). If the build fails, or the site still hasn't taken it
+   45 minutes later, the publisher takes the commit back and sets `ERROR`.
 
 ### 11.2 状态 The statuses
 
@@ -792,6 +793,39 @@ Once only. Cloudflare secrets (never in the repo):
   previews use Cloudflare's test key.
 - The cloud routine: see [11.6](#116-云端例程-the-routine-in-claudes-cloud).
 
+怎么建：
+
+- **Turnstile**：在 Cloudflare 的 Turnstile 里给推荐向导单独建一个小组件，主机名只填 `kuschonink.com`（`www` 没有 DNS 记录）。它的站点密钥写进 `suggest.json`，密钥存成 `TURNSTILE_SECRET_SUGGEST`：两个必须来自同一个小组件。
+- **Notion**：新建内部集成（Notion ▸ Settings ▸ Connections ▸ Develop or manage integrations），权限只要 Read content、Update content 和 Insert content，不要评论权限，用户信息选 No user information。正式网站的集成连接到“Field Guide suggestions (kuschonink)”页面（页面的 ••• ▸ Connections），测试集成连接到“… · test copies”页面。如果第一条推荐没有出现在 Notion 里，再把三个数据库分别连接给正式网站的集成。
+- **GitHub 令牌**：细粒度令牌（fine-grained），只限本仓库，只要 Contents 读写。到期日选在 2027 年 2 月中旬以后：巴黎这份导览 11 月 15 日结束，联系人在 90 天后（2027 年 2 月 14 日）删除；以后只要还有导览收推荐，就要续。在日历里提前一周提醒自己：令牌过期后，发布器和每天的联系人删除会悄悄停下，联系人就会留过期限；换上新令牌后接着做。
+- **GitHub 规则集**（仓库的 Settings ▸ Rules ▸ Rulesets，针对 `main`）：只开 **Restrict deletions** 和 **Block force pushes**。不要开 Require a pull request、Require status checks 或 Restrict updates：发布器直接提交到 `main`（只往前，从不强推），这些规则会把它挡住。
+
+How to make them:
+
+- **Turnstile**: a widget of its own for the wizard, with one hostname,
+  `kuschonink.com` (`www` has no DNS record). Its site key goes in
+  `suggest.json` and its secret in `TURNSTILE_SECRET_SUGGEST`: both from the
+  same widget.
+- **Notion**: an internal integration (Notion ▸ Settings ▸ Connections ▸
+  Develop or manage integrations) with Read, Update and Insert content only:
+  no comment capabilities, and No user information. Connect the site's
+  integration to the page "Field Guide suggestions (kuschonink)" (the page's
+  ••• ▸ Connections) and the test one to "… · test copies". If a first
+  suggestion doesn't show up in Notion, connect the three databases to the
+  site's integration one by one as well.
+- **GitHub token**: fine-grained, this repository only, Contents read and
+  write and nothing else. Make it expire after mid-February 2027: the Paris
+  guide ends on 15 November and its contacts are deleted 90 days later, on
+  14 February 2027; renew it for as long as guides take suggestions. Put a
+  reminder in your calendar a week before: once it runs out, the publisher
+  and the daily contact clean-up stop without a word, so contacts would be
+  kept past their date. With a new token they carry on.
+- **GitHub ruleset** (the repository's Settings ▸ Rules ▸ Rulesets, on
+  `main`): only **Restrict deletions** and **Block force pushes**. Never
+  Require a pull request, Require status checks or Restrict updates: the
+  publisher commits straight to `main` (forward only, never forced), and
+  those would stop it.
+
 PR previews (Worker Previews, section 7) never get the real ones. The
 `previews` block in `wrangler.jsonc` already gives them the test copies of the
 databases (below) and accepts Turnstile's test keys
@@ -848,8 +882,9 @@ Suggest a Place…**. `http://127.0.0.1:8798/_dump` shows what was kept.
 
 在 claude.ai 上设置一次（在 `main` 合并了推荐功能之后）：
 
-1. **Notion**：新建一个集成“Field Guide routine”，只共享 **Suggestions** 和 **处理日志** 两个数据库（**不要**共享
-   Contacts），复制它的令牌。
+1. **Notion**：新建一个内部集成“Field Guide routine”，权限和上面一样（Read、Update、Insert content，不要评论权限，
+   No user information）。在 **Suggestions** 和 **处理日志** 两个数据库各自的 ••• ▸ Connections 里分别连接它；
+   **不要**连接它们所在的页面（那个页面里还有 Contacts）。复制它的令牌。
 2. **环境**（claude.ai/code → Environments → New）：网络访问选 **Full**（要打开画廊网站和地理编码服务）；加一个
    **network secret**：主机 `api.notion.com`，值是上一步的令牌（会话本身看不到它）；不需要环境变量（数据库编号在
    `wrangler.jsonc` 里）；setup script 可以写 `npm ci --no-audit --no-fund`（不写也行，例程每次会自己装）。
@@ -869,9 +904,11 @@ repository and only writes to Notion.
 
 Set it up once on claude.ai (after the suggestions are merged into `main`):
 
-1. **Notion**: a new integration, "Field Guide routine", shared with only the
-   **Suggestions** database and the **Processing log** (**not** Contacts).
-   Copy its token.
+1. **Notion**: a new internal integration, "Field Guide routine", with the
+   same capabilities (Read, Update and Insert content; no comments, No user
+   information). Connect it to the **Suggestions** database and to the
+   **Processing log**, each on its own (••• ▸ Connections on each), **never**
+   to the page that holds them: that page also holds Contacts. Copy its token.
 2. **Environment** (claude.ai/code → Environments → New): network access
    **Full** (for gallery sites and the geocoders); one **network secret** for
    the host `api.notion.com`, with the token from step 1 (the session never
