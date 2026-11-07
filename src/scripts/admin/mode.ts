@@ -43,13 +43,32 @@ function apply() {
   names();
 }
 
+/** The page in the front-most window that isn't an admin window (what Edit This Page... edits). */
+function frontPage(): string {
+  const wins = [...document.querySelectorAll<HTMLElement>('[data-window][data-url]')]
+    .filter((w) => !/^\/admin(?:\/|$|\?)/.test(w.dataset.url ?? '') && w.dataset.state !== 'min' && !w.hidden)
+    .sort((a, b) => (Number(b.style.zIndex) || 0) - (Number(a.style.zIndex) || 0));
+  return wins[0]?.dataset.url ?? '';
+}
+
+/** Edit This Page... (Start menu) opens Notepad on the files of the page in front. */
+function pointEditLinks() {
+  const page = frontPage();
+  const href = page ? `/admin/edit?for=${encodeURIComponent(page)}` : '/admin/edit';
+  document.querySelectorAll<HTMLAnchorElement>('[data-admin-edit-page]').forEach((a) => (a.href = href));
+}
+
 export function initAdminMode() {
   if (!wired) {
     wired = true;
     document.addEventListener('admin:change', apply);
     document.addEventListener('desktop:login', apply);
+    // Whenever windows change (and as the Start menu is opened), point Edit This Page... at the page in front.
+    document.addEventListener('wm:change', pointEditLinks);
+    document.addEventListener('pointerdown', pointEditLinks, true);
   }
   apply();
+  pointEditLinks();
   // The cookie only says admin mode was on: check it still is.
   if (isAdminPage()) void whoAmI();
 }

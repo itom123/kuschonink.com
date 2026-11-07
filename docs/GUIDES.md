@@ -802,8 +802,8 @@ Once only. Cloudflare secrets (never in the repo):
 
 - **Turnstile**：在 Cloudflare 的 Turnstile 里给推荐向导单独建一个小组件，主机名只填 `kuschonink.com`（`www` 没有 DNS 记录）。它的站点密钥写进 `suggest.json`，密钥存成 `TURNSTILE_SECRET_SUGGEST`：两个必须来自同一个小组件。
 - **Notion**：新建内部集成（Notion ▸ Settings ▸ Connections ▸ Develop or manage integrations），权限只要 Read content、Update content 和 Insert content，不要评论权限，用户信息选 No user information。正式网站的集成连接到“Field Guide suggestions (kuschonink)”页面（页面的 ••• ▸ Connections），测试集成连接到“… · test copies”页面。如果第一条推荐没有出现在 Notion 里，再把三个数据库分别连接给正式网站的集成。
-- **GitHub 令牌**：细粒度令牌（fine-grained），只限本仓库，只要 Contents 读写。到期日选在 2027 年 2 月中旬以后：巴黎这份导览 11 月 15 日结束，联系人在 90 天后（2027 年 2 月 14 日）删除；以后只要还有导览收推荐，就要续。在日历里提前一周提醒自己：令牌过期后，发布器和每天的联系人删除会悄悄停下，联系人就会留过期限；换上新令牌后接着做。
-- **GitHub 规则集**（仓库的 Settings ▸ Rules ▸ Rulesets，针对 `main`）：只开 **Restrict deletions** 和 **Block force pushes**。不要开 Require a pull request、Require status checks 或 Restrict updates：发布器直接提交到 `main`（只往前，从不强推），这些规则会把它挡住。
+- **GitHub 令牌**：细粒度令牌（fine-grained），只限本仓库，只要 Contents 读写。到期日选在 2027 年 2 月中旬以后：巴黎这份导览 11 月 15 日结束，联系人在 90 天后（2027 年 2 月 14 日）删除；以后只要还有导览收推荐，就要续。在日历里提前一周提醒自己：令牌过期后，发布器、管理模式的编辑和每天的联系人删除会悄悄停下，联系人就会留过期限；换上新令牌后接着做。
+- **GitHub 规则集**（仓库的 Settings ▸ Rules ▸ Rulesets，针对 `main`）：只开 **Restrict deletions** 和 **Block force pushes**。不要开 Require a pull request、Require status checks 或 Restrict updates：发布器和管理模式的编辑都直接提交到 `main`（只往前，从不强推），这些规则会把它们挡住。
 
 How to make them:
 
@@ -822,14 +822,14 @@ How to make them:
   write and nothing else. Make it expire after mid-February 2027: the Paris
   guide ends on 15 November and its contacts are deleted 90 days later, on
   14 February 2027; renew it for as long as guides take suggestions. Put a
-  reminder in your calendar a week before: once it runs out, the publisher
-  and the daily contact clean-up stop without a word, so contacts would be
-  kept past their date. With a new token they carry on.
+  reminder in your calendar a week before: once it runs out, the publisher,
+  admin mode's editing and the daily contact clean-up stop without a word,
+  so contacts would be kept past their date. With a new token they carry on.
 - **GitHub ruleset** (the repository's Settings ▸ Rules ▸ Rulesets, on
   `main`): only **Restrict deletions** and **Block force pushes**. Never
   Require a pull request, Require status checks or Restrict updates: the
-  publisher commits straight to `main` (forward only, never forced), and
-  those would stop it.
+  publisher and admin mode's edits commit straight to `main` (forward only,
+  never forced), and those would stop them.
 
 PR previews (Worker Previews, section 7) never get the real ones. The
 `previews` block in `wrangler.jsonc` already gives them the test copies of the

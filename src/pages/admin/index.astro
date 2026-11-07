@@ -61,6 +61,10 @@ const L = { res: label(AW.resource), pass: label(AW.password), code: label(AW.co
         <ul class="adm-icons" {...attr('aria-label', AW.folder)}>
           <li><a class="icon" href="/admin/suggestions" {...attr('title', AW.queueTip)}><span class="ico ico-folder-open" aria-hidden="true"></span><span class="icon-label"><Bi t={AW.queue} /></span></a></li>
           <li><a class="icon" href="/admin/suggestions?view=log" {...attr('title', AW.logTip)}><span class="ico ico-documents" aria-hidden="true"></span><span class="icon-label"><Bi t={AW.log} /></span></a></li>
+          <li><a class="icon" href="/admin/edit" {...attr('title', AW.siteFilesTip)}><span class="ico ico-document" aria-hidden="true"></span><span class="icon-label"><Bi t={AW.siteFiles} /></span></a></li>
+          <li><a class="icon" href="/admin/changes" {...attr('title', AW.changesTip)}><span class="ico ico-topic" aria-hidden="true"></span><span class="icon-label"><Bi t={AW.changes} /></span></a></li>
+          <li><button type="button" class="icon" data-adm-cmd="picture" {...attr('title', AW.uploadPictureTip)}><span class="ico ico-image" aria-hidden="true"></span><span class="icon-label"><Bi t={AW.uploadPicture} /></span></button></li>
+          <li><button type="button" class="icon" data-adm-cmd="project" {...attr('title', AW.newProjectTip)}><span class="ico ico-folder" aria-hidden="true"></span><span class="icon-label"><Bi t={AW.newProject} /></span></button></li>
           <li><button type="button" class="icon" data-adm-cmd="logoff" {...attr('title', AW.logOffTip)}><span class="ico ico-keys" aria-hidden="true"></span><span class="icon-label"><Bi t={AW.logOff} /></span></button></li>
           <li><button type="button" class="icon" data-adm-cmd="logoff-all" {...attr('title', AW.logOffAllTip)}><span class="ico ico-shutdown" aria-hidden="true"></span><span class="icon-label"><Bi t={AW.logOffAll} /></span></button></li>
         </ul>

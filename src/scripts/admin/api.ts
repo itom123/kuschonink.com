@@ -2,13 +2,13 @@
 // session is an HttpOnly cookie the browser sends by itself; the server
 // checks every call. These helpers only make the calls and read the answers.
 
-export interface AdminMe { admin: boolean; exp?: number; notion?: boolean; mail?: boolean; routine?: boolean; publish?: boolean; github?: boolean; guides?: Record<string, string[]>; audiences?: Record<string, { en: string; zh: string }> }
+export interface AdminMe { admin: boolean; exp?: number; notion?: boolean; mail?: boolean; routine?: boolean; publish?: boolean; github?: boolean; repo?: string; guides?: Record<string, string[]>; audiences?: Record<string, { en: string; zh: string }> }
 
-export async function api<T = Record<string, unknown>>(path: string, body?: unknown): Promise<{ ok: boolean; status: number; data: T & { error?: string } }> {
+export async function api<T = Record<string, unknown>>(path: string, body?: unknown, method?: 'PUT'): Promise<{ ok: boolean; status: number; data: T & { error?: string } }> {
   let res: Response;
   try {
     res = await fetch(`/v1/admin${path}`, {
-      method: body === undefined ? 'GET' : 'POST',
+      method: method ?? (body === undefined ? 'GET' : 'POST'),
       headers: body === undefined ? { accept: 'application/json' } : { accept: 'application/json', 'content-type': 'application/json' },
       body: body === undefined ? undefined : JSON.stringify(body),
       credentials: 'same-origin',
