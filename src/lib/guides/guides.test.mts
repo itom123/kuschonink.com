@@ -158,7 +158,7 @@ const base = (): RawGuide => ({
   const raw = base();
   const probs = checkGuide(raw, 'fixture', { ...access, guides: { fixture: ['visitor', 'fotofilmic'] } });
   ok(probs.length === 0, 'the fixture guide passes the checks', probs.join('\n  '));
-  const acc: AccessFile = { ...access, guides: { fixture: ['visitor', 'fotofilmic'] } };
+  const acc: AccessFile = { ...access, guides: { fixture: ['visitor', 'fotofilmic'] }, tiles: { fixture: [2.07, 48.63, 2.8, 49.05] } };
   ok(checkAccess(acc, ['fixture']).length === 0, 'access.json fixture passes', checkAccess(acc, ['fixture']).join('\n  '));
   const rep = inspectGuide(raw, 'fixture', acc);
   ok(rep.missingZh > 0, 'texts without Chinese are counted', String(rep.missingZh));
@@ -189,6 +189,8 @@ const base = (): RawGuide => ({
   ok(!js.includes('Hotel Fixture') && !js.includes(String(W[0])) && !js.includes('Why A1') && !js.includes('Galerie\\nexpo'), 'the visitor payload holds no hidden place and no long texts');
   ok(pay.items.length === 5 && pay.places.length === 1 && pay.routes.length === 1, 'payload counts');
   ok(js.includes('Opening <3') && !JSON.stringify(pay).replace(/</g, '\\u003c').includes('<'), 'payload "<" can be escaped (load.ts payloadJson)');
+  ok(pay.tiles?.url === '/guides/fixture/tiles/{z}/{x}/{y}.png' && pay.tiles.min === 14 && pay.tiles.max === 19 && vv.tiles?.url === pay.tiles.url, 'payload tiles: the Worker\'s proxy for this guide, z14 to z19', JSON.stringify(pay.tiles));
+  ok(buildPayload(buildView(raw, 'fixture', { ...acc, tiles: undefined }, 'visitor')).tiles === undefined && !('tiles' in buildPayload(buildView(raw, 'fixture', { ...acc, tiles: {} }, 'visitor'))), 'no tile bounds in access.json → no tiles in the payload');
   let threw = false;
   try { buildView(raw, 'fixture', { ...acc, guides: { fixture: ['visitor'] } }, P); } catch { threw = true; }
   ok(threw, 'an audience not allowed on the guide throws');
@@ -200,7 +202,7 @@ const base = (): RawGuide => ({
 // ---------------------------------------------------------------------------
 // Broken copies: each must fail with file › id › field.
 {
-  const acc: AccessFile = { ...access, guides: { fixture: ['visitor', 'fotofilmic'] } };
+  const acc: AccessFile = { ...access, guides: { fixture: ['visitor', 'fotofilmic'] }, tiles: { fixture: [2.07, 48.63, 2.8, 49.05] } };
   type G = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   const cases: [string, (g: G) => void, string, string?][] = [
     ['bad date', (g) => { g.items.items[3].end = '2026-11-31'; }, 'guides/fixture/items.json › B1 › end', 'not a real date'],
@@ -233,6 +235,10 @@ const base = (): RawGuide => ({
     ['exception in the wrong year', (g) => { g.items.items[3].exceptions = [{ date: '2025-11-15', status: 'appointment' }]; }, 'items.json › B1 › exceptions[0].date', "outside the guide's days"],
     ['unknown placeholder in the subtitle', (g) => { g.guide.subtitle = '{exhibitions} to see'; }, 'guide.json › guide › subtitle', 'unknown placeholder {exhibitions}'],
     ['unknown placeholder in titleZh', (g) => { g.guide.titleZh = '{venues} 测试'; }, 'guide.json › guide › titleZh', 'unknown placeholder {venues}'],
+    ['placeholder with spaces', (g) => { g.guide.subtitle = '{ items } to see'; }, 'guide.json › guide › subtitle', 'without spaces'],
+    ['placeholder in public.subtitle', (g) => { g.guide.public = { ...g.guide.public, subtitle: '{items} to see' }; }, 'guide.json › guide › public.subtitle', 'work only in the title'],
+    ['placeholder in a label', (g) => { g.guide.labels.items = '{items} picks'; }, 'guide.json › guide › labels.items', 'work only in the title'],
+    ['[lon, lat] centre on a hidden place', (g) => { g.guide.map.centre = [W[0], W[1]]; }, 'guide.json › map › centre', 'next to "W"'],
     ['map centred on a hidden place', (g) => { Object.assign(g.map.views[0], { originY: 1442032.7187901973, width: 1536, height: 1408 }); }, 'places.json › W › coordinates', 'too close to the centre of map view "city"'],
     ['map centred on a hidden item', (g) => { g.items.items[4].audience = P; const c = project(g.items.items[4].coordinates, 11); Object.assign(g.map.views[1], { originX: c.x - 527, originY: c.y - 451 }); }, 'items.json › C1 › coordinates', 'too close to the centre of map view "region"'],
   ];
@@ -258,6 +264,20 @@ const base = (): RawGuide => ({
   ok(a3.some((p) => p.includes('› staff › secret')) && a3.some((p) => p.includes('› staff › includes[0]')), 'audience secret names and includes are checked');
   const a4 = checkAccess({ ...acc, audiences: [...acc.audiences].reverse() }, ['fixture']);
   ok(a4.length === 1 && a4[0].includes('access.json › fotofilmic › includes[0]') && a4[0].includes('"visitor" must be listed before "fotofilmic"'), 'audiences must go from least to most privileged', a4.join(' | '));
+  // Street-level tile bounds: [west, south, east, north], for a guide that exists, one region wide.
+  const t1 = checkAccess({ ...acc, tiles: { fixture: [2.8, 48.63, 2.07, 49.05] } }, ['fixture']);
+  ok(t1.length === 1 && t1[0].includes('access.json › tiles › fixture') && t1[0].includes('west 2.8 should be less than east 2.07'), 'tile bounds: west before east', t1.join(' | '));
+  const t2 = checkAccess({ ...acc, tiles: { fixture: [2.07, 49.05, 2.8, 48.63] } }, ['fixture']);
+  ok(t2.length === 1 && t2[0].includes('south 49.05 should be less than north 48.63'), 'tile bounds: south before north', t2.join(' | '));
+  const t3 = checkAccess({ ...acc, tiles: { ghost: [2.07, 48.63, 2.8, 49.05], fixture: [2.07, 48.63, 2.8], _comment: 'fine' } }, ['fixture']);
+  ok(t3.some((p) => p.includes('› tiles › ghost') && p.includes('not a guide')) && t3.some((p) => p.includes('› tiles › fixture') && p.includes('four numbers')) && !t3.some((p) => p.includes('_comment')), 'tile bounds: a known guide, four numbers; _comment allowed', t3.join(' | '));
+  const t4 = checkAccess({ ...acc, tiles: { fixture: [-1, 40, 5, 49] } }, ['fixture']);
+  ok(t4.length === 1 && t4[0].includes('spans more than 3°'), 'tile bounds: one region, not a country', t4.join(' | '));
+  const t5 = checkAccess({ ...acc, tiles: { fixture: [2.07, 48.63, 2.8, 91] } }, ['fixture']);
+  ok(t5.some((p) => p.includes('latitudes') && p.includes('85.06')), 'tile bounds: Web Mercator latitudes', t5.join(' | '));
+  const t6 = inspectGuide(base(), 'fixture', { ...acc, tiles: { fixture: [2.2, 48.8, 2.5, 48.9] } }).problems;
+  ok(t6.length === 1 && t6[0].includes('guides/fixture/map.json › region') && t6[0].includes('outside the tile bounds'), 'a base map reaching beyond the tile bounds is reported (the city map fits)', t6.join(' | '));
+  ok(checkAccess({ ...acc, tiles: undefined }, ['fixture']).length === 0 && inspectGuide(base(), 'fixture', { ...acc, tiles: undefined }).problems.length === 0, 'no tile bounds: nothing to report');
   // checkAll throws once with every line.
   const bad = structuredClone(base()) as G;
   bad.items.items[3].end = '2026-11-31';

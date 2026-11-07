@@ -4,6 +4,33 @@
    Worker sets data-gd-state on the wrapper when a log-on without JavaScript
    fails; the matching message then shows under the fields. */
 
+/* ---- Its window: a dialog box until the password is accepted ----
+   locked.astro gives the window fit="dialog" (Window.astro): on a computer it
+   is as wide as the box and as tall as what it holds (a message under the
+   fields makes it taller), never maximised; wm.ts puts it in the middle. On a
+   phone it fills the screen like every window (desktop.css). */
+@media (width > 700px) and (height > 480px) {
+  html.js #k98-windows > .app-window[data-fit="dialog"] { height: auto; max-height: calc(100% - 16px); }
+  /* Until the window manager places it: in the middle, whatever the head script
+     (Desktop.astro) remembers for the program or "Always maximize windows"
+     (system.css) would do. Specific enough to win over both. */
+  html.js #k98-windows > .app-window[data-fit="dialog"][data-state="normal"]:not([data-win-id]):not(.v-dialog) {
+    left: calc((100% - var(--ww)) / 2); top: 50%; transform: translateY(-50%);
+    width: var(--ww); height: auto;
+  }
+  html.js .app-window[data-fit="dialog"] .gd-logon { padding: 16px 12px 14px; gap: 14px; }
+}
+/* It can't be sized or maximised: no grip, and Maximize greyed out (98.css has
+   the picture, but only for the English label). */
+.app-window[data-fit="dialog"] .grip { display: none; }
+.app-window[data-fit="dialog"] .tb-max:disabled {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='10' height='10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M10 1H1v9h9V1zM9 3H2v6h7V3z' fill='%23fff'/%3E%3Cpath fill-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='gray'/%3E%3C/svg%3E");
+  background-position: top 2px left 3px;
+}
+/* Without JavaScript: a page as narrow as the box. */
+html:not(.js) .app-window[data-fit="dialog"] { max-width: var(--w); }
+html:not(.js) .app-window[data-fit="dialog"] .window-inner { min-height: 0; }
+
 .gd-logon-body { background: var(--face) !important; }
 
 .gd-logon {
@@ -39,10 +66,21 @@
 .gd-logon-keys { margin: 2px 2px 0; }
 .gd-logon-intro { margin: 2px 0 10px; line-height: 15px; }
 .gd-logon-row { display: grid; grid-template-columns: 68px minmax(0, 1fr); align-items: center; gap: 6px; margin-bottom: 8px; }
-.gd-logon-row input { width: 100%; box-sizing: border-box; font: 11px var(--ui-font); }
+.gd-logon-row :is(input, select) { width: 100%; box-sizing: border-box; font: 11px var(--ui-font); }
 .gd-logon-res { color: #000; text-overflow: ellipsis; }
 .gd-logon-res:read-only { background-color: var(--face); }
 .gd-logon-check { margin: 2px 0 0 74px; }
+
+/* Guide: with more than one listed guide. A drop-down list in the window's own
+   black on white (nothing from the guide's styles), highlighted in the
+   scheme's colour while it has the focus, its list always black on white;
+   without JavaScript, links to the other guides' boxes. */
+.gd-logon-guide select { min-width: 0; color: #000; background-color: #fff; text-overflow: ellipsis; }
+.gd-logon-guide select:focus { background-color: var(--sel); color: var(--sel-text); }
+.gd-logon-guide option { background-color: #fff; color: #000; }
+.gd-logon-guides { display: flex; flex-wrap: wrap; gap: 2px 12px; margin: 0; padding: 0; list-style: none; line-height: 15px; color: #000; }
+.gd-logon-guides a { color: #0000ee; }
+html.js .gd-logon-guides { display: none; }
 .gd-logon-buttons { display: flex; flex-direction: column; gap: 6px; }
 .gd-logon-buttons button { min-width: 75px; }
 
@@ -89,3 +127,4 @@
 :where(html[data-scheme="contrast"]) .gd-logon-cancel { background: #fff; box-shadow: inset 0 0 0 1px #000; }
 :where(html[data-scheme="contrast"]) .gd-logon-cancel:active { box-shadow: inset 0 0 0 3px #000; }
 :where(html[data-scheme="contrast"]) .gd-logon-msg { background: #fff; border-width: 2px; }
+:where(html[data-scheme="contrast"]) .gd-logon-guides a { color: #000; text-decoration: underline; }

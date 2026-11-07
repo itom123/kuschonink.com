@@ -202,7 +202,48 @@ const SCHEMA: Record<GuideFileName, S> = {
 const ACCESS_SCHEMA: S = obj({
   audiences: arr(obj({ id: str(), ...tx('label'), secret: str(), includes: arr(str(), { opt: true }) }), { rec: 'id', min: 1 }),
   guides: obj({}, { rest: arr(str(), { min: 1 }) }),
+  // Street-level tile bounds per guide, [west, south, east, north] in degrees (checkTiles() looks closer).
+  tiles: obj({}, { opt: true, rest: arr({ t: 'num' }, { min: 4 }) }),
 });
+
+/** A tile box may span at most this many degrees each way: tiles are for one region, not a country. */
+const TILE_SPAN = 3;
+
+/** access.json "tiles" › <slug> as [west, south, east, north], when it is one (checkTiles() reports why not). */
+function tileBox(access: unknown, slug: string): [number, number, number, number] | null {
+  const b = O(O(access).tiles)[slug];
+  if (!Array.isArray(b) || b.length !== 4 || !b.every((n) => typeof n === 'number' && Number.isFinite(n))) return null;
+  const [w, s, e, n] = b as number[];
+  if (!(w < e && s < n) || Math.abs(w) > 180 || Math.abs(e) > 180 || Math.abs(s) > 85.06 || Math.abs(n) > 85.06) return null;
+  if (e - w > TILE_SPAN || n - s > TILE_SPAN) return null;
+  return [w, s, e, n];
+}
+
+/** access.json "tiles": each entry names a guide and is a sensible [west, south, east, north] box. */
+function checkTiles(c: Ctx, access: unknown, guides: Rec): void {
+  for (const [slug, b] of Object.entries(O(O(access).tiles))) {
+    if (slug.startsWith('_')) continue;
+    const at: Loc = { id: 'tiles', path: slug };
+    if (!(slug in guides)) say(c, at, `${q(slug)} is not a guide in "guides".`);
+    if (!Array.isArray(b) || b.length !== 4 || !b.every((n) => typeof n === 'number' && Number.isFinite(n))) {
+      say(c, at, `should be [west, south, east, north] in degrees, four numbers, not ${q(b)}.`);
+      continue;
+    }
+    const [w, s, e, n] = b as number[];
+    if (Math.abs(w) > 180 || Math.abs(e) > 180) say(c, at, `longitudes ${w} and ${e} must be between -180 and 180.`);
+    if (Math.abs(s) > 85.06 || Math.abs(n) > 85.06) say(c, at, `latitudes ${s} and ${n} must be between -85.06 and 85.06 (Web Mercator).`);
+    if (!(w < e)) say(c, at, `west ${w} should be less than east ${e}. Write [west, south, east, north].`);
+    if (!(s < n)) say(c, at, `south ${s} should be less than north ${n}. Write [west, south, east, north].`);
+    if (w < e && s < n && (e - w > TILE_SPAN || n - s > TILE_SPAN)) say(c, at, `spans more than ${TILE_SPAN}° (${(e - w).toFixed(2)}° × ${(n - s).toFixed(2)}°). Tiles are for one region: cover the region view's area, no more.`);
+  }
+}
+
+/** Global pixel (x, y) at zoom z back to [longitude, latitude] (the inverse of core.ts project()). */
+function unproject(x: number, y: number, z: number): [number, number] {
+  const w = 256 * Math.pow(2, z);
+  const n = Math.PI * (1 - (2 * y) / w);
+  return [(x / w) * 360 - 180, (Math.atan(Math.sinh(n)) * 180) / Math.PI];
+}
 
 // ---------------------------------------------------------------------------
 // The walker.
@@ -505,9 +546,18 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
     // Placeholders in the title, subtitle and texts (view.ts fills them all).
     const scan = (s: unknown, path: string, id = 'texts') => {
       if (!isStr(s)) return;
-      for (const m of s.matchAll(/\{([A-Za-z]+)\}/g))
+      for (const m of s.matchAll(/\{\s*([A-Za-z]+)\s*\}/g))
         if (!PLACEHOLDERS.includes(m[1])) say(c, { id, path }, `unknown placeholder {${m[1]}}. Known: ${PLACEHOLDERS.map((p) => `{${p}}`).join(', ')}.`);
+        else if (m[0] !== `{${m[1]}}`) say(c, { id, path }, `write {${m[1]}} without spaces.`);
     };
+    // Fields that are never filled (public.* is shared by every audience): a placeholder would show as it is.
+    const unfilled = (s: unknown, path: string) => {
+      if (isStr(s) && /\{\s*[A-Za-z]+\s*\}/.test(s)) say(c, { id: 'guide', path }, 'placeholders such as {items} work only in the title, subtitle and texts. Write the number out here.');
+    };
+    for (const k of ['title', 'titleZh', 'subtitle', 'subtitleZh']) unfilled(O(g.public)[k], `public.${k}`);
+    A(g.holidays).forEach((h, i) => ['notice', 'noticeZh', 'name', 'nameZh'].forEach((k) => unfilled(O(h)[k], `holidays[${i}].${k}`)));
+    A(g.tiers).forEach((t, i) => ['text', 'textZh', 'name', 'nameZh'].forEach((k) => unfilled(O(t)[k], `tiers[${i}].${k}`)));
+    for (const [k, v] of Object.entries(O(g.labels))) unfilled(v, `labels.${k}`);
     for (const k of ['title', 'titleZh', 'subtitle', 'subtitleZh']) scan(g[k], k, 'guide');
     const texts = O(g.texts);
     for (const [sid, sec] of Object.entries(texts)) {
@@ -527,7 +577,22 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
     if (isStr(centre)) {
       if (!places.some((p) => O(p).id === centre))
         say(c, { id: 'map', path: 'centre' }, `${q(centre)} is not a place in places.json.`);
-    } else if (isLL(centre)) checkPoint(c, { id: 'map', path: 'centre' }, centre, region);
+    } else if (isLL(centre)) {
+      checkPoint(c, { id: 'map', path: 'centre' }, centre, region);
+      // A [lon, lat] centre goes to every audience, so it must not sit on a hidden place.
+      const near = new Set<string>();
+      for (const x of [...items, ...places]) {
+        const r = O(x);
+        if (r.audience === undefined || r.audience === null || !isLL(r.coordinates) || !isStr(r.id)) continue;
+        for (const v of boxes) {
+          const a = project(centre, v.z);
+          const p = project(r.coordinates, v.z);
+          if (Math.hypot(a.x - p.x, a.y - p.y) < CENTRE_GAP) near.add(r.id);
+        }
+      }
+      for (const id of near)
+        say(c, { id: 'map', path: 'centre' }, `is next to ${q(id)}, which not every reader sees. Write a place id (e.g. "W") so each audience gets its own centre.`);
+    }
   }
 
   const themes = new Set(A(g.themes).map((x) => O(x).id).filter(isStr));
@@ -668,6 +733,17 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
       if (isStr(f) && !/^[A-Za-z0-9][A-Za-z0-9._-]*\.(jpe?g|png|webp)$/i.test(f))
         say(c, { id: idOf(x, i), path: 'file' }, `${q(f)} should be a file name in public/guides/${slug}/map/ (jpg, png or webp).`);
     });
+    // Street-level tiles stop at the bounds in access.json, so every base map must lie inside them.
+    const tb = tileBox(access, slug);
+    if (tb) {
+      const eps = 1e-9;
+      for (const v of boxes) {
+        const [w, n] = unproject(v.originX, v.originY, v.z);
+        const [e, s] = unproject(v.originX + v.width, v.originY + v.height, v.z);
+        if (w < tb[0] - eps || e > tb[2] + eps || s < tb[1] - eps || n > tb[3] + eps)
+          say(c, { id: v.id, path: '' }, `reaches outside the tile bounds in access.json "tiles" (it spans [${w.toFixed(4)}, ${s.toFixed(4)}, ${e.toFixed(4)}, ${n.toFixed(4)}]). Widen them, or zoomed-in tiles will stop at this map's edge.`);
+      }
+    }
   }
 
   return { problems: [...new Set(problems)], missingZh };
@@ -722,6 +798,7 @@ export function checkAccess(access: unknown, slugs: string[]): string[] {
   }
   for (const s of slugs)
     if (!(s in guides)) problems.push(`guides/${s}/ › (folder) › (folder): not in access.json "guides", so nobody can open it. Add "${s}": ["visitor"].`);
+  checkTiles(c, access, guides);
   return [...new Set(problems)];
 }
 

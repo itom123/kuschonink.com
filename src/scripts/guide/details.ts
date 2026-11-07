@@ -50,6 +50,7 @@ export class Details {
     if (!this.cluster) return;
     for (const a of this.arts.values()) a.classList.remove('is-shown');
     this.shown = null;
+    delete this.cluster.dataset.gdNear;
     this.cluster.replaceChildren(
       h('h2', { class: 'gd-name' }, W.here(ids.length)),
       h('ul', {}, ids.map((id) => h('li', {}, h('a', { href: `#gd-item-${id}`, 'data-gd-sel': id }, `${id} ${name(id)}`)))),
@@ -58,9 +59,31 @@ export class Details {
     if (this.title) setText(this.title, W.here(ids.length));
   }
 
-  /** Where am I?: the nearest places as links, how far each is, and a way to stop. */
-  showNear(o: { title: Bi; note: Bi; empty: Bi; stop: Bi; rows: { id: string; name: string; icon: string; line: Bi }[] }) {
-    if (!this.cluster) return;
+  /**
+   * Where am I?: the nearest places as links, how far each is, and a way to
+   * stop. With refresh (a new position, a filter), the list keeps its scroll
+   * and the keyboard's place: the same places in the same order only change
+   * their words, and a new order is rebuilt with focus put back.
+   */
+  showNear(o: { title: Bi; note: Bi; empty: Bi; stop: Bi; rows: { id: string; name: string; icon: string; line: Bi }[] }, refresh = false) {
+    const box = this.cluster;
+    if (!box) return;
+    const key = o.rows.map((r) => r.id).join(' ');
+    const again = refresh && !box.hidden && box.dataset.gdNear != null;
+    if (again && box.dataset.gdNear === key && o.rows.length) {
+      for (const r of o.rows) {
+        const d = box.querySelector(`[data-gd-sel="${CSS.escape(r.id)}"] .gd-near-dist`);
+        if (d) setText(d, r.line);
+      }
+      const note = box.querySelector('.gd-near-note');
+      if (note) setText(note, o.note);
+      return;
+    }
+    const top = this.body.scrollTop;
+    const act = document.activeElement as HTMLElement | null;
+    const was = again && act && box.contains(act)
+      ? act.dataset.gdSel ? `[data-gd-sel="${CSS.escape(act.dataset.gdSel)}"]` : act.hasAttribute('data-gd-me-stop') ? '[data-gd-me-stop]' : '.gd-name'
+      : null;
     for (const a of this.arts.values()) a.classList.remove('is-shown');
     this.shown = null;
     const list = o.rows.length
@@ -69,14 +92,16 @@ export class Details {
         h('span', { class: 'gd-near-text' }, [h('span', { class: 'gd-near-name' }, `${r.id} ${r.name}`), h('span', { class: 'gd-near-dist' }, r.line)]),
       ]))))
       : h('p', {}, o.empty);
-    this.cluster.replaceChildren(
+    box.replaceChildren(
       h('h2', { class: 'gd-name', tabindex: -1 }, o.title),
       h('p', { class: 'gd-near-note' }, o.note),
       list,
       h('p', {}, h('button', { type: 'button', 'data-gd-me-stop': true }, o.stop)),
     );
-    this.cluster.hidden = false;
-    this.body.scrollTop = 0;
+    box.dataset.gdNear = key;
+    box.hidden = false;
+    this.body.scrollTop = again ? top : 0;
+    if (was) (box.querySelector<HTMLElement>(was) ?? box.querySelector<HTMLElement>('.gd-name'))?.focus({ preventScroll: true });
     if (this.title) setText(this.title, o.title);
   }
 

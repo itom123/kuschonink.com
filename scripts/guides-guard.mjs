@@ -238,7 +238,7 @@ for (const slug of Object.keys(guides)) {
   // Referenced images and base maps.
   const images = [];
   for (const it of items) if (it.image?.file) images.push({ folder: 'img', file: it.image.file, from: `${rel('items.json')} > ${it.id}` });
-  for (const v of mapFile.views ?? []) if (v.file) images.push({ folder: 'map', file: v.file, from: `${rel('map.json')} > ${v.id}` });
+  for (const v of mapFile.views ?? []) if (v.file) images.push({ folder: 'map', file: v.file, from: `${rel('map.json')} > ${v.id}`, width: v.width, height: v.height });
 
   data.set(slug, { texts: kept, sensitive, images });
   if (process.env.GUIDES_GUARD_VERBOSE) {
@@ -260,6 +260,34 @@ function signatureOk(buf, e) {
   if (e === '.png') return png ? true : 'is not a PNG (wrong signature)';
   if (e === '.webp') return webp ? true : 'is not a WebP (wrong signature)';
   return 'must be .jpg, .jpeg, .png or .webp';
+}
+
+/** A JPEG, PNG or WebP picture's size in pixels, read from its header, or null. */
+function pixelSize(buf) {
+  if (buf[0] === 0xff && buf[1] === 0xd8) {
+    // JPEG: walk the markers to the first SOFn (not DHT C4, JPG C8 or DAC CC).
+    let i = 2;
+    while (i + 9 < buf.length) {
+      if (buf[i] !== 0xff) return null;
+      const m = buf[i + 1];
+      if (m === 0xff) { i++; continue; }
+      if (m === 0xd8 || m === 0x01 || (m >= 0xd0 && m <= 0xd7)) { i += 2; continue; }
+      if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) return { w: buf.readUInt16BE(i + 7), h: buf.readUInt16BE(i + 5) };
+      i += 2 + buf.readUInt16BE(i + 2);
+    }
+    return null;
+  }
+  if (buf.length >= 24 && buf[0] === 0x89 && buf.toString('latin1', 12, 16) === 'IHDR') return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+  if (buf.length >= 30 && buf.toString('latin1', 0, 4) === 'RIFF' && buf.toString('latin1', 8, 12) === 'WEBP') {
+    const kind = buf.toString('latin1', 12, 16);
+    if (kind === 'VP8X') return { w: 1 + buf.readUIntLE(24, 3), h: 1 + buf.readUIntLE(27, 3) };
+    if (kind === 'VP8L') {
+      const b = buf.readUInt32LE(21);
+      return { w: 1 + (b & 0x3fff), h: 1 + ((b >> 14) & 0x3fff) };
+    }
+    if (kind === 'VP8 ') return { w: buf.readUInt16LE(26) & 0x3fff, h: buf.readUInt16LE(28) & 0x3fff };
+  }
+  return null;
 }
 
 /** Does rel exist under base with exactly this case? (Windows and macOS ignore case; Cloudflare doesn't.) */
@@ -292,9 +320,16 @@ for (const [slug, g] of data) {
     const abs = join(PUBLIC, slug, im.folder, ...im.file.split('/'));
     const size = statSync(abs).size;
     if (size > MAX_IMAGE) fail(rel, `${size} bytes is over 1 MB (${MAX_IMAGE} bytes)`);
-    const fd = readFileSync(abs).subarray(0, 16);
+    const whole = readFileSync(abs);
+    const fd = whole.subarray(0, 16);
     const sig = signatureOk(fd, ext(im.file));
     if (sig !== true) fail(rel, sig);
+    // A base map is drawn at map.json's width and height: a hand crop that doesn't match them moves every pin.
+    else if (im.folder === 'map' && typeof im.width === 'number' && typeof im.height === 'number') {
+      const px = pixelSize(whole);
+      if (!px) fail(rel, `its size in pixels can't be read; ${im.from} says ${im.width}x${im.height}`);
+      else if (px.w !== im.width || px.h !== im.height) fail(rel, `is ${px.w}x${px.h} px but ${im.from} says ${im.width}x${im.height}: fix width/height (and originX/originY) in map.json`);
+    }
   }
   for (const folder of ['img', 'map']) {
     for (const f of walk(join(PUBLIC, slug, folder))) {
