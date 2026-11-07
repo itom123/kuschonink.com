@@ -217,6 +217,7 @@ Kept in this browser only, and only as far as the visitor allows (see
 |  | `kus98:desk` | This tab | For a refresh: the pages open in windows, front to back, minimised or not, how far each was scrolled, each one's Back and Forward |
 |  | `kus98:draft` | This tab | Contact: a message not sent yet (cleared once it's sent) |
 |  | `kus98:guide:view` | This tab | Field Guide: for a refresh, which guide was open, the map's camera and area, and how far the pane was scrolled (`{guide, cam, area, scroll}`). Log Off clears it |
+|  | `kus98:guide:suggest:<slug>` | This tab | Field Guide: a suggestion being written in Suggest a Place (what was typed, not the picture), so a refresh doesn't lose it; cleared once it's sent |
 
 **What a refresh keeps.** Reloading the page (or a phone reloading a tab it put
 to sleep) brings the desktop back as it was: `memory.ts` writes `kus98:desk`
@@ -318,8 +319,9 @@ File ▸ Log Off removes it, so None doesn't log anyone out of a guide.
 **Without JavaScript** nothing is asked: posting the log-on form is itself the
 request for the guide's cookie.
 
-**Not covered:** Cloudflare's own pieces, the anti-spam check on Contact
-(Turnstile, in its own frame) and the analytics beacon (README, *Analytics*).
+**Not covered:** Cloudflare's own pieces, the anti-spam check on Contact,
+Paint's Send to Xiangyin and the Field Guide's Suggest a Place (Turnstile, in
+its own frame) and the analytics beacon (README, *Analytics*).
 
 **Keeping something new.** Decide its kind, ask `consent.allows()` (or use
 `stored()`), start its key with `kus98:` so a stricter choice removes it, write

@@ -6,6 +6,7 @@ import type { MenuSpec } from '../desktop/menu';
 import { dayLabel } from '../../lib/guides/core';
 import type { GuideApp } from './app';
 import type { Sort, View } from './state';
+import { SW } from '../../lib/guides/suggest-words';
 
 export function menuProvider(app: GuideApp) {
   return (name: string): MenuSpec[] | null => {
@@ -20,6 +21,8 @@ export function menuProvider(app: GuideApp) {
           ...(app.guides.length > 1 ? [{ label: '&Open Guide...', zh: '打开导览(&O)...', icon: 'guide', action: () => app.openGuide() }, { sep: true }] : []),
           { label: 'Open in &Google Maps', zh: '在 Google 地图中打开(&G)', disabled: !s.place, action: () => app.openLink(0) },
           { label: 'Get &Directions', zh: '获取路线(&D)', disabled: !s.place && !s.route, action: () => app.openLink(1) },
+          { sep: true },
+          { label: SW.menu.en, zh: SW.menu.zh, icon: 'guide', action: () => app.root.dispatchEvent(new Event('gd:suggest')) },
           { sep: true },
           { label: '&Print...', zh: '打印(&P)...', key: 'Ctrl+P', action: () => window.print() },
           { sep: true },

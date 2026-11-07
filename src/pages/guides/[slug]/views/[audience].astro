@@ -21,6 +21,8 @@ import { SEP, type Tool } from '../../../../lib/chrome';
 import { guideCards, loadView, payloadJson, viewPaths } from '../../../../lib/guides/load';
 import { dayLabel } from '../../../../lib/guides/core';
 import { W } from '../../../../lib/guides/words';
+import { SW } from '../../../../lib/guides/suggest-words';
+import suggestConfig from '../../../../content/guides/suggest.json';
 
 export function getStaticPaths() {
   return viewPaths().map(({ slug, audience }) => ({ params: { slug, audience } }));
@@ -44,6 +46,7 @@ const tools: Tool[] = [
   ...(hasDays ? [{ href: '#gd-days', label: W.days.en, zh: W.days.zh, icon: 'tb-days', title: W.daysTip.en, titleZh: W.daysTip.zh }] : []),
   { href: '#gd-info', label: W.info.en, zh: W.info.zh, icon: 'tb-info', title: W.infoTip.en, titleZh: W.infoTip.zh },
   SEP,
+  { cmd: 'gd-suggest', label: SW.tool.en, zh: SW.tool.zh, icon: 'tb-new', title: SW.toolTip.en, titleZh: SW.toolTip.zh },
   { cmd: 'gd-print', label: W.print.en, zh: W.print.zh, icon: 'tb-print', title: W.printTip.en, titleZh: W.printTip.zh },
 ];
 const status = [W.hint, W.countAll(view.items.length, view.labels.items), W.loggedOnAs(view.audienceLabel)];
@@ -77,6 +80,7 @@ const opt = (d: string) => {
       class="gd"
       data-gd
       data-slug={slug}
+      data-suggest-key={suggestConfig.turnstileSiteKey || undefined}
       data-view="places"
       data-detail="closed"
       data-items-en={view.labels.items.en}
@@ -138,6 +142,8 @@ const opt = (d: string) => {
 
 <script>
   import { initGuide } from '../../../../scripts/guide';
+  import { initSuggest } from '../../../../scripts/guide/suggest';
   initGuide();
-  document.addEventListener('astro:page-load', initGuide);
+  initSuggest();
+  document.addEventListener('astro:page-load', () => { initGuide(); initSuggest(); });
 </script>

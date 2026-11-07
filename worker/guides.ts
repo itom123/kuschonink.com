@@ -90,6 +90,8 @@ export interface GuidesDeps {
   now: () => number;
   /** Codes and names only: never a password, a cookie or a request body. */
   log: (...args: unknown[]) => void;
+  /** POST /guides/<slug>/suggest (worker/suggest.ts); without it, that address is a 404. */
+  suggest?: (request: Request, slug: string) => Promise<Response>;
 }
 
 /** Mirrors run_worker_first "/guides" and "/guides/*". */
@@ -125,6 +127,7 @@ async function route(req: Request, deps: GuidesDeps): Promise<Response> {
   if (at.html || CANONICAL.has(sub) || sub.startsWith('/views/') || sub.startsWith('/locked')) return redirect(home + url.search, 307);
   if (sub === '/login') return logOn(req, url, slug, deps);
   if (sub === '/logout') return logOff(req, url, slug);
+  if (sub === '/suggest') return deps.suggest ? deps.suggest(req, slug) : notFound(url, deps);
   const isTile = sub.startsWith('/tiles/');
   const isFile = sub.startsWith('/img/') || sub.startsWith('/map/') || isTile;
   if (sub && !isFile) return notFound(url, deps);
@@ -235,6 +238,16 @@ function passwords(deps: GuidesDeps, notes?: string[]): Map<string, string> {
 /** The audiences with a password whose cookie opens this guide, least privileged first. */
 function openers(deps: GuidesDeps, slug: string, pws = passwords(deps)): string[] {
   return deps.access.audiences.map((a) => a.id).filter((id) => pws.has(id) && viewOf(deps.access, slug, id) !== null);
+}
+
+/**
+ * The audience whose view of this guide the request's cookie opens, or null:
+ * what a suggestion from inside the guide is "sent by" (worker/suggest.ts).
+ */
+export async function guideAudience(req: Request, slug: string, deps: GuidesDeps): Promise<string | null> {
+  if (!SLUG.test(slug) || !isGuide(deps.access, slug)) return null;
+  const pepper = pepperOf(deps);
+  return pepper ? viewFor(deps, pepper, slug, req.headers.get('cookie')) : null;
 }
 
 /** The view of this guide that the request's cookie opens, or null. */

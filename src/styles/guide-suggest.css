@@ -1,0 +1,112 @@
+/* Field Guide (导览): the Suggest a Place wizard (src/scripts/guide/suggest.ts).
+   A Windows 98 wizard: a picture panel on the left, the step on the right,
+   Back / Next / Cancel underneath. Colours come from the scheme (schemes.css),
+   so High Contrast works; on a phone the panel goes and the step fills the width. */
+
+html.js .app-window.gd-suggest-dialog { height: auto; max-height: calc(100% - var(--y, 8px) - 6px); }
+.app-window.gd-suggest-dialog > .window-inner { min-height: 0; overflow: hidden auto; overscroll-behavior: contain; }
+
+.gd-suggest {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0 12px;
+  width: min(560px, calc(100vw - 32px));
+  padding: 12px 12px 10px;
+  font: 11px var(--ui-font);
+  line-height: 14px;
+}
+.gs-side {
+  grid-row: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 18px;
+  min-height: 260px;
+  background: linear-gradient(180deg, var(--title-a, #000080), var(--title-b, #1084d0));
+  box-shadow: var(--sunken);
+}
+.gs-side .ico { transform: scale(2); transform-origin: top center; image-rendering: pixelated; }
+.gs-main { grid-row: 1; min-width: 0; }
+.gs-pane { display: flex; flex-direction: column; gap: 7px; }
+.gs-pane[hidden] { display: none; }
+.gs-title { margin: 0; font-size: 13px; font-weight: bold; line-height: 16px; }
+.gs-lead { margin: 0 0 4px; }
+
+.gs-row { display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: start; gap: 6px; }
+.gs-row > label, .gs-label { padding-top: 4px; text-align: left; }
+.gs-field { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gs-field input:not([type="checkbox"], [type="radio"]), .gs-field textarea { box-sizing: border-box; width: 100%; }
+.gs-field textarea { resize: vertical; min-height: 44px; font: 13px/1.35 var(--ui-font); -webkit-user-select: text; user-select: text; }
+.gs-field small { color: var(--shadow); }
+.gs-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.gs-pair .gs-row { grid-template-columns: 112px minmax(0, 1fr); }
+.gs-pair .gs-row + .gs-row { grid-template-columns: 70px minmax(0, 1fr); }
+
+.gs-kinds { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 6px 8px 8px; }
+.gs-kinds legend { padding: 0 3px; }
+/* 98.css draws the box from the label (input + label for). */
+.gs-tick { display: block; min-height: 14px; }
+.gs-kinds .gs-tick { display: inline-block; }
+.gs-pane > .gs-tick { margin-left: 118px; }
+
+.gs-picture { gap: 4px; }
+.gs-thumb { display: flex; align-items: center; gap: 8px; min-height: 24px; color: var(--shadow); }
+.gs-thumb img { width: auto; height: auto; max-width: 96px; max-height: 64px; background: #fff; box-shadow: 0 0 0 1px #000; }
+.gs-pic-buttons { display: flex; gap: 6px; }
+.gs-pic-buttons button { min-width: 75px; }
+.gs-file, .gs-trap { position: absolute !important; left: -9999px; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+
+.gs-privacy { display: flex; align-items: flex-start; gap: 6px; margin: 4px 0 0; padding: 6px 8px; background: var(--light, #fff); box-shadow: var(--sunken); }
+.gs-privacy .ico { flex: none; margin-top: 1px; }
+
+.gs-summary {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 3px 10px;
+  margin: 0;
+  max-height: 210px;
+  overflow: auto;
+  padding: 6px 8px;
+  background: var(--light, #fff);
+  box-shadow: var(--sunken);
+}
+.gs-summary dt { color: var(--shadow); }
+.gs-summary dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.gs-turnstile:empty { display: none; }
+.gs-wait { color: var(--shadow); }
+
+.gs-problem { margin: 8px 0 0; padding: 4px 6px; background: var(--tip, #ffffe1); border: 1px solid #000; }
+.gs-problem[hidden] { display: none; }
+
+.gs-buttons {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--shadow);
+}
+.gs-buttons button { min-width: 75px; }
+.gs-buttons > button:last-child { margin-left: 6px; }
+.gs-step { margin-right: auto; color: var(--shadow); }
+
+.gs-done { gap: 8px; }
+.gs-ref { margin: 4px 0; font: bold 18px/22px var(--ui-font); letter-spacing: 1px; -webkit-user-select: all; user-select: all; }
+
+/* A phone or a narrow window: no picture panel, labels above their fields. */
+@media (max-width: 560px) {
+  .gd-suggest { grid-template-columns: minmax(0, 1fr); width: calc(100vw - 30px); padding: 10px 10px 8px; }
+  .gs-side { display: none; }
+  .gs-row, .gs-pair .gs-row, .gs-pair .gs-row + .gs-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .gs-row > label, .gs-label { padding-top: 0; text-align: left; }
+  .gs-pair { grid-template-columns: 1fr; }
+  .gs-pane > .gs-tick { margin-left: 0; }
+  .gs-field input:not([type="checkbox"], [type="radio"]), .gs-field textarea { font-size: 16px; } /* no zoom on iOS */
+  .gs-buttons { gap: 6px; }
+  .gs-step { width: 100%; }
+}

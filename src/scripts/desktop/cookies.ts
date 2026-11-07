@@ -56,7 +56,7 @@ const NEEDS: [Bi, Bi][] = [
 const SKIPS: [Bi, Bi][] = [
   [
     { en: 'This tab only: ', zh: '只限这个标签页：' },
-    { en: 'the windows you had open, a message not sent yet and your place in a guide, until you close the tab. Without it, a reload starts afresh.', zh: '打开着的窗口、还没发送的消息和你在导览里的位置，直到你关闭这个标签页。没有它，刷新后会从头开始。' },
+    { en: 'the windows you had open, a message or suggestion not sent yet and your place in a guide, until you close the tab. Without it, a reload starts afresh.', zh: '打开着的窗口、还没发送的消息或推荐和你在导览里的位置，直到你关闭这个标签页。没有它，刷新后会从头开始。' },
   ],
   [
     { en: 'Lasting: ', zh: '长期保存：' },

@@ -15,6 +15,7 @@ directly.
 - [8. 构建失败时 When the build fails](#8-构建失败时-when-the-build-fails)
 - [9. 让云端 Claude Code 来改 Asking cloud Claude Code](#9-让云端-claude-code-来改-asking-cloud-claude-code)
 - [10. 字段说明 Field reference](#10-字段说明-field-reference)
+- [11. 读者推荐 Suggestions](#11-读者推荐-suggestions)
 
 ---
 
@@ -427,8 +428,10 @@ both when the site is built.
 - 改了签名用的密钥（`GUIDES_COOKIE_SECRET`，没设它时是 `TURNSTILE_SECRET`；它少于 24 个字符时两个都算），所有人都要重新输入密码。
   第一次设置 `GUIDES_COOKIE_SECRET` 也一样。
 - **PR 预览有自己的 secret，不用正式网站的。** 每个分支的预览（Worker Previews）只用 `wrangler.jsonc`
-  里 `previews` 部分的设置，加上预览自己的 secret，所以**预览里的导览密码和正式网站的不一样**，除非你把它们设成一样。
-  预览里是那个分支真实的导览，而预览链接是公开的，所以这些密码要和正式网站的一样强，不要用简单的测试密码。
+  里 `previews` 部分的设置，加上预览自己的 secret，所以**预览里的导览密码和正式网站的不一样**。
+  预览里是那个分支真实的导览，而预览链接是公开的，所以这些密码要和正式网站的一样强，不要用简单的测试密码；
+  但一定要和正式网站的**不同**（`GUIDES_COOKIE_SECRET` 也是）：推到仓库的每个分支都会有预览、拿到这些 secret，
+  包括云端会话推的 `claude/…` 分支（见 11.6），分支里的代码读得到它们。
   在自己电脑上设置一次，以后新建的预览都会用：
   `npx wrangler preview base-config secret put GUIDES_PASSWORD`（`GUIDES_PASSWORD_FOTOFILMIC`、
   `GUIDES_COOKIE_SECRET`、`TURNSTILE_SECRET` 同理；也可以在控制台的 Previews Base 里设置）。
@@ -471,9 +474,12 @@ variables, not the Worker.
 - **PR previews have their own secrets, never production's.** Each branch's
   preview (Worker Previews) gets only the settings in the `previews` block of
   `wrangler.jsonc`, plus the previews' own secrets. So **a preview's guide
-  passwords are not the live site's**, unless you set them the same. A
-  preview serves that branch's real guides at a public link, so make them as
-  strong as the live site's, never short test words. Set them once on your
+  passwords are not the live site's**. A preview serves that branch's real
+  guides at a public link, so make them as strong as the live site's, never
+  short test words, but always **different** from the live site's
+  (`GUIDES_COOKIE_SECRET` too): every branch pushed to the repository gets a
+  preview with these secrets, a cloud session's `claude/…` branch included
+  (section 11.6), and that branch's code can read them. Set them once on your
   own computer, for every new preview:
   `npx wrangler preview base-config secret put GUIDES_PASSWORD` (likewise
   `GUIDES_PASSWORD_FOTOFILMIC`, `GUIDES_COOKIE_SECRET`, `TURNSTILE_SECRET`;
@@ -640,6 +646,7 @@ below). Any file may have a `_comment`, which is never shown.
 | `image?` | `{ file, credit, caption?, alt?, altZh? }`；文件在 `img/` | Picture; the file is in `img/` |
 | `label?` | 开场缩放时显示标签（默认 A 级显示） | Label at the opening zoom (default: tier A) |
 | `audience?` | 只给某些读者 | Only for some audiences |
+| `suggested?` | `{ on, by?, own?, ref }`：读者推荐，由发布器加入（第 11 节）；`ref` 是 Notion 页面编号，不会出现在网页里 | A reader's suggestion, added by the publisher (section 11); `ref` is the Notion page and never reaches browsers |
 
 ### `places.json` (`places[]`)
 
@@ -685,3 +692,296 @@ below). Any file may have a `_comment`, which is never shown.
 
 一般不用手改 `map.json`；底图让 Claude 做。You rarely edit `map.json` by
 hand; ask Claude for base maps.
+
+---
+
+## 11. 读者推荐 Suggestions
+
+已经登录某份导览的人（访客和学员都可以），可以用 **文件 ▸ 推荐地点…** 或工具栏的 **推荐**，推荐一个地点或展览，也可以是自己的展览。推荐不会直接出现在导览里：先进入 Notion，由你决定。
+
+People logged on to a guide (visitors and participants alike) can suggest a
+place or a show, their own included, with **File ▸ Suggest a Place…** or the
+toolbar's **Suggest**. Nothing goes into the guide by itself: it lands in
+Notion and you decide.
+
+### 11.1 流程 How it goes
+
+1. 推荐者填写向导：是什么、时间地点、链接和图片、关于自己（可不填）、确认发送。服务器（`worker/suggest.ts`）核对来源、登录、内容、频率和反垃圾验证，清除图片里的位置等信息，然后在 Notion 的 **Suggestions** 里新建一条（状态 `NEW`），并给你发一封通知邮件。Notion 出问题时，整条推荐改用邮件发给你，不会丢失。
+2. 你在 Notion 里（或网站的管理界面里）把状态改成 **APPROVED**（收录）或 **REFUSED**（不收录）。收录前可以设 **Tier**（A/B/C，默认 C）、**Show to**（`Everyone`，或某一类读者，如 `fotofilmic`）和 **Owner notes**（给云端例程的说明）。
+3. 云端例程（Claude Code 的定时任务，每天 08:00–22:00 巴黎时间每小时一次，你在网站上批准时也会立即运行一次）按 [`scripts/suggestions/ROUTINE.md`](../scripts/suggestions/ROUTINE.md) 处理每条 `APPROVED`：核对官网、补全链接和开放时间、定位、查重，写好条目，把状态改成 `READY`（或 `DUPLICATE`、`NEEDS CHECK`、`ERROR`）。**例程不能改仓库**：它读的是陌生人写的文字和外部网页，可能被误导。
+4. 网站自己的代码（发布器，`worker/publish.ts`，每 10 分钟一次）把 `READY` 的条目再检查一遍（只能用已知字段、通过构建时的同一套检查、不能含某类读者不该看到的词），然后提交到 `main`：只改这份导览的 `items.json` 和 `img/` 里的图片。状态变成 `PUBLISHING`；网站换上这次提交的构建后（通常一两分钟）变成 `PUBLISHED`。构建失败，或者 45 分钟后网站还没换上，发布器会自动撤回这次提交，状态变成 `ERROR`。
+
+1. The sender goes through the wizard: what it is, when and where, links and
+   a picture, about them (optional), check and send. The server
+   (`worker/suggest.ts`) checks where it came from, the log-on, the fields,
+   how often, and the anti-spam check, strips location data from the picture,
+   and adds a page to **Suggestions** in Notion (status `NEW`), then emails
+   you. If Notion fails, the whole suggestion is emailed to you instead.
+2. In Notion (or the site's admin queue), set the status to **APPROVED** or
+   **REFUSED**. Before approving you can set **Tier** (A, B or C; C by
+   default), **Show to** (`Everyone`, or one audience such as `fotofilmic`)
+   and **Owner notes** (instructions for the routine).
+3. The cloud routine (a Claude Code scheduled task, hourly 08:00–22:00 Paris,
+   and at once when you approve on the site) follows
+   [`scripts/suggestions/ROUTINE.md`](../scripts/suggestions/ROUTINE.md) for
+   each `APPROVED` page: it checks the venue's own pages, fills in links and
+   hours, finds the place on the map, looks for duplicates, writes the entry,
+   and sets `READY` (or `DUPLICATE`, `NEEDS CHECK`, `ERROR`). **The routine
+   can't change the repository**: it reads strangers' text and other sites,
+   so it could be misled.
+4. The site's own code (the publisher, `worker/publish.ts`, every ten minutes)
+   checks each `READY` entry again (known fields only, the build's own checks,
+   no word an audience mustn't see) and commits it to `main`, touching only
+   the guide's `items.json` and its `img/`. The status becomes `PUBLISHING`,
+   then `PUBLISHED` once the site runs that commit's build (usually within a
+   couple of minutes). If the build fails, or the site still hasn't taken it
+   45 minutes later, the publisher takes the commit back and sets `ERROR`.
+
+### 11.2 状态 The statuses
+
+| 状态 Status | 谁设 Set by | 意思 Meaning |
+| --- | --- | --- |
+| `NEW` | 服务器 the Worker | 刚收到 Just in |
+| `ASKED` | 你 you | 已发邮件问推荐者 You emailed the sender |
+| `APPROVED` / `REFUSED` | 你 you | 收录 / 不收录 Take it / don't |
+| `PROCESSING` | 例程 the routine | 正在处理（两小时没完成就重新排队）Being worked on (free again after two hours) |
+| `READY` | 例程 the routine | 条目已写好，等发布器 Entry written, waiting for the publisher |
+| `PUBLISHING` / `PUBLISHED` | 发布器 the publisher | 已提交 / 已上线 Committed / live |
+| `DUPLICATE` | 例程 the routine | 导览里已有，或别人推荐过（见 Result）Already in the guide, or sent before (see Result) |
+| `NEEDS CHECK` | 例程、发布器 routine, publisher | 需要你决定（见 Result），改好后再设 `APPROVED` Needs your decision (see Result); set `APPROVED` again after |
+| `ERROR` | 例程、发布器 routine, publisher | 出错（见 Result）Something failed (see Result) |
+| `SPAM` | 你 you | 垃圾信息，忽略 Spam, ignored |
+
+查重：同一个网址、50 米以内名字相近、同一场馆且日期重叠并有相同艺术家或相近的展名，都算重复。每条导览条目都带着它在 Notion 里的编号（`suggested.ref`），所以重复运行也不会加两次。条目编号（如 C3）从不重复使用；改级别（如 C 改 B）会换一个新编号，路线和日程里的引用一起改。
+
+Duplicates: the same web address; within 50 m with a similar name; or the same
+venue with overlapping dates and a shared artist or a similar show title. Each
+entry carries its Notion page (`suggested.ref`), so running twice never adds
+anything twice. Ids (such as C3) are never reused; a new tier (C to B) gives a
+new id, and routes and events follow it.
+
+### 11.3 隐私 Privacy
+
+- 推荐者的名字和电子邮箱只存在 **Contacts** 里（例程读不到），导览结束 90 天后自动删除（没有日期的导览：一年后）。
+- 只有推荐者在“署名”里填了名字，导览里才会写“由 … 推荐”。导览的文件在 GitHub 上公开，所以署名会留在历史记录里（向导里写明了）。
+- 网络地址只用来限制频率，不保存。
+
+- The sender's name and email are kept only in **Contacts** (the routine can't
+  read it) and deleted 90 days after the guide ends (a year after sending for a
+  guide without dates).
+- The guide says who suggested an entry only with the name they gave under
+  *Credit me*. The guide's files are public on GitHub, so that name stays in
+  their history; the wizard says so.
+- Internet addresses are used for rate limits only and aren't kept.
+
+### 11.4 设置 Settings
+
+只需设一次。Cloudflare 的 secret（不写进仓库）：
+
+Once only. Cloudflare secrets (never in the repo):
+
+| Secret | 用途 For |
+| --- | --- |
+| `NOTION_TOKEN` | 网站的 Notion 集成 The site's Notion integration (Suggestions, Contacts, log) |
+| `TURNSTILE_SECRET_SUGGEST` | 推荐向导自己的 Turnstile The wizard's own Turnstile widget |
+| `GITHUB_TOKEN` | 只限本仓库、Contents 读写的细粒度令牌（发布器）A fine-grained token, this repo only, Contents read/write (the publisher) |
+
+- `wrangler.jsonc` 的 `vars`：三个 Notion 数据源的编号（`NOTION_SUGGESTIONS`、`NOTION_CONTACTS`、`NOTION_LOG`）。为空时推荐改用邮件。
+- `src/content/guides/suggest.json`：Turnstile 的公开站点密钥（不是 secret）。为空时正式网站上不能推荐；本机和预览用 Cloudflare 的测试密钥。
+- 云端例程：见 [11.6](#116-云端例程-the-routine-in-claudes-cloud)。
+
+- `vars` in `wrangler.jsonc`: the three Notion data-source ids
+  (`NOTION_SUGGESTIONS`, `NOTION_CONTACTS`, `NOTION_LOG`). Empty: suggestions
+  are emailed instead.
+- `src/content/guides/suggest.json`: the Turnstile widget's public site key
+  (not a secret). Empty: no suggestions on the live site; `wrangler dev` and
+  previews use Cloudflare's test key.
+- The cloud routine: see [11.6](#116-云端例程-the-routine-in-claudes-cloud).
+
+怎么建：
+
+- **Turnstile**：在 Cloudflare 的 Turnstile 里给推荐向导单独建一个小组件，主机名只填 `kuschonink.com`（`www` 没有 DNS 记录）。它的站点密钥写进 `suggest.json`，密钥存成 `TURNSTILE_SECRET_SUGGEST`：两个必须来自同一个小组件。
+- **Notion**：新建内部集成（Notion ▸ Settings ▸ Connections ▸ Develop or manage integrations），权限只要 Read content、Update content 和 Insert content，不要评论权限，用户信息选 No user information。正式网站的集成连接到“Field Guide suggestions (kuschonink)”页面（页面的 ••• ▸ Connections），测试集成连接到“… · test copies”页面。如果第一条推荐没有出现在 Notion 里，再把三个数据库分别连接给正式网站的集成。
+- **GitHub 令牌**：细粒度令牌（fine-grained），只限本仓库，只要 Contents 读写。到期日选在 2027 年 2 月中旬以后：巴黎这份导览 11 月 15 日结束，联系人在 90 天后（2027 年 2 月 14 日）删除；以后只要还有导览收推荐，就要续。在日历里提前一周提醒自己：令牌过期后，发布器和每天的联系人删除会悄悄停下，联系人就会留过期限；换上新令牌后接着做。
+- **GitHub 规则集**（仓库的 Settings ▸ Rules ▸ Rulesets，针对 `main`）：只开 **Restrict deletions** 和 **Block force pushes**。不要开 Require a pull request、Require status checks 或 Restrict updates：发布器直接提交到 `main`（只往前，从不强推），这些规则会把它挡住。
+
+How to make them:
+
+- **Turnstile**: a widget of its own for the wizard, with one hostname,
+  `kuschonink.com` (`www` has no DNS record). Its site key goes in
+  `suggest.json` and its secret in `TURNSTILE_SECRET_SUGGEST`: both from the
+  same widget.
+- **Notion**: an internal integration (Notion ▸ Settings ▸ Connections ▸
+  Develop or manage integrations) with Read, Update and Insert content only:
+  no comment capabilities, and No user information. Connect the site's
+  integration to the page "Field Guide suggestions (kuschonink)" (the page's
+  ••• ▸ Connections) and the test one to "… · test copies". If a first
+  suggestion doesn't show up in Notion, connect the three databases to the
+  site's integration one by one as well.
+- **GitHub token**: fine-grained, this repository only, Contents read and
+  write and nothing else. Make it expire after mid-February 2027: the Paris
+  guide ends on 15 November and its contacts are deleted 90 days later, on
+  14 February 2027; renew it for as long as guides take suggestions. Put a
+  reminder in your calendar a week before: once it runs out, the publisher
+  and the daily contact clean-up stop without a word, so contacts would be
+  kept past their date. With a new token they carry on.
+- **GitHub ruleset** (the repository's Settings ▸ Rules ▸ Rulesets, on
+  `main`): only **Restrict deletions** and **Block force pushes**. Never
+  Require a pull request, Require status checks or Restrict updates: the
+  publisher commits straight to `main` (forward only, never forced), and
+  those would stop it.
+
+PR previews (Worker Previews, section 7) never get the real ones. The
+`previews` block in `wrangler.jsonc` already gives them the test copies of the
+databases (below) and accepts Turnstile's test keys
+(`TURNSTILE_HOSTNAMES=example.com`). Their two secrets, set once on your own
+computer with `npx wrangler preview base-config secret put NAME`:
+`NOTION_TOKEN`, from a test Notion integration shared only with the page
+"Field Guide suggestions (kuschonink) · test copies", and
+`TURNSTILE_SECRET_SUGGEST` set to Cloudflare's test secret
+`1x0000000000000000000000000000000AA`. Never a `GITHUB_TOKEN`: a preview names
+no repository, so it never publishes.
+
+PR 预览（Worker Previews，见第 7 节）从不用正式的值。`wrangler.jsonc` 的 `previews` 部分已经让它们用下面的测试数据库，
+并接受 Turnstile 的测试密钥（`TURNSTILE_HOSTNAMES=example.com`）。它们的两个 secret 在自己电脑上用
+`npx wrangler preview base-config secret put 名字` 设置一次：`NOTION_TOKEN`（一个只共享给
+“Field Guide suggestions (kuschonink) · test copies”页面的测试 Notion 集成），以及
+`TURNSTILE_SECRET_SUGGEST`，设成 Cloudflare 的测试密钥 `1x0000000000000000000000000000000AA`。
+永远不给预览 `GITHUB_TOKEN`：预览没有仓库名，不会发布。
+
+| Var | Test data source |
+| --- | --- |
+| `NOTION_SUGGESTIONS` | `d2a5fe18-8031-425e-a123-3969fb32fbe7` |
+| `NOTION_CONTACTS` | `26a774fe-1de2-4760-a1c7-8700b1b62de5` |
+| `NOTION_LOG` | `652c23d0-b96b-4cee-a9a3-d4708c1207b8` |
+
+### 11.5 本机测试 Trying it locally
+
+```bash
+node scripts/dev/notion-standin.mjs 8798
+```
+
+`.dev.vars`（不进仓库 gitignored）里加：
+
+Add to `.dev.vars` (gitignored):
+
+```ini
+NOTION_TOKEN=dev
+NOTION_API=http://127.0.0.1:8798
+NOTION_SUGGESTIONS=ds-suggestions
+NOTION_CONTACTS=ds-contacts
+NOTION_LOG=ds-log
+TURNSTILE_SECRET_SUGGEST=1x0000000000000000000000000000000AA
+TURNSTILE_HOSTNAMES=example.com,localhost
+```
+
+然后 `npm run build` 和 `npm run preview`，登录一份导览，用 **文件 ▸ 推荐地点…**。`http://127.0.0.1:8798/_dump` 显示存下了什么。
+
+Then `npm run build` and `npm run preview`, log on to a guide and use **File ▸
+Suggest a Place…**. `http://127.0.0.1:8798/_dump` shows what was kept.
+
+### 11.6 云端例程 The routine in Claude's cloud
+
+推荐流程**不需要你的电脑开着**：收推荐、批准和拒绝、发布（每 10 分钟）和到期删除联系方式（每天）都在 Cloudflare
+的 Worker 里；核对和补全由 Claude Code 的云端定时任务（scheduled task，以前叫 routine，下面称“例程”）在 Anthropic
+的服务器上完成。ROUTINE.md 让它只读仓库、只写 Notion（见下面的“安全”）。
+
+在 claude.ai 上设置一次（在 `main` 合并了推荐功能之后）：
+
+1. **Notion**：新建一个内部集成“Field Guide routine”，权限和上面一样（Read、Update、Insert content，不要评论权限，
+   No user information）。在 **Suggestions** 和 **处理日志** 两个数据库各自的 ••• ▸ Connections 里分别连接它；
+   **不要**连接它们所在的页面（那个页面里还有 Contacts）。复制它的令牌。
+2. **环境**：在 claude.ai/code 输入框下面的环境菜单里，点一个环境的齿轮 ▸ **Edit cloud environment**（或新建一个）：
+   - **Network access** 选 **Full**（要打开画廊网站和地理编码服务）；
+   - **Network secrets** ▸ **Add secret**：Secret type 用 **Bearer**，主机 `api.notion.com`，Header name `Authorization`、
+     Prefix `Bearer`（默认就是），Value 填上一步的令牌 ▸ **Add**；最后 **Save changes**。会话本身看不到这个令牌。
+     网络 secret 要 Pro、Max、Ultra、Team 或 Enterprise 套餐，而且是 Anthropic 托管的环境。
+   - **Setup script** 留空（项目依赖不放这里，例程每次自己装）；不需要环境变量（数据库编号在 `wrangler.jsonc` 里）。
+3. **定时任务**：[claude.ai/code/routines](https://claude.ai/code/routines) ▸ **New task**（有的账号显示 Routines 和
+   **New routine**）：仓库 `itom123/kuschonink.com`，分支 `main`，用上面的环境，**去掉所有连接器**；提示词：
+   `Follow scripts/suggestions/ROUTINE.md in the repository, on main. If this run was started with a text, it says why (approved: …, or manual: …).`
+   时间：预设只有每小时、每天、每周，没有“几点到几点”。建好后在任务名旁边的菜单 ▸ **Edit** 里选 **Custom**，填
+   `CRON_TZ=Europe/Paris 7 8-22 * * *`（巴黎时间 8:07 到 22:07，每小时一次）。框里原来有别的 `CRON_TZ=` 就改成
+   `Europe/Paris`；不接受这个前缀的话写 UTC 时间：冬令时 `7 7-21 * * *`，夏令时 `7 6-20 * * *`。没事可做的运行会立刻结束，不记日志。
+4. **API 触发器**：任务菜单 ▸ **Edit** ▸ **Trigger** 那一行的 **+** ▸ **API** ▸ 复制 **Fire URL** ▸ **Generate token**
+   （令牌只显示一次）。把两者存成 Cloudflare secret `ROUTINE_FIRE_URL` 和 `ROUTINE_TOKEN`，只给正式网站、不给预览
+   （在切换到 Worker Previews 之后再存，见第 7 节）。管理模式的“收录”和“立即运行”用它。**Run now** 和 API 触发合计每个任务
+   每小时最多 30 次。
+5. 试一次：在任务里 **Run now**，看它的会话记录；Notion 的处理日志只在真的处理了推荐时才有新的一行。
+
+安全：
+
+- 触发时带的文字（`approved: …`、`manual: …`）会被包在 `<routine-fire-payload>` 里、标成不可信的数据；提示词只把它
+  当作说明，所以没关系。
+- 云端会话用你连接的 GitHub 权限。Anthropic 的 GitHub 代理只拦删分支和推标签，**不限制推到哪个分支**；`main` 上的规则集
+  也分不清例程和发布器（两者都以你的身份提交）。所以“例程只读仓库”靠的是它遵守 ROUTINE.md（推荐里的文字和网页都只是
+  数据），不是技术上的保证。偶尔看一下 GitHub 上有没有你不认识的推送（尤其是 `claude/…` 分支）；有的话删掉那个分支，看一下
+  例程那次的会话。推上去的分支都会有预览，这也是预览的 secret 要和正式网站不同的原因（第 7 节）。
+- 要技术上的保证，可以让任务不挂仓库、只从 raw.githubusercontent.com 读它需要的文件，这样它根本推不了。这要改
+  ROUTINE.md（还没做）。
+
+Nothing here needs your computer to be on: taking suggestions, approving and
+refusing, publishing (every 10 minutes) and deleting contact details when due
+(daily) all happen in the Cloudflare Worker; checking and completing them is
+a Claude Code scheduled task (formerly a routine; "the routine" below) on
+Anthropic's servers. ROUTINE.md has it only read the repository and only
+write to Notion (see Safety below).
+
+Set it up once on claude.ai (after the suggestions are merged into `main`):
+
+1. **Notion**: a new internal integration, "Field Guide routine", with the
+   same capabilities (Read, Update and Insert content; no comments, No user
+   information). Connect it to the **Suggestions** database and to the
+   **Processing log**, each on its own (••• ▸ Connections on each), **never**
+   to the page that holds them: that page also holds Contacts. Copy its token.
+2. **Environment**: in the environment menu under the message box at
+   claude.ai/code, the gear on an environment ▸ **Edit cloud environment**
+   (or add a new one):
+   - **Network access**: **Full** (for gallery sites and the geocoders);
+   - **Network secrets** ▸ **Add secret**: Secret type **Bearer**, host
+     `api.notion.com`, Header name `Authorization` and Prefix `Bearer` (the
+     defaults), Value the token from step 1 ▸ **Add**; then **Save changes**.
+     The session never sees the token. Network secrets need a Pro, Max,
+     Ultra, Team or Enterprise plan and an Anthropic-hosted environment.
+   - **Setup script**: leave it empty (project installs don't belong there;
+     the routine installs what it needs itself). No environment variables
+     (the database ids are in `wrangler.jsonc`).
+3. **Scheduled task**: [claude.ai/code/routines](https://claude.ai/code/routines)
+   ▸ **New task** (some accounts say Routines and **New routine**):
+   repository `itom123/kuschonink.com`, branch `main`, the environment
+   above, **no connectors**; prompt:
+   `Follow scripts/suggestions/ROUTINE.md in the repository, on main. If this run was started with a text, it says why (approved: …, or manual: …).`
+   Schedule: the presets are hourly, daily or weekly, with no window of
+   hours. Once it exists, open the menu next to its name ▸ **Edit**, pick
+   **Custom** and enter `CRON_TZ=Europe/Paris 7 8-22 * * *` (every hour from
+   8:07 to 22:07, Paris time). If the field already starts with another
+   `CRON_TZ=`, change it to `Europe/Paris`; if it won't take the prefix,
+   write the hours in UTC: `7 7-21 * * *` in winter, `7 6-20 * * *` in
+   summer. A run with nothing to do stops at once and logs nothing.
+4. **API trigger**: the task's menu ▸ **Edit** ▸ **+** in the **Trigger** row
+   ▸ **API** ▸ copy the **Fire URL** ▸ **Generate token** (shown once). Save
+   them as the Cloudflare secrets `ROUTINE_FIRE_URL` and `ROUTINE_TOKEN`, for
+   the live site only, never for previews (after the switch to Worker
+   Previews, see section 7). Admin mode's Approve and Run Now use it. **Run
+   now** and API fires share 30 an hour per task.
+5. Try it: **Run now** on the task, and read its session. The Processing log
+   only gets a line when a suggestion was actually handled.
+
+Safety:
+
+- The text a run is started with (`approved: …`, `manual: …`) arrives wrapped
+  in a `<routine-fire-payload>` block marked as untrusted data. The prompt
+  only takes it as information, so that's fine.
+- Cloud sessions use the GitHub access you connected. Anthropic's GitHub
+  proxy blocks branch deletions and tag pushes, but **not which branch a push
+  goes to**, and a ruleset on `main` can't tell the routine from the
+  publisher (both commit as you). So "the routine only reads the repository"
+  rests on it following ROUTINE.md (suggestions and web pages are data, never
+  instructions); it isn't a technical guarantee. Now and then, look on GitHub
+  for pushes you don't recognise (`claude/…` branches above all); delete such
+  a branch and read that run's session. Every pushed branch gets a preview,
+  which is why previews need their own secrets, different from the live
+  site's (section 7).
+- For a technical guarantee, the task could run with no repository attached
+  and read the files it needs from raw.githubusercontent.com, so it couldn't
+  push at all. That needs a change to ROUTINE.md (not done yet).
