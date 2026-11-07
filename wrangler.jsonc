@@ -72,9 +72,11 @@
   // NOTION_TOKEN of a Notion integration that sees only those test copies, and
   // TURNSTILE_SECRET_SUGGEST, a test secret. No GITHUB_REPO and never a
   // GITHUB_TOKEN: a preview never publishes to the repository. Admin mode in a
-  // preview only with its own ADMIN_PASSWORD and ADMIN_TOTP_SECRET (test
-  // values); it sends no emails (no MAIL_OUT) and never starts the routine
-  // (never ROUTINE_FIRE_URL or ROUTINE_TOKEN).
+  // preview shows the fullest view of that branch's guides, at a public link:
+  // leave ADMIN_PASSWORD and ADMIN_TOTP_SECRET unset for previews (admin is
+  // then off there), or give them values as strong as production's. It sends
+  // no emails (no MAIL_OUT) and never starts the routine (never
+  // ROUTINE_FIRE_URL or ROUTINE_TOKEN).
   "previews": {
     "send_email": [
       { "name": "EMAIL", "destination_address": "Xiangyin.Tom.Gu@gmail.com" }
