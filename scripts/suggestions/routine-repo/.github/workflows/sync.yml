@@ -1,14 +1,16 @@
 # The routine's copy of the Field Guide suggestions tool: see README.md.
-# Every 10 minutes it takes the files of the commit kuschonink.com runs, with
-# that repository's own downloader, and commits them here when they changed.
-# Its source is in itom123/kuschonink.com: scripts/suggestions/routine-repo/.
+# Every 10 minutes it takes the files of the commit kuschonink.com runs (the tool,
+# with that repository's own downloader, and this repository's own files, from
+# scripts/suggestions/routine-repo/ there), locks sharp's version for `npm ci`,
+# and commits them when they changed. It pushes with this repository's deploy
+# key (the secret SYNC_DEPLOY_KEY): the ruleset lets nothing else update a branch.
 name: Sync
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '3-59/10 * * * *'   # off the busy minute :00
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: sync
   cancel-in-progress: false
@@ -17,18 +19,30 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ssh-key: ${{ secrets.SYNC_DEPLOY_KEY }}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22'
       - name: Take the files of the commit the site runs
         run: |
           curl -fsS https://raw.githubusercontent.com/itom123/kuschonink.com/main/scripts/suggestions/download.mjs -o "$RUNNER_TEMP/download.mjs"
           node "$RUNNER_TEMP/download.mjs" "$RUNNER_TEMP/tree" > "$RUNNER_TEMP/took.json"
+          commit=$(node -p 'require(process.argv[1]).commit' "$RUNNER_TEMP/took.json")
+          for f in README.md .gitignore .claude/settings.json .github/workflows/sync.yml; do
+            mkdir -p "$RUNNER_TEMP/tree/$(dirname "$f")"
+            curl -fsS "https://raw.githubusercontent.com/itom123/kuschonink.com/$commit/scripts/suggestions/routine-repo/$f" -o "$RUNNER_TEMP/tree/$f"
+          done
+          # sharp at exact versions, so that the routine's `npm ci` installs what was locked here.
+          (cd "$RUNNER_TEMP/tree" && npm install --package-lock-only --no-audit --no-fund)
+          # Changes once a month, so that the copy never goes 60 days without a
+          # commit (GitHub then turns scheduled workflows off).
+          date -u +%Y-%m > "$RUNNER_TEMP/tree/.synced"
           node -e 'const t = require(process.argv[1]); console.log(`${t.commit} (${t.why}): ${t.files.length} files`)' "$RUNNER_TEMP/took.json"
       - name: Commit them when they changed
         run: |
-          find . -mindepth 1 -maxdepth 1 ! -name .git ! -name .github ! -name README.md ! -name .gitignore -exec rm -rf {} +
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
           cp -a "$RUNNER_TEMP/tree/." .
           git add -A
           if git diff --cached --quiet; then echo 'No change.'; exit 0; fi

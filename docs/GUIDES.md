@@ -917,10 +917,16 @@ GitHub Action 每 10 分钟从这个仓库更新。所以例程推不了这个�
    **不要**连接它们所在的页面（那个页面里还有 Contacts）。复制它的令牌。
 2. **工具的副本**：公开仓库 `itom123/kuschonink-routine`。里面只有 `scripts/suggestions/download.mjs` 取的文件（工具、工具
    引用的模块、各份导览的文件、`package.json` 和 ROUTINE.md），都来自网站当前运行的那个提交；`.download.json` 写着是哪个提交。
-   它的工作流每 10 分钟运行一次，有变化才提交；一条规则（ruleset）只让这个工作流（GitHub Actions）往里推送。不要手改副本：
-   下一次同步会把它覆盖。要重建的话：新建这个公开仓库，放进这个仓库 `scripts/suggestions/routine-repo/` 里的三样东西
-   （`README.md`、`.gitignore`、`.github/workflows/sync.yml`），加上规则（所有分支：Restrict creations、Restrict updates、
-   Restrict deletions、Block force pushes；Bypass list 只有 GitHub Actions），然后在 Actions ▸ Sync ▸ **Run workflow** 运行一次。
+   它的工作流每 10 分钟运行一次，有变化才提交，副本自己的四样东西（`README.md`、`.gitignore`、`.claude/settings.json`、`.github/workflows/sync.yml`）
+   也从这个仓库的 `scripts/suggestions/routine-repo/` 取。它用副本的部署密钥（deploy key，Actions secret `SYNC_DEPLOY_KEY`）
+   推送；一条规则（ruleset）只让部署密钥新建、更新、删除分支，你自己的推送和例程的推送都会被拒。所以不要手改副本：改这个仓库
+   里的那四样东西，下一次同步就会带过去。副本的 `.claude/settings.json` 让例程照写的 `./tool …` 和 `npm ci --no-audit --no-fund`
+   直接运行，拒绝 `git push`、`git commit`、`git remote` 和 `gh`；每次同步还写一份 `package-lock.json`，让例程的 `npm ci` 装的
+   正是锁定的 sharp。`.synced` 每月变一次，让副本不会 60 天没有提交（那样 GitHub 会关掉公开仓库的定时
+   工作流）；要是还是关了，在 Actions ▸ Sync ▸ **Enable workflow** 重新打开。要重建的话：新建这个公开仓库，放进那四样东西；
+   生成一对 SSH 密钥，公钥加成可写的部署密钥（Settings ▸ Deploy keys，勾选 Allow write access），私钥存成 Actions secret
+   `SYNC_DEPLOY_KEY`，不在别处留副本；加上规则（所有分支：Restrict creations、Restrict updates、Restrict deletions、Block
+   force pushes；Bypass list 只有 Deploy keys）；然后在 Actions ▸ Sync ▸ **Run workflow** 运行一次。
 3. **环境**：在 claude.ai/code 输入框下面的环境菜单里，点一个环境的齿轮 ▸ **Edit cloud environment**（或新建一个）：
    - **Network access** 选 **Full**（要打开画廊网站和地理编码服务，还要从 kuschonink.com 读网站当前的版本号、从 npm 装 sharp）；
    - **Network secrets** ▸ **Add secret**：Secret type 用 **Bearer**，主机 `api.notion.com`，Header name `Authorization`、
@@ -933,7 +939,7 @@ GitHub Action 每 10 分钟从这个仓库更新。所以例程推不了这个�
    - 名字，比如 `Field Guide suggestions`；提示词照抄：
 
      ```text
-     Process the approved suggestions for my Field Guide (kuschonink.com). The repository attached to this task, itom123/kuschonink-routine, is my own copy of my suggestions tool and my guides' files, which its GitHub Action takes from my site's repository, itom123/kuschonink.com. Read scripts/suggestions/ROUTINE.md in it and follow it: it has you run npm install --no-audit --no-fund (for sharp) and the tool, ./tool, whose commands (list, claim, show, match, geocode, check, picture, web-picture, ready, mark, log) read and update the suggestions in my Notion, and check once with curl that api.github.com refuses itom123/kuschonink.com. Never commit, push, open pull requests or attach another repository.
+     Process the approved suggestions for my Field Guide (kuschonink.com). The repository attached to this task, itom123/kuschonink-routine, is my own copy of my suggestions tool and my guides' files, which its GitHub Action takes from my site's repository, itom123/kuschonink.com. Read scripts/suggestions/ROUTINE.md in it and follow it: it has you run npm ci --no-audit --no-fund (for sharp) and the tool, ./tool, whose commands (list, claim, show, match, geocode, check, picture, web-picture, ready, mark, log) read and update the suggestions in my Notion, and check once with curl that api.github.com refuses itom123/kuschonink.com. Never commit, push, open pull requests or attach another repository.
 
      If this run was started with a text, it says why (approved: …, or manual: …).
      ```
@@ -970,7 +976,11 @@ GitHub Action 每 10 分钟从这个仓库更新。所以例程推不了这个�
   （网络 secret 也从来不会加到发往 GitHub 的请求上。）每次运行在处理之前都先检查这个仓库的 403；如果 GitHub 反而回了内容，
   它什么都不处理，在处理日志里记一条 `Failed`：把这个仓库从任务上去掉。永远不要给任务挂这个仓库，也不要给它的环境 GitHub
   令牌。代理的 403 里提到会话可以申请挂仓库（`add_repo`）；文档没说定时任务能不能不经你同意这样做，ROUTINE.md 不许例程这样做。
-- **副本也改不了**：副本的规则只让它自己的工作流推送，每次同步又从这个仓库重写一遍。
+- **副本也改不了**：副本的规则只让它的部署密钥（只有它的工作流拿得到）更新分支，每次同步又从这个仓库重写一遍。云端会话结束时，
+  内置的 Stop hook 会要求提交没跟踪的文件；副本的 `.gitignore` 让例程留下的文件不算在内，ROUTINE.md 也不许例程提交。
+  例程连 GitHub 用的是你在 claude.ai 连的权限：用 Claude GitHub App 的话，例程改不了副本的规则；用 `/web-setup` 的令牌的话
+  （它有管理员权限），被误导的例程理论上能先删规则再推送，挡住它的只有副本的 `.claude/settings.json` 和自动模式的检查。
+- **GitHub 连接失效时**：例程最多跳过 72 小时，然后任务会自己关掉。重新连接 GitHub，再在任务里把它打开。
 - **它读什么**：副本，也就是 download.mjs 从 raw.githubusercontent.com 取的文件，全部来自同一个提交：网站当前运行的那个
   （页面里的版本号，发布器也认它；网站没给就用 `main`），最多晚 10 分钟。所以例程的检查就是发布器的检查，说明也和工具是
   同一个版本。
@@ -997,14 +1007,27 @@ Set it up once:
    holds only what `scripts/suggestions/download.mjs` takes (the tool, the
    modules it imports, the guides' files, `package.json` and ROUTINE.md), all
    from the commit the live site runs; `.download.json` says which. Its
-   workflow runs every 10 minutes and commits when something changed, and a
-   ruleset lets only that workflow (GitHub Actions) push there. Don't edit
-   the copy: the next sync overwrites it. To make it again: create that
-   public repository with the three files in this repository's
-   `scripts/suggestions/routine-repo/` (`README.md`, `.gitignore`,
-   `.github/workflows/sync.yml`), add the ruleset (all branches: Restrict
+   workflow runs every 10 minutes and commits when something changed; the
+   copy's own four files (`README.md`, `.gitignore`, `.claude/settings.json`,
+   `.github/workflows/sync.yml`) come from this repository's
+   `scripts/suggestions/routine-repo/` too. It pushes with the copy's deploy
+   key (the Actions secret `SYNC_DEPLOY_KEY`), and a ruleset lets only deploy
+   keys create, update or delete a branch, so your own pushes and a run's are
+   refused. So don't edit the copy: change those four files here, and the
+   next sync takes them there. The copy's `.claude/settings.json` lets a
+   run's `./tool …` and `npm ci --no-audit --no-fund` run as written, and
+   refuses `git push`, `git commit`, `git remote` and `gh`; each sync also
+   writes `package-lock.json`, so that the run's `npm ci` installs exactly
+   the sharp locked there. `.synced` changes once a month, so that the
+   copy never goes 60 days without a commit (GitHub then turns a public
+   repository's scheduled workflows off); if it was turned off anyway, turn
+   it back on in Actions ▸ Sync ▸ **Enable workflow**. To make it again:
+   create that public repository with the four files; make an SSH key pair,
+   add the public key as a deploy key with write access (Settings ▸ Deploy
+   keys, Allow write access) and keep the private key only as the Actions
+   secret `SYNC_DEPLOY_KEY`; add the ruleset (all branches: Restrict
    creations, Restrict updates, Restrict deletions, Block force pushes; only
-   GitHub Actions in the bypass list), and run the workflow once (Actions ▸
+   Deploy keys in the bypass list); then run the workflow once (Actions ▸
    Sync ▸ **Run workflow**).
 3. **Environment**: in the environment menu under the message box at
    claude.ai/code, the gear on an environment ▸ **Edit cloud environment**
@@ -1026,7 +1049,7 @@ Set it up once:
    - A name, such as `Field Guide suggestions`, and this prompt, as it is:
 
      ```text
-     Process the approved suggestions for my Field Guide (kuschonink.com). The repository attached to this task, itom123/kuschonink-routine, is my own copy of my suggestions tool and my guides' files, which its GitHub Action takes from my site's repository, itom123/kuschonink.com. Read scripts/suggestions/ROUTINE.md in it and follow it: it has you run npm install --no-audit --no-fund (for sharp) and the tool, ./tool, whose commands (list, claim, show, match, geocode, check, picture, web-picture, ready, mark, log) read and update the suggestions in my Notion, and check once with curl that api.github.com refuses itom123/kuschonink.com. Never commit, push, open pull requests or attach another repository.
+     Process the approved suggestions for my Field Guide (kuschonink.com). The repository attached to this task, itom123/kuschonink-routine, is my own copy of my suggestions tool and my guides' files, which its GitHub Action takes from my site's repository, itom123/kuschonink.com. Read scripts/suggestions/ROUTINE.md in it and follow it: it has you run npm ci --no-audit --no-fund (for sharp) and the tool, ./tool, whose commands (list, claim, show, match, geocode, check, picture, web-picture, ready, mark, log) read and update the suggestions in my Notion, and check once with curl that api.github.com refuses itom123/kuschonink.com. Never commit, push, open pull requests or attach another repository.
 
      If this run was started with a text, it says why (approved: …, or manual: …).
      ```
@@ -1091,7 +1114,18 @@ Safety:
   docs don't say whether a scheduled task can do that without you, and
   ROUTINE.md forbids it.
 - **The copy can't be changed by a run either**: its ruleset lets only its
-  own workflow push, and every sync rewrites it from this repository.
+  deploy key (which only its workflow has) update a branch, and every sync
+  rewrites it from this repository. When a cloud session ends, its built-in
+  Stop hook asks to commit untracked files; the copy's `.gitignore` leaves
+  out what a run makes, and ROUTINE.md forbids commits. A run reaches GitHub
+  with the access you connected on claude.ai: through the Claude GitHub App
+  it can't change the copy's ruleset; through a `/web-setup` token (which is
+  an admin's) a misled run could in principle delete the ruleset and then
+  push, and only the copy's `.claude/settings.json` and the auto mode check
+  stand in its way.
+- **If claude.ai's GitHub connection lapses**, runs are skipped for up to
+  72 hours and then the task turns itself off: reconnect GitHub, then turn
+  the task back on.
 - **What a run reads**: the copy, that is, the files download.mjs takes from
   raw.githubusercontent.com, all from one commit: the one the live site runs
   (the build id in its pages, which the publisher also goes by), or `main` if

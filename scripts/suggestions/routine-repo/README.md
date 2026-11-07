@@ -7,13 +7,25 @@ Claude Code scheduled task that checks the suggestions (that repository's
 kuschonink.com itself, so it has no way to push there.
 
 Every 10 minutes, the workflow in `.github/workflows/sync.yml` takes the files
-of the commit the live site runs, with kuschonink.com's own
-`scripts/suggestions/download.mjs`, and commits them here when they changed:
-the tool and the modules it imports, the guides' files, `package.json` and
-`scripts/suggestions/ROUTINE.md`, the task's instructions. `.download.json`
-says which commit.
+of the commit the live site runs and commits them here when they changed: the
+tool and the modules it imports, the guides' files, `package.json` and
+`scripts/suggestions/ROUTINE.md` (the task's instructions), with
+kuschonink.com's own `scripts/suggestions/download.mjs`, and this file,
+`.gitignore`, `.claude/settings.json` and the workflow, from kuschonink.com's
+`scripts/suggestions/routine-repo/`. It also writes `package-lock.json`, so
+that the routine's `npm ci` installs sharp at exactly those versions.
+`.download.json` says which commit.
 
-Don't change anything here: each sync replaces everything but this file,
-`.gitignore` and `.github/`, and a ruleset lets only that workflow push. These
-three files come from kuschonink.com's `scripts/suggestions/routine-repo/`:
-change them there first.
+`.claude/settings.json` lets a run use `./tool …` and
+`npm ci --no-audit --no-fund` as written, and refuses `git push`,
+`git commit`, `git remote` and `gh`.
+
+Nothing here is changed by hand: the workflow pushes with this repository's
+deploy key (the Actions secret `SYNC_DEPLOY_KEY`), and a ruleset lets nothing
+else create, update or delete a branch. To change these files, change them in
+kuschonink.com; the next sync brings them here.
+
+`.synced` changes once a month, so that the copy never goes 60 days without a
+commit: GitHub turns a public repository's scheduled workflows off after that.
+If the workflow was turned off anyway, turn it back on in Actions ▸ Sync ▸
+Enable workflow (or `gh workflow enable sync.yml -R itom123/kuschonink-routine`).
