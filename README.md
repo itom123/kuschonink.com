@@ -311,7 +311,10 @@ choices and custom colours are in `localStorage` (`kus98:paint`).
 city guides for friends and groups: a map of recommended places in three tiers,
 with a heat map, routes, the days of an event and practical notes. Each guide is
 a document inside the program, at `/guides/<slug>` (`\\XIANGYIN\GUIDES\<SLUG>`
-in the log-on box). The first is `paris-photo-days-2026`. On a computer the window
+in the log-on box). A slug is `<city>-<yyyy>-<mm>` and never changes; the first
+is `paris-2026-11`. `/guides/<city>` opens that city's newest listed guide, past
+guides stay at their addresses (unlisted), and old addresses named under `moved`
+in `access.json` redirect for good (docs/GUIDES.md, section 12). On a computer the window
 shows a list, the map and the details side by side; on a phone it shows one at a
 time, and tapping a pin raises a details sheet. It works without JavaScript as
 one readable page. Wherever a base picture is magnified past 1:1 (the region

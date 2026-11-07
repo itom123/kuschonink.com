@@ -1,13 +1,14 @@
 #!/usr/bin/env node
-// The routine's downloader: the task's prompt runs it first, and ROUTINE.md says
-// what follows. The routine runs with no repository attached, so it has no way to
-// push; it takes the files it needs from raw.githubusercontent.com instead, every
+// The routine's downloader. The routine's own repository, itom123/kuschonink-routine,
+// is a copy that its GitHub Action makes with this (scripts/suggestions/routine-repo/),
+// so that the routine never has this repository attached; you can also run it by
+// hand. It takes the files the tool needs from raw.githubusercontent.com, every
 // one from the same commit: the one the live site runs (the build id in its
 // pages, which the publisher also goes by), or main when the site gives none. It
 // only makes GET requests, and only writes into the folder it is given, which
-// must be new or empty. Given a folder it filled before, it takes nothing again
-// and prints the same, so that a run that comes back for a second turn keeps to
-// one commit. Plain Node, no packages, so it runs before anything is installed.
+// must be new or empty; given a folder it filled before, it takes nothing again
+// and prints the same. The folder works wherever it is moved or cloned to. Plain
+// Node, no packages, so it runs before anything is installed.
 //
 //   node download.mjs <folder> [--commit <id>|main]
 //
@@ -19,8 +20,10 @@
 //   - scripts/suggestions/ROUTINE.md at that commit: the run's instructions;
 //   - package.json: the .ts files are ES modules, and the packages the tool
 //     imports (sharp) at the repository's versions, for `npm install`;
-//   - tool: a script that runs the tool from any folder (`<folder>/tool list`);
-//   - .download.json: what it printed, for a second run on the same folder.
+//   - tool: a script that runs the tool with the `node` on PATH, from any
+//     folder (`./tool list`, `<folder>/tool list`);
+//   - .download.json: which commit it took and its files (no paths of this
+//     machine), for the routine's log and for a second run on the same folder.
 // Then it starts the tool once, to check it loads, and prints what it took.
 //
 // KUS_RAW and KUS_SITE point it at stand-ins (scripts/suggestions/tool.test.mts).
@@ -154,15 +157,27 @@ async function liveBuild() {
 
 const lf = (b) => b.toString('utf8').replace(/\r\n/g, '\n');
 
-/** What an earlier, complete download into this folder printed; null if there was none. */
+/** What an earlier, complete download into this folder took; null if there was none. */
 function earlier(folder) {
   try {
-    const done = JSON.parse(readFileSync(join(folder, MARK), 'utf8'));
-    return done?.folder === folder && COMMIT.test(done.commit) && existsSync(done.tool) ? done : null;
+    const took = JSON.parse(readFileSync(join(folder, MARK), 'utf8'));
+    return COMMIT.test(took?.commit) && existsSync(join(folder, 'tool')) ? took : null;
   } catch {
     return null;
   }
 }
+
+/** What it prints: what it took, and where it is on this machine. The instructions are the commit's, so that they go with its tool. */
+const printed = (folder, took) => ({
+  commit: took.commit,
+  why: took.why,
+  folder,
+  tool: join(folder, 'tool'),
+  instructions: `read ${join(folder, ...ROUTINE.split('/'))} and follow it`,
+  guides: took.guides,
+  packages: took.packages,
+  files: took.files,
+});
 
 export async function download(args) {
   args = [...args];
@@ -172,14 +187,13 @@ export async function download(args) {
   const folder = resolve(args[0]);
   if (asked !== undefined && !COMMIT.test(asked)) throw new Refusal(`"${asked}" is not a commit id or main`);
   if (existsSync(folder) && readdirSync(folder).length) {
-    // A run can come back for a second turn (a run's text arrives as a second
-    // message): it goes on with the files it took the first time.
-    const done = earlier(folder);
-    if (!done) throw new Refusal(`${folder} is not empty: use a new, empty folder`);
-    if (asked !== undefined && !(done.commit.startsWith(asked) || asked.startsWith(done.commit))) {
-      throw new Refusal(`${folder} already holds ${done.commit}: use a new, empty folder for ${asked}`);
+    // Run again on the same folder, it goes on with the files it took the first time.
+    const took = earlier(folder);
+    if (!took) throw new Refusal(`${folder} is not empty: use a new, empty folder`);
+    if (asked !== undefined && !(took.commit.startsWith(asked) || asked.startsWith(took.commit))) {
+      throw new Refusal(`${folder} already holds ${took.commit}: use a new, empty folder for ${asked}`);
     }
-    return { ...done, reused: 'downloaded into this folder before: nothing taken again' };
+    return { ...printed(folder, took), reused: 'downloaded into this folder before: nothing taken again' };
   }
 
   let commit = asked;
@@ -238,9 +252,6 @@ export async function download(args) {
     if (!dependencies[name]) throw new Refusal(`the tool imports ${name}, which package.json doesn't name`);
   }
 
-  // The run's instructions are this commit's, so that they go with its tool.
-  const instructions = `read ${join(folder, ...ROUTINE.split('/'))} and follow it`;
-
   mkdirSync(folder, { recursive: true });
   for (const [p, bytes] of files) {
     const to = join(folder, ...p.split('/'));
@@ -249,13 +260,13 @@ export async function download(args) {
   }
   writeFileSync(join(folder, 'package.json'), `${JSON.stringify({ private: true, type: 'module', dependencies }, null, 2)}\n`);
   const tool = join(folder, ...ENTRY.split('/'));
-  const sh = (s) => `'${s.replace(/'/g, `'\\''`)}'`;
   writeFileSync(join(folder, 'tool'), [
     '#!/bin/sh',
-    `# The routine's tool, downloaded from ${commit}. NODE_USE_ENV_PROXY: Node's fetch`,
-    '# goes through the proxy in HTTPS_PROXY, as curl and npm do, when the session names one.',
+    `# The routine's tool, from ${commit}: ${ENTRY} next to this script, wherever the`,
+    "# folder is, with the node on PATH. NODE_USE_ENV_PROXY: Node's fetch goes through",
+    '# the proxy in HTTPS_PROXY, as curl and npm do, when the session names one.',
     'export NODE_USE_ENV_PROXY=1',
-    `exec ${sh(process.execPath)} --experimental-strip-types --no-warnings ${sh(tool)} "$@"`,
+    `exec node --experimental-strip-types --no-warnings "$(dirname "$0")/${ENTRY}" "$@"`,
     '',
   ].join('\n'));
   chmodSync(join(folder, 'tool'), 0o755);
@@ -265,9 +276,9 @@ export async function download(args) {
   if (r.status !== 0 || !/\blist\b/.test(r.stdout ?? '')) {
     throw new Refusal(`the tool doesn't start (${process.version}): ${(r.stderr || r.stdout || String(r.error ?? '')).trim().split('\n').slice(0, 8).join(' | ')}`);
   }
-  const done = { commit, why, folder, tool: join(folder, 'tool'), instructions, guides, packages: dependencies, files: [...files.keys()].sort() };
-  writeFileSync(join(folder, MARK), `${JSON.stringify(done, null, 2)}\n`); // last, so only a complete download has one
-  return done;
+  const took = { commit, why, guides, packages: dependencies, files: [...files.keys()].sort() };
+  writeFileSync(join(folder, MARK), `${JSON.stringify(took, null, 2)}\n`); // last, so only a complete download has one
+  return printed(folder, took);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {

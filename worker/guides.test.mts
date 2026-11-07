@@ -438,6 +438,41 @@ await expectView('member cookie → members-only: the member view', get('/guides
   check('ASSETS throws on /guides → 503 neutral page', (await run(get('/guides'), deps({ assets: () => { throw new Error('boom'); } }))).status === 503);
 }
 
+// ---- Old addresses (access.json "moved") and /guides/<city> ----
+{
+  const moved = { ...ACCESS, moved: { 'old-city': 'city-one', stale: 'gone-guide', _comment: 'city-one' } } as unknown as AccessFile;
+  const HOME = (cities: string) => `<!doctype html><html><body><div class="folder-page" data-gd-first="city-one" data-gd-cities="${cities}"><p>HOME PAGE</p></div></body></html>`;
+  const d = (cities = 'city:city-one other:open-day') =>
+    deps({
+      access: moved,
+      assets: (req) => {
+        const p = new URL(req.url).pathname;
+        asked.push(p);
+        return p === '/guides' ? new Response(HOME(cities), { headers: { 'content-type': 'text/html; charset=utf-8' } }) : assets(req);
+      },
+    });
+  const to = async (req: Request, x = d()) => {
+    const r = await run(req, x);
+    return `${r.status} ${r.headers.get('location')}`;
+  };
+
+  asked = [];
+  const r = await run(get('/guides/old-city?place=A3'), d());
+  check('an old address → 301 to the guide, query kept, private, no body', r.status === 301 && r.headers.get('location') === '/guides/city-one?place=A3' && r.headers.get('cache-control') === 'private, no-store' && r.body === null, { s: r.status, loc: r.headers.get('location') });
+  check('… nothing is read to answer it', asked.length === 0, asked);
+  check('… the rest of the path comes along', (await to(get('/guides/old-city/img/a1.jpg'))) === '301 /guides/city-one/img/a1.jpg' && (await to(get('/guides/old-city/tiles/14/8297/5634.png'))) === '301 /guides/city-one/tiles/14/8297/5634.png');
+  check('… /guides/<old>.html and /guides/<old>/ too', (await to(get('/guides/old-city.html'))) === '301 /guides/city-one' && (await to(get('/guides/old-city/'))) === '301 /guides/city-one/');
+  check('… HEAD → 301; a POST (log on, suggest) → 308, so it stays a POST', (await to(get('/guides/old-city', undefined, {}, 'HEAD'))) === '301 /guides/city-one' && (await to(post('/guides/old-city/login', { password: PW.visitor }))) === '308 /guides/city-one/login');
+  check('an old address sent to no guide, a key that is not an address, or a name only the prototype has → 404', (await run(get('/guides/stale'), d())).status === 404 && (await run(get('/guides/_comment'), d())).status === 404 && (await run(get('/guides/constructor'), d())).status === 404);
+
+  check('/guides/<city> → 307 to its newest listed guide, query kept', (await to(get('/guides/city?day=2026-11-12'))) === '307 /guides/city-one?day=2026-11-12' && (await to(get('/guides/other'))) === '307 /guides/open-day');
+  check('… /guides/<city>/ as well', (await to(get('/guides/city/'))) === '307 /guides/city-one');
+  check('… a city with no listed guide, or one the line sends to no guide → 404', (await run(get('/guides/rome'), d())).status === 404 && (await run(get('/guides/city'), d('city:gone-guide'))).status === 404 && (await run(get('/guides/city'), d(''))).status === 404);
+  check('… only the address itself: no files under a city, no POST', (await run(get('/guides/city/img/a1.jpg'), d())).status === 404 && (await run(post('/guides/city/login', { password: PW.visitor }), d())).status === 404);
+  const own = await run(get('/guides/open-day'), d('open-day:city-one'));
+  check('a guide of the same name wins over a city', own.status === 200 && !own.headers.has('location'), own.status);
+}
+
 // ---- The Worker never bundles guide content: only access.json, types, and guide code that reads none ----
 // Every module the bundle can reach from worker/ is followed the way esbuild follows it, so this holds
 // after edits by people (or AIs) who don't know the rule: static and dynamic imports, re-exports, side-

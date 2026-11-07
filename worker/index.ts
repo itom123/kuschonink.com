@@ -191,6 +191,7 @@ function suggestDeps(env: Env): SuggestDeps {
     visitor: limitKey,
     now: () => Date.now(),
     log: (...args) => console.error(...args),
+    access: access as AccessFile,
   };
 }
 

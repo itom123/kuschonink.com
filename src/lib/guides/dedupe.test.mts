@@ -1,8 +1,8 @@
 // npm test: is a suggestion something the guide already has? (dedupe.ts),
 // against the real Paris items and official listings.
 import { addressSimilarity, compare, datesOverlap, distanceM, findMatches, fingerprint, nameSimilarity, normText, normUrl, people, type Known } from './dedupe.ts';
-import items from '../../content/guides/paris-photo-days-2026/items.json' with { type: 'json' };
-import listings from '../../content/guides/paris-photo-days-2026/listings.json' with { type: 'json' };
+import items from '../../content/guides/paris-2026-11/items.json' with { type: 'json' };
+import listings from '../../content/guides/paris-2026-11/listings.json' with { type: 'json' };
 
 let fails = 0;
 function check(name: string, ok: boolean, detail: unknown = '') {

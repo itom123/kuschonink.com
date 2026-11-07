@@ -215,7 +215,7 @@ export async function publish(deps: PublishDeps, trigger: LogEntry['trigger'] = 
       deps.log('publish: could not watch the builds', (e as Error).message);
       report.errors.push((e as Error).message);
     }
-    const ready = (await deps.notion.queryAll(deps.db.suggestions, { filter: isStatus('READY'), sorts: [{ timestamp: 'created_time', direction: 'ascending' }] }, BATCH)).map(readSuggestion);
+    const ready = (await deps.notion.queryAll(deps.db.suggestions, { filter: isStatus('READY'), sorts: [{ timestamp: 'created_time', direction: 'ascending' }] }, BATCH)).map((p) => readSuggestion(p, deps.access));
     const bySlug = new Map<string, SuggestionRow[]>();
     for (const r of ready) {
       if (!Object.hasOwn(deps.access.guides, r.guide)) {
@@ -370,7 +370,7 @@ async function publishBatch(deps: PublishDeps, slug: string, rows: SuggestionRow
  * the next run and holds up nothing else.
  */
 async function watchBuilds(deps: PublishDeps, report: PublishReport) {
-  const rows = (await deps.notion.queryAll(deps.db.suggestions, { filter: isStatus('PUBLISHING') }, 50)).map(readSuggestion);
+  const rows = (await deps.notion.queryAll(deps.db.suggestions, { filter: isStatus('PUBLISHING') }, 50)).map((p) => readSuggestion(p, deps.access));
   const bySha = new Map<string, SuggestionRow[]>();
   for (const r of rows) {
     const sha = shaOf(r.commit);

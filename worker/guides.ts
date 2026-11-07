@@ -20,6 +20,7 @@
 // closed. Written with its dependencies passed in, like contact.ts, so
 // worker/guides.test.mts runs it in Node.
 import type { AccessFile } from '../src/lib/guides/types';
+import { cityGuide, currentSlug } from '../src/lib/guides/address.ts';
 
 export const PREFIX = '/guides';
 export const COOKIE = 'kus98_guides';
@@ -62,6 +63,8 @@ const TILE_TIMEOUT_MS = 8000;
 const CANONICAL = new Set(['/', '/index', '/index.html', '/views']);
 /** The first listed guide, as the build writes it on the home page (src/pages/guides/index.astro). */
 const FIRST = /\sdata-gd-first="([a-z0-9-]{1,100})"/;
+/** Each city's newest listed guide, as the build writes it on the home page: "paris:paris-2026-11 …". */
+const CITIES = /\sdata-gd-cities="([a-z0-9: -]{0,4000})"/;
 
 /** What the log-on page shows without JavaScript (its data-gd-state). */
 export type LogonState = 'none' | 'wrong' | 'wait' | 'off' | 'denied' | 'error';
@@ -122,7 +125,8 @@ async function route(req: Request, deps: GuidesDeps): Promise<Response> {
   if (url.protocol === 'http:' && !isLocal(url.hostname)) return redirect(`https://${url.host}${p}${url.search}`, 308);
   if (p === PREFIX || p === `${PREFIX}/`) return programHome(req, url, deps);
   const at = parse(p);
-  if (!at || !isGuide(deps.access, at.slug)) return notFound(url, deps);
+  if (!at) return notFound(url, deps);
+  if (!isGuide(deps.access, at.slug)) return elsewhere(req, url, at, deps);
   const { slug, sub } = at;
   const home = `${PREFIX}/${slug}`;
   // /guides/<slug>.html, /<slug>/, the built views and log-on page: always the guide's own address.
@@ -162,6 +166,27 @@ async function programHome(req: Request, url: URL, deps: GuidesDeps): Promise<Re
   if (slug && SLUG.test(slug) && isGuide(deps.access, slug)) return redirect(`${PREFIX}/${slug}${url.search}`, 307);
   if (url.pathname !== PREFIX) return redirect(PREFIX + url.search, 307);
   return deps.assets(req);
+}
+
+/**
+ * An address that is no guide (src/lib/guides/address.ts):
+ * - an old one that access.json "moved" sends on: there for good, with the
+ *   rest of the path and the query (308 keeps a POST a POST);
+ * - a city, /guides/<city>: the newest listed guide there (307, as it moves
+ *   on when a new guide is listed). The build names it on the /guides page
+ *   (data-gd-cities), so the Worker reads no guide content;
+ * - anything else: 404.
+ */
+async function elsewhere(req: Request, url: URL, at: { slug: string; sub: string; html: boolean }, deps: GuidesDeps): Promise<Response> {
+  const to = currentSlug(deps.access, at.slug);
+  if (to) return redirect(`${PREFIX}/${to}${at.sub}${url.search}`, req.method === 'GET' || req.method === 'HEAD' ? 301 : 308);
+  if (!at.html && (at.sub === '' || at.sub === '/') && (req.method === 'GET' || req.method === 'HEAD')) {
+    const built = await deps.assets(new Request(new URL(PREFIX, url)));
+    const line = built.ok ? CITIES.exec(await built.text())?.[1] ?? '' : '';
+    const slug = cityGuide(line, at.slug);
+    if (slug && isGuide(deps.access, slug)) return redirect(`${PREFIX}/${slug}${url.search}`, 307);
+  }
+  return notFound(url, deps);
 }
 
 /** "/guides/<slug>[.html][/<sub>]" → its parts; null when the slug can't be one. */

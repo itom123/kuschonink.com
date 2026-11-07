@@ -4,6 +4,7 @@
 // and load.ts fails the build with all of them at once.
 import type { AccessFile } from './types';
 import { WEEKDAYS, isISODate, project } from './core.ts';
+import { citySlug } from './address.ts';
 
 export const GUIDE_FILES = ['guide', 'items', 'places', 'events', 'routes', 'listings', 'map'] as const;
 export type GuideFileName = (typeof GUIDE_FILES)[number];
@@ -208,7 +209,20 @@ const ACCESS_SCHEMA: S = obj({
   guides: obj({}, { rest: arr(str(), { min: 1 }) }),
   // Street-level tile bounds per guide, [west, south, east, north] in degrees (checkTiles() looks closer).
   tiles: obj({}, { opt: true, rest: arr({ t: 'num' }, { min: 4 }) }),
+  // Old address → the guide's slug now (checkMoved() looks closer).
+  moved: obj({}, { opt: true, rest: str() }),
 });
+
+/** access.json "moved": each old address is no guide of its own and sends to one that is. */
+function checkMoved(c: Ctx, access: unknown, guides: Rec): void {
+  for (const [old, to] of Object.entries(O(O(access).moved))) {
+    if (old.startsWith('_')) continue;
+    const at: Loc = { id: 'moved', path: old };
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(old)) say(c, at, `${q(old)} should be lower-case-kebab, like an address.`);
+    if (old in guides) say(c, at, `${q(old)} is still a guide in "guides". An address moves only once its guide has a new one.`);
+    if (isStr(to) && !(to in guides)) say(c, at, `${q(to)} is not a guide in "guides". Send ${q(old)} to the guide's address now.`);
+  }
+}
 
 /** A tile box may span at most this many degrees each way: tiles are for one region, not a country. */
 const TILE_SPAN = 3;
@@ -541,6 +555,11 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
       say(c, { id: 'window', path: 'end' }, 'the guide covers more than 92 days. Check the year.');
     const ev = O(g.event);
     range(c, { id: 'event', path: '' }, ev.start, ev.end);
+    // The address starts with the city, so /guides/<city> can find the guide (src/lib/guides/address.ts).
+    if (isStr(g.city) && citySlug(g.city) && !slug.startsWith(`${citySlug(g.city)}-`)) {
+      const month = isStr(win0.start) && /^\d{4}-\d{2}/.test(win0.start) ? win0.start.slice(0, 7) : 'topic';
+      say(c, { id: 'guide', path: 'city' }, `the guide's address (its folder, ${q(slug)}) should start with its city: "${citySlug(g.city)}-${month}". See docs/GUIDES.md, section 12.`);
+    }
     if (isStr(g.timezone)) {
       try {
         new Intl.DateTimeFormat('en', { timeZone: g.timezone });
@@ -804,6 +823,7 @@ export function checkAccess(access: unknown, slugs: string[]): string[] {
   for (const s of slugs)
     if (!(s in guides)) problems.push(`guides/${s}/ › (folder) › (folder): not in access.json "guides", so nobody can open it. Add "${s}": ["visitor"].`);
   checkTiles(c, access, guides);
+  checkMoved(c, access, guides);
   return [...new Set(problems)];
 }
 

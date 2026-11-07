@@ -4,19 +4,22 @@
 // the first one's own address (worker/guides.ts), whose log-on box is where a
 // guide is chosen. This page tells the Worker which guide that is
 // (data-gd-first: the slug, nothing else), so the Worker never reads guide
-// content. Otherwise it is only seen when no guide is listed: a neutral window
-// that says so, in the window's own black on white.
+// content. It also names each city's newest listed guide (data-gd-cities:
+// "paris:paris-2026-11 …"), which /guides/<city> opens. Otherwise it is only
+// seen when no guide is listed: a neutral window that says so, in the window's
+// own black on white.
 import Desktop from '../../layouts/Desktop.astro';
 import Window from '../../components/desktop/Window.astro';
 import Bi from '../../components/Bi.astro';
 import { site } from '../../lib/content';
 import { seoTitle } from '../../lib/i18n';
-import { guideCards } from '../../lib/guides/load';
+import { cityLinks, guideCards } from '../../lib/guides/load';
 import { W } from '../../lib/guides/words';
 
 // The first listed guide, in access.json order. Its link below shows only where
 // no Worker sends the address on (a local preview).
 const first = guideCards()[0]?.slug;
+const cities = cityLinks() || undefined;
 const seo = {
   ...seoTitle(W.program, site.name),
   description: `Field Guide: city guides on ${site.name}'s desktop. Each guide opens with a password.`,
@@ -34,7 +37,7 @@ const seo = {
     bodyClass="folder-body"
     status={first ? undefined : W.guides(0)}
   >
-    <div class="folder-page" data-gd-first={first}>
+    <div class="folder-page" data-gd-first={first} data-gd-cities={cities}>
       <h1 class="sr-only"><Bi t={W.program} /></h1>
       {first ? (
         <p><a href={`/guides/${first}`}><Bi t={{ en: 'Open Field Guide', zh: '打开导览' }} /></a></p>

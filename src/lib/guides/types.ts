@@ -54,6 +54,12 @@ export interface AccessFile {
    * Content-free: no names, no places. Without it a guide has no tiles.
    */
   tiles?: Record<string, [number, number, number, number]>;
+  /**
+   * Old address → the guide's slug now ({ "paris-photo-days-2026": "paris-2026-11" }).
+   * The Worker sends /guides/<old>/… there for good, and suggestions sent under
+   * the old name still reach the guide (src/lib/guides/address.ts).
+   */
+  moved?: Record<string, string>;
 }
 export interface AudienceRecord {
   id: string;
