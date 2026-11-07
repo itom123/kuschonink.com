@@ -20,6 +20,7 @@ sitemap). The password and the code are checked on the server
 - **管理 ▸ 推荐**：导览推荐的队列（像 Outlook Express）：收录、拒绝、编辑、给推荐者发邮件、立即运行例程、立即发布、处理日志。
   在 Notion 里改状态也一样，两边总是一致（Notion 是唯一的数据来源）。
 - 导览里：不用导览密码就能看到最完整的版本；**文件 ▸ 推荐队列…**；每个条目的详情里有 **编辑…**，直接保存进导览（提交到 `main`，构建时检查）。
+- 图片可以照常保存：照片右键菜单里的 **图片另存为...** 和 **复制快捷方式**、图像查看器的 **保存**、浏览器自己的右键菜单和拖动都能用。访客都不行（见 `docs/DESKTOP.md` 的“Pictures can't be saved”）。
 - **注销 Administrator…** 结束管理模式；**在所有地方注销** 让所有浏览器都退出。
 
 In admin mode:
@@ -33,6 +34,10 @@ In admin mode:
 - In a guide: the fullest view without the guide's password; **File ▸
   Suggestions Queue…**; and **Edit…** in each entry's details, which saves
   straight into the guide (a commit to `main`, checked by the build).
+- Pictures can be saved as before: **Save Picture As...** and **Copy
+  Shortcut** in a photograph's menu, **Save** in the Image Viewer, the
+  browser's own menu and dragging. Visitors can't (see "Pictures can't be
+  saved" in `docs/DESKTOP.md`).
 - **Log Off Administrator…** ends admin mode; **Log Off Everywhere** ends it
   in every browser.
 

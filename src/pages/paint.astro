@@ -41,7 +41,7 @@ const hint = { en: `Draw with a mouse, a finger or a pen. When you’re done, cl
     bodyClass="paint-body flat"
     status={[hint, ' ', ' ']}
   >
-    <div class="paint" data-paint data-artist={artist} data-artist-full={site.name} data-sitekey={site.contact.form.turnstileSiteKey || undefined}>
+    <div class="paint" data-paint data-savable data-artist={artist} data-artist-full={site.name} data-sitekey={site.contact.form.turnstileSiteKey || undefined}>
       <p class="paint-note" data-note>
         <span class="ico ico16 ico-mail" aria-hidden="true"></span>
         <span class="paint-note-text">

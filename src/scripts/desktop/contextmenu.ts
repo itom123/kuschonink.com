@@ -1,6 +1,7 @@
 // Right-click menus for everything on the desktop. Also: press and hold on a
 // touch screen, and Shift+F10 or the Menu key on a keyboard. Text fields and
-// Shift+right-click keep the browser's own menu.
+// Shift+right-click keep the browser's own menu, except on a picture: the
+// site's pictures never get the browser's menu (nosave.ts).
 import { commands } from './commands';
 import { arrangeIcons, lineUpIcons, openIcon, select } from './icons';
 import * as menu from './menu';
@@ -160,7 +161,8 @@ export function initContextMenus() {
     if (e.defaultPrevented) return;
     if (e.shiftKey || t.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"]')) return;
     const touch = ((e as PointerEvent).pointerType || lastPointerType) === 'touch';
-    // On phones, pressing and holding a photo or text keeps the phone's own menu (Save image…).
+    // On phones, pressing and holding text keeps the phone's own menu (Copy…). A picture gets
+    // none: nosave.ts turns the phone's menu down, as it would offer to save the picture.
     if (touch && t.closest('[data-window-body], .sheet-holder')) return;
     if (performance.now() - longPressAt < 800) {
       e.preventDefault();

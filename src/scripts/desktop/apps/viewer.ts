@@ -1,7 +1,9 @@
 // Image Viewer: click a photograph in a project (or in a room of the house)
 // to see it large, zoom in, step through the others, or set it as wallpaper.
+// Save says the picture can't be saved, except in admin mode (nosave.ts).
 import { appWindow } from '../appwindow';
 import { commands } from '../commands';
+import { savePicture } from '../nosave';
 import { settings } from '../settings';
 import { h, setText, type Text } from '../util';
 import { largestSrc } from '../winmenus';
@@ -92,12 +94,8 @@ function build() {
         return applyZoom();
       case 'wallpaper':
         return settings.set({ wallpaper: pics[index].src, wallpaperMode: 'stretch' });
-      case 'save': {
-        const a = h('a', { href: pics[index].src, download: pics[index].name, 'data-native': '' });
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      }
+      case 'save':
+        return savePicture(img, pics[index].src, pics[index].name);
     }
   });
   stage.addEventListener('dblclick', () => {

@@ -56,6 +56,7 @@ Ground rules:
 | `router.ts` | Opens pages in windows: fetches the page, swaps the window, keeps the browser's address and history in step. A page asked for twice is fetched once; a navigation that's overtaken stops waiting but doesn't cancel the request the newer one waits for |
 | `taskbar.ts`, `startmenu.ts`, `tray.ts` | Taskbar buttons, clock, Start menu (Documents ▸ remembers recent pages), volume |
 | `menu.ts`, `menubar.ts`, `winmenus.ts`, `contextmenu.ts` | One menu engine for the Start menu, menu bars and right-click menus (press and hold on touch, Shift+F10) |
+| `nosave.ts` | The site's pictures can't be saved: no browser menu on a picture, no dragging one out, and Save Picture As... says why (see [Pictures can't be saved](#pictures-cant-be-saved)) |
 | `icons.ts` | Icons on the desktop and in folders: select, double-click, drag, rubber band, arrow keys |
 | `dialogs.ts`, `properties.ts`, `aboutbox.ts` | Message boxes, dialog windows, Properties sheets |
 | `boot.ts`, `session.ts` | Start-up, log-on (everyone is Guest; the name can't be changed), log off, shut down, stand by |
@@ -120,6 +121,9 @@ may run more than once, and their page may sit in a window next to others:
 6. **Using the right button yourself?** Call `preventDefault()` on the
    `contextmenu` event (Paint paints with the right button); the desktop's
    right-click menu then leaves it alone.
+7. **Showing a picture the visitor may keep** (their own drawing or upload)?
+   Put it inside `[data-savable]`, as Paint does. Every other picture can't
+   be saved (see [Pictures can't be saved](#pictures-cant-be-saved)).
 
 ### `window.kus98`
 
@@ -148,6 +152,32 @@ may run more than once, and their page may sit in a window next to others:
 | `consent:change` | `document` | The choice about cookies changed, here or in another tab (`detail.level`; `detail.again`: what the page shows is to be kept again, `keepAgain()` in `consent.ts`) |
 | `astro:page-load` | `document` | After each page opens (so existing component inits run) |
 | `wm:change`, `start:open`, `icons:select`, `bin:change` | | Window, Start menu, selection and Recycle Bin changes |
+
+## Pictures can't be saved
+
+The photographs and drawings are the artist's, protected by copyright:
+visitors can look at them but not keep them. `src/scripts/desktop/nosave.ts`
+and one rule in `desktop.css` see to it, on every page.
+
+- **No browser menu on a picture** (`img`, `canvas`, SVG `image`). A
+  right-click still gets the desktop's own menu. Shift+right-click, and
+  pressing and holding on a phone, get nothing: `nosave.ts` listens last (on
+  `window`, after the desktop and page scripts) and turns down the browser's
+  menu. On an iPhone or iPad the CSS stops the press-and-hold callout.
+- **No dragging a picture out**, nor a link holding one (`dragstart`, and
+  `-webkit-user-drag` in the CSS). Selecting a page leaves the pictures out.
+- **Save Picture As...** in a photograph's menu and **Save** in the Image
+  Viewer stay, but say "This picture is protected by copyright and can't be
+  saved." (`savePicture()`). Copy Shortcut, which copied the file's address,
+  is gone from the photograph's menu.
+- **Left alone:** admin mode (`html[data-admin]`: everything as before, Copy
+  Shortcut included), and anything inside `[data-savable]`, the visitor's own
+  pictures: Paint (File ▸ Save, Copy, painting with the right button), its
+  Send preview, and the picture in Suggest a Place.
+- **What it can't stop:** Firefox always opens its own menu on
+  Shift+right-click. Without JavaScript only the CSS works. Screenshots,
+  printing, the page source and the browser's developer tools still reach
+  the pictures, which are public files under `/_astro/`.
 
 ## Two languages (the 中/EN switch)
 
