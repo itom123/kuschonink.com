@@ -49,6 +49,9 @@ const disabled = (item: HTMLElement) => item.getAttribute('aria-disabled') === '
 
 function focusItem(item?: HTMLElement | null) {
   item?.focus({ preventScroll: true });
+  // In a menu that scrolls (taller than the screen), the item comes into view.
+  const m = item?.closest<HTMLElement>('.menu');
+  if (item && m && m.scrollHeight > m.clientHeight) item.scrollIntoView({ block: 'nearest' });
 }
 
 /**
@@ -59,13 +62,24 @@ function focusItem(item?: HTMLElement | null) {
 function placeSub(sub: HTMLElement) {
   const s = sub.style;
   sub.classList.remove('flip');
-  s.left = s.top = s.maxHeight = s.overflowY = '';
+  s.position = s.left = s.top = s.maxHeight = s.overflowY = '';
   const right = innerWidth - 2;
   const limit = innerHeight - 2;
   // Taller than the screen: it scrolls. (Before the sideways check: a scroll bar widens it.)
   if (sub.getBoundingClientRect().height > limit - 4) {
     s.maxHeight = `${limit - 4}px`;
     s.overflowY = 'auto';
+  }
+  // In a menu that scrolls, the menu would cut it off: it is placed on the screen instead, beside its item.
+  const holder = sub.parentElement?.closest<HTMLElement>('.menu');
+  if (holder && holder.scrollHeight > holder.clientHeight) {
+    const at = sub.parentElement!.getBoundingClientRect(), r = sub.getBoundingClientRect();
+    let left = at.right - 3;
+    if (left + r.width > right) left = Math.max(2, at.left - r.width + 3);
+    s.position = 'fixed';
+    s.left = `${left}px`;
+    s.top = `${Math.max(2, Math.min(at.top - 3, limit - r.height))}px`;
+    return;
   }
   const r = sub.getBoundingClientRect();
   if (r.right > right) {
@@ -293,6 +307,14 @@ export function popup(
   root.style.left = '0px';
   root.style.top = '0px';
   document.body.appendChild(root);
+  // Taller than the screen (a phone held sideways): it scrolls, below its bar when at least half the screen is
+  // there, else from the top. Scrolling closes a submenu, which stays where it was put (placeSub).
+  const screen = innerHeight - 4, below = innerHeight - 2 - y;
+  if (root.getBoundingClientRect().height > screen) {
+    root.style.maxHeight = `${below >= screen / 2 ? below : screen}px`;
+    root.style.overflowY = 'auto';
+    root.addEventListener('scroll', () => root.querySelectorAll(':scope > li.open').forEach((li) => closeSub(li)), { passive: true });
+  }
   const r = root.getBoundingClientRect();
   let left = x;
   let top = y;

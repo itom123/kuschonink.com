@@ -120,6 +120,16 @@ html.js .gd-logon-guides { display: none; }
   .gd-logon-buttons { flex-direction: row; justify-content: flex-end; }
 }
 
+/* ---- A phone held sideways: the splash beside the box, so the password shows without scrolling
+   (the window's frame: guide.css, Full Screen) ---- */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 480px) {
+  .gd-logon { flex-direction: row; align-items: flex-start; justify-content: center; gap: 18px; padding: 10px 8px 12px; }
+  .gd-logon-splash { flex: 0 1 190px; flex-direction: column; align-items: flex-start; gap: 8px; width: auto; padding-top: 6px; }
+  .gd-logon-icon { width: 48px; height: 48px; }
+  .gd-logon-title { font-size: 19px; }
+  .gd-logon-form { flex: 0 1 420px; min-width: 0; }
+}
+
 /* ---- High Contrast ---- */
 :where(html[data-scheme="contrast"]) .gd-logon-body { background: #fff !important; }
 :where(html[data-scheme="contrast"]) .gd-logon-sub { color: #000; }

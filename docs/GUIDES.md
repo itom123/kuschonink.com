@@ -40,6 +40,8 @@ directly.
 - **地点的排序**：地点列表上方的“排序方式”默认是“推荐”（A、B、C 级依次排，同级按编号）。另外还有“名称”、“区域”（按导览里片区的顺序）、“当天开放的优先”（先在“日期”框里选定一天）和“离我最近”（先按“我在哪里？”）。选了别的排序后会出现“默认”按钮，单击即可恢复推荐顺序。“查看 ▸ 排序方式”菜单里是同样几种排序。排序只调整每一组之内的次序（参考点、当天闭馆的地点和官方条目各自是一组）。选择会记在这台设备上，“离我最近”除外。
 - **我在哪里？**：只有按下按钮时，浏览器才会询问位置。之后地图上会出现一个红色的圆点，并显示“实时位置”标签，旁边有“停止”按钮。再按一次按钮、单击“停止”，或者刷新页面、注销、关闭窗口，都会关掉它；刷新之后它是关着的。位置只留在设备上，从不发送出去。浏览器不允许时，导览会说明怎样开启。
 - **街道地图**：底图被放大到超过原图大小的地方（城区底图周围的大区底图会最先被放大），街道级的地图瓦片由 Worker 从 IGN（Plan IGN）代为取得，地址是 `/guides/<名字>/tiles/{z}/{x}/{y}.png`，缩放级别 12 至 19，只给已登录的读者。城区底图放不满窗口时（比如竖着拿的平板），四周会补上大区底图和它的瓦片，不会露出灰色。范围由 `access.json` 的 `tiles` 决定（见第 10 节）。IGN 只看到 Worker，看不到访客。每位访客每分钟从 IGN 取图最多 600 块（已在缓存里的不算），超出的瓦片返回 429。
+- **地图手势**：在手机和平板上，地图的手势和地图应用（Google 地图、苹果地图）一样：一根手指拖动移动地图，快速一划地图会继续滑行；两根手指捏合缩放；轻点两下放大；轻点两下后按住，向下滑动放大、向上滑动缩小；两根手指同时轻点一下缩小。地图上的文字不会被选中，长按也不会弹出菜单。用鼠标时，双击放大，按住 Shift 键双击缩小，滚轮缩放。代码在 `src/scripts/guide/gestures.ts`。
+- **横屏**：手机横过来时，导览铺满整个屏幕（像 Internet Explorer 的“全屏”）：任务栏让开（最小化导览就会回来），标题栏的按钮移到菜单栏右端，旁边是中文/EN 切换和“今天”提示（轻点提示打开日期）；工具栏立在左边，状态栏只留给读屏软件。地图因此有原来两倍多的高度。密码对话框也一样，只是保留任务栏，标题和密码框左右并排。CSS 在 `src/styles/guide.css` 最后。
 
 **Field Guide (导览)** is a program on the Xiangyin 98 desktop for city guides
 behind a password: a map, recommended places in three tiers (A, B, C), routes,
@@ -89,6 +91,20 @@ past guides stay at their own addresses (section 12).
   (section 10). IGN sees the Worker, never the visitor. Each visitor may fetch at
   most 600 tiles from IGN a minute (cached tiles don't count); beyond that a tile
   answers 429.
+- **Map gestures.** On a phone or tablet the map answers the gestures of a maps
+  app (Google Maps, Apple Maps): drag with one finger to move it, and a flick
+  sends it gliding on; pinch to zoom; double-tap to zoom in; double-tap and hold,
+  then slide down to zoom in or up to zoom out; tap with two fingers to zoom out.
+  Nothing on the map selects as text, and pressing and holding opens no menu.
+  With a mouse, double-click zooms in, Shift and double-click zooms out, and the
+  wheel zooms. The code is `src/scripts/guide/gestures.ts`.
+- **A phone held sideways.** The guide fills the whole screen, as Internet
+  Explorer's Full Screen did: the taskbar steps aside (minimise the guide to
+  get it back), the title bar's buttons end the menu bar beside a 中/EN switch
+  and the Today note (tap it for Days), the toolbar stands on the left and the
+  status bar is left to screen readers. The map gets more than twice the height
+  it had. The password box gets the same frame but keeps the taskbar, with its
+  title beside the form. The CSS ends `src/styles/guide.css`.
 
 ---
 

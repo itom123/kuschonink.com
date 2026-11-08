@@ -1,7 +1,8 @@
-// Field Guide (导览): the map engine. Plain DOM, no d3; the gestures copy the
-// House's map (src/scripts/map.ts). It takes over the server-rendered map in
-// GuideMap.astro: the base image and the pin links stay, their %-positions
-// give way to transforms. World units are z14 global pixels (core.ts project()).
+// Field Guide (导览): the map engine. Plain DOM, no d3. It takes over the
+// server-rendered map in GuideMap.astro: the base image and the pin links
+// stay, their %-positions give way to transforms. World units are z14 global
+// pixels (core.ts project()). Fingers get the gestures of map apps
+// (gestures.ts); a mouse drags, double-clicks and scrolls as on the House's map.
 //
 // Layers inside .gd-stage: base images (one per map view, coarser ones first,
 // the extra ones loaded when first wanted, under a white wash) → street-level
@@ -21,6 +22,7 @@ import { LABEL_GAP, makeMeasure, placeLabels, type Box, type Side } from './labe
 import { drawRoute, makeRouteSvg } from './route.ts';
 import { cellSize, heatPixels, readRamp, type RGB } from './heat.ts';
 import { TileLayer, tileClip } from './tiles.ts';
+import { Gestures, type Act } from './gestures.ts';
 
 export interface MapPin { id: string; kind: 'item' | 'place' | 'listing'; tier?: TierId; letter?: string; coordinates: LonLat; short: string; aria: Bi; visible: boolean; dim?: boolean; hollow?: boolean; label?: boolean; step?: number }
 export interface MapHooks {
@@ -49,6 +51,10 @@ const CELL = 2;
 /** The heat canvas reaches a quarter of the view beyond each side (House's OVER). */
 const OVER = 0.25;
 const LABEL_H = 17;
+/** A flick's glide slows by e every this many ms (it goes on for about this long times its speed). */
+const GLIDE_MS = 325;
+/** A text box a finger on the map takes the focus from (so a phone puts its keyboard away). */
+const FIELD = 'input, textarea, select, [contenteditable]:not([contenteditable="false"])';
 
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const coarse = () => matchMedia('(pointer: coarse)').matches;
@@ -121,10 +127,14 @@ export class GuideMap {
   private flying = false;
   private wheeling = false;
   private wheelTimer = 0;
-  private pointers = new Map<number, { x: number; y: number }>();
-  private moved = 0;
-  private pinch = { d: 0, x: 0, y: 0 };
-  private lastTap = { t: 0, x: 0, y: 0 };
+  /** A pinch on a trackpad (Safari's gesture events). */
+  private trackpad = false;
+  /** Fingers and the mouse on the map. */
+  private g = new Gestures();
+  /** What each finger came down on, for its tap. */
+  private touched = new Map<number, Element>();
+  /** No click until then: a drag just ended, or a finger's tap was taken already. */
+  private quietUntil = 0;
   private lastPointer = 'mouse';
   private ro: ResizeObserver;
   private unsub: (() => void) | null = null;
@@ -659,7 +669,7 @@ export class GuideMap {
   }
 
   private live() {
-    return this.pointers.size > 0 || this.flying || this.wheeling;
+    return this.g.down > 0 || this.flying || this.wheeling || this.trackpad;
   }
 
   /**
@@ -693,6 +703,40 @@ export class GuideMap {
         this.c = to;
         this.settle();
       }
+    };
+    this.anim = requestAnimationFrame(step);
+  }
+
+  /**
+   * A flick: the map glides on the way the finger went (its speed in px/ms)
+   * and slows to a stop, or stops at the map's edge. A touch, a button or a
+   * key stops it (interrupt(), flyTo()). Not under reduced motion.
+   */
+  private glide(vx: number, vy: number) {
+    if (reduced()) return this.settle();
+    cancelAnimationFrame(this.anim);
+    this.flying = true;
+    this.target = null;
+    let t0 = performance.now();
+    const step = (t: number) => {
+      if (this.off.signal.aborted) return;
+      const dt = Math.min(50, Math.max(0, t - t0));
+      t0 = t;
+      const k = Math.exp(-dt / GLIDE_MS);
+      const dx = vx * GLIDE_MS * (1 - k), dy = vy * GLIDE_MS * (1 - k);
+      vx *= k;
+      vy *= k;
+      const c = this.c, want = { ...c, cx: c.cx - dx / c.s, cy: c.cy - dy / c.s };
+      this.c = this.clamp(want);
+      if (Math.abs(this.c.cx - want.cx) * c.s > 0.01) vx = 0;
+      if (Math.abs(this.c.cy - want.cy) * c.s > 0.01) vy = 0;
+      if (Math.hypot(vx, vy) < 0.02) {
+        this.flying = false;
+        this.settle();
+        return;
+      }
+      this.paint();
+      this.anim = requestAnimationFrame(step);
     };
     this.anim = requestAnimationFrame(step);
   }
@@ -1011,90 +1055,101 @@ export class GuideMap {
       const r = vpEl.getBoundingClientRect();
       return { x: e.clientX - r.left, y: e.clientY - r.top };
     };
-    const forget = (id: number) => {
-      if (!this.pointers.delete(id)) return;
-      if (this.pointers.size < 2) this.pinch.d = 0;
-      if (!this.pointers.size) {
-        vpEl.classList.remove('dragging');
-        this.settle(); // draw afresh where the gesture left it
-      }
+    const when = (e: Event) => e.timeStamp || performance.now();
+    const run = (acts: Act[]) => { for (const a of acts) this.act(a); };
+    // Once a gesture moves the map, the viewport takes its pointer over (a finger starts captured by what it touched).
+    const take = (e: PointerEvent) => {
+      if (!this.g.moved || vpEl.classList.contains('dragging')) return;
+      try { vpEl.setPointerCapture(e.pointerId); } catch { /* already gone */ }
+      vpEl.classList.add('dragging');
+    };
+    const lose = (e: PointerEvent) => {
+      this.touched.delete(e.pointerId);
+      run(this.g.cancel(e.pointerId, when(e)));
     };
     vpEl.addEventListener('pointerdown', (e) => {
       // Only the main button pans (a right-click is for menus).
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       this.lastPointer = e.pointerType;
-      this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      this.moved = 0;
       this.interrupt();
-      if (this.pointers.size === 2) {
-        const [a, b] = [...this.pointers.values()];
-        this.pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-      }
+      const touch = e.pointerType !== 'mouse';
+      // A finger on the map puts a phone's keyboard away, as in a maps app (the map keeps the touch to itself, below).
+      const f = document.activeElement;
+      if (touch && f instanceof HTMLElement && f.matches(FIELD)) f.blur();
+      this.touched.set(e.pointerId, e.target as Element);
+      const q = at(e);
+      run(this.g.downAt(e.pointerId, touch ? 'touch' : 'mouse', q.x, q.y, when(e)));
     }, { signal });
     vpEl.addEventListener('pointermove', (e) => {
-      const p = this.pointers.get(e.pointerId);
-      if (!p) return;
-      if (e.pointerType === 'mouse' && !(e.buttons & 1)) return forget(e.pointerId);
-      const dx = e.clientX - p.x, dy = e.clientY - p.y;
-      this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      if (this.pointers.size === 1) {
-        this.moved += Math.abs(dx) + Math.abs(dy);
-        if (this.moved > 4 && !vpEl.classList.contains('dragging')) {
-          try { vpEl.setPointerCapture(e.pointerId); } catch { /* already gone */ }
-          vpEl.classList.add('dragging');
-        }
-        this.c = this.clamp({ ...this.c, cx: this.c.cx - dx / this.c.s, cy: this.c.cy - dy / this.c.s });
-        this.render();
-      } else if (this.pointers.size === 2) {
-        // Pinch: zoom about the midpoint, and follow the midpoint as it moves.
-        const [a, b] = [...this.pointers.values()];
-        const d = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
-        if (this.pinch.d) {
-          const r = vpEl.getBoundingClientRect();
-          this.zoomTo(this.zoomStep(d / this.pinch.d, mx - r.left, my - r.top));
-          const c = this.c;
-          this.c = this.clamp({ ...c, cx: c.cx - (mx - this.pinch.x) / c.s, cy: c.cy - (my - this.pinch.y) / c.s });
-          this.render();
-        }
-        this.pinch = { d, x: mx, y: my };
-        this.moved = 99;
-      }
+      if (e.pointerType === 'mouse' && this.g.down && !(e.buttons & 1)) return lose(e);
+      const q = at(e);
+      const acts = this.g.moveTo(e.pointerId, q.x, q.y, when(e));
+      if (!acts.length) return;
+      take(e);
+      run(acts);
     }, { signal });
-    const end = (e: PointerEvent) => forget(e.pointerId);
     vpEl.addEventListener('pointerup', (e) => {
-      // Double-tap zooms in (a mouse uses dblclick).
-      if (e.pointerType !== 'mouse' && this.moved <= 4 && this.pointers.size === 1) {
-        const t = performance.now(), q = at(e);
-        if (t - this.lastTap.t < 300 && Math.hypot(q.x - this.lastTap.x, q.y - this.lastTap.y) < 20) {
-          this.lastTap.t = 0;
-          this.interrupt();
-          this.zoomTo(this.zoomStep(2, q.x, q.y), 250);
-        } else this.lastTap = { t, x: q.x, y: q.y };
-      }
-      end(e);
+      const q = at(e);
+      run(this.g.upAt(e.pointerId, q.x, q.y, when(e)));
+      this.touched.delete(e.pointerId);
     }, { signal });
-    vpEl.addEventListener('pointercancel', end, { signal });
-    // A finger starts captured by what it touched; only the viewport's own loss ends the drag.
-    vpEl.addEventListener('lostpointercapture', (e) => { if (e.target === vpEl) end(e); }, { signal });
-    vpEl.addEventListener('pointerleave', (e) => { if (!e.buttons) forget(e.pointerId); }, { signal });
-    // A drag is not a click.
+    vpEl.addEventListener('pointercancel', lose, { signal });
+    // Only the viewport's own loss of a pointer ends a gesture (a finger's first capture is what it touched).
+    vpEl.addEventListener('lostpointercapture', (e) => { if (e.target === vpEl) lose(e); }, { signal });
+    vpEl.addEventListener('pointerleave', (e) => { if (!e.buttons) lose(e); }, { signal });
+    // Fingers on the map are the map's alone (gestures.ts): a phone starts nothing of its own here. Otherwise an
+    // iPhone reads a double-tap as a double-click (the desktop listens for those), and a double-tap and hold as
+    // selecting text, which then catches the nearest words beside the map. No click comes of a touch either:
+    // its tap is act()'s.
+    vpEl.addEventListener('touchstart', (e) => { if (e.cancelable) e.preventDefault(); }, { passive: false, signal });
+    this.root.addEventListener('selectstart', (e) => e.preventDefault(), { signal });
+    // A drag is not a click, and a tap already taken is not taken twice. Keys still click.
     vpEl.addEventListener('click', (e) => {
-      if (this.moved > 4) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.moved = 0;
-      }
+      if (e.detail === 0 || performance.now() > this.quietUntil) return;
+      e.preventDefault();
+      e.stopPropagation();
     }, { capture: true, signal });
     vpEl.addEventListener('dblclick', (e) => {
       if (this.lastPointer !== 'mouse' || (e.target as Element).closest('.gd-pin, .gd-cluster')) return;
       e.preventDefault();
       const q = at(e);
       this.interrupt();
-      this.zoomTo(this.zoomStep(2, q.x, q.y), 250);
+      // Shift+double-click zooms out, as on other web maps.
+      this.zoomTo(this.zoomStep(e.shiftKey ? 0.5 : 2, q.x, q.y), 250);
     }, { signal });
+    // Safari pinches on a trackpad (a Mac's, an iPad's) with gesture events of its own, which would zoom the whole
+    // page; on the map they zoom the map. Fingers on a screen send them too: the pointer gestures have those.
+    let pinched = 1;
+    const trackpad = (e: Event) => {
+      e.preventDefault();
+      const g = e as Event & { scale?: number; clientX?: number; clientY?: number };
+      if (e.type === 'gesturestart') {
+        if (this.g.down) return;
+        pinched = 1;
+        this.interrupt();
+        this.trackpad = true;
+        return;
+      }
+      if (!this.trackpad) return;
+      if (e.type === 'gestureend') {
+        this.trackpad = false;
+        this.settle();
+        return;
+      }
+      const s = g.scale ?? 1;
+      if (!(s > 0)) return;
+      const vp = this.vp();
+      const q = g.clientX != null && g.clientY != null ? at({ clientX: g.clientX, clientY: g.clientY }) : { x: vp.w / 2, y: vp.h / 2 };
+      this.zoomTo(this.zoomStep(s / pinched, q.x, q.y));
+      pinched = s;
+      this.render();
+    };
+    for (const t of ['gesturestart', 'gesturechange', 'gestureend']) vpEl.addEventListener(t, trackpad, { passive: false, signal });
 
     vpEl.addEventListener('wheel', (e) => {
       e.preventDefault();
+      // Mid-pinch, Safari's gesture events above are zooming already.
+      if (this.trackpad) return;
       this.wheeling = true;
       clearTimeout(this.wheelTimer);
       this.wheelTimer = window.setTimeout(() => { this.wheeling = false; this.settle(); }, 150);
@@ -1123,19 +1178,9 @@ export class GuideMap {
       this.flyTo(t, 150);
     }, { signal });
 
-    // Pins: select on click or Enter, Space too; arrows move between pins.
+    // Pins: select on click or Enter, Space too; arrows move between pins. (A finger's tap: act().)
     this.pinsEl.addEventListener('click', (e) => {
-      const t = e.target as Element;
-      const cl = t.closest<HTMLButtonElement>('.gd-cluster');
-      if (cl) {
-        e.preventDefault();
-        this.fitCluster((cl.dataset.ids ?? '').split(' ').filter(Boolean));
-        return;
-      }
-      const a = t.closest<HTMLAnchorElement>('a.gd-pin[data-id]');
-      if (!a) return;
-      e.preventDefault();
-      this.hooks.onSelect(a.dataset.id!, e.detail === 0 ? 'keyboard' : 'pointer');
+      if (this.press(e.target as Element, e.detail === 0 ? 'keyboard' : 'pointer')) e.preventDefault();
     }, { signal });
     this.pinsEl.addEventListener('keydown', (e) => {
       const a = (e.target as Element).closest<HTMLAnchorElement>('a.gd-pin[data-id]');
@@ -1169,6 +1214,10 @@ export class GuideMap {
     this.stage.addEventListener('contextmenu', (e) => e.preventDefault(), { signal });
     this.stage.addEventListener('dragstart', (e) => e.preventDefault(), { signal });
 
+    // The credits keep to one line where room is short (guide.css, Full Screen): a tap shows them in full, another folds them.
+    const credits = this.root.querySelector<HTMLElement>('.gd-attrib');
+    credits?.addEventListener('click', () => credits.classList.toggle('is-open'), { signal });
+
     // Map buttons (heat and area are the program's: data-cmd="gd-heat" / "gd-area").
     this.root.querySelectorAll<HTMLButtonElement>('[data-gd-zoom]').forEach((b) => b.addEventListener('click', () => {
       const z = b.dataset.gdZoom;
@@ -1176,5 +1225,51 @@ export class GuideMap {
       else if (z === 'out') this.zoomBy(1 / 1.6);
       else this.home();
     }, { signal }));
+  }
+
+  /** A pin or a cluster pressed (a click, or a finger's tap): the pin is selected, the cluster zoomed into. */
+  private press(t: Element, how: 'pointer' | 'keyboard') {
+    const cl = t.closest<HTMLButtonElement>('.gd-cluster');
+    if (cl && this.pinsEl.contains(cl)) {
+      this.fitCluster((cl.dataset.ids ?? '').split(' ').filter(Boolean));
+      return true;
+    }
+    const a = t.closest<HTMLAnchorElement>('a.gd-pin[data-id]');
+    if (!a || !this.pinsEl.contains(a)) return false;
+    this.hooks.onSelect(a.dataset.id!, how);
+    return true;
+  }
+
+  /** What a gesture asks for (gestures.ts). */
+  private act(a: Act) {
+    switch (a.type) {
+      case 'pan':
+        this.c = this.clamp({ ...this.c, cx: this.c.cx - a.dx / this.c.s, cy: this.c.cy - a.dy / this.c.s });
+        return this.render();
+      case 'zoom':
+        this.zoomTo(this.zoomStep(a.f, a.x, a.y));
+        return this.render();
+      case 'zoomIn':
+      case 'zoomOut':
+        // A double-tap zooms in a step, a two-finger tap out, as the + and - buttons but round the fingers.
+        this.interrupt();
+        return this.zoomTo(this.zoomStep(a.type === 'zoomIn' ? 2 : 0.5, a.x, a.y), 250);
+      case 'tap': {
+        // A mouse's click does its own pressing; a finger's tap is pressed here (the map keeps its touches).
+        if (this.lastPointer === 'mouse') return;
+        this.quietUntil = performance.now() + 600;
+        const el = this.touched.get(a.id);
+        if (el && this.press(el, 'pointer')) this.g.forgetTap();
+        return;
+      }
+      case 'glide':
+      case 'end':
+        this.viewport.classList.remove('dragging');
+        if (this.g.moved || this.lastPointer !== 'mouse') this.quietUntil = performance.now() + (this.lastPointer === 'mouse' ? 300 : 600);
+        if (a.type === 'glide') return this.glide(a.vx, a.vy);
+        // Drawn afresh where the gesture left it (a step it started settles when it lands).
+        if (!this.flying) this.settle();
+        return;
+    }
   }
 }

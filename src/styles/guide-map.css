@@ -37,6 +37,9 @@
 .gd-map-note { margin: 4px 0; font: 13px/1.3 "Times New Roman", Times, serif; }
 
 html.js .gd-map { width: 100%; height: 100%; min-height: 0; overflow: hidden; background: var(--gd-desk); }
+/* The map, its buttons, legend and credits are a picture to handle, not text: nothing on it selects, a press
+   and hold opens no menu, a tap doesn't flash. Fingers on the map are map.ts's own (gestures.ts). */
+html.js .gd-map { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
 html.js .gd-viewport {
   position: absolute; inset: 0; outline: none;
   touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
@@ -228,9 +231,11 @@ html.js .gd-base[data-tiled]::after { display: none; }
 :where(html[data-scheme="contrast"]) .gd-tiles img { filter: grayscale(1) contrast(1.1); }
 @media (forced-colors: active) { .gd-tiles img { forced-color-adjust: none; } }
 
-/* ---- Map buttons: 34×34 with the raised bevel ---- */
-html.js .gd-mapui-zoom { position: absolute; z-index: 5; right: calc(var(--gd-free-right, 0px) + 12px); bottom: calc(var(--gd-free-bottom, 0px) + 30px); display: flex; flex-direction: column; }
-html.js .gd-mapui-layers { position: absolute; z-index: 5; left: 12px; bottom: calc(var(--gd-free-bottom, 0px) + 30px); display: flex; }
+/* ---- Map buttons: 34×34 with the raised bevel ----
+   --gd-safe-bottom: what the phone's own bars cover at the bottom (a landscape iPhone's home
+   indicator: guide.css, Full Screen). The map goes under it; its buttons and credits stop above. */
+html.js .gd-mapui-zoom { position: absolute; z-index: 5; right: calc(var(--gd-free-right, 0px) + 12px); bottom: calc(var(--gd-free-bottom, 0px) + var(--gd-safe-bottom, 0px) + 30px); display: flex; flex-direction: column; }
+html.js .gd-mapui-layers { position: absolute; z-index: 5; left: 12px; bottom: calc(var(--gd-free-bottom, 0px) + var(--gd-safe-bottom, 0px) + 30px); display: flex; }
 .gd-mapui button {
   box-sizing: border-box; width: 34px; height: 34px; min-width: 0; min-height: 0; padding: 0;
   display: grid; place-items: center; border: 0;
@@ -248,7 +253,7 @@ html.js .gd-mapui-layers { position: absolute; z-index: 5; left: 12px; bottom: c
 @media (max-height: 320px) { html.js .gd-mapui-zoom { flex-direction: row; } html.js .gd-mapui-zoom [data-cmd="gd-locate"] { margin: 0 6px 0 0; } }
 /* A short strip above a phone's half sheet (app.ts shortMap): the column becomes a row, a little lower. */
 html.js .gd-map[data-short] .gd-mapui-zoom { flex-direction: row; }
-html.js .gd-map[data-short] :is(.gd-mapui-zoom, .gd-mapui-layers) { bottom: calc(var(--gd-free-bottom, 0px) + 22px); }
+html.js .gd-map[data-short] :is(.gd-mapui-zoom, .gd-mapui-layers) { bottom: calc(var(--gd-free-bottom, 0px) + var(--gd-safe-bottom, 0px) + 22px); }
 html.js .gd-map[data-short] .gd-mapui-zoom [data-cmd="gd-locate"] { margin: 0 6px 0 0; }
 
 /* ---- Legend plate ---- */
@@ -260,13 +265,13 @@ html.js .gd-map[data-short] .gd-mapui-zoom [data-cmd="gd-locate"] { margin: 0 6p
 .gd-key-route { display: inline-block; width: 24px; height: 5px; background: #fff; position: relative; }
 .gd-key-route::after { content: ""; position: absolute; left: 0; right: 0; top: 1px; border-top: 3px dashed var(--gd-route); }
 .gd-key-route[data-mode="transit"]::after { border-top-style: dotted; }
-html.js .gd-legend { position: absolute; z-index: 5; left: 12px; top: 12px; margin: 0; max-width: min(260px, calc(100% - 80px)); max-height: calc(100% - 24px - var(--gd-free-bottom, 0px)); overflow: auto; }
+html.js .gd-legend { position: absolute; z-index: 5; left: 12px; top: 12px; margin: 0; max-width: min(260px, calc(100% - 80px)); max-height: calc(100% - 24px - var(--gd-free-bottom, 0px) - var(--gd-safe-bottom, 0px)); overflow: auto; }
 .gd-legend:not([open]) { padding-bottom: 2px; }
 .gd-map:not([data-heat]) .gd-key-heat { display: none; }
 
 /* ---- Attribution ---- */
 .gd-attrib { margin: 2px 0; padding: 1px 4px; font: 10px/1.25 var(--gd-sans); color: #000; background: rgba(255, 255, 255, 0.85); }
-html.js .gd-attrib { position: absolute; z-index: 5; right: var(--gd-free-right, 0px); bottom: var(--gd-free-bottom, 0px); margin: 0; max-width: calc(100% - var(--gd-free-right, 0px) - 24px); box-sizing: border-box; text-align: right; }
+html.js .gd-attrib { position: absolute; z-index: 5; right: var(--gd-free-right, 0px); bottom: calc(var(--gd-free-bottom, 0px) + var(--gd-safe-bottom, 0px)); margin: 0; max-width: calc(100% - var(--gd-free-right, 0px) - 24px); box-sizing: border-box; text-align: right; }
 
 /* ---- High Contrast and forced colours ---- */
 :where(html[data-scheme="contrast"]) .gd-label { background: #fff; color: #000; }
