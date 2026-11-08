@@ -106,6 +106,15 @@ from `src/scripts/guide/`.
   minimising the guide, or another window in front, brings it back. The CSS is
   at the end of `guide.css`; `app.ts` adds a 中/EN switch and the Today note to
   the window's frame for it.
+- **A status bar too narrow for its words** (a phone, a small window) scrolls
+  them, as the scrolling status-bar messages of the late 1990s did: the words
+  rest at their start, slide left until they have gone, come back in from the
+  right and rest again, so the whole sentence can be read. Every program's
+  status bar does it, whatever writes to it (`src/scripts/desktop/marquee.ts`,
+  started by the shell). Only the field's `text-indent` moves, never the words,
+  so screen readers hear them once, as before. A mouse resting on the field
+  holds them still; with reduced motion they wrap onto a second line instead.
+  Words that fit stay still; without JavaScript, long ones still end in "…".
 
 Without JavaScript, the window is an ordinary page: the close button links to
 `/`, and minimise and maximise are hidden.
