@@ -1888,8 +1888,8 @@
       "why": "Slow looking, analogue photographs and ordinary moments; the project also links images, a book and fragrance.",
       "whyZh": "慢慢看：胶片照片与日常瞬间；这个项目还把影像、一本书和一款香氛联系在一起。",
       "address": "29 Rue des Gravilliers, 75003 Paris",
-      "hours": "Mon–Fri 11:00–14:00 / 15:00–19:00; Sat 11:00–19:00; Sun 11:00–18:00",
-      "hoursZh": "周一至周五 11:00–14:00 / 15:00–19:00；周六 11:00–19:00；周日 11:00–18:00",
+      "hours": "Mon–Fri 11:00–14:00 / 15:00–19:00; Sat 11:00–19:00; closed Sunday",
+      "hoursZh": "周一至周五 11:00–14:00 / 15:00–19:00；周六 11:00–19:00；周日闭馆",
       "start": "2026-11-05",
       "end": "2026-11-29",
       "open": [
@@ -1898,8 +1898,7 @@
         "wed",
         "thu",
         "fri",
-        "sat",
-        "sun"
+        "sat"
       ],
       "minutes": 25,
       "sourceUrl": "https://photodays.paris/MUSKHANE",
