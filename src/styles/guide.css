@@ -12,6 +12,8 @@
 
 /* Toolbar: the view buttons latch, as in the Explorer bar. */
 .app-window[data-app="guide"] .toolbar .tool[aria-pressed="true"] { box-shadow: var(--thin-down); background: var(--dither); }
+/* The program's bars and the Today note are not text to select (a double-tap on a phone would pick a word out). */
+.app-window[data-app="guide"] :is(.menubar, .toolbar, .status-bar), .gd-note { -webkit-user-select: none; user-select: none; }
 :where(html[data-scheme="contrast"]) .app-window[data-app="guide"] .toolbar .tool[aria-pressed="true"] { box-shadow: inset 0 0 0 2px #000; background: #fff; }
 
 /* The body doesn't scroll with JS (the panes do); without JS it is a page. */
@@ -44,6 +46,26 @@ html.js .gd { height: 100%; container-type: size; }
 .gd-f select, .gd-f input { height: var(--gd-ctl); box-sizing: border-box; font: 11px var(--ui-font); min-width: 0; }
 .gd-f-find { flex: 1 1 180px; }
 .gd-f-find input { flex: 1; width: 100%; font-family: var(--gd-sans); }
+/* Touch: the boxes are taller than 98.css's 21px, so its drop-down button (a fixed 16×17 picture) sat in the
+   top corner. Here it fills the box's height, the arrow in its middle, as Windows draws a taller combo box:
+   the same bevel (it stretches: drawn in percentages), pressed in while the list opens. Both heights here are
+   even, so the 4px arrow sits on whole pixels. */
+@media (pointer: coarse) {
+  :is(.gd-f, .gd-sort-field) select {
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4'%3E%3Cpath d='M0 0h7v1H6v1H5v1H4v1H3V3H2V2H1V1H0z'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' fill='%23dfdfdf'/%3E%3Crect x='1' y='1' width='100%25' height='100%25' fill='%23fff'/%3E%3Crect x='2' y='2' width='100%25' height='100%25' fill='silver'/%3E%3Crect x='100%25' y='1' width='1' height='100%25' transform='translate(-2 0)' fill='gray'/%3E%3Crect x='1' y='100%25' width='100%25' height='1' transform='translate(0 -2)' fill='gray'/%3E%3Crect x='100%25' width='1' height='100%25' transform='translate(-1 0)' fill='%23000'/%3E%3Crect y='100%25' width='100%25' height='1' transform='translate(0 -1)' fill='%23000'/%3E%3C/svg%3E");
+    background-position: right 9px center, right 2px top 2px;
+    background-size: 7px 4px, 20px calc(100% - 4px);
+    background-repeat: no-repeat;
+  }
+  :is(.gd-f, .gd-sort-field) select:active {
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4'%3E%3Cpath d='M0 0h7v1H6v1H5v1H4v1H3V3H2V2H1V1H0z'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' fill='gray'/%3E%3Crect x='1' y='1' width='100%25' height='100%25' fill='silver'/%3E%3Crect x='100%25' width='1' height='100%25' transform='translate(-1 0)' fill='gray'/%3E%3Crect y='100%25' width='100%25' height='1' transform='translate(0 -1)' fill='gray'/%3E%3C/svg%3E");
+    background-position: right 8px top calc(50% + 1px), right 2px top 2px;
+  }
+}
 
 /* ---- The work area ---- */
 .gd-main { position: relative; flex: 1; min-height: 0; }

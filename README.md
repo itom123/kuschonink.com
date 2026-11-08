@@ -321,7 +321,10 @@ is `paris-2026-11`. `/guides/<city>` opens that city's newest listed guide, past
 guides stay at their addresses (unlisted), and old addresses named under `moved`
 in `access.json` redirect for good (docs/GUIDES.md, section 12). On a computer the window
 shows a list, the map and the details side by side; on a phone it shows one at a
-time, and tapping a pin raises a details sheet. It works without JavaScript as
+time, and tapping a pin raises a details sheet. On a touch screen the map takes the
+gestures of a maps app (`src/scripts/guide/gestures.ts`): drag and flick, pinch,
+double-tap to zoom in, double-tap and slide to zoom, two-finger tap to zoom out;
+nothing on it selects text. It works without JavaScript as
 one readable page. Wherever a base picture is magnified past 1:1 (the region
 round the city plan long before the plan itself), the map shows street-level
 tiles from IGN's Plan IGN. The Worker fetches them at
@@ -386,11 +389,12 @@ and English: [`docs/GUIDES.md`](docs/GUIDES.md).
   loading in `src/lib/guides/`; the program and its map in `src/scripts/guide/`
   and `src/components/guide/`; styles in `src/styles/guide*.css`; the gate in
   `worker/guides.ts`.
-- **Tests:** `npm test` runs all eleven `*.test.mts` suites, in the order
+- **Tests:** `npm test` runs all 25 `*.test.mts` suites, in the order
   `package.json` lists them. The Field Guide's are `src/lib/guides/guides.test.mts`
   (day rules, time zones, audience filtering, the real data, broken copies),
   `worker/guides.test.mts` (the gate: views, cookies, log-on, log-off, tiles) and,
   in `src/scripts/guide/`, `camera.test.mts` (the map's pan and zoom),
+  `gestures.test.mts` (the map's finger gestures),
   `find.test.mts` (Find, and the distances of Where am I?), `heat.test.mts`,
   `order.test.mts` (Sort by), `pins.test.mts` (how many pins show at each zoom)
   and `tiles.test.mts` (the street-level tiles). The build runs the guard and

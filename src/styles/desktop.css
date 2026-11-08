@@ -318,8 +318,8 @@ html[data-dragging] { -webkit-user-select: none; user-select: none; }
 
 .tray { flex: none; display: flex; align-items: center; gap: 3px; height: 22px; padding: 0 6px 0 4px; box-sizing: border-box; box-shadow: var(--thin-down); }
 .tray-btn { display: grid; place-items: center; width: 18px; height: 18px; min-width: 0; min-height: 0; padding: 0; background: none; border: 0; box-shadow: none; }
-/* The 中/EN switch in the tray: two small buttons, the language showing pressed in (src/scripts/lang.ts). */
-.tray .tray-lang { display: inline-flex; gap: 0; margin-right: 2px; }
+/* The 中/EN switch in the tray: two small buttons of one width, the language showing pressed in (src/scripts/lang.ts). */
+.tray .tray-lang { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0; margin-right: 2px; }
 .tray .tray-lang button {
   min-width: 0; min-height: 0; height: 18px; padding: 0 5px; font: inherit; font-size: 11px; line-height: 16px;
   color: #000; text-shadow: none; text-decoration: none; cursor: inherit; background: var(--face); box-shadow: var(--raised);
@@ -414,6 +414,10 @@ html[data-nowelcome] #k98-windows > [data-app="welcome"] { display: none; }
   .tb-btn { width: 26px; height: 22px; background-position: center !important; }
   .app-window .title-bar { padding-top: 3px; padding-bottom: 3px; }
   .start-button, .task, .tb-group, .tasks, .start { height: 32px; }
+  /* The tray as tall as Start and the task buttons, and the 中/EN switch and the speaker filling it. */
+  .tray { height: 32px; padding-right: 4px; }
+  .tray .tray-lang button { height: 28px; padding: 0 10px; }
+  .tray .tray-btn { width: 28px; height: 28px; }
   .menu-item { height: 32px; }
   .menu-item.big { height: 40px; }
   .ql-btn { width: 32px; height: 32px; }
