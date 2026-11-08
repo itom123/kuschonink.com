@@ -5,6 +5,11 @@
 import type { Bi } from './types';
 
 const b = (en: string, zh: string): Bi => ({ en, zh });
+/** Language names for W.original(), by ISO 639-1 code. */
+const LANGS: Record<string, [string, string]> = {
+  fr: ['French', '法语'], de: ['German', '德语'], it: ['Italian', '意大利语'], es: ['Spanish', '西班牙语'], pt: ['Portuguese', '葡萄牙语'],
+  nl: ['Dutch', '荷兰语'], ja: ['Japanese', '日语'], ko: ['Korean', '韩语'], zh: ['Chinese', '中文'], en: ['English', '英语'],
+};
 /** A guide's noun inside a sentence: "Other listings" → "other listings". With another capital in it ("MEP", "Photo Days map") it stays as written. */
 export const lowerFirst = (s: string) => (/^\p{Lu}[^\p{Lu}]*$/u.test(s) ? s[0].toLowerCase() + s.slice(1) : s);
 
@@ -79,6 +84,11 @@ export const W = {
   sourcePage: b('Where this comes from', '信息来源'),
   website: b('Website', '网站'),
   notChecked: b('Not checked by this guide.', '本导览未核实。'),
+  /** The fold that keeps an official entry's own text: "Original text (French)". */
+  original: (lang: string) => {
+    const n = LANGS[lang.toLowerCase().slice(0, 2)];
+    return n ? b(`Original text (${n[0]})`, `原文（${n[1]}）`) : b('Original text', '原文');
+  },
   photoFailed: b('The picture could not be loaded.', '图片无法加载。'),
   publishedHours: b('Published hours, not live', '公布的开放时间，非实时'),
   chooseDay: b('Choose a day to check opening.', '选择日期以查看是否开放。'),
@@ -107,7 +117,6 @@ export const W = {
     b(`${open} of ${total} ${items.en.toLowerCase()} open - ${day.en}`, `${day.zh || day.en}：${total} 个${items.zh || items.en}中 ${open} 个开放`),
   countAll: (total: number, items: Bi) => b(`${total} ${items.en.toLowerCase()}`, `${total} 个${items.zh || items.en}`),
   matches: (n: number, q: string) => b(`${n} match "${q}"`, `${n} 个匹配“${q}”`),
-  plusListings: (n: number, listings: Bi) => b(` + ${n} ${lowerFirst(listings.en)}`, ` + ${n} 个${listings.zh || listings.en}`),
   noMatch: b('Nothing matches. Try another day, or clear Find.', '没有匹配的地点。换一天试试，或清除查找。'),
   // Today note.
   before: (start: Bi, end: Bi, tz: Bi) => b(`This guide covers ${start.en} to ${end.en}. Days and opening times use ${tz.en || 'local time'}.`, `本导览涵盖 ${start.zh} 至 ${end.zh}。日期和开放时间均按${tz.zh || tz.en || '当地时间'}计算。`),
@@ -195,6 +204,7 @@ export function fullDate(d: string): Bi {
 export function dateRange(a?: string, z?: string): Bi | null {
   if (!a && !z) return null;
   const A = a ? fullDate(a) : null, Z = z ? fullDate(z) : null;
+  if (A && Z && a === z) return A;
   if (A && Z) return b(`${A.en} - ${Z.en}`, `${A.zh} - ${Z.zh}`);
   if (A) return b(`From ${A.en}`, `${A.zh}起`);
   return b(`Until ${Z!.en}`, `至${Z!.zh}`);

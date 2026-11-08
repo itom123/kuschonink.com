@@ -89,21 +89,39 @@ const loose = view.listings.records.filter((r) => !r.item);
       </article>
     );
   })}
-  {loose.map((r) => (
-    <article class="gd-article gd-listing" id={`gd-item-${r.id}`} data-gd-article={r.id} data-kind="listing">
-      <p class="gd-kicker"><span class="ico ico16 ico-pin-d" aria-hidden="true"></span> {r.id} - <Bi t={view.labels.listing} /> - <Bi t={category(r.category)} /></p>
-      <h2 class="gd-name" tabindex="-1">{r.name}</h2>
-      <p class="gd-actions">
-        <a class="button-link" href={`https://www.google.com/maps/search/?api=1&query=${r.coordinates[1]},${r.coordinates[0]}`} target="_blank" rel="noopener"><Bi t={W.openMaps} /></a>
-      </p>
-      {r.image && <Photo p={r.image} fallback={view.credits.image} />}
-      <p class="gd-listing-text" lang={lang}>{r.details}</p>
-      <p class="gd-caution"><Bi t={listingNote} /></p>
-      <p class="gd-links">
-        {r.url && <a href={r.url} target="_blank" rel="noopener">{host(r.url)}</a>}
-        {view.listings.source.url ? <a href={view.listings.source.url} target="_blank" rel="noopener">{view.listings.source.name}</a> : <span>{view.listings.source.name}</span>}
-      </p>
-    </article>
-  ))}
+  {loose.map((r) => {
+    const dates = dateRange(r.start, r.end);
+    // In the guide's words (about), the source's own text folds away under them; without, it is the text.
+    const words = has(r.about);
+    const point = `${r.coordinates[1]},${r.coordinates[0]}`;
+    return (
+      <article class="gd-article gd-listing" id={`gd-item-${r.id}`} data-gd-article={r.id} data-kind="listing" data-gd-address={r.address ? `${r.name}, ${r.address}` : undefined}>
+        <p class="gd-kicker"><span class="ico ico16 ico-pin-d" aria-hidden="true"></span> {r.id} - <Bi t={view.labels.listing} /> - <Bi t={category(r.category)} /></p>
+        <h2 class="gd-name" tabindex="-1">{r.name}</h2>
+        {(r.subtitle || r.by) && <p class="gd-sub">{r.subtitle && <b>{r.subtitle}</b>}{r.subtitle && r.by && <br />}{r.by && <span class="gd-by">{r.by}</span>}</p>}
+        <div class="gd-status" data-gd-status><span class="gd-sq" data-code="choose-day" aria-hidden="true"></span><b data-gd-status-text><Bi t={W.chooseDay} /></b> <span class="gd-status-note" data-gd-status-note></span></div>
+        <p class="gd-actions">
+          <a class="button-link" href={r.address ? mapsSearchUrl(r.name, r.address) : `https://www.google.com/maps/search/?api=1&query=${point}`} target="_blank" rel="noopener"><Bi t={W.openMaps} /></a>
+          <a class="button-link" href={r.address ? dir(r.name, r.address) : `https://www.google.com/maps/dir/?api=1&destination=${point}&travelmode=walking`} target="_blank" rel="noopener"><Bi t={W.directions} /></a>
+          {r.address && <button type="button" class="gd-copy" data-gd-copy data-js-only><Bi t={W.copyAddress} /></button>}
+        </p>
+        {r.image && <Photo p={r.image} fallback={view.credits.image} />}
+        {words ? <p class="gd-why"><Bi t={r.about} /></p> : <p class="gd-listing-text" lang={lang}>{r.details}</p>}
+        <dl class="gd-facts">
+          {r.address && <><dt><Bi t={W.address} /></dt><dd>{r.address}</dd></>}
+          {has(r.hours) && <><dt><Bi t={W.hours} /></dt><dd><Bi t={r.hours} /> <small>(<Bi t={W.publishedHours} />)</small></dd></>}
+          {dates && <><dt><Bi t={W.dates} /></dt><dd><Bi t={dates} /></dd></>}
+          {words && (has(r.price) || has(view.defaults.price)) && <><dt><Bi t={W.price} /></dt><dd><Bi t={has(r.price) ? r.price : view.defaults.price} /></dd></>}
+          {words && <><dt><Bi t={view.labels.listing} /></dt><dd><details><summary><Bi t={W.original(lang ?? '')} /></summary><p class="gd-listing-text" lang={lang}>{r.details}</p></details></dd></>}
+        </dl>
+        {has(r.note) && <p class="gd-caution"><Bi t={r.note} /></p>}
+        <p class="gd-caution"><Bi t={listingNote} /></p>
+        <p class="gd-links">
+          {r.url && <a href={r.url} target="_blank" rel="noopener">{host(r.url)}</a>}
+          {view.listings.source.url ? <a href={view.listings.source.url} target="_blank" rel="noopener">{view.listings.source.name}</a> : <span>{view.listings.source.name}</span>}
+        </p>
+      </article>
+    );
+  })}
   <div class="gd-article gd-group-list" data-gd-cluster hidden></div>
 </div>

@@ -281,11 +281,35 @@ export interface ListingRecord {
   /** The source's own text, lines separated by \n. */
   details: string;
   url?: string;
-  /** Only where the source gives one clear date range. */
+  /**
+   * The dates of what happens at this point: one show's, or from the first
+   * show to the last at a venue with several (a gap goes in `exceptions`).
+   */
   start?: ISODate;
   end?: ISODate;
   /** The picture the source publishes with this record. */
   image?: ImageRecord;
+  // The record in the guide's words (all optional; without them the page shows
+  // the source's text alone). Names, titles and addresses stay in the original.
+  /** The show's title as published (several: "A / B"). */
+  subtitle?: string;
+  /** The artist(s), in normal case (several shows: "A / B"). */
+  by?: string;
+  address?: string;
+  /** Everything in `details` but the address and hours, in English (and Chinese). */
+  about?: string;
+  aboutZh?: string;
+  hours?: string;
+  hoursZh?: string;
+  /** Weekdays it opens. Omit when it isn't known. */
+  open?: Weekday[];
+  holiday?: HolidayPolicy;
+  access?: Access;
+  exceptions?: { date: ISODate; status: Override; note?: string; noteZh?: string }[];
+  price?: string;
+  priceZh?: string;
+  note?: string;
+  noteZh?: string;
 }
 
 /** map.json: base maps (Web-Mercator image crops). */
@@ -386,10 +410,24 @@ export interface Route {
 /** A picture as the page shows it: its address behind the password, and "Published by …" when it isn't credits.image. */
 export interface Picture { src: string; credit: string; caption: string; alt: Bi; source?: Bi }
 
-export interface Listing extends Omit<ListingRecord, 'image'> {
+/** A listings.json record as the page shows it: its day rule works like an item's. */
+export interface Listing extends DayRule {
+  id: string;
+  name: string;
+  category: string;
+  coordinates: LonLat;
+  details: string;
+  url?: string;
   /** The item that stands for this record, if any. */
   item?: string;
   image?: Picture;
+  subtitle: string;
+  by: string;
+  address: string;
+  about: Bi;
+  hours: Bi;
+  price: Bi;
+  note: Bi;
 }
 
 export interface MapView {
@@ -476,7 +514,8 @@ export interface Payload {
   tiles?: TileSource;
   items: (DayRule & { id: string; tier: TierId; name: string; short: string; address: string; zone: string; themes: string[]; coordinates: LonLat; label: boolean; listing?: string })[];
   places: { id: string; label: Bi; name: string; short: string; address: string; coordinates: LonLat }[];
-  listings: { id: string; name: string; category: string; coordinates: LonLat; start?: ISODate; end?: ISODate; item?: string }[];
+  /** Official entries; one an item stands for has `item`, and shows as that item. */
+  listings: (DayRule & { id: string; name: string; category: string; coordinates: LonLat; item?: string })[];
   routes: { id: string; name: Bi; stops: string[]; mode: RouteMode }[];
   events: { id: string; date: ISODate; until?: ISODate; start?: HHMM; end?: HHMM; place?: string; title: Bi }[];
 }

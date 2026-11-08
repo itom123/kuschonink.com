@@ -91,9 +91,14 @@ const sorts: { v: string; t: BiT; off?: boolean }[] = [
         <tbody data-gd-group="listings">
           <tr class="gd-group"><th colspan="2" scope="rowgroup"><Bi t={view.labels.listings} /></th></tr>
           {loose.map((r) => (
-            <tr data-gd-row={r.id} data-kind="listing" data-start={r.start} data-end={r.end} data-q={q(r.id, r.name, both(category(r.category)), r.details)}>
+            <tr data-gd-row={r.id} data-kind="listing" data-q={q(r.id, r.name, r.subtitle, r.by, r.address, both(category(r.category)), both(r.about), r.details)}>
               <td class="gd-col-ref"><span class="ico ico16 ico-pin-d" aria-hidden="true"></span> {r.id}</td>
-              <td class="gd-col-main"><a href={`#gd-item-${r.id}`} data-gd-sel={r.id} class="gd-row-name">{r.name}</a><span class="gd-row-sub"><Bi t={category(r.category)} /></span></td>
+              <td class="gd-col-main">
+                <a href={`#gd-item-${r.id}`} data-gd-sel={r.id} class="gd-row-name">{r.name}</a>
+                {(r.by || r.subtitle) && <span class="gd-row-sub">{[r.by, r.subtitle].filter(Boolean).join(' - ')}</span>}
+                {/* As an item's: the day status or the opening days, then its kind of place. */}
+                <span class="gd-row-meta"><span class="gd-row-day" data-gd-cell>{r.open?.length ? <Bi t={weekPattern(r.open)} /> : null}</span><span class="gd-dot" aria-hidden="true">·</span><span class="gd-row-area"><Bi t={category(r.category)} /></span></span>
+              </td>
             </tr>
           ))}
         </tbody>

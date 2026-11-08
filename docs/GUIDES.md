@@ -38,6 +38,8 @@ directly.
 - 内容全部是仓库里的 JSON 文件。改了 `main` 上的文件，大约一分钟后网站就更新。
   数据有错时构建会失败，网站保持原样，不会坏掉。
 - **地点的排序**：地点列表上方的“排序方式”默认是“推荐”（A、B、C 级依次排，同级按编号）。另外还有“名称”、“区域”（按导览里片区的顺序）、“当天开放的优先”（先在“日期”框里选定一天）和“离我最近”（先按“我在哪里？”）。选了别的排序后会出现“默认”按钮，单击即可恢复推荐顺序。“查看 ▸ 排序方式”菜单里是同样几种排序。排序只调整每一组之内的次序（参考点、当天闭馆的地点和官方条目各自是一组）。选择会记在这台设备上，“离我最近”除外。
+- **其他条目**：官方地图上没有被推荐的条目（巴黎导览有 58 个，编号 D 开头，灰色图钉），在地点列表上方勾选“显示全部其他条目”才出现。它们和推荐的展览一样有中英文说明、地址、开放时间、日期和图片，选定一天时也显示当天开不开放；法文原文收在“原文（法语）”里。勾选后它们也算进状态栏的展览数，比如“109 个展览”或“109 个展览中 N 个开放”；当天不开放的和展览一起归入“某日不开放”一组。它们没有主题，所以选了主题时不显示，也不进热力图。
+- **状态栏**：手机上或窗口太窄、一句话放不下时，状态栏的文字会像当年的滚动字幕一样移动：先停一下，再向左移出，从右边移回来，这样整句话都看得到。鼠标停在上面时文字不动；系统设置了“减少动态效果”时改为折行显示。
 - **我在哪里？**：只有按下按钮时，浏览器才会询问位置。之后地图上会出现一个红色的圆点，并显示“实时位置”标签，旁边有“停止”按钮。再按一次按钮、单击“停止”，或者刷新页面、注销、关闭窗口，都会关掉它；刷新之后它是关着的。位置只留在设备上，从不发送出去。浏览器不允许时，导览会说明怎样开启。
 - **街道地图**：底图被放大到超过原图大小的地方（城区底图周围的大区底图会最先被放大），街道级的地图瓦片由 Worker 从 IGN（Plan IGN）代为取得，地址是 `/guides/<名字>/tiles/{z}/{x}/{y}.png`，缩放级别 12 至 19，只给已登录的读者。城区底图放不满窗口时（比如竖着拿的平板），四周会补上大区底图和它的瓦片，不会露出灰色。范围由 `access.json` 的 `tiles` 决定（见第 10 节）。IGN 只看到 Worker，看不到访客。每位访客每分钟从 IGN 取图最多 600 块（已在缓存里的不算），超出的瓦片返回 429。
 - **地图手势**：在手机和平板上，地图的手势和地图应用（Google 地图、苹果地图）一样：一根手指拖动移动地图，快速一划地图会继续滑行；两根手指捏合缩放；轻点两下放大；轻点两下后按住，向下滑动放大、向上滑动缩小；两根手指同时轻点一下缩小。地图上的文字不会被选中，长按也不会弹出菜单。用鼠标时，双击放大，按住 Shift 键双击缩小，滚轮缩放。代码在 `src/scripts/guide/gestures.ts`。
@@ -76,6 +78,21 @@ past guides stay at their own addresses (section 12).
   Sorting only changes the order inside each group (reference points, places
   closed that day and official entries each stay together), and the choice is
   remembered on this device, except Nearest first.
+- **Other listings.** The official map's entries that aren't recommended (58
+  in the Paris guide, ids starting with D, grey pins) show once **Show all
+  other listings** above the Places list is ticked. Each has what a
+  recommended exhibition has: English and Chinese text, address, hours, dates
+  and picture, and whether it is open on the chosen day; the French original
+  folds away under **Original text (French)**. Ticked, they count in the
+  status bar's number of exhibitions ("109 exhibitions", "N of 109
+  exhibitions open"), and those closed that day join the exhibitions in the
+  "Closed on …" group. They have no themes, so a theme leaves them out, and
+  they stay out of the heat map.
+- **The status bar.** When a sentence doesn't fit (a phone, a narrow window),
+  the status bar scrolls it, as the scrolling messages of the time did: it
+  rests, slides left until it has gone, comes back in from the right and
+  rests again, so the whole sentence can be read. A mouse resting on it holds
+  it still; with reduced motion turned on, it wraps onto a second line instead.
 - **Where am I?** The browser asks for your position only when you press the
   button. A red dot then follows you on the map, with a **Live location** chip
   that has a **Stop** button. Pressing the button again, pressing **Stop**, or a
@@ -720,6 +737,19 @@ below). Any file may have a `_comment`, which is never shown.
 | --- | --- | --- |
 | `source` | `{ name, url?, checked, lang, credit? }`：官方来源 | The official source |
 | `records[]` | `{ id, name, category, coordinates, details, url?, start?, end?, image? }`；`details` 是来源原文，用 `\n` 分行；`image` 和地点的一样 | Records in the source's own words, lines split by `\n`; `image` as for an item |
+| `start?`, `end?` | 这个点上活动的日期；一处有几档展览时，从第一档开始到最后一档结束，中间空着的日子写进 `exceptions`。可以在导览的日子以外 | The dates of what happens at this point; at a venue with several shows, from the first start to the last end, with any gap in `exceptions`. They may fall outside the guide's days |
+| `subtitle?`, `by?` | 展名（原文）、艺术家（正常大小写）；几档展览用 ` / ` 隔开 | Show title (original), artist(s) in normal case; several shows joined with ` / ` |
+| `address?` | 地址（原文），写法和地点一样；有了才有“复制地址” | Address (original), written as an item's; it brings Copy address |
+| `about?`/`aboutZh?` | 除地址和开放时间外，`details` 的全部内容的英文和中文：是什么、每档展览的名称（附意思）和日期、怎么进去 | Everything in `details` but the address and hours, in English and Chinese: what it is, each show with its title (and meaning) and dates, how to get in |
+| `hours?`/`hoursZh?`, `open?`, `holiday?`, `access?`, `exceptions?[]` | 和地点一样，决定选定一天时开不开放；例外只能在导览的日子里 | As for an item: they decide whether it is open on the chosen day. Exceptions only on the guide's days |
+| `price?`/`priceZh?`, `note?`/`noteZh?` | 门票、提醒 | Admission, caution |
+
+`listings.json` 的条目只有 `id`、`name`、`category`、`coordinates`、`details` 是必填的；没有 `about` 的条目只显示原文，和以前一样。重新导入官方地图时，保留编号和这些中英文字段。
+
+Only `id`, `name`, `category`, `coordinates` and `details` are required; a
+record without `about` shows the source's text alone, as before. On a
+re-import of the official map, keep the ids and these English and Chinese
+fields.
 
 ### `map.json`
 

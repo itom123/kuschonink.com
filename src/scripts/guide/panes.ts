@@ -1,15 +1,15 @@
 // Field Guide (导览): the server-rendered panes, kept in step with the state.
 // Places: "Sort by:" and its Default button (the orders are order.ts), each
-// row's day, the "Closed on <day>" group, theme and Find, listings on or off,
-// the selected row. Routes: the radio and each stop's status. Days: today and
-// past days, in the guide's own time zone.
+// row's day, the "Closed on <day>" group (items and shown listings alike),
+// theme and Find, listings on or off, the selected row. Routes: the radio and
+// each stop's status. Days: today and past days, in the guide's own time zone.
 import type { Bi, ISODate, StatusCode } from '../../lib/guides/types';
 import { bi, h, setText } from './dom';
 import { DEFAULT_SORT, sortInUse, sortRows } from './order';
 import type { GdState, Sort } from './state';
 
 export interface RowInfo {
-  /** Passes theme and Find (and, for listings, the day if they have dates). */
+  /** Passes theme and Find. */
   match: boolean;
   /** Open (or worth going) on the chosen day. */
   visitable: boolean;
@@ -112,7 +112,7 @@ export class PlacesPane {
       const r = info(id, tr.dataset.kind!);
       return { id, tr, r, name: this.names.get(id) ?? '', tier: tr.dataset.tier, zone: tr.dataset.zi ? Number(tr.dataset.zi) : undefined, code: r.code, m: metres ? metres(id) : null };
     });
-    let open = 0, shut = 0, shown = 0;
+    let open = 0, shut = 0, shown = 0, loose = 0;
     for (const { id, tr, r } of sortRows(list, use)) {
       const kind = tr.dataset.kind!;
       const cell = this.cells.get(id);
@@ -124,14 +124,18 @@ export class PlacesPane {
       tr.hidden = !r.match || (kind === 'listing' && !s.listings);
       tr.classList.toggle('gd-shut', !r.visitable);
       if (!tr.hidden && kind !== 'place') shown++;
-      if (kind === 'item') {
-        if (r.match && !r.visitable && dayName) { this.closed?.append(tr); if (!tr.hidden) shut++; }
-        else { this.items?.append(tr); if (!tr.hidden && r.visitable) open++; }
-      } else if (kind === 'listing') this.listings?.append(tr);
+      // Closed that day: items and shown official entries share one group, and both count.
+      if (r.match && !r.visitable && dayName && !tr.hidden) { this.closed?.append(tr); shut++; }
+      else {
+        (kind === 'listing' ? this.listings : this.items)?.append(tr);
+        if (!tr.hidden && r.visitable) open++;
+        if (!tr.hidden && kind === 'listing') loose++;
+      }
     }
     if (this.closed) this.closed.hidden = shut === 0;
     if (this.closedHead) setText(this.closedHead, closedLabel(shut));
-    if (this.listings) this.listings.hidden = !s.listings;
+    // Its heading goes too when every shown entry is in the closed group.
+    if (this.listings) this.listings.hidden = !s.listings || loose === 0;
     if (this.empty) this.empty.hidden = shown > 0;
     this.select(s.place);
     // A new order is read from its top (or from the selected row).

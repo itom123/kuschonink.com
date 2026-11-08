@@ -183,7 +183,29 @@ const SCHEMA: Record<GuideFileName, S> = {
   listings: obj({
     source: obj({ name: str(), url: opt(url), checked: date, lang: str(), credit: opt(str()) }),
     records: arr(
-      obj({ id: str(), name: str(), category: str(), coordinates: lonlat, details: str(), url: opt(url), start: opt(date), end: opt(date), image: picture }),
+      obj({
+        id: str(),
+        name: str(),
+        category: str(),
+        coordinates: lonlat,
+        details: str(),
+        url: opt(url),
+        start: opt(date),
+        end: opt(date),
+        image: picture,
+        // In the guide's words (types.ts ListingRecord): optional, so a fresh import still loads.
+        subtitle: opt(str()),
+        by: opt(str()),
+        address: opt(str()),
+        ...tx('about', false),
+        ...tx('hours', false),
+        open: arr(enm('weekday'), { opt: true, min: 1 }),
+        holiday: enm('holiday', true),
+        access: enm('access', true),
+        exceptions: arr(obj({ date, status: enm('override'), ...tx('note', false) }), { opt: true }),
+        ...tx('price', false),
+        ...tx('note', false),
+      }),
       { rec: 'id' },
     ),
   }),
@@ -765,8 +787,18 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
       if (isStr(r.category) && !cats.has(r.category))
         say(c, { ...at, path: 'category' }, `${q(r.category)} is not a category in guide.json. Known: ${[...cats].join(', ') || '(none: add "categories")'}.`);
       range(c, at, r.start, r.end);
-      checkPoint(c, { ...at, path: 'coordinates' }, r.coordinates, region);
-      checkPicture(c, (path) => ({ ...at, path }), r.image);
+      // Unlike an item, a record may fall outside the guide's days (a show after the festival), but
+      // its one-day exceptions are for days the guide covers.
+      const f = (p: string): Loc => ({ ...at, path: p });
+      dupes(c, A(r.exceptions), 'date', () => f('exceptions'));
+      A(r.exceptions).forEach((e, j) => {
+        const d = O(e).date;
+        if (isStr(d) && isISODate(d) && !inWindow(d, win)) say(c, f(`exceptions[${j}].date`), `${q(d)} is outside the guide's days (${winText}). Check the year.`);
+      });
+      const o = A(r.open);
+      if (new Set(o).size !== o.length) say(c, f('open'), 'lists a weekday twice.');
+      checkPoint(c, f('coordinates'), r.coordinates, region);
+      checkPicture(c, f, r.image);
     });
   }
 

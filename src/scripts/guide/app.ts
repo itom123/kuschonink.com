@@ -24,6 +24,7 @@ import {
 const WIDE = 960;
 type How = 'pointer' | 'keyboard';
 type Item = Payload['items'][number];
+type Listing = Payload['listings'][number];
 interface OpenOpts { reload?: boolean }
 const kus = () => window.kus98 as unknown as (undefined | {
   open(url: string, o?: OpenOpts): Promise<void>;
@@ -70,6 +71,8 @@ export class GuideApp {
   private readonly routes: RoutesPane;
   private readonly daysPane: DaysPane;
   private readonly items = new Map<string, Item>();
+  /** The official entries no item stands for ("Show all"): their day rules, like an item's. */
+  private readonly lists = new Map<string, Listing>();
   private readonly names = new Map<string, string>();
   readonly labels: { items: Bi; listings: Bi; title: Bi };
   /** The listed guides (public titles); File ▸ Open Guide... shows only when there are several. */
@@ -114,7 +117,7 @@ export class GuideApp {
     this.p = JSON.parse(raw) as Payload;
     for (const i of this.p.items) { this.items.set(i.id, i); this.names.set(i.id, i.name); }
     for (const x of this.p.places) this.names.set(x.id, x.name);
-    for (const l of this.p.listings) this.names.set(l.id, l.name);
+    for (const l of this.p.listings) { this.names.set(l.id, l.name); if (!l.item) this.lists.set(l.id, l); }
     // data-guide-*, not data-title-*: the 中/EN switch (lang.ts) would turn those into a tooltip.
     this.labels = { items: biData(root, 'items'), listings: biData(root, 'listings'), title: biData(root, 'guide') };
     this.guides = listedGuides(root);
@@ -249,7 +252,8 @@ export class GuideApp {
     }
     for (const l of this.p.listings) {
       if (l.item) continue;
-      const s = sub(l.id);
+      // The artist and show, else the kind of place.
+      const s = sub(l.id) ?? row(l.id)?.querySelector('.gd-row-area') ?? null;
       out.push({ kind: 'listing', id: l.id, name: l.name, sub: s, icon: 'ico16 ico-pin-d',
         fields: [field(10, l.name), field(12, l.id), field(7, s?.textContent), field(3, row(l.id)?.dataset.q), field(1, body(l.id))] });
     }
@@ -564,7 +568,7 @@ export class GuideApp {
     const s = this.store.get();
     const shown = [
       ...this.p.items.filter((i) => this.matchItem(i.id) && this.status(i.id)!.visitable),
-      ...(s.listings ? this.p.listings.filter((l) => this.matchListing(l.id)) : []),
+      ...(s.listings ? this.p.listings.filter((l) => this.matchListing(l.id) && this.status(l.id)!.visitable) : []),
     ];
     const near = nearest(f.coordinates, shown.map((x) => ({ id: x.id, coordinates: x.coordinates })), 5);
     const key = near.map((x) => x.id).join(' ');
@@ -580,7 +584,7 @@ export class GuideApp {
       rows: near.map(({ id, m }) => {
         const it = this.items.get(id);
         const d = distanceText(m), w = W.walk(walkMinutes(m));
-        const st = it && day ? this.status(id)!.short : null;
+        const st = day ? this.status(id)?.short ?? null : null;
         return {
           id,
           name: this.names.get(id) ?? id,
@@ -594,7 +598,7 @@ export class GuideApp {
 
   // ---- Day status, matching ----
   status(id: string): DayStatus | null {
-    const it = this.items.get(id);
+    const it = this.items.get(id) ?? this.lists.get(id);
     if (!it) return null;
     const d = this.store.get().day;
     return dayStatus(it, d === 'any' ? null : d, this.p.holidays);
@@ -619,12 +623,11 @@ export class GuideApp {
     return this.matchQ(id, q);
   }
 
+  /** An official entry passes Find when shown; it has no themes, so a theme leaves it out. Its day is its status, as an item's. */
   private matchListing(id: string, q?: string) {
     const s = this.store.get();
-    const l = this.p.listings.find((x) => x.id === id);
-    if (!l || l.item) return false;
+    if (!this.lists.has(id)) return false;
     if (s.theme) return false;
-    if (s.day !== 'any' && ((l.start && s.day < l.start) || (l.end && s.day > l.end))) return false;
     return this.matchQ(id, q);
   }
 
@@ -652,10 +655,9 @@ export class GuideApp {
     if (filters || first) {
       const day = s.day === 'any' ? null : dayLabel(s.day);
       this.counts = this.places.render(s, (id, kind) => {
-        if (kind === 'listing') return { match: this.matchListing(id), visitable: true, cell: null };
         if (kind === 'place') return { match: true, visitable: true, cell: null };
         const st = this.status(id)!;
-        return { match: this.matchItem(id), visitable: st.visitable, cell: day ? st.short : null, code: st.code };
+        return { match: kind === 'listing' ? this.matchListing(id) : this.matchItem(id), visitable: st.visitable, cell: day ? st.short : null, code: st.code };
       }, day, (n) => (day ? { en: `Closed on ${day.en} (${n})`, zh: `${day.zh}不开放（${n}）` } : { en: '', zh: '' }), {
         // "Nearest first": straight lines from the last position, read when the list sorts.
         metres: (id) => { const c = this.coords(id); return this.fix && c ? distance(this.fix.coordinates, c) : null; },
@@ -714,9 +716,15 @@ export class GuideApp {
       });
     }
     if (s.listings) {
-      for (const l of this.p.listings) {
-        if (l.item) continue;
-        pins.push({ id: l.id, kind: 'listing', coordinates: l.coordinates, short: l.name.slice(0, 14), aria: { en: `${l.id}, ${l.name}`, zh: `${l.id}，${l.name}` }, visible: this.matchListing(l.id) || l.id === s.place, dim: !!s.route, label: l.id === s.place });
+      // As an item's pin: gone on a day it is closed, hollow when shown all the same (selected).
+      for (const l of this.lists.values()) {
+        const st = this.status(l.id)!;
+        const visible = (this.matchListing(l.id) && st.visitable) || l.id === s.place;
+        pins.push({
+          id: l.id, kind: 'listing', coordinates: l.coordinates, short: l.name.slice(0, 14),
+          aria: { en: `${l.id}, ${l.name}, ${st.short.en}`, zh: `${l.id}，${l.name}，${st.short.zh || st.short.en}` },
+          visible, hollow: visible && !st.visitable, dim: !!s.route, label: l.id === s.place,
+        });
       }
     }
     this.map.setPins(pins);
@@ -774,14 +782,10 @@ export class GuideApp {
       setText(f0, t);
     }
     if (f1) {
-      const total = this.p.items.filter((i) => this.matchItem(i.id)).length;
+      // With "Show all", the official entries count as exhibitions too, open or closed by their own days.
+      const total = this.p.items.filter((i) => this.matchItem(i.id)).length + (s.listings ? [...this.lists.keys()].filter((id) => this.matchListing(id)).length : 0);
       let t: Bi = s.day === 'any' ? W.countAll(total, this.labels.items) : W.openOf(this.counts.open, total, this.labels.items, dayLabel(s.day));
       if (s.q.trim()) t = W.matches(this.counts.shown, s.q.trim());
-      if (s.listings) {
-        const n = this.p.listings.filter((l) => this.matchListing(l.id)).length;
-        const plus = W.plusListings(n, this.labels.listings);
-        t = { en: t.en + plus.en, zh: t.zh + plus.zh };
-      }
       // Only new text goes into the live region, so the counts aren't re-read.
       const key = t.en + '\u0000' + t.zh;
       if (key !== this.lastCount) { this.lastCount = key; setText(f1, t); }

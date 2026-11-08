@@ -150,9 +150,31 @@ export function buildView(raw: RawGuide, slug: string, access: AccessFile, audie
 
   const backLink = new Map<string, string>();
   for (const i of items) if (i.listing) backLink.set(i.listing, i.id);
-  const records: Listing[] = (lst?.records || []).map(({ image, ...r }) => {
+  const records: Listing[] = (lst?.records || []).map((r) => {
     const item = backLink.get(r.id);
-    return { ...r, ...(item ? { item } : {}), ...(image ? { image: picture(image, r.name) } : {}) };
+    return {
+      id: r.id,
+      name: r.name,
+      category: r.category,
+      coordinates: [r.coordinates[0], r.coordinates[1]] as LonLat,
+      details: r.details,
+      ...(r.url ? { url: r.url } : {}),
+      ...(item ? { item } : {}),
+      ...(r.image ? { image: picture(r.image, r.name) } : {}),
+      subtitle: r.subtitle || '',
+      by: r.by || '',
+      address: r.address || '',
+      about: b(r.about, r.aboutZh),
+      hours: b(r.hours, r.hoursZh),
+      price: b(r.price, r.priceZh),
+      note: b(r.note, r.noteZh),
+      ...(r.start ? { start: r.start } : {}),
+      ...(r.end ? { end: r.end } : {}),
+      ...(r.open ? { open: [...r.open] } : {}),
+      holiday: r.holiday || 'confirm',
+      access: r.access || 'walk-in',
+      exceptions: (r.exceptions || []).map((e) => ({ date: e.date, status: e.status, note: b(e.note, e.noteZh) })),
+    };
   });
 
   const counts = { items: items.length, listings: records.length, routes: routes.length };
@@ -287,9 +309,13 @@ export function buildPayload(v: GuideView): Payload {
       name: r.name,
       category: r.category,
       coordinates: r.coordinates,
+      ...(r.item ? { item: r.item } : {}),
       ...(r.start ? { start: r.start } : {}),
       ...(r.end ? { end: r.end } : {}),
-      ...(r.item ? { item: r.item } : {}),
+      ...(r.open ? { open: r.open } : {}),
+      holiday: r.holiday,
+      access: r.access,
+      exceptions: r.exceptions,
     })),
     routes: v.routes.map((r) => ({ id: r.id, name: r.name, stops: r.stops, mode: r.mode })),
     events: v.events.map((e) => ({
