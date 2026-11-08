@@ -3,8 +3,8 @@
   "places": [
     {
       "id": "W",
-      "label": "Workshop",
-      "labelZh": "工作坊",
+      "label": "FotoFilmic workshop",
+      "labelZh": "FotoFilmic 工作坊",
       "name": "Hotel Moris",
       "short": "Hotel Moris",
       "address": "13 Rue René Boulanger, 75010 Paris",
@@ -12,8 +12,11 @@
         2.357512,
         48.869191
       ],
-      "note": "Workshop venue, 9–11 November. Day 1 starts at 09:30; days 2 and 3 at 09:00.",
-      "noteZh": "工作坊场地，11月9日至11日。第1天 09:30 开始；第2、3天 09:00 开始。",
+      "note": "FotoFilmic workshop venue: Torbjørn Rødland’s “Parisian Trickster”, 9–11 November. Day 1 starts at 09:30; days 2 and 3 at 09:00.",
+      "noteZh": "FotoFilmic 工作坊场地：Torbjørn Rødland 的“Parisian Trickster”，11月9日至11日。第1天 09:30 开始；第2、3天 09:00 开始。",
+      "links": [
+        "https://fotofilmic.com/torbjorn-rodland/"
+      ],
       "audience": "fotofilmic"
     },
     {
