@@ -168,11 +168,12 @@
         "sat",
         "sun"
       ],
+      "holiday": "open",
       "minutes": 100,
       "price": "At desk €13 / reduced €8; online €14 / reduced €9. Proof required.",
       "priceZh": "现场购票 €13，优惠票 €8；网上购票 €14，优惠票 €9。优惠票需出示有效证件。",
-      "note": "Primary MEP hours override the shorter Photo Days listing. Traoré ends 29 Nov. Ticket desk closes 30 min before; rooms cleared 15 min before. Confirm 11 Nov holiday access before relying on it.",
-      "noteZh": "以 MEP 官方的开放时间为准，不采用 Photo Days 列出的较短时间。Traoré 的展览 11月29日结束。售票处提前 30 分钟停止售票；展厅提前 15 分钟清场。11月11日是公共假日，能否入场请先确认，再做安排。",
+      "note": "Primary MEP hours override the shorter Photo Days listing. Traoré ends 29 Nov. Ticket desk closes 30 min before; rooms cleared 15 min before.",
+      "noteZh": "以 MEP 官方的开放时间为准，不采用 Photo Days 列出的较短时间。Traoré 的展览 11月29日结束。售票处提前 30 分钟停止售票；展厅提前 15 分钟清场。",
       "sourceUrl": "https://photodays.paris/MEP",
       "links": [
         "https://www.mep-fr.org/venir/",
@@ -453,7 +454,7 @@
       "address": "BnF François-Mitterrand, Galerie 2, Quai François Mauriac, 75013; entrance from Rue Émile-Durkheim",
       "hours": "Tue–Sat 10:00–19:00; Sun 13:00–19:00; closed Mondays and public holidays",
       "hoursZh": "周二至周六 10:00–19:00；周日 13:00–19:00；周一及公共假日闭馆",
-      "start": "2026-09-29",
+      "start": "2026-09-30",
       "end": "2027-01-31",
       "open": [
         "tue",
@@ -513,6 +514,7 @@
         "sat",
         "sun"
       ],
+      "holiday": "open",
       "minutes": 65,
       "price": "Free entry.",
       "priceZh": "免费入场。",
@@ -550,8 +552,8 @@
       "address": "84 Rue du Temple, 75003 Paris",
       "hours": "Thu–Sat 14:00–19:00",
       "hoursZh": "周四至周六 14:00–19:00",
-      "start": "2026-11-02",
-      "end": "2026-12-12",
+      "start": "2026-11-03",
+      "end": "2026-12-05",
       "open": [
         "thu",
         "fri",
@@ -882,8 +884,8 @@
         "sat"
       ],
       "minutes": 45,
-      "note": "12 Nov opening is listed from 18:00 / 18:30 on different festival pages; treat 18:30 as the safer arrival.",
-      "noteZh": "11月12日的开幕时间，在摄影节不同页面上分别写作 18:00 和 18:30；按 18:30 到场更稳妥。",
+      "note": "Opening Thu 12 Nov 18:00–21:00 with the artists; book signing from 19:00.",
+      "noteZh": "11月12日（周四）18:00–21:00 开幕，艺术家到场；19:00 起签书。",
       "sourceUrl": "https://photodays.paris/Polka-Galerie",
       "links": [],
       "listing": "D84",
@@ -968,8 +970,8 @@
         "sat"
       ],
       "minutes": 35,
-      "note": "Festival page says Tue–Sat; map says Mon–Sat. Do not rely on Monday access.",
-      "noteZh": "摄影节页面写周二至周六，地图写周一至周六。不要指望周一能入场。",
+      "note": "The gallery and the directories all say Tue–Sat; closed Sunday and Monday.",
+      "noteZh": "画廊和各目录网站都写周二至周六；周日和周一闭馆。",
       "sourceUrl": "https://photodays.paris/Clementine-de-la-Feronniere",
       "links": [],
       "listing": "D69",
@@ -1045,8 +1047,8 @@
       "why": "Reworked negatives, painted photographs and modest constructions turn photographed objects into small theatres of memory.",
       "whyZh": "重新加工的底片、手绘的照片和简朴的搭建，把被拍摄的物件变成一座座记忆的小剧场。",
       "address": "2 Rue de la Légion d’Honneur, 75007 Paris",
-      "hours": "Wed–Sun 13:00–18:00",
-      "hoursZh": "周三至周日 13:00–18:00",
+      "hours": "Wed–Sun 13:00–18:00; Thu until 20:00; closed Mon/Tue",
+      "hoursZh": "周三至周日 13:00–18:00；周四至 20:00；周一、周二闭馆",
       "start": "2026-11-11",
       "end": "2027-02-28",
       "open": [
@@ -1056,9 +1058,10 @@
         "sat",
         "sun"
       ],
+      "holiday": "open",
       "minutes": 40,
-      "note": "11 Nov holiday access not independently confirmed; choose 12–15 Nov.",
-      "noteZh": "11月11日公共假日能否入场，尚未得到独立确认；请选择 11月12日至15日前往。",
+      "note": "The exhibition opens on 11 Nov (Armistice Day), on purpose. Last entry 17:30; Thu 19:30.",
+      "noteZh": "展览特意选在11月11日（停战纪念日）开幕。最晚入场 17:30；周四 19:30。",
       "sourceUrl": "https://photodays.paris/Musee-de-la-legion-d-honneur",
       "links": [],
       "listing": "D28",
@@ -1088,8 +1091,8 @@
       "why": "A slow, large-format encounter with religious space; consider how the existing chapel changes the photographs’ presence.",
       "whyZh": "以大画幅缓慢地面对宗教空间；思考原有的礼拜堂如何改变照片的在场感。",
       "address": "95 Rue de Sèvres, 75006 Paris",
-      "hours": "Daily 07:00–12:00 / 14:30–18:00 per festival venue page",
-      "hoursZh": "每日 07:00–12:00 / 14:30–18:00（据摄影节场馆页面）",
+      "hours": "Daily 09:00–12:00 / 14:30–18:00; closed at lunch",
+      "hoursZh": "每日 09:00–12:00 / 14:30–18:00；午间关闭",
       "start": "2026-11-02",
       "end": "2026-11-30",
       "open": [
@@ -1101,11 +1104,12 @@
         "sat",
         "sun"
       ],
+      "holiday": "open",
       "minutes": 30,
       "price": "Free access as listed.",
       "priceZh": "据公布信息免费入场。",
-      "note": "Official map gives continuous 08:00–18:00; use the stricter split hours and avoid services/midday.",
-      "noteZh": "官方地图写的是 08:00–18:00 连续开放；请以更严格的分段时间为准，并避开礼拜时段和中午。",
+      "note": "The festival now lists 09:00–18:00; the chapel’s own hours are Mon–Sat 07:00–12:30 / 14:30–18:30 and Sun 07:30–13:00 / 14:30–18:30. Go when both say open, and avoid Mass times.",
+      "noteZh": "摄影节现在写的是 09:00–18:00；小教堂自己公布的时间是周一至周六 07:00–12:30 / 14:30–18:30，周日 07:30–13:00 / 14:30–18:30。请在两者都开放的时段前往，并避开弥撒时间。",
       "sourceUrl": "https://photodays.paris/Chapelle-St-Vincent-de-Paul-Thomas-KLOTZ",
       "links": [],
       "listing": "D59",
@@ -1274,7 +1278,7 @@
       "address": "1 Rue des Minimes, 75003 Paris",
       "hours": "Wed–Sat 12:00–19:00",
       "hoursZh": "周三至周六 12:00–19:00",
-      "start": "2026-10-28",
+      "start": "2026-10-30",
       "end": "2027-01-16",
       "open": [
         "wed",
@@ -1316,7 +1320,7 @@
       "hours": "Wed–Sat 11:00–19:00",
       "hoursZh": "周三至周六 11:00–19:00",
       "start": "2026-11-02",
-      "end": "2026-11-30",
+      "end": "2026-12-19",
       "open": [
         "wed",
         "thu",
@@ -1356,8 +1360,8 @@
       "why": "A range of women’s practices across self-portraiture, memory, abstraction and collage; compare how different methods carry lived experience.",
       "whyZh": "多位女性艺术家的创作，涵盖自拍像、记忆、抽象与拼贴；比较不同方法如何承载亲身经验。",
       "address": "8 Rue Chapon, 75003 Paris",
-      "hours": "11–13 Nov 14:00–19:00; 14 Nov 14:00–21:00; 15 Nov appointment only",
-      "hoursZh": "11月11日至13日 14:00–19:00；11月14日 14:00–21:00；11月15日仅限预约",
+      "hours": "10 Nov 18:00–20:00 (opening); 11–13 Nov 14:00–19:00; 14 Nov 14:00–21:00; 15 Nov appointment only",
+      "hoursZh": "11月10日 18:00–20:00（开幕）；11月11日至13日 14:00–19:00；11月14日 14:00–21:00；11月15日仅限预约",
       "start": "2026-11-10",
       "end": "2026-11-15",
       "open": [
@@ -1368,6 +1372,7 @@
         "sat",
         "sun"
       ],
+      "holiday": "open",
       "exceptions": [
         {
           "date": "2026-11-15",
@@ -1566,6 +1571,7 @@
         "sat",
         "sun"
       ],
+      "holiday": "open",
       "minutes": 30,
       "sourceUrl": "https://www.sixteen.world/",
       "coordinates": [
@@ -1647,6 +1653,7 @@
         "fri",
         "sat"
       ],
+      "holiday": "open",
       "minutes": 30,
       "note": "FUTURES gives both 8–14 and 9–15 Nov; this guide uses only 9–14 Nov. The hours are printed only in the programme picture on the FUTURES page.",
       "noteZh": "FUTURES 同时写了11月8日至14日和11月9日至15日；本导览只采用11月9日至14日。开放时间只印在 FUTURES 网页上的节目单图片里。",
@@ -1795,8 +1802,8 @@
       "why": "A private collection shows its photographs for the first time; the Clichy half is about the body, in portraits, documents and intimate pictures. Compare how close each photographer is allowed to come.",
       "whyZh": "一家私人收藏首次展出它的摄影作品；克利希这一半关于身体，有肖像、纪实和私密的照片。比较每位摄影师被允许靠得多近。",
       "address": "21 Rue Georges Boisseau, 92110 Clichy",
-      "hours": "Thu–Sat 11:00–19:00; last entry 18:00",
-      "hoursZh": "周四至周六 11:00–19:00；最晚入场 18:00",
+      "hours": "Thu–Sat 11:00–19:00, booking required; last entry 18:00",
+      "hoursZh": "周四至周六 11:00–19:00，须预约；最晚入场 18:00",
       "start": "2026-09-25",
       "end": "2026-12-19",
       "open": [
@@ -1804,6 +1811,7 @@
         "fri",
         "sat"
       ],
+      "access": "appointment",
       "minutes": 45,
       "price": "Free; booking required.",
       "priceZh": "免费；必须预约。",
@@ -1888,8 +1896,8 @@
       "why": "Slow looking, analogue photographs and ordinary moments; the project also links images, a book and fragrance.",
       "whyZh": "慢慢看：胶片照片与日常瞬间；这个项目还把影像、一本书和一款香氛联系在一起。",
       "address": "29 Rue des Gravilliers, 75003 Paris",
-      "hours": "Mon–Fri 11:00–14:00 / 15:00–19:00; Sat 11:00–19:00; Sun 11:00–18:00",
-      "hoursZh": "周一至周五 11:00–14:00 / 15:00–19:00；周六 11:00–19:00；周日 11:00–18:00",
+      "hours": "Mon–Fri 11:00–14:00 / 15:00–19:00; Sat 11:00–19:00; closed Sunday",
+      "hoursZh": "周一至周五 11:00–14:00 / 15:00–19:00；周六 11:00–19:00；周日闭馆",
       "start": "2026-11-05",
       "end": "2026-11-29",
       "open": [
@@ -1898,8 +1906,7 @@
         "wed",
         "thu",
         "fri",
-        "sat",
-        "sun"
+        "sat"
       ],
       "minutes": 25,
       "sourceUrl": "https://photodays.paris/MUSKHANE",
@@ -2066,8 +2073,8 @@
       "why": "Pictures reworked on the presses of the family print works where the book itself was printed. A short show with the launch, for anyone curious about print as material.",
       "whyZh": "作者在自家印刷厂的印刷机上重新加工图像，这本书也是在那里印的。展期很短，与新书发布同时，适合对“印刷即材质”感兴趣的人。",
       "address": "47 Rue de la Folie-Méricourt, 75011 Paris",
-      "hours": "Fri 13 Nov 18:00–22:00 (launch). Sat 14 Nov: hours not published",
-      "hoursZh": "11月13日（周五）18:00–22:00（发布会）。11月14日（周六）：开放时间未公布",
+      "hours": "Fri 13 Nov (launch) and Sat 14 Nov; times not published",
+      "hoursZh": "11月13日（周五，发布会）和14日（周六）；开放时间未公布",
       "start": "2026-11-13",
       "end": "2026-11-14",
       "open": [
@@ -2075,8 +2082,8 @@
         "sat"
       ],
       "minutes": 25,
-      "note": "A photo lab, not a gallery: check the publisher’s page before going on Saturday.",
-      "noteZh": "这是一家冲印实验室，不是画廊：周六前往前请先查看出版社的页面。",
+      "note": "A photo lab, not a gallery: check the publisher’s page before going. The book signing is at Paris Photo, Booth K6, Sun 15 Nov 14:00.",
+      "noteZh": "这是一家冲印实验室，不是画廊：出发前请先查看出版社的页面。签书会在 Paris Photo 的 K6 展位，11月15日（周日）14:00。",
       "sourceUrl": "https://loosejoints.biz/blogs/current-events/jean-vincent-simonet-paris-launch",
       "coordinates": [
         2.371811,
