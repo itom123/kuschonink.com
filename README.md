@@ -324,7 +324,9 @@ shows a list, the map and the details side by side; on a phone it shows one at a
 time, and tapping a pin raises a details sheet. On a touch screen the map takes the
 gestures of a maps app (`src/scripts/guide/gestures.ts`): drag and flick, pinch,
 double-tap to zoom in, double-tap and slide to zoom, two-finger tap to zoom out;
-nothing on it selects text. It works without JavaScript as
+nothing on it selects text. Held sideways, a phone shows the guide Full Screen,
+as Internet Explorer did: no taskbar or title bar, the window's buttons at the
+end of the menu bar, the toolbar down the left. It works without JavaScript as
 one readable page. Wherever a base picture is magnified past 1:1 (the region
 round the city plan long before the plan itself), the map shows street-level
 tiles from IGN's Plan IGN. The Worker fetches them at

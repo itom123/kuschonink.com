@@ -103,6 +103,8 @@ export class GuideApp {
   private nearAt: Fix['coordinates'] | null = null;
   /** The insets last sent to map.setFree(), as "right bottom". */
   private freeKey = '';
+  /** The Today note's copy in the menu bar, shown only in Full Screen (fullScreenParts). */
+  private noteBar: HTMLElement | null = null;
 
   constructor(root: HTMLElement) {
     this.root = root;
@@ -136,12 +138,43 @@ export class GuideApp {
     this.initMap();
     this.initFind();
     this.bind();
+    this.fullScreenParts();
     this.syncControls();
     const s = this.store.get();
     if (s.place) this.store.set({ detail: 'half' });
     this.render(new Set(Object.keys(s) as (keyof GdState)[]), true);
     this.store.on((_st, changed) => this.render(changed, false));
     this.restoreScroll();
+  }
+
+  /**
+   * What a phone held sideways shows in the window's frame (guide.css, Full Screen), where the
+   * taskbar and the program's own note give way: the 中/EN switch beside the window's buttons
+   * (lang.ts answers it as it does the taskbar's), and the Today note in the menu bar's spare
+   * room, which opens Days. Elsewhere CSS hides both.
+   */
+  private fullScreenParts() {
+    if (this.win === this.root) return;
+    const parts: HTMLElement[] = [];
+    const ctl = this.win.querySelector<HTMLElement>(':scope > .title-bar .title-bar-controls');
+    if (ctl && !ctl.querySelector('.gd-lang')) {
+      const zh = document.documentElement.dataset.lang === 'zh';
+      const sw = h('span', { class: 'lang-toggle gd-lang', role: 'group', 'aria-label': 'Language · 语言' }, [
+        h('button', { type: 'button', 'data-lang-toggle': 'zh', lang: 'zh-Hans', 'aria-pressed': String(zh) }, '中文'),
+        h('button', { type: 'button', 'data-lang-toggle': 'en', lang: 'en', 'aria-pressed': String(!zh) }, 'EN'),
+      ]);
+      ctl.prepend(sw);
+      parts.push(sw);
+    }
+    const menubar = this.win.querySelector<HTMLElement>(':scope > [data-window-inner] > .menubar');
+    if (menubar && !this.win.querySelector('.gd-note-bar')) {
+      const bar = h('button', { type: 'button', class: 'gd-note-bar', hidden: true });
+      bar.addEventListener('click', () => { if (this.p.window) this.setView('days'); }, { signal: this.ac.signal });
+      menubar.after(bar);
+      parts.push(bar);
+      this.noteBar = bar;
+    }
+    this.ac.signal.addEventListener('abort', () => { for (const el of parts) el.remove(); }, { once: true });
   }
 
   // ---- The map (A6a's engine) ----
@@ -769,7 +802,7 @@ export class GuideApp {
     const el = this.root.querySelector<HTMLElement>('[data-gd-today]');
     const w = this.p.window;
     if (!el) return;
-    if (!w) { el.hidden = true; return; }
+    if (!w) { el.hidden = true; if (this.noteBar) this.noteBar.hidden = true; return; }
     const t = this.today;
     const start = dayLabel(w.start), end = dayLabel(w.end);
     const line = (e: Payload['events'][number]) => ({ en: `${dayLabel(e.date).en}${e.start ? ' ' + e.start : ''} - ${e.title.en}`, zh: `${dayLabel(e.date).zh}${e.start ? ' ' + e.start : ''} - ${e.title.zh || e.title.en}` });
@@ -790,6 +823,7 @@ export class GuideApp {
     }
     setText(el, text);
     el.hidden = false;
+    if (this.noteBar) { setText(this.noteBar, text); this.noteBar.hidden = false; }
   }
 
   // ---- Actions ----

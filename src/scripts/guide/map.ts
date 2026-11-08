@@ -1214,6 +1214,10 @@ export class GuideMap {
     this.stage.addEventListener('contextmenu', (e) => e.preventDefault(), { signal });
     this.stage.addEventListener('dragstart', (e) => e.preventDefault(), { signal });
 
+    // The credits keep to one line where room is short (guide.css, Full Screen): a tap shows them in full, another folds them.
+    const credits = this.root.querySelector<HTMLElement>('.gd-attrib');
+    credits?.addEventListener('click', () => credits.classList.toggle('is-open'), { signal });
+
     // Map buttons (heat and area are the program's: data-cmd="gd-heat" / "gd-area").
     this.root.querySelectorAll<HTMLButtonElement>('[data-gd-zoom]').forEach((b) => b.addEventListener('click', () => {
       const z = b.dataset.gdZoom;

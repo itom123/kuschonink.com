@@ -182,8 +182,8 @@ tr.gd-group th { padding: 4px 6px 2px; text-align: left; font: bold 11px var(--u
 @media (pointer: coarse) {
   .gd-route-pick { margin: 0; }
   .gd-route-pick label, .gd-scope label { display: inline-flex; padding: 10px 8px 10px 0; }
-  .gd-route-pick label::before { top: 10px; }
-  .gd-route-pick label::after { top: 14px; }
+  .gd-route-pick input[type="radio"] + label::before { top: 10px; }
+  .gd-route-pick input[type="radio"]:checked + label::after { top: 14px; }
 }
 .gd-route-card { margin: 0 0 12px 22px; }
 html.js .gd-route-card { display: none; }
@@ -345,3 +345,91 @@ html.js .gd { position: relative; }
   .gd-find-list { border-color: CanvasText; }
 }
 @media print { .gd-find-list { display: none !important; } }
+
+/* What app.ts puts in the window's frame for Full Screen (below) shows only there. */
+.title-bar .gd-lang, .gd-note-bar { display: none; }
+
+/* ---- A phone held sideways: Full Screen ----
+   A landscape phone has width to spare and hardly any height (about 320px under the browser's
+   bar), and the window's bars took two thirds of it. So, as Internet Explorer's View ▸ Full Screen
+   did: the taskbar gives way while the Field Guide is the window in front (Minimize brings it back,
+   with the desktop). The title bar goes and its buttons end the menu bar, as a maximised
+   document's do in Windows 98, with the 中/EN switch beside them and the Today note in between
+   (app.ts fullScreenParts; tapping the note opens Days). The toolbar stands on the left, as
+   Paint's tool box does; the status bar is for screen readers only; the filters and the panes'
+   heads keep to one slim line. The map runs under an iPhone's home indicator; its buttons, the
+   lists and the toolbar stop above it. The log-on box gets the same frame but keeps the taskbar
+   (its 中/EN switch and Start), and puts its splash beside the form (guide-logon.css). */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 480px) {
+  html.js:has(#k98-windows > .app-window[data-app="guide"][data-active]:not([data-state="min"]) [data-gd]) { --taskbar-h: 0px; }
+  html.js:has(#k98-windows > .app-window[data-app="guide"][data-active]:not([data-state="min"]) [data-gd]) .taskbar { display: none; }
+
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) {
+    --gd-safe-bottom: env(safe-area-inset-bottom, 0px);
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: "menu note ctl" "main main main";
+    /* Clear of the notch (the page covers the whole screen: viewport-fit=cover). */
+    padding: 2px max(2px, env(safe-area-inset-right, 0px)) 0 max(2px, env(safe-area-inset-left, 0px));
+  }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) > [data-window-inner] { display: contents; }
+  /* With its toolbar shown, the toolbar takes a column on the left. */
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]):has(> [data-window-inner] > .toolbar):not([data-hide~="toolbar"]) {
+    grid-template-columns: auto auto minmax(0, 1fr) auto; grid-template-areas: "menu menu note ctl" "rail main main main";
+  }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) > .title-bar { grid-area: ctl; padding: 0 0 0 6px; background: none; }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) > .title-bar .title-bar-text { display: none; }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) .menubar { grid-area: menu; flex-wrap: nowrap; min-width: 0; overflow: hidden; padding: 0; }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) .mb-item { padding: 6px 8px 7px; }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) .toolbar {
+    grid-area: rail; flex-direction: column; flex-wrap: nowrap; gap: 1px; min-height: 0;
+    overflow: hidden auto; margin: 2px 2px 0 0; padding: 1px 2px calc(1px + var(--gd-safe-bottom)) 1px;
+    box-shadow: inset 1px 0 var(--hi), inset -1px 0 var(--shadow), inset 0 1px var(--hi);
+  }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) .toolbar .tool { min-width: 52px; padding: 3px 2px; }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) .toolbar .tool-sep { width: auto; height: 2px; margin: 2px 3px; box-shadow: inset 0 1px var(--shadow), inset 0 -1px var(--hi); }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) .window-main { grid-area: main; min-width: 0; }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) .status-bar {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  /* The 中/EN switch before the window's buttons, drawn as the taskbar's. */
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) > .title-bar .gd-lang { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; margin-right: 8px; }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) > .title-bar .gd-lang button {
+    min-width: 0; min-height: 0; height: 24px; padding: 0 9px; font: 11px var(--ui-font); line-height: 22px;
+    color: #000; text-shadow: none; text-decoration: none; cursor: inherit; background: var(--face); box-shadow: var(--raised);
+  }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) > .title-bar .gd-lang button[aria-pressed="true"] { font-weight: bold; box-shadow: var(--pressed); background: var(--dither); }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) > .title-bar .gd-lang button:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+  /* The Today note in the menu bar's spare room, one line; the program's own note steps aside. */
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) .gd-note-bar {
+    grid-area: note; display: block; align-self: center; min-width: 0; max-width: 100%; justify-self: start; margin: 0 0 0 8px; box-sizing: border-box;
+    height: 24px; padding: 0 8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: left;
+    background: var(--tip); color: #000; border: 1px solid #000; box-shadow: none; text-shadow: none;
+    font: 13px/22px "Times New Roman", Times, serif;
+  }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) .gd-note-bar[hidden] { display: none; }
+  html.js .app-window[data-app="guide"]:has([data-gd], [data-gd-logon]) .gd-note-bar:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+  html.js .app-window[data-app="guide"]:has([data-gd]) .gd > .gd-note { display: none; }
+
+  /* Inside the program. The filters: one row, where the boxes narrow before a label breaks. */
+  .gd-filters { flex-wrap: nowrap; gap: 4px 10px; padding: 2px 4px; }
+  .gd-f-label { flex: none; white-space: nowrap; }
+  /* The panes: the toolbar on the left shows which one is open (and Map closes it), so while it shows, their head is for screen readers only. */
+  html.js .app-window[data-app="guide"]:has(> [data-window-inner] > .toolbar):not([data-hide~="toolbar"]) .gd-pane-bar {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+  }
+  html.js .app-window[data-app="guide"]:has(> [data-window-inner] > .toolbar):not([data-hide~="toolbar"]) .gd-pane-bar .gd-x { display: none; }
+  html.js :is(.gd-pane-body, .gd-details-body) { padding-bottom: var(--gd-safe-bottom); }
+  /* Places: Sort by and the box for the other listings share a line. */
+  html.js .gd[data-view="places"] #gd-places { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr); }
+  html.js #gd-places > .gd-pane-body { grid-column: 1 / -1; }
+  html.js #gd-places > .gd-scope { display: flex; align-items: center; padding: 0 8px 0 4px; border-bottom: 1px solid #c0c0c0; }
+  html.js #gd-places > .gd-scope label { padding: 6px 0; }
+  .gd-sortbar { padding: 2px 4px 2px 6px; }
+  .gd-sort-field select, .gd-sort-default { height: 30px; }
+  /* The details drawer's head. */
+  .gd-details-bar .gd-x { width: 30px; height: 26px; }
+  .gd-details-bar .gd-x::before, .gd-details-bar .gd-x::after { left: 11px; top: 12px; }
+  .gd-sheet-map { height: 26px; }
+  /* The map's credits: one line beside the drawer (map.ts opens them in full on a tap). */
+  html.js .gd-attrib:not(.is-open) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+}

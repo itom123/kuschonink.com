@@ -97,6 +97,15 @@ from `src/scripts/guide/`.
   (maximised, for the Field Guide); back to one with it (Log Off), it is the
   small box in the middle again (`wm.swap`). On a phone it fills the screen like
   every window. Its CSS is in `guide-logon.css`.
+- **Full Screen (the Field Guide, a phone held sideways).** On a landscape
+  phone (`pointer: coarse`, at most 480px tall) the Field Guide's window drops
+  its title bar: its buttons end the menu bar, as a maximised document's do,
+  the toolbar becomes a column on the left and the status bar is for screen
+  readers only. While the guide (not its log-on box) is the active window, the
+  taskbar gives way (`--taskbar-h: 0`), as Internet Explorer's Full Screen did;
+  minimising the guide, or another window in front, brings it back. The CSS is
+  at the end of `guide.css`; `app.ts` adds a 中/EN switch and the Today note to
+  the window's frame for it.
 
 Without JavaScript, the window is an ordinary page: the close button links to
 `/`, and minimise and maximise are hidden.
@@ -183,7 +192,9 @@ and one rule in `desktop.css` see to it, on every page.
 
 The site carries English and Chinese side by side; `<html data-lang>` picks
 which one shows (`src/styles/lang.css`, `src/scripts/lang.ts`, words in
-`src/lib/i18n.ts`). The switch is in the taskbar tray. The desktop follows it:
+`src/lib/i18n.ts`). The switch is in the taskbar tray (and, while the Field
+Guide is Full Screen on a landscape phone, in its window: any `[data-lang-toggle]`
+button works). The desktop follows it:
 
 - **In Astro**, wrap text in `<Bi t={{ en, zh }} />`, and translatable
   attributes in `attr('title' | 'aria-label' | …, { en, zh })`. `Window.astro`
