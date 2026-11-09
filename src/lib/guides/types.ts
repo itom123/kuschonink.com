@@ -60,7 +60,16 @@ export interface AccessFile {
    * the old name still reach the guide (src/lib/guides/address.ts).
    */
   moved?: Record<string, string>;
+  /**
+   * What a reader can choose to see, in the order the log-on box offers them
+   * (its tabs): "Places to eat", "Exhibitions", "Photography". Each guide says
+   * which it answers in guide.json "kinds". Public: the labels show before the
+   * password, so keep them neutral.
+   */
+  kinds?: KindRecord[];
 }
+/** One choice in the log-on box: a kind of guide. */
+export interface KindRecord { id: string; label: string; labelZh?: string }
 export interface AudienceRecord {
   id: string;
   label: string;
@@ -93,6 +102,11 @@ export interface GuideFile {
   public: { title: string; titleZh?: string; subtitle?: string; subtitleZh?: string };
   /** Offered in the log-on box's list of guides (still locked). /guides opens the first listed guide, so an unlisted one opens only from its link. */
   listed: boolean;
+  /**
+   * The kinds of guide this one is (access.json "kinds"), its main one first:
+   * the log-on box opens on that tab, and the guide is offered under each.
+   */
+  kinds?: string[];
   city: string;
   cityZh?: string;
   /** IANA time zone, e.g. "Europe/Paris". "Today" and day rules use it. */
@@ -113,6 +127,17 @@ export interface GuideFile {
   zones: { id: string; name: string; nameZh?: string }[];
   /** Categories of listings.json records (`source` = the name used by the original source). */
   categories?: { id: string; source?: string; name: string; nameZh?: string }[];
+  /**
+   * Price levels, cheapest first ("€" … "€€€€"). Items name theirs in `cost`.
+   * With them the guide gets a Price filter, a "Price" order and a price mark
+   * on each place. `text` says what the level means ("€25–50 a head").
+   */
+  costs?: { id: string; name?: string; nameZh?: string; text?: string; textZh?: string }[];
+  /**
+   * Distinctions, highest first (a guidebook's stars: "3-stars" … "bib").
+   * Items name theirs in `award`; `short` is the mark in the list ("★★").
+   */
+  awards?: { id: string; name: string; nameZh?: string; short?: string; shortZh?: string }[];
   /** The nouns this guide uses in the interface. */
   labels: {
     item: string; itemZh?: string;          // "Exhibition"
@@ -121,6 +146,14 @@ export interface GuideFile {
     by?: string; byZh?: string;             // "Artist"
     listing?: string; listingZh?: string;   // "Official map entry"
     listings?: string; listingsZh?: string; // "Official map"
+    /** The tiers as a whole ("Category"). With it, a drop-down above the list shows one tier at a time. */
+    tier?: string; tierZh?: string;
+    /** The themes' filter and facts ("Cuisine"). Default "Theme". */
+    theme?: string; themeZh?: string;
+    /** The price levels' filter and facts ("Price range"). Default "Price range". */
+    cost?: string; costZh?: string;
+    /** The distinctions' facts ("Michelin Guide"). Default "Award". */
+    award?: string; awardZh?: string;
   };
   /** Page texts, in display order (section id → section). */
   texts: Record<string, TextSection>;
@@ -139,6 +172,8 @@ export interface GuideFile {
    */
   sensitive: { public: string[]; [audience: string]: string[] };
   defaults?: { price?: string; priceZh?: string; listingNote?: string; listingNoteZh?: string };
+  /** File ▸ Suggest a Place… and the toolbar's Suggest. Default true; false for a guide the wizard doesn't fit (restaurants). */
+  suggestions?: boolean;
 }
 
 /** items.json: the recommended places. */
@@ -152,6 +187,8 @@ export interface ItemRecord {
   short?: string;
   /** Paris: the exhibition title. */
   subtitle?: string;
+  /** The subtitle in Chinese, when it is a description rather than a title ("Omakase sushi" / "无菜单寿司"). */
+  subtitleZh?: string;
   /** Paris: the artist(s). */
   by?: string;
   zone: string;
@@ -172,6 +209,10 @@ export interface ItemRecord {
   minutes?: number;
   price?: string;
   priceZh?: string;
+  /** Its price level: an id from guide.json "costs" ("€€"). */
+  cost?: string;
+  /** Its distinction: an id from guide.json "awards" ("1-star"). */
+  award?: string;
   note?: string;
   noteZh?: string;
   /** The page this information came from. */
@@ -329,6 +370,8 @@ export interface Item extends DayRule {
   name: string;
   short: string;
   subtitle: string;
+  /** The subtitle in Chinese, or "" (show the subtitle). */
+  subtitleZh: string;
   by: string;
   zone: string;
   themes: string[];
@@ -337,6 +380,8 @@ export interface Item extends DayRule {
   hours: Bi;
   minutes?: number;
   price: Bi;
+  cost?: string;
+  award?: string;
   note: Bi;
   sourceUrl?: string;
   links: string[];
@@ -425,7 +470,11 @@ export interface GuideView {
   themes: { id: string; name: Bi }[];
   zones: { id: string; name: Bi }[];
   categories: { id: string; name: Bi }[];
-  labels: { item: Bi; items: Bi; subtitle: Bi; by: Bi; listing: Bi; listings: Bi };
+  costs: { id: string; name: Bi; text: Bi }[];
+  awards: { id: string; name: Bi; short: Bi }[];
+  labels: { item: Bi; items: Bi; subtitle: Bi; by: Bi; listing: Bi; listings: Bi; tier: Bi; theme: Bi; cost: Bi; award: Bi };
+  /** File ▸ Suggest a Place… and the toolbar's Suggest. */
+  suggestions: boolean;
   texts: Section[];
   links: { label: Bi; url: string }[];
   credits: { points: Bi; image: Bi; basemap: string };
@@ -454,7 +503,12 @@ export interface GuideCard {
   slug: string;
   publicTitle: Bi;
   publicSubtitle: Bi;
+  /** Its kinds (guide.json "kinds"), its main one first. */
+  kinds: string[];
 }
+
+/** A tab of the log-on box: a kind and its listed guides, in access.json order. */
+export interface KindTab { id: string; label: Bi; guides: string[] }
 
 // ---------------------------------------------------------------------------
 // What the browser gets: <script type="application/json" data-gd-data> inside
@@ -468,13 +522,19 @@ export interface Payload {
   window?: { start: ISODate; end: ISODate; days: ISODate[] };
   holidays: { date: ISODate; name: Bi; notice: Bi }[];
   tiers: { id: TierId; name: Bi; weight: number }[];
+  /** The guide shows a Category filter by tier (guide.json labels.tier). */
+  tierFilter?: boolean;
   themes: { id: string; name: Bi }[];
+  costs: { id: string; name: Bi }[];
+  awards: { id: string; name: Bi; short: Bi }[];
+  /** false: File ▸ Suggest a Place… is left out (guide.json "suggestions": false). */
+  suggestions?: false;
   centre: LonLat;
   heatRadius: number;
   map: { views: MapView[] };
   /** Street-level tiles, when the guide has them (the map shows them once zoomed past the city picture's 1:1). */
   tiles?: TileSource;
-  items: (DayRule & { id: string; tier: TierId; name: string; short: string; address: string; zone: string; themes: string[]; coordinates: LonLat; label: boolean; listing?: string })[];
+  items: (DayRule & { id: string; tier: TierId; name: string; short: string; address: string; zone: string; themes: string[]; coordinates: LonLat; label: boolean; listing?: string; cost?: string; award?: string })[];
   places: { id: string; label: Bi; name: string; short: string; address: string; coordinates: LonLat }[];
   listings: { id: string; name: string; category: string; coordinates: LonLat; start?: ISODate; end?: ISODate; item?: string }[];
   routes: { id: string; name: Bi; stops: string[]; mode: RouteMode }[];

@@ -64,6 +64,7 @@ const SCHEMA: Record<GuideFileName, S> = {
     ...tx('subtitle', false),
     public: obj({ ...tx('title'), ...tx('subtitle', false) }),
     listed: bool,
+    kinds: arr(str(), { opt: true, min: 1 }),
     ...tx('city'),
     timezone: str(),
     ...tx('timezoneLabel', false),
@@ -75,7 +76,12 @@ const SCHEMA: Record<GuideFileName, S> = {
     themes: arr(named),
     zones: arr(named),
     categories: arr(obj({ id: str(), source: opt(str()), ...tx('name') }), { opt: true }),
-    labels: obj({ ...tx('item'), ...tx('items'), ...tx('subtitle', false), ...tx('by', false), ...tx('listing', false), ...tx('listings', false) }),
+    costs: arr(obj({ id: str(), ...tx('name', false), ...tx('text', false) }), { opt: true, min: 1 }),
+    awards: arr(obj({ id: str(), ...tx('name'), ...tx('short', false) }), { opt: true, min: 1 }),
+    labels: obj({
+      ...tx('item'), ...tx('items'), ...tx('subtitle', false), ...tx('by', false), ...tx('listing', false), ...tx('listings', false),
+      ...tx('tier', false), ...tx('theme', false), ...tx('cost', false), ...tx('award', false),
+    }),
     texts: obj(
       {},
       {
@@ -92,6 +98,7 @@ const SCHEMA: Record<GuideFileName, S> = {
     map: obj({ centre: { t: 'centre' }, heatRadius: { t: 'num', min: 10, max: 20000 } }),
     sensitive: obj({ public: arr(str()) }, { rest: arr(str()) }),
     defaults: obj({ ...tx('price', false), ...tx('listingNote', false) }, { opt: true }),
+    suggestions: opt(bool),
   }),
   items: obj({
     items: arr(
@@ -101,6 +108,7 @@ const SCHEMA: Record<GuideFileName, S> = {
         name: str(),
         short: opt(str({ max: 14 })),
         subtitle: opt(str()),
+        subtitleZh: zh,
         by: opt(str()),
         zone: str(),
         themes: arr(str(), { min: 1 }),
@@ -115,6 +123,8 @@ const SCHEMA: Record<GuideFileName, S> = {
         exceptions: arr(obj({ date, status: enm('override'), ...tx('note', false) }), { opt: true }),
         minutes: { t: 'num', opt: true, int: true, min: 1, max: 1440 },
         ...tx('price', false),
+        cost: opt(str()),
+        award: opt(str()),
         ...tx('note', false),
         sourceUrl: opt(url),
         links: arr(url, { opt: true }),
@@ -212,6 +222,8 @@ const ACCESS_SCHEMA: S = obj({
   tiles: obj({}, { opt: true, rest: arr({ t: 'num' }, { min: 4 }) }),
   // Old address → the guide's slug now (checkMoved() looks closer).
   moved: obj({}, { opt: true, rest: str() }),
+  // The log-on box's tabs: what a reader can choose to see. Each guide names its own in guide.json "kinds".
+  kinds: arr(obj({ id: str(), ...tx('label') }), { opt: true, rec: 'id', min: 1 }),
 });
 
 /** access.json "moved": each old address is no guide of its own and sends to one that is. */
@@ -384,14 +396,14 @@ function walk(v: unknown, s: S, at: Loc, c: Ctx): void {
         if (s.rest) walk(v[k], s.rest, child(at, k), c);
         else say(c, child(at, k), `unknown field; ${suggest(k, known)}`);
       }
-      // Chinese twins: times must match; count the missing ones.
+      // Chinese twins: times must match; count the missing ones (an item's subtitle is usually a title in its own language).
       for (const k of known) {
         if (!k.endsWith('Zh') || !(k.slice(0, -2) in s.f)) continue;
         const base = v[k.slice(0, -2)];
         const twin = v[k];
         if (!isStr(base) || !base.trim()) continue;
         if (!isStr(twin) || !twin.trim()) {
-          c.missingZh++;
+          if (k !== 'subtitleZh') c.missingZh++;
           continue;
         }
         const a = timesIn(base).join(' ');
@@ -569,7 +581,17 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
       }
     }
     dupes(c, A(g.holidays), 'date', () => ({ id: 'holidays', path: 'date' }));
-    for (const k of ['tiers', 'themes', 'zones', 'categories']) dupes(c, A(g[k]), 'id', (id) => ({ id: k, path: `id ${q(id)}` }));
+    for (const k of ['tiers', 'themes', 'zones', 'categories', 'costs', 'awards']) dupes(c, A(g[k]), 'id', (id) => ({ id: k, path: `id ${q(id)}` }));
+    // Kinds: the log-on box's tabs (access.json "kinds"). A listed guide needs one, or no tab would offer it.
+    const kinds = A(g.kinds);
+    const known = A(access?.kinds).map((k) => O(k).id).filter(isStr);
+    kinds.forEach((k, i) => {
+      if (isStr(k) && !known.includes(k))
+        say(c, { id: 'guide', path: `kinds[${i}]` }, known.length ? `${q(k)} is not a kind in access.json "kinds". Known: ${known.join(', ')}.` : `${q(k)}: access.json has no "kinds" yet. Add it there first.`);
+    });
+    if (new Set(kinds).size !== kinds.length) say(c, { id: 'guide', path: 'kinds' }, 'lists a kind twice.');
+    if (g.listed === true && known.length && !kinds.length)
+      say(c, { id: 'guide', path: 'kinds' }, `is missing. A listed guide names its kind, so the log-on box can offer it. Known: ${known.join(', ')}.`);
     A(g.holidays).forEach((h, i) => {
       const d = O(h).date;
       if (isStr(d) && isISODate(d) && !inWindow(d, win)) say(c, { id: 'holidays', path: `[${i}].date` }, `${q(d)} is outside the guide's days (${winText}). Check the year.`);
@@ -588,6 +610,8 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
     for (const k of ['title', 'titleZh', 'subtitle', 'subtitleZh']) unfilled(O(g.public)[k], `public.${k}`);
     A(g.holidays).forEach((h, i) => ['notice', 'noticeZh', 'name', 'nameZh'].forEach((k) => unfilled(O(h)[k], `holidays[${i}].${k}`)));
     A(g.tiers).forEach((t, i) => ['text', 'textZh', 'name', 'nameZh'].forEach((k) => unfilled(O(t)[k], `tiers[${i}].${k}`)));
+    A(g.costs).forEach((x, i) => ['name', 'nameZh', 'text', 'textZh'].forEach((k) => unfilled(O(x)[k], `costs[${i}].${k}`)));
+    A(g.awards).forEach((x, i) => ['name', 'nameZh', 'short', 'shortZh'].forEach((k) => unfilled(O(x)[k], `awards[${i}].${k}`)));
     for (const [k, v] of Object.entries(O(g.labels))) unfilled(v, `labels.${k}`);
     for (const k of ['title', 'titleZh', 'subtitle', 'subtitleZh']) scan(g[k], k, 'guide');
     const texts = O(g.texts);
@@ -629,6 +653,8 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
   const themes = new Set(A(g.themes).map((x) => O(x).id).filter(isStr));
   const zones = new Set(A(g.zones).map((x) => O(x).id).filter(isStr));
   const cats = new Set(A(g.categories).map((x) => O(x).id).filter(isStr));
+  const costs = new Set(A(g.costs).map((x) => O(x).id).filter(isStr));
+  const awards = new Set(A(g.awards).map((x) => O(x).id).filter(isStr));
   const listingIds = new Set(records.map((x) => O(x).id).filter(isStr));
   const itemIds = new Set(items.map((x) => O(x).id).filter(isStr));
   const placeIds = new Set(places.map((x) => O(x).id).filter(isStr));
@@ -669,6 +695,10 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
       else if (isStr(r.id) && isStr(r.tier) && r.id[0] !== r.tier)
         say(c, f('id'), `${q(r.id)} should start with its tier letter "${r.tier}", e.g. ${r.tier}${r.id.slice(1)}.`);
       if (isStr(r.zone) && !zones.has(r.zone)) say(c, f('zone'), `${q(r.zone)} is not a zone in guide.json. Known: ${[...zones].join(', ')}.`);
+      if (isStr(r.cost) && !costs.has(r.cost))
+        say(c, f('cost'), costs.size ? `${q(r.cost)} is not a price level in guide.json "costs". Known: ${[...costs].join(', ')}.` : `${q(r.cost)}: guide.json has no "costs" (price levels) yet.`);
+      if (isStr(r.award) && !awards.has(r.award))
+        say(c, f('award'), awards.size ? `${q(r.award)} is not a distinction in guide.json "awards". Known: ${[...awards].join(', ')}.` : `${q(r.award)}: guide.json has no "awards" yet.`);
       const th = A(r.themes);
       th.forEach((t, j) => {
         if (isStr(t) && !themes.has(t)) say(c, f(`themes[${j}]`), `${q(t)} is not a theme in guide.json. Known: ${[...themes].join(', ')}.`);
@@ -844,6 +874,12 @@ export function checkAccess(access: unknown, slugs: string[]): string[] {
   }
   for (const s of slugs)
     if (!(s in guides)) problems.push(`guides/${s}/ › (folder) › (folder): not in access.json "guides", so nobody can open it. Add "${s}": ["visitor"].`);
+  const kinds = A(O(access).kinds);
+  dupes(c, kinds, 'id', (id) => ({ id: 'kinds', path: `id ${q(id)}` }));
+  kinds.forEach((k, i) => {
+    const id = O(k).id;
+    if (isStr(id) && !/^[a-z][a-z0-9-]*$/.test(id)) say(c, { id: 'kinds', path: `[${i}].id` }, `${q(id)} should be lower case letters, digits and "-".`);
+  });
   checkTiles(c, access, guides);
   checkMoved(c, access, guides);
   return [...new Set(problems)];

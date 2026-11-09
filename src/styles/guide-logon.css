@@ -42,6 +42,21 @@ html:not(.js) .app-window[data-fit="dialog"] .window-inner { min-height: 0; }
 }
 .gd-logon[data-busy], .gd-logon[data-busy] * { cursor: progress; }
 
+/* ---- Tabs: what the reader wants to see (access.json "kinds"), as a Windows 98 property sheet.
+   The panel holds the splash and the password box; without tabs it is no box at all. ---- */
+.gd-logon-panel:not(.window) { display: contents; }
+.gd-logon-kinds { width: min(436px, 100%); box-sizing: border-box; flex: none; }
+.gd-logon-kinds > li { min-width: 0; }
+.gd-logon-kinds a { white-space: nowrap; cursor: default; }
+.gd-logon-kinds a[aria-disabled="true"] { cursor: progress; }
+.gd-logon-panel.window {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  width: min(436px, 100%); box-sizing: border-box; padding: 16px 8px 12px;
+}
+/* The selected tab joins the panel (98.css pulls the tabs 2px over it), so nothing between them. */
+.gd-logon[data-gd-tabbed], html.js .app-window[data-fit="dialog"] .gd-logon[data-gd-tabbed] { gap: 0; }
+@media (pointer: coarse) { .gd-logon-kinds a { margin: 9px 10px; } }
+
 /* ---- Splash: content fonts, no photographs ---- */
 .gd-logon-splash {
   display: flex; align-items: center; gap: 14px;
@@ -128,6 +143,10 @@ html.js .gd-logon-guides { display: none; }
   .gd-logon-icon { width: 48px; height: 48px; }
   .gd-logon-title { font-size: 19px; }
   .gd-logon-form { flex: 0 1 420px; min-width: 0; }
+  /* With tabs: the tabs on top, the splash beside the box inside the panel. */
+  .gd-logon[data-gd-tabbed] { flex-direction: column; align-items: center; gap: 0; }
+  .gd-logon[data-gd-tabbed] .gd-logon-kinds { width: min(660px, 100%); }
+  .gd-logon-panel.window { flex-direction: row; align-items: flex-start; justify-content: center; gap: 18px; width: min(660px, 100%); padding: 10px 8px 12px; }
 }
 
 /* ---- High Contrast ---- */

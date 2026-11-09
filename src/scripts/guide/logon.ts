@@ -4,11 +4,14 @@
 // Errors come as Windows 98 message boxes. The password is never kept: it
 // lives only in the field and in the request. Choosing another guide in the
 // Guide list opens that guide's box in the same window, so the password always
-// goes to the guide chosen.
+// goes to the guide chosen. The tabs on top (what the reader wants to see:
+// access.json "kinds") work the same way: another kind opens its first guide's
+// box, unless this guide is one of its guides too; then only the Guide list
+// changes to that kind's guides.
 //
 // This file imports no guide content: everything it knows (the slug, the
 // public title) comes from the page's own attributes.
-import { pick } from '../lang';
+import { getLang, pick } from '../lang';
 
 interface Bi { en: string; zh: string }
 type Icon = 'error' | 'warning' | 'info';
@@ -58,6 +61,10 @@ const fine = matchMedia('(pointer: fine)');
 
 /** The guide just chosen in a Guide list: its box starts on the list, not on the password. */
 let chosen = '';
+/** The tab the last box was on when another guide was chosen: the next box opens on it (a guide can be under several). */
+let chosenKind = '';
+/** Chosen on a tab (the next box starts on the tabs), or in the Guide list (it starts on the list). */
+let chosenOn: 'tab' | 'list' = 'list';
 
 export function initLogOn() {
   for (const root of document.querySelectorAll<HTMLElement>('[data-gd-logon]:not([data-init])')) {
@@ -73,6 +80,7 @@ function setUp(root: HTMLElement) {
   const next = root.querySelector<HTMLInputElement>('[data-gd-next]');
   const cancel = root.querySelector<HTMLAnchorElement>('[data-gd-cancel]');
   const list = root.querySelector<HTMLSelectElement>('[data-gd-guide]');
+  const tabs = [...root.querySelectorAll<HTMLAnchorElement>('a[data-gd-kind]')];
   if (!form || !pass || !ok || !next) return;
 
   const win = root.closest<HTMLElement>('[data-window]');
@@ -150,15 +158,40 @@ function setUp(root: HTMLElement) {
     status(MSG.off.text);
   }
 
-  // ---- First focus: the Guide list when a guide was just chosen in it (arrow keys go on choosing), else the password ----
-  const fromList = !!list && chosen === slug;
+  // ---- Tabs: what the reader wants to see. Each lists its guides; the Guide list keeps those of the chosen tab ----
+  const guidesOf = (a: HTMLAnchorElement) => (a.dataset.gdKindGuides ?? '').split(' ').filter(Boolean);
+  const guideRow = list?.closest<HTMLElement>('.gd-logon-guide') ?? null;
+  const options = list ? [...list.options] : [];
+  const showKind = (kind: string) => {
+    for (const a of tabs) a.parentElement?.setAttribute('aria-selected', String(a.dataset.gdKind === kind));
+    if (!list || !tabs.length) return;
+    const keep = options.filter((o) => (o.dataset.kinds ?? '').split(' ').includes(kind));
+    // In the language on screen (lang.ts names each option in both).
+    for (const o of keep) o.textContent = (getLang() === 'zh' ? o.dataset.textZh : o.dataset.textEn) || o.textContent;
+    list.replaceChildren(...keep);
+    list.value = slug;
+    if (guideRow) guideRow.hidden = keep.length < 2;
+  };
+  const tabOf = (kind: string) => tabs.find((a) => a.dataset.gdKind === kind);
+  // Opened from another guide's box on a tab that this guide answers too: on that tab.
+  const onKind = chosen === slug && chosenKind && tabOf(chosenKind) && guidesOf(tabOf(chosenKind)!).includes(slug) ? chosenKind : '';
+  if (onKind) showKind(onKind);
+
+  // ---- First focus: the tabs or the Guide list when a guide was just chosen there, so arrow keys go on choosing; else the password ----
+  const fromTab = chosen === slug && chosenOn === 'tab' && !!onKind;
+  const fromList = !!list && chosen === slug && chosenOn === 'list';
   chosen = '';
-  if (fromList && fine.matches) requestAnimationFrame(() => list?.focus({ preventScroll: true }));
+  chosenKind = '';
+  if (fromTab && fine.matches) requestAnimationFrame(() => tabOf(onKind)?.focus({ preventScroll: true }));
+  else if (fromList && fine.matches) requestAnimationFrame(() => list?.focus({ preventScroll: true }));
   else focus();
 
   // ---- Guide: another listed guide's box, in this window ----
   let choosing = 0;
-  const choose = async (other: string) => {
+  /** The tab on screen ('' without tabs). */
+  const kindNow = () => tabs.find((a) => a.parentElement?.getAttribute('aria-selected') === 'true')?.dataset.gdKind ?? '';
+  /** `on`: where it was chosen. The guide's box opens on the tab this box is on. */
+  const choose = async (other: string, on: 'tab' | 'list', kind = kindNow()) => {
     const n = ++choosing;
     const url = `/guides/${other}`;
     const d = shell();
@@ -170,6 +203,8 @@ function setUp(root: HTMLElement) {
     busy = true;
     root.toggleAttribute('data-busy', true);
     chosen = other;
+    chosenKind = kind;
+    chosenOn = on;
     try {
       await d.open(url);
     } catch {
@@ -178,17 +213,47 @@ function setUp(root: HTMLElement) {
     }
     if (n !== choosing) return; // another guide was chosen meanwhile
     chosen = '';
+    chosenKind = '';
     // Still here (it couldn't open): back to this guide.
     if (root.isConnected && !signal.aborted) {
       busy = false;
       root.removeAttribute('data-busy');
-      list!.value = slug;
+      if (list) list.value = slug;
+      if (on === 'tab') tabs.find((a) => a.dataset.gdKind === kindNow())?.focus({ preventScroll: true });
     }
   };
+  for (const a of tabs) {
+    a.addEventListener('click', (e) => {
+      // A modified click: the browser follows the link itself.
+      if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      if (busy) return;
+      const kind = a.dataset.gdKind ?? '';
+      const gs = guidesOf(a);
+      if (gs.includes(slug)) showKind(kind);
+      else if (gs[0]) void choose(gs[0], 'tab', kind);
+    }, { signal });
+    // Arrow keys move along the tabs; Enter or Space opens one.
+    a.addEventListener('keydown', (e) => {
+      const i = tabs.indexOf(a);
+      const to = e.key === 'ArrowRight' ? tabs[(i + 1) % tabs.length]
+        : e.key === 'ArrowLeft' ? tabs[(i - 1 + tabs.length) % tabs.length]
+        : e.key === 'Home' ? tabs[0]
+        : e.key === 'End' ? tabs[tabs.length - 1]
+        : null;
+      if (to) {
+        e.preventDefault();
+        to.focus();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        a.click();
+      }
+    }, { signal });
+  }
   if (list) {
     list.value = slug; // not a choice the browser kept from an earlier visit
     list.addEventListener('change', () => {
-      if (list.value && list.value !== slug) void choose(list.value);
+      if (list.value && list.value !== slug) void choose(list.value, 'list');
     }, { signal });
   }
 
@@ -210,6 +275,10 @@ function setUp(root: HTMLElement) {
     busy = on;
     ok.disabled = on;
     if (list) list.disabled = on; // no other guide while this one checks the password
+    for (const a of tabs) {
+      if (on) a.setAttribute('aria-disabled', 'true');
+      else a.removeAttribute('aria-disabled');
+    }
     root.toggleAttribute('data-busy', on);
     if (on) win?.setAttribute('aria-busy', 'true');
     else win?.removeAttribute('aria-busy');
