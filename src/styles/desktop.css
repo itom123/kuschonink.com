@@ -134,7 +134,12 @@ html.js .app-window {
   top: var(--y, calc((100% - var(--wh)) / 2));
 }
 html.js .app-window[data-state="max"] { left: 0; top: 0; width: 100%; height: 100%; }
-html.js .app-window[data-state="min"] { visibility: hidden; }
+/* Minimised: hidden through and through. A part that makes itself visible (the Field Guide's heartbeat,
+   the house's blueprint scans) would otherwise show on the desktop; !important outranks animations too. */
+html.js .app-window[data-state="min"],
+html.js .app-window[data-state="min"] *,
+html.js .app-window[data-state="min"] *::before,
+html.js .app-window[data-state="min"] *::after { visibility: hidden !important; }
 html.js .app-window.auto-size { width: max-content; height: auto; max-width: calc(100% - 16px); }
 
 .app-window > .title-bar { flex: none; gap: 4px; -webkit-user-select: none; user-select: none; touch-action: none; }
