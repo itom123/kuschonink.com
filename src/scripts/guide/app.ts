@@ -36,6 +36,26 @@ const biData = (el: HTMLElement, k: string): Bi => ({ en: el.dataset[`${k}En`] ?
 
 /** A listed guide, by its neutral public title (File ▸ Open Guide...). */
 export interface GuideLink { slug: string; title: Bi }
+/** What readers can choose to see, with its listed guides (File ▸ Open Guide... groups the guides by it). */
+export interface KindLink { id: string; label: Bi; guides: string[] }
+
+/** The kinds the page names, when listed guides answer two or more; else none. */
+function guideKinds(root: HTMLElement, guides: GuideLink[]): KindLink[] {
+  try {
+    const raw: unknown = JSON.parse(root.querySelector('script[data-gd-kinds]')?.textContent ?? '[]');
+    if (!Array.isArray(raw)) return [];
+    const known = new Set(guides.map((g) => g.slug));
+    const out: KindLink[] = [];
+    for (const k of raw as { id?: unknown; label?: { en?: unknown; zh?: unknown }; guides?: unknown }[]) {
+      if (typeof k?.id !== 'string' || typeof k.label?.en !== 'string' || !Array.isArray(k.guides)) continue;
+      const gs = k.guides.filter((x): x is string => typeof x === 'string' && known.has(x));
+      if (gs.length) out.push({ id: k.id, label: { en: k.label.en, zh: typeof k.label.zh === 'string' && k.label.zh ? k.label.zh : k.label.en }, guides: gs });
+    }
+    return out.length > 1 ? out : [];
+  } catch {
+    return [];
+  }
+}
 
 /** The listed guides the page names (public titles only); empty if the page names none. */
 function listedGuides(root: HTMLElement): GuideLink[] {
@@ -77,6 +97,8 @@ export class GuideApp {
   readonly labels: { items: Bi; listings: Bi; title: Bi };
   /** The listed guides (public titles); File ▸ Open Guide... shows only when there are several. */
   readonly guides: GuideLink[];
+  /** The same guides by kind (none: one flat list). */
+  readonly kinds: KindLink[];
   private session: Session;
   private hintTimer = 0;
   private urlTimer = 0;
@@ -121,6 +143,7 @@ export class GuideApp {
     // data-guide-*, not data-title-*: the 中/EN switch (lang.ts) would turn those into a tooltip.
     this.labels = { items: biData(root, 'items'), listings: biData(root, 'listings'), title: biData(root, 'guide') };
     this.guides = listedGuides(root);
+    this.kinds = guideKinds(root, this.guides);
     this.fields = [...this.win.querySelectorAll<HTMLElement>(':scope > [data-window-inner] > .status-bar > .status-bar-field')];
     if (this.fields[1]) { this.fields[1].setAttribute('role', 'status'); this.fields[1].setAttribute('aria-live', 'polite'); }
     this.today = todayIn(this.p.timezone);
@@ -579,7 +602,7 @@ export class GuideApp {
     this.details.showNear({
       title: W.nearYou,
       note: W.nearNote(day),
-      empty: W.nearNone(day, !!s.q.trim() || !!s.theme),
+      empty: W.nearNone(day, !!s.q.trim() || !!s.theme || !!s.tier || !!s.cost),
       stop: W.stopLocating,
       rows: near.map(({ id, m }) => {
         const it = this.items.get(id);
@@ -619,15 +642,17 @@ export class GuideApp {
     const s = this.store.get();
     const it = this.items.get(id);
     if (!it) return true;
+    if (s.tier && it.tier !== s.tier) return false;
+    if (s.cost && it.cost !== s.cost) return false;
     if (s.theme && !it.themes.includes(s.theme)) return false;
     return this.matchQ(id, q);
   }
 
-  /** An official entry passes Find when shown; it has no themes, so a theme leaves it out. Its day is its status, as an item's. */
+  /** An official entry passes Find when shown; it has no theme, tier or price, so those filters leave it out. Its day is its status, as an item's. */
   private matchListing(id: string, q?: string) {
     const s = this.store.get();
     if (!this.lists.has(id)) return false;
-    if (s.theme) return false;
+    if (s.theme || s.tier || s.cost) return false;
     return this.matchQ(id, q);
   }
 
@@ -643,12 +668,12 @@ export class GuideApp {
   // ---- Rendering ----
   view(): View {
     const v = this.store.get().view ?? (this.wide ? 'places' : 'map');
-    return v === 'days' && !this.p.window ? 'places' : v;
+    return (v === 'days' && !this.p.window) || (v === 'routes' && !this.p.routes.length) ? 'places' : v;
   }
 
   private render(changed: Set<keyof GdState>, first: boolean) {
     const s = this.store.get();
-    const filters = ['day', 'theme', 'q', 'listings', 'route', 'labels', 'place', 'sort'].some((k) => changed.has(k as keyof GdState));
+    const filters = ['day', 'tier', 'cost', 'theme', 'q', 'listings', 'route', 'labels', 'place', 'sort'].some((k) => changed.has(k as keyof GdState));
     this.root.dataset.view = this.view();
     this.root.dataset.layout = this.wide ? 'wide' : 'compact';
     this.root.classList.toggle('has-route', !!s.route);
@@ -914,6 +939,10 @@ export class GuideApp {
     }
     const theme = this.root.querySelector<HTMLSelectElement>('[data-gd-theme-select]');
     if (theme) theme.value = s.theme;
+    const tier = this.root.querySelector<HTMLSelectElement>('[data-gd-tier-select]');
+    if (tier) tier.value = s.tier;
+    const cost = this.root.querySelector<HTMLSelectElement>('[data-gd-cost-select]');
+    if (cost) cost.value = s.cost;
     const q = this.root.querySelector<HTMLInputElement>('[data-gd-q]');
     if (q && q.value !== s.q) q.value = s.q;
     const l = this.root.querySelector<HTMLInputElement>('[data-gd-listings]');
@@ -965,15 +994,23 @@ export class GuideApp {
   openGuide() {
     if (this.guides.length < 2) return;
     const ask = h('p', { class: 'msg-text', id: `gd-open-ask-${this.slug}` }, W.openGuideAsk);
+    const link = (g: GuideLink) => {
+      const here = g.slug === this.slug;
+      return h('li', {}, h('a', { href: `/guides/${g.slug}`, 'data-gd-open': g.slug, 'aria-current': here ? 'true' : null }, [
+        h('span', { class: 'ico ico16 ico-guide', 'aria-hidden': 'true' }),
+        ' ',
+        here ? h('b', {}, g.title) : g.title,
+      ]));
+    };
+    const bySlug = new Map(this.guides.map((g) => [g.slug, g]));
+    // By kind (a guide can be under several), as the log-on box's tabs; else one list.
     const list = h('ul', { class: 'tree-view gd-open-list', 'aria-labelledby': ask.id },
-      this.guides.map((g) => {
-        const here = g.slug === this.slug;
-        return h('li', {}, h('a', { href: `/guides/${g.slug}`, 'data-gd-open': g.slug, 'aria-current': here ? 'true' : null }, [
-          h('span', { class: 'ico ico16 ico-guide', 'aria-hidden': 'true' }),
-          ' ',
-          here ? h('b', {}, g.title) : g.title,
-        ]));
-      }));
+      this.kinds.length
+        ? this.kinds.map((k) => h('li', { class: 'gd-open-kind' }, [
+          h('span', {}, [h('span', { class: 'ico ico16 ico-folder', 'aria-hidden': 'true' }), ' ', k.label]),
+          h('ul', {}, k.guides.map((slug) => link(bySlug.get(slug)!))),
+        ]))
+        : this.guides.map(link));
     const cancel = h('button', { type: 'button' }, W.cancel);
     const win = dialog({
       title: W.openGuideTitle,
@@ -1159,7 +1196,7 @@ export class GuideApp {
         return;
       }
       if (t.closest('[data-gd-clear-find]')) {
-        this.store.set({ q: '', theme: '' });
+        this.store.set({ q: '', theme: '', tier: '', cost: '' });
         this.syncControls();
       }
     }, { signal });
@@ -1168,6 +1205,8 @@ export class GuideApp {
       const t = e.target as HTMLElement;
       if (t.matches('[data-gd-day]')) this.setDay((t as HTMLSelectElement).value);
       else if (t.matches('[data-gd-theme-select]')) this.store.set({ theme: (t as HTMLSelectElement).value });
+      else if (t.matches('[data-gd-tier-select]')) this.store.set({ tier: (t as HTMLSelectElement).value });
+      else if (t.matches('[data-gd-cost-select]')) this.store.set({ cost: (t as HTMLSelectElement).value });
       else if (t.matches('[data-gd-listings]')) this.store.set({ listings: (t as HTMLInputElement).checked });
       else if (t.matches('[data-gd-route-radio]')) this.setRoute((t as HTMLInputElement).value || null);
     }, { signal });
@@ -1261,7 +1300,7 @@ export class GuideApp {
       if (!(e as CustomEvent).detail?.same) return;
       const u = this.win.dataset.url ?? '';
       const st = initialState(this.p, u.includes('?') ? u.slice(u.indexOf('?')) : '', loadPrefs(), this.today);
-      this.store.set({ place: st.place, day: st.day, dayAuto: st.dayAuto, theme: st.theme, q: st.q, listings: st.listings, area: st.area, route: st.route, view: st.view, detail: st.place ? (this.wide ? 'half' : 'full') : 'closed' });
+      this.store.set({ place: st.place, day: st.day, dayAuto: st.dayAuto, tier: st.tier, cost: st.cost, theme: st.theme, q: st.q, listings: st.listings, area: st.area, route: st.route, view: st.view, detail: st.place ? (this.wide ? 'half' : 'full') : 'closed' });
       this.syncControls();
     }, { signal });
 

@@ -12,18 +12,29 @@
 // view, a picture or a base map never leaves the Worker without a valid
 // cookie, and every failure fails closed.
 //
-// The cookie: kus98_guides=v1.<audience>.<expiry>.<HMAC-SHA256>. Its key is
+// The cookie: kus98_guides_<audience>=v1.<audience>.<expiry>.<HMAC-SHA256>,
+// one per audience, so a device can be logged on to guides of different
+// audiences at once (the photography guide with the visitors' password, the
+// restaurant guide with its own). Cookies named plain kus98_guides, as they were
+// before, are still read. The name only keeps them apart: the audience that
+// counts is the one inside the signed value. Its key is
 // an HMAC of that audience's password under a secret only the server has (the
 // pepper: GUIDES_COOKIE_SECRET, else TURNSTILE_SECRET), so nobody can sign a
 // cookie for a guessed password. Changing one password logs out only that
 // audience; changing the pepper logs out everyone; without one, every guide is
-// closed. Written with its dependencies passed in, like contact.ts, so
+// closed. Log Off forgets the cookies that open that guide, and no others. Written with its dependencies passed in, like contact.ts, so
 // worker/guides.test.mts runs it in Node.
 import type { AccessFile } from '../src/lib/guides/types';
 import { cityGuide, currentSlug } from '../src/lib/guides/address.ts';
 
 export const PREFIX = '/guides';
 export const COOKIE = 'kus98_guides';
+/** An audience's own cookie: kus98_guides_<audience>. */
+export const cookieName = (audience: string) => `${COOKIE}_${audience}`;
+/** The guide cookies a request may carry: each audience's, and the plain name of the cookies made before. */
+const COOKIE_NAME = /^kus98_guides(?:_[a-z][a-z0-9-]{0,63})?$/;
+/** At most this many guide cookies are checked in one request (one per audience, and an old plain one). */
+const MAX_COOKIES = 8;
 /** "Save this password": 30 days. Otherwise a browser-session cookie whose signed expiry is 12 hours. */
 export const REMEMBER_S = 30 * 86400;
 export const SESSION_S = 12 * 3600;
@@ -132,7 +143,7 @@ async function route(req: Request, deps: GuidesDeps): Promise<Response> {
   // /guides/<slug>.html, /<slug>/, the built views and log-on page: always the guide's own address.
   if (at.html || CANONICAL.has(sub) || sub.startsWith('/views/') || sub.startsWith('/locked')) return redirect(home + url.search, 307);
   if (sub === '/login') return logOn(req, url, slug, deps);
-  if (sub === '/logout') return logOff(req, url, slug);
+  if (sub === '/logout') return logOff(req, url, slug, deps);
   if (sub === '/suggest') return deps.suggest ? deps.suggest(req, slug) : notFound(url, deps);
   const isTile = sub.startsWith('/tiles/');
   const isFile = sub.startsWith('/img/') || sub.startsWith('/map/') || isTile;
@@ -287,7 +298,7 @@ export function topView(access: AccessFile, slug: string): string | null {
 
 /** The view of this guide that the request's cookie opens, or null. */
 async function viewFor(deps: GuidesDeps, pepper: string, slug: string, header: string | null): Promise<string | null> {
-  if (!header || !header.includes(`${COOKIE}=`)) return null;
+  if (!header || !header.includes(COOKIE)) return null;
   const pws = passwords(deps);
   let best: string | null = null;
   for (const aud of await cookieAudiences(pepper, header, pws, deps.now())) {
@@ -297,15 +308,24 @@ async function viewFor(deps: GuidesDeps, pepper: string, slug: string, header: s
   return best;
 }
 
-/** The audiences of the valid guide cookies in a Cookie header (a few at most). */
+/** The guide cookies in a Cookie header as [name, value] (a few at most). */
+function guideCookies(header: string | null): [string, string][] {
+  const out: [string, string][] = [];
+  for (const part of (header ?? '').split(';')) {
+    const c = part.trim();
+    const eq = c.indexOf('=');
+    if (eq < 1 || !COOKIE_NAME.test(c.slice(0, eq))) continue;
+    out.push([c.slice(0, eq), c.slice(eq + 1)]);
+    if (out.length >= MAX_COOKIES) break;
+  }
+  return out;
+}
+
+/** The audiences of the valid guide cookies in a Cookie header. */
 async function cookieAudiences(pepper: string, header: string, pws: Map<string, string>, now: number): Promise<string[]> {
   const out: string[] = [];
-  let seen = 0;
-  for (const part of header.split(';')) {
-    const c = part.trim();
-    if (!c.startsWith(`${COOKIE}=`)) continue;
-    if (++seen > 4) break;
-    const aud = await checkToken(pepper, c.slice(COOKIE.length + 1), pws, now);
+  for (const [, value] of guideCookies(header)) {
+    const aud = await checkToken(pepper, value, pws, now);
     if (aud && !out.includes(aud)) out.push(aud);
   }
   return out;
@@ -392,7 +412,7 @@ export async function checkToken(pepper: string, token: string, pws: Map<string,
 export async function issueCookie(pepper: string, audience: string, password: string, now: number, remember: boolean, secure: boolean): Promise<string> {
   const ttl = remember ? REMEMBER_S : SESSION_S;
   const token = await makeToken(pepper, audience, password, Math.floor(now / 1000) + ttl);
-  return [`${COOKIE}=${token}`, `Path=${PREFIX}`, 'HttpOnly', 'SameSite=Lax', ...(secure ? ['Secure'] : []), ...(remember ? [`Max-Age=${ttl}`] : [])].join('; ');
+  return [`${cookieName(audience)}=${token}`, `Path=${PREFIX}`, 'HttpOnly', 'SameSite=Lax', ...(secure ? ['Secure'] : []), ...(remember ? [`Max-Age=${ttl}`] : [])].join('; ');
 }
 
 const sha256 = async (s: string) => new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(s)));
@@ -519,15 +539,32 @@ async function logOn(req: Request, url: URL, slug: string, deps: GuidesDeps): Pr
   return asJson ? json({ ok: true, next }, 200, { 'set-cookie': cookie }) : redirect(next, 303, { 'set-cookie': cookie });
 }
 
-function logOff(req: Request, url: URL, slug: string): Response {
+/**
+ * The cookies Log Off clears on this guide: those of every audience that opens
+ * it, and an old plain kus98_guides when the audience it names opens it too (or
+ * says none). A cookie for guides of other audiences stays: logging off the
+ * restaurant guide keeps the photography guide open.
+ */
+export function cookiesToClear(access: AccessFile, slug: string, header: string | null): string[] {
+  const names = access.audiences.filter((a) => viewOf(access, slug, a.id) !== null).map((a) => cookieName(a.id));
+  const old = guideCookies(header).find(([name]) => name === COOKIE);
+  const oldAudience = old ? TOKEN.exec(old[1])?.[1] : undefined;
+  if (!oldAudience || viewOf(access, slug, oldAudience) !== null) names.unshift(COOKIE);
+  return names;
+}
+
+function logOff(req: Request, url: URL, slug: string, deps: GuidesDeps): Response {
   const home = `${PREFIX}/${slug}`;
   const asJson = wantsJson(req);
   if (req.method !== 'POST') return asJson ? json({ error: 'method_not_allowed' }, 405, { allow: 'POST' }) : redirect(home, 303);
   if (!sameOrigin(req, url.origin)) {
     return asJson ? json({ error: 'origin_not_allowed' }, 403) : note(403, 'This page could not log off. Reload it and try again.', '无法注销。请刷新网页后再试。');
   }
-  const clear = [`${COOKIE}=`, `Path=${PREFIX}`, 'Max-Age=0', 'Expires=Thu, 01 Jan 1970 00:00:00 GMT', 'HttpOnly', 'SameSite=Lax', ...(isLocal(url.hostname) ? [] : ['Secure'])].join('; ');
-  return asJson ? json({ ok: true }, 200, { 'set-cookie': clear }) : redirect(home, 303, { 'set-cookie': clear });
+  const secure = isLocal(url.hostname) ? [] : ['Secure'];
+  const res = asJson ? json({ ok: true }, 200) : redirect(home, 303);
+  for (const name of cookiesToClear(deps.access, slug, req.headers.get('cookie')))
+    res.headers.append('set-cookie', [`${name}=`, `Path=${PREFIX}`, 'Max-Age=0', 'Expires=Thu, 01 Jan 1970 00:00:00 GMT', 'HttpOnly', 'SameSite=Lax', ...secure].join('; '));
+  return res;
 }
 
 // ---- Responses ----

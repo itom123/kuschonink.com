@@ -23,7 +23,8 @@ export function menuProvider(app: GuideApp) {
           { label: 'Open in &Google Maps', zh: '在 Google 地图中打开(&G)', disabled: !s.place, action: () => app.openLink(0) },
           { label: 'Get &Directions', zh: '获取路线(&D)', disabled: !s.place && !s.route, action: () => app.openLink(1) },
           { sep: true },
-          { label: SW.menu.en, zh: SW.menu.zh, icon: 'guide', action: () => app.root.dispatchEvent(new Event('gd:suggest')) },
+          // Not in a guide whose suggestions are off (guide.json "suggestions": false).
+          ...(p.suggestions === false ? [] : [{ label: SW.menu.en, zh: SW.menu.zh, icon: 'guide', action: () => app.root.dispatchEvent(new Event('gd:suggest')) }]),
           // Admin mode only (the queue checks the session on the server).
           ...(document.documentElement.hasAttribute('data-admin') ? [{ label: AW.queueMenu.en, zh: AW.queueMenu.zh, icon: 'keys', action: () => void (window.kus98 as unknown as { open(u: string): Promise<void> } | undefined)?.open('/admin/suggestions') }] : []),
           { sep: true },
@@ -38,7 +39,7 @@ export function menuProvider(app: GuideApp) {
           { label: 'Copy &Link', zh: '复制链接(&L)', action: () => void app.copyLink() },
           { sep: true },
           { label: '&Find...', zh: '查找(&F)...', key: 'Ctrl+F', action: () => app.focusFind() },
-          { label: 'Clea&r Filters', zh: '清除筛选条件(&R)', disabled: !s.q && !s.theme, action: () => { app.store.set({ q: '', theme: '' }); app.syncControls(); } },
+          { label: 'Clea&r Filters', zh: '清除筛选条件(&R)', disabled: !s.q && !s.theme && !s.tier && !s.cost, action: () => { app.store.set({ q: '', theme: '', tier: '', cost: '' }); app.syncControls(); } },
         ];
       case 'view': {
         const pane = (id: View, label: string, zh: string): MenuSpec => ({ label, zh, radio: true, checked: v === id, action: () => app.setView(id) });
@@ -56,13 +57,14 @@ export function menuProvider(app: GuideApp) {
           { sep: true },
           by('name', 'by &Name', '按名称(&N)'),
           by('zone', 'by &Area', '按区域(&A)'),
+          ...(p.costs?.length ? [by('cost', 'by &Price', '按价格(&P)')] : []),
           ...(hasDays ? [by('open', '&Open That Day First', '当天开放的优先(&O)')] : []),
           by('near', 'Nearest &First', '离我最近(&F)'),
         ];
         return [
           pane('map', '&Map', '地图(&M)'),
           pane('places', '&Places', '地点(&P)'),
-          pane('routes', '&Routes', '路线(&R)'),
+          ...(p.routes.length ? [pane('routes', '&Routes', '路线(&R)')] : []),
           ...(hasDays ? [pane('days', '&Days', '日期(&D)')] : []),
           pane('info', '&Info', '说明(&I)'),
           { sep: true },

@@ -1,7 +1,8 @@
 ---
 // Field Guide: the Places pane. One list at every width, two columns: the ref
 // with its tier icon, then the name, the artist and title, and a small line
-// with the opening days (or the chosen day's status) and the area. "Sort by:"
+// with the distinction and price level (a guide that has them), the opening
+// days (or the chosen day's status) and the area. "Sort by:"
 // orders it; JS also fills the day, moves the places closed on the chosen day
 // into their own group and filters by theme and Find (src/scripts/guide/
 // panes.ts, order.ts). Without JS it lists everything, in the guide's order.
@@ -18,6 +19,16 @@ const zone = (id: string) => view.zones.find((z) => z.id === id)?.name ?? { en: 
 // The Area order follows the guide's own list of areas.
 const zoneAt = (id: string) => { const i = view.zones.findIndex((z) => z.id === id); return i < 0 ? view.zones.length : i; };
 const theme = (id: string) => view.themes.find((t) => t.id === id)?.name ?? { en: id, zh: '' };
+// The Price order follows the guide's own list of levels (cheapest first).
+const costAt = (id?: string) => { const i = id ? view.costs.findIndex((c) => c.id === id) : -1; return i < 0 ? undefined : i; };
+const costOf = (id?: string) => (id ? view.costs.find((c) => c.id === id) : undefined);
+const awardOf = (id?: string) => (id ? view.awards.find((a) => a.id === id) : undefined);
+/** The marks before the days and area: "★★ €€€€". */
+const marks = (it: { award?: string; cost?: string }): BiT | null => {
+  const a = awardOf(it.award), c = costOf(it.cost);
+  if (!a && !c) return null;
+  return { en: [a?.short.en, c?.name.en].filter(Boolean).join(' '), zh: [a ? a.short.zh || a.short.en : '', c ? c.name.zh || c.name.en : ''].filter(Boolean).join(' ') };
+};
 const category = (id: string) => view.categories.find((c) => c.id === id)?.name ?? { en: id, zh: '' };
 const both = (t: BiT) => `${t.en} ${t.zh}`;
 const q = (...parts: string[]) => normalise(parts.filter(Boolean).join(' '));
@@ -28,6 +39,7 @@ const sorts: { v: string; t: BiT; off?: boolean }[] = [
   { v: 'tier', t: W.sortTier },
   { v: 'name', t: W.sortName },
   { v: 'zone', t: W.sortZone },
+  ...(view.costs.length ? [{ v: 'cost', t: W.sortCost }] : []),
   ...(hasDays ? [{ v: 'open', t: W.sortOpen, off: true }] : []),
   { v: 'near', t: W.sortNear, off: true },
 ];
@@ -73,13 +85,13 @@ const sorts: { v: string; t: BiT; off?: boolean }[] = [
       )}
       <tbody data-gd-group="items">
         {view.items.map((it) => (
-          <tr data-gd-row={it.id} data-kind="item" data-tier={it.tier} data-zone={it.zone} data-zi={zoneAt(it.zone)} data-q={q(it.id, it.name, it.short, it.subtitle, it.by, it.address, both(zone(it.zone)), ...it.themes.map((t) => both(theme(t))))}>
+          <tr data-gd-row={it.id} data-kind="item" data-tier={it.tier} data-zone={it.zone} data-zi={zoneAt(it.zone)} data-ci={costAt(it.cost)} data-q={q(it.id, it.name, it.short, it.subtitle, it.subtitleZh, it.by, it.address, both(zone(it.zone)), ...it.themes.map((t) => both(theme(t))), ...(awardOf(it.award) ? [both(awardOf(it.award)!.name)] : []))}>
             <td class="gd-col-ref"><span class={`ico ico16 ico-pin-${it.tier.toLowerCase()}`} aria-hidden="true"></span> {it.id}</td>
             <td class="gd-col-main">
               <a href={`#gd-item-${it.id}`} data-gd-sel={it.id} class="gd-row-name">{it.name}</a>
-              {(it.by || it.subtitle) && <span class="gd-row-sub">{[it.by, it.subtitle].filter(Boolean).join(' - ')}</span>}
-              {/* The day status when a day is chosen (panes.ts), else the opening days; then the area. */}
-              <span class="gd-row-meta"><span class="gd-row-day" data-gd-cell>{it.open?.length ? <Bi t={weekPattern(it.open)} /> : null}</span><span class="gd-dot" aria-hidden="true">·</span><span class="gd-row-area"><Bi t={zone(it.zone)} /></span></span>
+              {(it.by || it.subtitle) && <span class="gd-row-sub">{it.by}{it.by && it.subtitle && ' - '}{it.subtitleZh ? <Bi t={{ en: it.subtitle, zh: it.subtitleZh }} /> : it.subtitle}</span>}
+              {/* The marks (distinction, price level); the day status when a day is chosen (panes.ts), else the opening days; then the area. */}
+              <span class="gd-row-meta">{marks(it) && <><span class="gd-row-marks"><Bi t={marks(it)!} /></span><span class="gd-dot" aria-hidden="true">·</span></>}<span class="gd-row-day" data-gd-cell>{it.open?.length ? <Bi t={weekPattern(it.open)} /> : null}</span><span class="gd-dot" aria-hidden="true">·</span><span class="gd-row-area"><Bi t={zone(it.zone)} /></span></span>
             </td>
           </tr>
         ))}

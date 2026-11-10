@@ -35,6 +35,14 @@ export const W = {
   today: b('today', '今天'),
   theme: b('Looking for:', '主题：'),
   allThemes: b('Everything', '全部'),
+  // A guide with price levels (guide.json "costs"): the Price filter and its facts.
+  costLabel: b('Price', '价位'),
+  anyCost: b('Any', '不限'),
+  // A drop-down that names itself: "Price: any", "Cuisine: all".
+  all: b('all', '全部'),
+  any: b('any', '不限'),
+  // A guide with distinctions (guide.json "awards"), unless it names them (labels.award).
+  awardLabel: b('Award', '荣誉'),
   find: b('Find:', '查找：'),
   findPh: b('Name, street or keyword', '名称、街道或关键词'),
   findBtn: b('Find', '查找'),
@@ -52,6 +60,7 @@ export const W = {
   sortTier: b('Recommended (default)', '推荐（默认）'),
   sortName: b('Name', '名称'),
   sortZone: b('Area', '区域'),
+  sortCost: b('Price, lowest first', '价格从低到高'),
   sortOpen: b('Open that day first', '当天开放的优先'),
   sortNear: b('Nearest first', '离我最近'),
   sortDefault: b('Default', '默认'),

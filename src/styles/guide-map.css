@@ -107,6 +107,8 @@ html.js .gd-live .gd-live-stop { font-weight: normal; }
   .gd-live-stop { border: 1px solid ButtonText; }
 }
 @media (prefers-reduced-motion: reduce) { .gd-me::after { animation: none; } }
+/* No heartbeat while the guide is minimised (desktop.css keeps it hidden; this stops the work too). */
+.app-window[data-state="min"] .gd-me::after { animation: none; }
 @media print { .gd-live { display: none !important; } }
 
 /* ---- Pins: 16px pixel icons, or letter plates for places ---- */

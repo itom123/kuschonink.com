@@ -13,7 +13,7 @@ import Window from '../../../components/desktop/Window.astro';
 import LogOn from '../../../components/guide/LogOn.astro';
 import { site } from '../../../lib/content';
 import { seoTitle } from '../../../lib/i18n';
-import { guideCards, guideSlugs, publicInfo } from '../../../lib/guides/load';
+import { guideCards, guideSlugs, kindTabs, publicInfo } from '../../../lib/guides/load';
 
 export function getStaticPaths() {
   return guideSlugs().map((slug) => ({ params: { slug } }));
@@ -33,9 +33,16 @@ const seo = {
 // than one and this guide is one of them. An unlisted guide's box has none: its
 // Resource line names it, and it stays apart from the listed ones.
 const cards = guideCards();
-const guides = cards.length > 1 && cards.some((c) => c.slug === slug)
+const listed = cards.some((c) => c.slug === slug);
+const guides = cards.length > 1 && listed
   ? cards.map((c) => ({ slug: c.slug, title: { en: c.publicTitle.en, zh: c.publicTitle.zh || c.publicTitle.en } }))
   : [];
+// The tabs: what a reader wants to see (access.json "kinds"), when listed guides answer two or more.
+// The box opens on this guide's main kind (the first in its guide.json "kinds" that has a tab).
+const tabs = listed ? kindTabs() : [];
+const kinds = tabs.length > 1 ? tabs.map((t) => ({ id: t.id, label: { en: t.label.en, zh: t.label.zh || t.label.en }, guides: t.guides })) : [];
+const kind = kinds.length ? (card.kinds.find((k) => kinds.some((t) => t.id === k)) ?? '') : '';
+const shown = kind ? kinds.find((t) => t.id === kind)!.guides.length : guides.length;
 ---
 <Desktop seo={seo} noindex path={`/guides/${slug}`}>
   <Window
@@ -47,11 +54,11 @@ const guides = cards.length > 1 && cards.some((c) => c.slug === slug)
     title={title}
     fit="dialog"
     w={454}
-    h={guides.length ? 349 : 320}
+    h={(shown > 1 ? 349 : 320) + (kinds.length ? 36 : 0)}
     menus={['&File', '&Help']}
     bodyClass="gd-logon-body"
     status={[{ en: 'Type the password to open this guide.', zh: '输入密码以打开这份导览。' }]}
   >
-    <LogOn slug={slug} title={name} subtitle={sub} guides={guides} />
+    <LogOn slug={slug} title={name} subtitle={sub} guides={guides} kinds={kinds} kind={kind} />
   </Window>
 </Desktop>

@@ -17,6 +17,7 @@ directly.
 - [10. 字段说明 Field reference](#10-字段说明-field-reference)
 - [11. 读者推荐 Suggestions](#11-读者推荐-suggestions)
 - [12. 地址与存档 Addresses and the archive](#12-地址与存档-addresses-and-the-archive)
+- [13. 吃饭、看展、看摄影：餐厅导览 Eating, exhibitions, photography: the restaurant guide](#13-吃饭看展看摄影餐厅导览-eating-exhibitions-photography-the-restaurant-guide)
 
 ---
 
@@ -31,16 +32,16 @@ directly.
 - 没有选导览的中间页。从桌面图标、“开始 ▸ 程序 ▸ 导览”、“运行”或“查找”打开“导览”，
   或者直接输入 `kuschonink.com/guides`（有没有 JavaScript 都一样），都会直接进入第一份列出的导览
   （`guide.json` 里 `"listed": true`，按 `access.json` 里的顺序）：没登录时是密码对话框，已登录就是导览本身。
-  有不止一份导览时，在密码对话框里选择要看哪一份。一份都没列出时，`/guides` 只显示“这里还没有导览”。
+  有不止一份导览时，在密码对话框里选择要看哪一份：上方的选项卡先选“吃饭的地方”“看展览”还是“看摄影”（第 13 节），再在“导览”框里选。一份都没列出时，`/guides` 只显示“这里还没有导览”。
 - 输入密码后，服务器（Cloudflare Worker）决定你属于哪一类读者（audience），给你那一类读者的版本。
   “访客”（visitor）看到公开内容；“学员”（fotofilmic）看到访客的全部内容，另加只给学员的内容。
 - 导览页面不进搜索引擎（`noindex`，不在 sitemap 里）。
 - 内容全部是仓库里的 JSON 文件。改了 `main` 上的文件，大约一分钟后网站就更新。
   数据有错时构建会失败，网站保持原样，不会坏掉。
 - **地点的排序**：地点列表上方的“排序方式”默认是“推荐”（A、B、C 级依次排，同级按编号）。另外还有“名称”、“区域”（按导览里片区的顺序）、“当天开放的优先”（先在“日期”框里选定一天）和“离我最近”（先按“我在哪里？”）。选了别的排序后会出现“默认”按钮，单击即可恢复推荐顺序。“查看 ▸ 排序方式”菜单里是同样几种排序。排序只调整每一组之内的次序（参考点、当天闭馆的地点和官方条目各自是一组）。选择会记在这台设备上，“离我最近”除外。
-- **其他条目**：官方地图上没有被推荐的条目（巴黎导览有 58 个，编号 D 开头，灰色图钉），在地点列表上方勾选“显示全部其他条目”才出现。它们和推荐的展览一样有中英文说明、地址、开放时间、日期和图片，选定一天时也显示当天开不开放；法文原文收在“原文（法语）”里。勾选后它们也算进状态栏的展览数，比如“109 个展览”或“109 个展览中 N 个开放”；当天不开放的和展览一起归入“某日不开放”一组。它们没有主题，所以选了主题时不显示，也不进热力图。
+- **其他条目**：官方地图上没有被推荐的条目（巴黎导览有 58 个，编号 D 开头，灰色图钉），在地点列表上方勾选“显示全部其他条目”才出现。它们和推荐的展览一样有中英文说明、地址、开放时间、日期和图片，选定一天时也显示当天开不开放；法文原文收在“原文（法语）”里。勾选后它们也算进状态栏的展览数，比如“109 个展览”或“109 个展览中 N 个开放”；当天不开放的和展览一起归入“某日不开放”一组。它们没有主题、级别或价格，所以选了这些时不显示，也不进热力图。
 - **状态栏**：手机上或窗口太窄、一句话放不下时，状态栏的文字会像当年的滚动字幕一样移动：先停一下，再向左移出，从右边移回来，这样整句话都看得到。鼠标停在上面时文字不动；系统设置了“减少动态效果”时改为折行显示。
-- **我在哪里？**：只有按下按钮时，浏览器才会询问位置。之后地图上会出现一个红色的圆点，并显示“实时位置”标签，旁边有“停止”按钮。再按一次按钮、单击“停止”，或者刷新页面、注销、关闭窗口，都会关掉它；刷新之后它是关着的。位置只留在设备上，从不发送出去。浏览器不允许时，导览会说明怎样开启。
+- **我在哪里？**：只有按下按钮时，浏览器才会询问位置。之后地图上会出现一个红色的圆点，并显示“实时位置”标签，旁边有“停止”按钮。再按一次按钮、单击“停止”，或者刷新页面、注销、关闭窗口，都会关掉它；刷新之后它是关着的。最小化导览时，红点和它的“心跳”一起隐藏，还原后接着显示。位置只留在设备上，从不发送出去。浏览器不允许时，导览会说明怎样开启。
 - **街道地图**：底图被放大到超过原图大小的地方（城区底图周围的大区底图会最先被放大），街道级的地图瓦片由 Worker 从 IGN（Plan IGN）代为取得，地址是 `/guides/<名字>/tiles/{z}/{x}/{y}.png`，缩放级别 12 至 19，只给已登录的读者。城区底图放不满窗口时（比如竖着拿的平板），四周会补上大区底图和它的瓦片，不会露出灰色。范围由 `access.json` 的 `tiles` 决定（见第 10 节）。IGN 只看到 Worker，看不到访客。每位访客每分钟从 IGN 取图最多 600 块（已在缓存里的不算），超出的瓦片返回 429。
 - **地图手势**：在手机和平板上，地图的手势和地图应用（Google 地图、苹果地图）一样：一根手指拖动移动地图，快速一划地图会继续滑行；两根手指捏合缩放；轻点两下放大；轻点两下后按住，向下滑动放大、向上滑动缩小；两根手指同时轻点一下缩小。地图上的文字不会被选中，长按也不会弹出菜单。用鼠标时，双击放大，按住 Shift 键双击缩小，滚轮缩放。代码在 `src/scripts/guide/gestures.ts`。
 - **横屏**：手机横过来时，导览铺满整个屏幕（像 Internet Explorer 的“全屏”）：任务栏让开（最小化导览就会回来），标题栏的按钮移到菜单栏右端，旁边是中文/EN 切换和“今天”提示（轻点提示打开日期）；工具栏立在左边，状态栏只留给读屏软件。地图因此有原来两倍多的高度。密码对话框也一样，只是保留任务栏，标题和密码框左右并排。CSS 在 `src/styles/guide.css` 最后。
@@ -59,8 +60,9 @@ past guides stay at their own addresses (section 12).
   without JavaScript) all go straight to the first listed guide
   (`"listed": true` in `guide.json`, in `access.json` order): its password box,
   or the guide itself once logged on. With more than one guide, people choose
-  theirs in the password box. With none listed, `/guides` only says there are
-  no guides yet.
+  theirs in the password box: its tabs first ask what they want to see (Places
+  to eat, Exhibitions, Photography: section 13), then the Guide box. With none
+  listed, `/guides` only says there are no guides yet.
 - With a password, the server (the Cloudflare Worker) works out which
   **audience** the visitor belongs to and serves that audience's version.
   Visitors (`visitor`) see the public content. Participants (`fotofilmic`) see
@@ -86,8 +88,8 @@ past guides stay at their own addresses (section 12).
   folds away under **Original text (French)**. Ticked, they count in the
   status bar's number of exhibitions ("109 exhibitions", "N of 109
   exhibitions open"), and those closed that day join the exhibitions in the
-  "Closed on …" group. They have no themes, so a theme leaves them out, and
-  they stay out of the heat map.
+  "Closed on …" group. They have no theme, tier or price, so choosing one
+  leaves them out, and they stay out of the heat map.
 - **The status bar.** When a sentence doesn't fit (a phone, a narrow window),
   the status bar scrolls it, as the scrolling messages of the time did: it
   rests, slides left until it has gone, comes back in from the right and
@@ -97,8 +99,10 @@ past guides stay at their own addresses (section 12).
   button. A red dot then follows you on the map, with a **Live location** chip
   that has a **Stop** button. Pressing the button again, pressing **Stop**, or a
   refresh, log off or closed window turns it off, and it stays off after a
-  refresh. Your position stays on your device and is never sent anywhere. If the
-  browser refuses, the guide says how to allow it.
+  refresh. While the guide is minimised, the dot and its heartbeat are hidden
+  with it; restoring the guide brings them back. Your position stays on your
+  device and is never sent anywhere. If the browser refuses, the guide says how
+  to allow it.
 - **Street-level tiles.** Wherever a base picture is magnified past 1:1 (the
   region round the city plan first), street tiles from Plan IGN take over.
   Where the city plan doesn't fill the window (a tablet held upright, say),
@@ -139,9 +143,11 @@ src/content/guides/
     listings.json                官方来源的次要条目 secondary records from an official source
     map.json                     底图 base maps
     README.md                    速查表 a cheat-sheet
+  paris-restaurants/             餐厅导览（长期，没有日期；第 13 节）the restaurant guide (long-term, no dates; section 13)
 public/guides/paris-2026-11/
   img/                           图片 pictures
   map/                           底图图片 base-map images
+scripts/google-list.mjs          从共享的 Google 地图列表读出草稿（第 13 节）a draft from a shared Google Maps list (section 13)
 ```
 
 - 文件夹名就是网址里的名字（小写，用连字符）。
@@ -463,6 +469,7 @@ both when the site is built.
 
 - `GUIDES_PASSWORD`：访客的密码；
 - `GUIDES_PASSWORD_FOTOFILMIC`：学员的密码；
+- `GUIDES_PASSWORD_FOOD`：餐厅导览（巴黎美食）的密码，读者显示为“来宾”（第 13 节）。没设之前，餐厅导览显示“尚未开放”；
 - `GUIDES_COOKIE_SECRET`（建议设置）：给登录 cookie 签名的密钥，这样别人伪造不了登录状态。
   用 32 个以上的随机字符，比如让密码管理器生成一个；不用记住它，也不要告诉别人。
   没设的话，Worker 用已有的 `TURNSTILE_SECRET` 签名；少于 24 个字符时，两个一起签名。
@@ -498,6 +505,9 @@ Passwords and keys **never** go in the repo. They are all Cloudflare secrets:
 
 - `GUIDES_PASSWORD`: the visitors' password;
 - `GUIDES_PASSWORD_FOTOFILMIC`: the participants' password;
+- `GUIDES_PASSWORD_FOOD`: the restaurant guide's (Eating in Paris), whose
+  readers show as Guest (section 13). Until it is set, that guide says it
+  isn't open yet;
 - `GUIDES_COOKIE_SECRET` (recommended): the key that signs the log-on
   cookies, so nobody can forge one. Use 32 or more random characters, for
   example from a password manager; you never need to remember it, and nobody
@@ -602,6 +612,8 @@ The site doesn't break: when a build fails, the live site stays as it was.
 | `write {items} without spaces` | 占位符的花括号里有空格，如 `{ items }` A placeholder with spaces inside its braces | 写成 `{items}` Write it without spaces |
 | `px but` (the guard) | 底图图片的像素大小和 `map.json` 里的 `width`、`height` 不一样，图钉会跑位 A base map's pixel size differs from `width` and `height` in `map.json`, so its pins would move | 改 `map.json` 的 `width`、`height`（和 `originX`、`originY`），或重新裁图 Fix `width`, `height` (and `originX`, `originY`) in `map.json`, or crop the picture to match |
 | `its size in pixels can't be read` (the guard) | 读不出底图的像素大小，文件可能坏了，或不是图片 The pixel size of a base map can't be read: the file may be damaged or not a picture | 重新导出为 JPEG、PNG 或 WebP Export it again as JPEG, PNG or WebP |
+| `is not a kind in access.json`, `A listed guide names its kind` | 导览的 `kinds` 写了 `access.json` 里没有的类型，或者列出的导览没写 `kinds` A guide's `kinds` names a kind `access.json` doesn't have, or a listed guide has no `kinds` | 改正拼写，或给导览加上 `"kinds": ["food"]` 之类 Fix the spelling, or give the guide `"kinds"` such as `["food"]` |
+| `is not a price level`, `is not a distinction` | 地点的 `cost` 或 `award` 不在 `guide.json` 的 `costs` 或 `awards` 里 An item's `cost` or `award` isn't in `costs` or `awards` in `guide.json` | 用已有的编号，如 `"€€"`、`"1-star"` Use an id that exists, such as `"€€"` or `"1-star"` |
 | `not a Field Guide file` | 导览文件夹里有一个不认识的 `.json` 文件 A `.json` file in a guide's folder that the Field Guide doesn't use | 删掉它，或改成已知的文件名 Delete it, or rename it to a known file name |
 | `there is no folder`, `not in access.json` | `access.json` 和文件夹对不上 `access.json` and the folders disagree | 两边一起改 Change both |
 | `should start with its city` | 导览的名字（文件夹名、地址）没有以城市开头 A guide's name (its folder and address) doesn't start with its city | 按提示改名，或改 `city`；已经分享过的地址要加进 `moved`（第 12 节） Rename it as suggested, or fix `city`; add a shared address to `moved` (section 12) |
@@ -648,6 +660,7 @@ below). Any file may have a `_comment`, which is never shown.
 | `audiences[].includes?` | 也能看到哪些读者的内容 | Audiences whose content this one also sees |
 | `guides` | 导览名 → 能打开它的读者 | Guide slug → the audiences that may open it |
 | `moved?` | 旧地址 → 导览现在的名字，如 `{"paris-photo-days-2026": "paris-2026-11"}`。旧地址永久转到新地址，用旧名发来的推荐照样送到这份导览（第 12 节） | Old address → the guide's slug now. The old address redirects for good, and suggestions sent under the old name still reach the guide (section 12) |
+| `kinds?[]` | `{ id, label, labelZh? }`：读者可以选择看什么（密码对话框的选项卡和“打开导览”的分组），按这里的顺序。名称在输入密码前就显示，保持中性 | What readers can choose to see (the password box's tabs, File ▸ Open Guide's groups), in this order. The labels show before the password: keep them neutral |
 | `tiles?` | 导览名 → 街道级地图瓦片的范围 `[西, 南, 东, 北]`（度），一般就是大区底图的范围；写了才有瓦片。只写数字，不写地点。东西、南北各跨不超过 3°，并且要包住这份导览的每一张底图 | Guide slug → the area of its street-level tiles, `[west, south, east, north]` in degrees (usually the region view's area); without it the guide has no tiles. Numbers only, never a place. Each side spans at most 3°, and the box must hold every base map |
 
 ### `guide.json`
@@ -656,6 +669,7 @@ below). Any file may have a `_comment`, which is never shown.
 | --- | --- | --- |
 | `title`/`titleZh?`, `subtitle?`/`subtitleZh?` | 打开后显示的完整标题 | The full title, once open |
 | `public` | `{ title, titleZh?, subtitle?, subtitleZh? }`：输入密码前显示的中性标题 | The neutral title shown before the password |
+| `kinds?` | 这份导览属于哪几类（`access.json` 的 `kinds`），主要的放在最前面：密码对话框打开在那一张选项卡上。列出的导览必须写 | The kinds this guide is (`access.json` "kinds"), its main one first: the password box opens on that tab. A listed guide needs one |
 | `listed` | 是否在密码对话框里供人选择；排在最前面（按 `access.json` 的顺序）的那份，就是打开“导览”时进入的导览，也是 `/guides/<城市>` 进入的导览。`false` 就是存档：地址照样能用（第 12 节） | Offered in the password box's choice of guides; the first listed one (in `access.json` order) is where Field Guide and `/guides/<city>` open. `false` archives it: its address still works (section 12) |
 | `city`/`cityZh?` | 城市；导览的名字以它开头（`Paris` → `paris-…`） | The city; the guide's slug starts with it (`Paris` → `paris-…`) |
 | `timezone` | 时区（IANA），如 `Europe/Paris`；“今天”按它算 | IANA time zone; "today" follows it |
@@ -667,13 +681,16 @@ below). Any file may have a `_comment`, which is never shown.
 | `tiers[]` | `{ id: "A"/"B"/"C", name, nameZh?, text?, textZh?, weight }`；`weight` 决定热力图 | Tiers; `weight` drives the heat map |
 | `themes[]`, `zones[]` | `{ id, name, nameZh? }`：主题、片区 | Themes and zones |
 | `categories?[]` | `{ id, source?, name, nameZh? }`：`listings.json` 的分类 | Categories of listings |
-| `labels` | 界面用的名词：`item`, `items`, `subtitle?`, `by?`, `listing?`, `listings?`（各有 `Zh`） | The interface's nouns (each with `Zh`) |
+| `costs?[]` | `{ id, name?, nameZh?, text?, textZh? }`：价位，从便宜到贵（如 `"€"` 到 `"€€€€"`；`text` 说明含义）。有它就有“价位”筛选、按价格排序和每个地点的价位标记 | Price levels, cheapest first (e.g. `"€"` to `"€€€€"`; `text` says what each means). They bring a Price filter, a Price order and a price mark on each place |
+| `awards?[]` | `{ id, name, nameZh?, short?, shortZh? }`：评级，从高到低（米其林星级等）；`short` 是列表里的标记，如 `★★` | Distinctions, highest first (Michelin stars…); `short` is the mark in the list, e.g. `★★` |
+| `labels` | 界面用的名词：`item`, `items`, `subtitle?`, `by?`, `listing?`, `listings?`，以及 `tier?`（写了就有按分级筛选的“类别”框）、`theme?`（主题框的名字，如“菜系”）、`cost?`、`award?`（各有 `Zh`） | The interface's nouns (each with `Zh`), and `tier?` (with it, a Category box filters by tier), `theme?` (the theme box's name, e.g. Cuisine), `cost?`, `award?` |
 | `texts` | 说明页各节，`id → { heading, headingZh?, paras?[], items?[], audience? }`；`paras[]` 是 `{ text, textZh?, audience? }`，`items[]` 是 `{ lead?, leadZh?, text, textZh?, audience? }` | Info sections, in order |
 | `links?[]` | `{ label, labelZh?, url, audience? }` | Links |
 | `credits` | `{ points?, pointsZh?, image?, imageZh? }`：资料和图片来源 | Credits for the points and pictures |
 | `map` | `{ centre, heatRadius }`：`centre` 是参考点 `id` 或 `[经度, 纬度]`；`heatRadius` 单位米 | Map centre (a place id or `[lon, lat]`) and heat radius in metres |
 | `sensitive` | `{ public: [...], <读者 id>: [...] }`：防泄漏检查用的词 | Words for the leak guard |
 | `defaults?` | `{ price?, priceZh?, listingNote?, listingNoteZh? }` | Default price and listing note |
+| `suggestions?` | `false`：这份导览不收读者推荐（没有“推荐”按钮和菜单项）。默认 `true` | `false`: no Suggest button or menu item in this guide. Default `true` |
 
 ### `items.json` (`items[]`)
 
@@ -683,7 +700,7 @@ below). Any file may have a `_comment`, which is never shown.
 | `tier` | `A`, `B` 或 `C` | `A`, `B` or `C` |
 | `name` | 原名 | The original name |
 | `short?` | 地图标签，不超过 14 个字符 | Map label, ≤14 characters |
-| `subtitle?`, `by?` | 副标题（巴黎：展览名）、作者（巴黎：艺术家） | Subtitle (Paris: exhibition title), by (Paris: artist) |
+| `subtitle?`/`subtitleZh?`, `by?` | 副标题（巴黎：展览名；餐厅：菜式，可以有中文）、作者（巴黎：艺术家；餐厅：主厨） | Subtitle (Paris: exhibition title; restaurants: the cuisine, which may have Chinese), by (Paris: artist; restaurants: chef) |
 | `zone`, `themes[]` | `guide.json` 里的片区和主题 `id` | Zone and theme ids from `guide.json` |
 | `why`/`whyZh?` | 推荐理由 | Why it's worth it |
 | `address` | 地址（原文） | Address (original) |
@@ -695,6 +712,7 @@ below). Any file may have a `_comment`, which is never shown.
 | `exceptions?[]` | `{ date, status, note?, noteZh? }`；`status`：`open`, `closed`, `appointment`, `confirm` | One-day exceptions |
 | `minutes?` | 建议停留分钟数 | Minutes to allow |
 | `price?`/`priceZh?`, `note?`/`noteZh?` | 价格、提醒 | Price, caution |
+| `cost?`, `award?` | 价位、评级：`guide.json` 的 `costs`、`awards` 里的编号 | Price level and distinction: ids from `costs` and `awards` in `guide.json` |
 | `sourceUrl?`, `links?[]` | 信息来源页、其他链接 | Source page, other links |
 | `listing?` | `listings.json` 里对应条目的 `id` | Its record in `listings.json` |
 | `coordinates` | `[经度, 纬度]` | `[longitude, latitude]` |
@@ -1274,3 +1292,129 @@ ones are added by city and month.
   `moved`. The old address, and everything under it (pictures, tiles, log-on),
   redirects there for good, and suggestions still in Notion under the old name
   still publish. This Paris guide, for example, was `paris-photo-days-2026`.
+
+---
+
+## 13. 吃饭、看展、看摄影：餐厅导览 Eating, exhibitions, photography: the restaurant guide
+
+### 13.1 读者先选看什么 Readers choose what to see
+
+密码对话框上方有选项卡：**吃饭的地方**、**看展览**、**看摄影**。选项卡来自 `access.json` 的 `kinds`（顺序也在那里），每份导览在自己的 `guide.json` 里用 `"kinds"` 写明属于哪几类，主要的放在最前面：
+
+- `paris-restaurants`：`["food"]`；
+- `paris-2026-11`：`["photography", "exhibitions"]`（它是摄影展导览，所以两张选项卡都有它）。
+
+单击另一张选项卡，会打开那一类第一份导览的密码对话框；如果当前这份导览也属于那一类，就只换选项卡。一类里有不止一份导览时，“导览”框里列出这一类的导览。没有 JavaScript 时，选项卡就是链接。导览里的 **文件 ▸ 打开导览…** 也按这几类分组。至少有两类导览列出时才显示选项卡。
+
+以后有了真正的“看展览”导览，就把 `"exhibitions"` 从 `paris-2026-11` 里去掉，只写在新导览里。
+
+The password box has tabs on top: **Places to eat**, **Exhibitions**,
+**Photography**. They come from `kinds` in `access.json` (in that order), and
+each guide says which it is in its own `guide.json` `"kinds"`, its main one
+first: `paris-restaurants` is `["food"]`; `paris-2026-11` is
+`["photography", "exhibitions"]` (a guide to photography shows, so under both).
+Another tab opens the box of that kind's first guide, or, if this guide is of
+that kind too, only changes the tab. With several guides of one kind, the Guide
+box lists that kind's. Without JavaScript the tabs are links. **File ▸ Open
+Guide…** in a guide groups the guides the same way. The tabs show once two kinds
+have a listed guide. When there is a real exhibitions guide, take
+`"exhibitions"` out of `paris-2026-11`.
+
+### 13.2 密码 The password
+
+餐厅导览有自己的密码：读者“来宾”（`food`），密码是 Cloudflare secret `GUIDES_PASSWORD_FOOD`（`access.json`：`"paris-restaurants": ["food"]`）。访客和学员的密码打不开它，它的密码也打不开摄影导览。设置方法见第 7 节；PR 预览要另设一个（`npx wrangler preview base-config secret put GUIDES_PASSWORD_FOOD`）。没设之前，导览显示“尚未开放”，所以可以先合并、再设密码。
+
+每类读者有自己的登录 cookie（`kus98_guides_<读者>`），同一台设备可以同时登录摄影导览和餐厅导览。“注销”只清除能打开这份导览的 cookie，另一份导览照样开着。
+
+The restaurant guide has a password of its own: its readers are Guest
+(`food`), and the password is the Cloudflare secret `GUIDES_PASSWORD_FOOD`
+(`"paris-restaurants": ["food"]` in `access.json`). The visitors' and
+participants' passwords don't open it, and it doesn't open the photography
+guide. Set it as in section 7; PR previews need one of their own
+(`npx wrangler preview base-config secret put GUIDES_PASSWORD_FOOD`). Until it
+is set, the guide says it isn't open yet, so it can be merged first.
+
+Each audience has its own log-on cookie (`kus98_guides_<audience>`), so one
+device can be logged on to the photography guide and the restaurant guide at
+once. Log Off clears only the cookies that open that guide.
+
+### 13.3 类别和价位 Categories and prices
+
+- **类别就是分级**：A“米其林与餐厅周”（米其林指南的星级、必比登推介和其他入选餐厅，加上巴黎餐厅周 restaurantweek.fr 的餐厅：这就是“米其林”那份名单），B“日常餐厅”，C“咖啡与甜点”（含几家酒吧）。每家是否真有米其林评级，看它的 ★、Bib 或“指南”标记。`labels.tier` 写了“类别”，所以导览上方有“类别”框。
+- **巴黎餐厅周（2026 年 11 月 1–15 日）**：参加的餐厅带主题 `restaurant-week`（“菜系”框里的第一项），`price` 先写餐厅周的套餐和价格，再写平时的价格，`links` 第一个是 restaurantweek.fr 上的预订页。活动结束后，把主题和餐厅周的价格删掉，或换成下一届的。
+- **价位**：`costs` 定义四档，`"€"` 人均 €25 以下、`"€€"` €25–50、`"€€€"` €50–100、`"€€€€"` €100 以上（一个人的餐费，不含酒水）。每家在 `items.json` 里写 `"cost": "€€"`，`price` / `priceZh` 写具体价格。
+- **米其林**：`"award": "1-star"`（`3-stars`、`2-stars`、`1-star`、`bib`、`selected`），列表和详情里显示 ★、Bib 或“指南”。以 2026 年米其林指南（法国）为准；每年三月新指南出来后，请 Claude 核对一次。
+- **菜系**：`themes`（法餐、日料、韩餐、中餐及其他亚洲菜、烤肉、拉面……），导览上方的“菜系”框。
+- 有类别或价位框的导览，三个框各自写着名字（“价位：不限”），在手机上并排一行。
+
+- **Categories are the tiers**: A Michelin & Restaurant Week (the Michelin
+  Guide's stars, Bib Gourmand and other picks, and the restaurants of Paris
+  Restaurant Week, restaurantweek.fr: the "Michelin" list), B Everyday tables,
+  C Cafés and sweets (and a few bars). Whether a place really has a Michelin
+  distinction shows in its ★, Bib or Guide mark. `labels.tier` is "Category",
+  so the guide has a Category box.
+- **Paris Restaurant Week (1–15 November 2026)**: its restaurants carry the
+  theme `restaurant-week` (first in the Cuisine box); `price` gives the event's
+  menus and prices first, then the usual ones; the first of `links` is the
+  booking page on restaurantweek.fr. After the event, take the theme and the
+  event prices out, or update them for the next one.
+- **Price levels**: `costs` defines four, `"€"` under €25 a head, `"€€"`
+  €25–50, `"€€€"` €50–100, `"€€€€"` over €100 (food for one, without drinks).
+  Each place has `"cost": "€€"`, and its menu prices in `price` / `priceZh`.
+- **Michelin**: `"award": "1-star"` (`3-stars`, `2-stars`, `1-star`, `bib`,
+  `selected`), shown as ★, Bib or Guide. From the MICHELIN Guide France 2026;
+  ask Claude to check them each March, when the new guide comes out.
+- **Cuisine**: `themes` (French, Japanese, Korean, Chinese and other Asian,
+  grills, noodles…), the Cuisine box.
+- With a Category or Price box, the three boxes name themselves ("Price: any")
+  and share one row on a phone.
+
+一家新餐厅的例子 An example:
+
+```json
+{
+  "id": "B82", "tier": "B", "name": "Chez Exemple",
+  "subtitle": "Neo-bistro", "subtitleZh": "新派小酒馆", "by": "Name of the chef",
+  "zone": "bastille", "themes": ["french"],
+  "why": "One or two plain sentences: what you eat and why go.", "whyZh": "一两句话：吃什么，为什么值得去。",
+  "address": "1 Rue Exemple, 75011 Paris",
+  "cost": "€€", "price": "Lunch €24; dinner about €45", "priceZh": "午餐 €24；晚餐人均约 €45",
+  "note": "Book a few days ahead.", "noteZh": "建议提前几天预订。",
+  "links": ["https://example.org", "https://maps.google.com/?cid=1234567890"],
+  "coordinates": [2.3801, 48.8536]
+}
+```
+
+### 13.4 从 Google 列表加餐厅（小心机器人检测）Adding places from a Google list, gently
+
+Google 会识别机器人：短时间里请求太多，就会弹验证码或者拒绝。所以：
+
+1. 把列表在 Google 地图里设成“任何知道链接的人都能查看”，把链接发给 Claude（链接不要写进仓库：仓库是公开的）。
+2. Claude 运行 `node scripts/google-list.mjs <链接> --guide paris-restaurants`。它只向 Google 请求一次（和 Google 地图网页自己的请求一样），一小时内再运行就读本机保存的结果；只保存地点，不保存列表主人的名字或头像。Google 回的不是列表时（验证码页、同意页、429……）它立刻停下，不会重试。
+3. 草稿在 `.google-lists/` 里（不进仓库）：新的地点、导览里已有的（按 `links` 里的 Google 地图页面或名字和距离对上）、列表里已经没有的。
+4. 每家新店的类别、价位、米其林评级和文字，从餐厅官网、米其林指南和媒体查，**不从 Google 一家一家地抓**。查清了再写进 `items.json`。查不到的先记在 `src/content/guides/paris-restaurants/README.md` 的“待核实”里。
+5. 万一 Google 不给：等一个小时以上再试一次；或者在 takeout.google.com 导出“已保存”的列表（CSV）发给 Claude。
+
+Google watches for robots: too many requests and it shows a CAPTCHA or says
+no. So:
+
+1. Share the list in Google Maps ("Anyone with the link") and send the link to
+   Claude. Keep the link out of the repository: it is public.
+2. Claude runs `node scripts/google-list.mjs <link> --guide paris-restaurants`.
+   It asks Google once (the same request the Maps page makes); within the hour
+   it reads its saved copy instead. It keeps the places only, never the list
+   owner's name or picture. If Google answers with anything but the list (a
+   CAPTCHA, a consent page, 429…), it stops at once and never retries.
+3. The draft is in `.google-lists/` (never committed): new places, those the
+   guide has (matched by the Google Maps page in `links`, or by name and
+   distance), and those the list no longer has.
+4. Each new place's category, price, Michelin distinction and words come from
+   its own pages, the MICHELIN Guide and the press, **never from Google one
+   place at a time**. Then it goes into `items.json`. What can't be checked
+   waits under "Waiting for a check" in
+   `src/content/guides/paris-restaurants/README.md`.
+5. If Google says no: wait an hour or more and try once more, or export the
+   list from takeout.google.com (Saved, as CSV) and send that to Claude.
+
+导览本身照样有密码、不进搜索引擎（第 1 节），所以别人的机器人也读不到这份名单。The guide itself stays behind the password and out of search engines (section 1), so other people's robots can't read the list either.
+

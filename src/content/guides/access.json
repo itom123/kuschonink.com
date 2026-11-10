@@ -2,17 +2,26 @@
   "_comment": "Who may open which guide. Each audience's password is a Cloudflare secret, named below (the name, never the password). List audiences from least to most privileged: a password that matches several opens the first. 谁可以打开哪份导览：每个受众的密码是 Cloudflare 里的一个 secret，这里只写它的名字，不写密码。受众按权限从低到高排列。See docs/GUIDES.md.",
   "audiences": [
     { "id": "visitor", "label": "Visitor", "labelZh": "访客", "secret": "GUIDES_PASSWORD" },
-    { "id": "fotofilmic", "label": "FotoFilmic participant", "labelZh": "FotoFilmic 学员", "secret": "GUIDES_PASSWORD_FOTOFILMIC", "includes": ["visitor"] }
+    { "id": "fotofilmic", "label": "FotoFilmic participant", "labelZh": "FotoFilmic 学员", "secret": "GUIDES_PASSWORD_FOTOFILMIC", "includes": ["visitor"] },
+    { "id": "food", "label": "Guest", "labelZh": "来宾", "secret": "GUIDES_PASSWORD_FOOD" }
   ],
   "guides": {
-    "paris-2026-11": ["visitor", "fotofilmic"]
+    "paris-2026-11": ["visitor", "fotofilmic"],
+    "paris-restaurants": ["food"]
   },
   "_tiles": "Street-level map tiles (Plan IGN, fetched by the Worker) for a guide: the area they cover as [west, south, east, north] in degrees, usually the region view's area. Only numbers here, never a place. 街道级地图瓦片（Plan IGN，由 Worker 代取）的覆盖范围：[西, 南, 东, 北]，单位为度，一般就是大区底图的范围。这里只写数字，不写地点。",
   "tiles": {
-    "paris-2026-11": [2.07, 48.63, 2.8, 49.05]
+    "paris-2026-11": [2.07, 48.63, 2.8, 49.05],
+    "paris-restaurants": [2.07, 48.63, 2.8, 49.05]
   },
   "_moved": "Old addresses that still work: /guides/<old>/… goes to the guide's address now, for good, and suggestions sent under the old name still reach the guide. A guide's address is <city>-<yyyy>-<mm> and never changes once shared (docs/GUIDES.md, section 12); add a line here only if one ever has to. 旧地址：/guides/<旧名>/… 永久转到导览现在的地址，用旧名发来的推荐也照样送到这份导览。导览地址写作 <城市>-<年>-<月>，一经分享就不再改（docs/GUIDES.md 第12节）；只有地址不得不改时才在这里加一行。",
   "moved": {
     "paris-photo-days-2026": "paris-2026-11"
-  }
+  },
+  "_kinds": "What a reader can choose to see: the tabs of the log-on box, in this order, and the groups of File ▸ Open Guide. Each guide names its own in guide.json \"kinds\", its main one first. The labels show before the password, so keep them neutral. 读者可以选择看什么：密码对话框上的选项卡（按这里的顺序）和“文件 ▸ 打开导览”里的分组。每份导览在 guide.json 的 \"kinds\" 里写明自己属于哪一类，主要的放在最前面。这些名称在输入密码前就会显示，请保持中性。",
+  "kinds": [
+    { "id": "food", "label": "Places to eat", "labelZh": "吃饭的地方" },
+    { "id": "exhibitions", "label": "Exhibitions", "labelZh": "看展览" },
+    { "id": "photography", "label": "Photography", "labelZh": "看摄影" }
+  ]
 }

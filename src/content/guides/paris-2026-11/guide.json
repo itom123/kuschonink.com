@@ -11,6 +11,7 @@
     "subtitleZh": "2026年11月8日至15日"
   },
   "listed": true,
+  "kinds": ["photography", "exhibitions"],
   "city": "Paris",
   "cityZh": "巴黎",
   "timezone": "Europe/Paris",

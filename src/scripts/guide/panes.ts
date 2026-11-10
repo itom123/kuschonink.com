@@ -84,12 +84,16 @@ export class PlacesPane {
   query(id: string) { return this.rows.get(id)?.dataset.q ?? ''; }
 
   /** The order the list uses: the chosen one, or the default while that can't apply. */
-  inUse(s: GdState): Sort { return sortInUse(s.sort, s.day !== 'any', !!this.hooks?.located()); }
+  inUse(s: GdState): Sort { return sortInUse(s.sort, s.day !== 'any', !!this.hooks?.located(), this.priced); }
 
-  /** Open that day first needs a chosen day; Nearest first needs a position. */
+  /** The guide has price levels: its rows carry their level's place (data-ci), and "Price" is an order. */
+  get priced(): boolean { return !!this.sortSel?.querySelector('option[value="cost"]'); }
+
+  /** Open that day first needs a chosen day; Nearest first needs a position; Price needs price levels. */
   can(sort: Sort, s = this.last): boolean {
     if (sort === 'open') return !!s && s.day !== 'any';
     if (sort === 'near') return !!this.hooks?.located();
+    if (sort === 'cost') return this.priced;
     return true;
   }
 
@@ -110,7 +114,7 @@ export class PlacesPane {
     const list = [...this.rows.values()].filter((tr) => tr.dataset.kind !== 'place').map((tr) => {
       const id = tr.dataset.gdRow!;
       const r = info(id, tr.dataset.kind!);
-      return { id, tr, r, name: this.names.get(id) ?? '', tier: tr.dataset.tier, zone: tr.dataset.zi ? Number(tr.dataset.zi) : undefined, code: r.code, m: metres ? metres(id) : null };
+      return { id, tr, r, name: this.names.get(id) ?? '', tier: tr.dataset.tier, zone: tr.dataset.zi ? Number(tr.dataset.zi) : undefined, cost: tr.dataset.ci ? Number(tr.dataset.ci) : undefined, code: r.code, m: metres ? metres(id) : null };
     });
     let open = 0, shut = 0, shown = 0, loose = 0;
     for (const { id, tr, r } of sortRows(list, use)) {

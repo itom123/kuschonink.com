@@ -76,7 +76,7 @@ const item = (id: string, coordinates: [number, number], extra: Record<string, u
 const base = (): RawGuide => ({
   guide: {
     _comment: 'test',
-    title: 'Fixture Days', titleZh: '测试日', subtitle: '{items} picks', public: { title: 'Fixture 2026', titleZh: '测试 2026' }, listed: true,
+    title: 'Fixture Days', titleZh: '测试日', subtitle: '{items} picks', public: { title: 'Fixture 2026', titleZh: '测试 2026' }, listed: true, kinds: ['photography'],
     city: 'Paris', cityZh: '巴黎', timezone: 'Europe/Paris', checked: '2026-11-01', window: { start: '2026-11-08', end: '2026-11-15' },
     holidays: [{ date: '2026-11-11', name: 'Armistice Day', nameZh: '停战纪念日' }],
     tiers: [{ id: 'A', name: 'Must', weight: 3 }, { id: 'B', name: 'Good', weight: 2 }, { id: 'C', name: 'Maybe', weight: 1 }],
@@ -273,6 +273,14 @@ const base = (): RawGuide => ({
     ['[lon, lat] centre on a hidden place', (g) => { g.guide.map.centre = [W[0], W[1]]; }, 'guide.json › map › centre', 'next to "W"'],
     ['map centred on a hidden place', (g) => { Object.assign(g.map.views[0], { originY: 1442032.7187901973, width: 1536, height: 1408 }); }, 'places.json › W › coordinates', 'too close to the centre of map view "city"'],
     ['map centred on a hidden item', (g) => { g.items.items[4].audience = P; const c = project(g.items.items[4].coordinates, 11); Object.assign(g.map.views[1], { originX: c.x - 527, originY: c.y - 451 }); }, 'items.json › C1 › coordinates', 'too close to the centre of map view "region"'],
+    // Kinds (access.json "kinds"), price levels and distinctions.
+    ['unknown kind', (g) => { g.guide.kinds = ['shopping']; }, 'guide.json › guide › kinds[0]', 'not a kind in access.json'],
+    ['a listed guide without a kind', (g) => { delete g.guide.kinds; }, 'guide.json › guide › kinds', 'A listed guide names its kind'],
+    ['a kind twice', (g) => { g.guide.kinds = ['food', 'food']; }, 'guide.json › guide › kinds', 'twice'],
+    ['a price level without costs', (g) => { g.items.items[0].cost = '€€'; }, 'items.json › A1 › cost', 'no "costs"'],
+    ['unknown price level', (g) => { g.guide.costs = [{ id: '€' }, { id: '€€' }]; g.items.items[0].cost = '€€€'; }, 'items.json › A1 › cost', 'not a price level'],
+    ['unknown distinction', (g) => { g.guide.awards = [{ id: '1-star', name: 'One star', short: '★' }]; g.items.items[0].award = '4-stars'; }, 'items.json › A1 › award', 'not a distinction'],
+    ['a price level twice', (g) => { g.guide.costs = [{ id: '€' }, { id: '€' }]; }, 'guide.json › costs › id "€"', 'used twice'],
   ];
   for (const [name, mutate, where, what] of cases) {
     const g = structuredClone(base()) as G;
@@ -280,6 +288,31 @@ const base = (): RawGuide => ({
     const probs = checkGuide(g as RawGuide, 'paris-fixture', acc);
     const hit = probs.find((p) => p.includes(where) && (!what || p.toLowerCase().includes(what.toLowerCase())));
     ok(!!hit, `broken copy: ${name}`, hit || probs.join(' | ') || '(no problems found)');
+  }
+  // A guide with price levels and distinctions: they reach the view and the payload; suggestions can be off.
+  {
+    const f = structuredClone(base()) as G;
+    Object.assign(f.guide, {
+      costs: [{ id: '€', text: 'under €25 a head', textZh: '人均 €25 以下' }, { id: '€€' }],
+      awards: [{ id: '1-star', name: 'One Michelin star', nameZh: '米其林一星', short: '★', shortZh: '★' }],
+      suggestions: false,
+    });
+    f.guide.labels = { ...f.guide.labels, tier: 'Category', tierZh: '类别', theme: 'Cuisine', themeZh: '菜系' };
+    Object.assign(f.items.items[0], { cost: '€€', award: '1-star', subtitle: 'Neo-bistro', subtitleZh: '新派小酒馆' });
+    ok(checkGuide(f as RawGuide, 'paris-fixture', acc).length === 0, 'costs, awards, labels and suggestions pass', checkGuide(f as RawGuide, 'paris-fixture', acc).join(' | '));
+    const v = buildView(f as RawGuide, 'paris-fixture', acc, 'visitor');
+    const it = v.items.find((i) => i.id === 'A1')!;
+    ok(it.cost === '€€' && it.award === '1-star' && it.subtitleZh === '新派小酒馆', 'an item keeps its price level, distinction and Chinese subtitle');
+    ok(v.costs[0].name.en === '€' && v.costs[0].text.zh === '人均 €25 以下' && v.awards[0].short.en === '★' && v.labels.tier.en === 'Category' && !v.suggestions, 'a price level without a name is called by its id; labels and suggestions reach the view');
+    const pl = buildPayload(v);
+    ok(pl.tierFilter === true && pl.suggestions === false && pl.costs.length === 2 && pl.items.find((i) => i.id === 'A1')!.cost === '€€', 'the payload has the Category filter, price levels and "no suggestions"');
+    const plain = buildPayload(buildView(base(), 'paris-fixture', acc, 'visitor'));
+    ok(!plain.tierFilter && !('suggestions' in plain) && plain.costs.length === 0, 'a guide without them is as before');
+  }
+  // Kinds in access.json: lower case ids, each once.
+  {
+    const bad = checkAccess({ ...access, kinds: [{ id: 'Food', label: 'Food' }, { id: 'x', label: 'X' }, { id: 'x', label: 'Y' }] }, Object.keys(access.guides));
+    ok(bad.some((p) => p.includes('kinds') && p.includes('"Food" should be lower case')) && bad.some((p) => p.includes('kinds') && p.includes('used twice')), 'access.json kinds: lower case, each once', bad.join(' | '));
   }
   // Keys starting with _ are notes, not fields.
   const g = structuredClone(base()) as G;

@@ -21,6 +21,7 @@ const top = (c: Parameters<typeof findMatches>[0]) => findMatches(c, known)[0];
 check('normText: accents, case, punctuation', normText('  Maison Européenne — de la PHOTO! ') === 'maison europeenne de la photo');
 check('normUrl: www, query, trailing slash, language prefix', normUrl('https://www.Example.com/fr/Expo/?utm=1#x') === 'example.com/expo' && normUrl('example.com/expo/') === 'example.com/expo');
 check('normUrl: only web addresses', normUrl('javascript:alert(1)') === '' && normUrl('mailto:a@b.c') === '' && normUrl('') === '');
+check('normUrl: a Google Maps place page keeps its place number', normUrl('https://maps.google.com/?cid=5750501904841008585') === 'maps.google.com/?cid=5750501904841008585' && normUrl('https://maps.google.com/?cid=1') !== normUrl('https://maps.google.com/?cid=2') && normUrl('https://maps.google.com/?q=x') === 'maps.google.com');
 check('nameSimilarity: the same place written two ways', nameSimilarity('MEP · Maison européenne de la Photographie', 'Maison Europeenne de la Photographie') >= 0.6);
 check('nameSimilarity: "Foundation" and "Fondation" are filler', nameSimilarity('Henri Cartier-Bresson Foundation', 'Fondation Henri Cartier-Bresson') >= 0.9);
 check('nameSimilarity: different places', nameSimilarity('Galerie Polka', 'Fondation Henri Cartier-Bresson') < 0.3);
