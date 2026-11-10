@@ -352,12 +352,15 @@ and `/guides/*`) checks the password and decides which **audience** it belongs
 to. Audiences, and which
 guides each may open, are in `src/content/guides/access.json`; each audience's
 password is a Cloudflare secret named there (`GUIDES_PASSWORD` for visitors,
-`GUIDES_PASSWORD_FOTOFILMIC` for participants), never in the repo. Each needs
+`GUIDES_PASSWORD_FOTOFILMIC` for participants, `GUIDES_PASSWORD_FOOD` for the
+restaurant guide's guests), never in the repo. Each needs
 6 or more characters and must differ from the other; case, extra spaces and
 full-width characters don't matter. Every
 guide is built once per audience, and the Worker serves the page for the
 visitor's audience, so a visitor's HTML and data never hold what's marked for
-someone else. The log-on is a signed `HttpOnly` cookie, `kus98_guides`; pictures
+someone else. The log-on is a signed `HttpOnly` cookie per audience,
+`kus98_guides_<audience>` (plain `kus98_guides`, the older name, is still
+read), so one device can hold several guides' passwords; pictures
 and base maps are served only with it. A server-only key signs it, so nobody
 can forge one: the secret `GUIDES_COOKIE_SECRET` (recommended: 32 or more
 random characters), or `TURNSTILE_SECRET` when that isn't set (one under 24

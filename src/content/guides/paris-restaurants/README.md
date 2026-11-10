@@ -20,6 +20,7 @@
 - 坐标是 `[经度, 纬度]`。Coordinates are `[longitude, latitude]`.
 - 中文里的时间要和英文一样。Times in `…Zh` must match the English.
 - 这份导览不收读者推荐（`"suggestions": false`）。This guide takes no suggestions from readers.
+- **密码 Password**：自己的密码，Cloudflare secret `GUIDES_PASSWORD_FOOD`（读者“来宾”）。没设之前显示“尚未开放”。Its own password, the Cloudflare secret `GUIDES_PASSWORD_FOOD` (readers show as Guest). Until it is set, the guide says it isn't open yet.
 
 ## 从 Google 列表加新餐厅 Adding places from the Google list
 

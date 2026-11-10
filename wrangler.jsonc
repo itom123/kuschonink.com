@@ -61,8 +61,8 @@
   // in this block, never the top-level ones, and never production's secrets.
   // Previews have their own secrets, set once for all of them with
   // `npx wrangler preview base-config secret put NAME` (or in the dashboard's
-  // Previews Base): TURNSTILE_SECRET, GUIDES_PASSWORD, GUIDES_PASSWORD_FOTOFILMIC
-  // and GUIDES_COOKIE_SECRET, as strong as production's (a preview serves that
+  // Previews Base): TURNSTILE_SECRET, GUIDES_PASSWORD, GUIDES_PASSWORD_FOTOFILMIC,
+  // GUIDES_PASSWORD_FOOD and GUIDES_COOKIE_SECRET, as strong as production's (a preview serves that
   // branch's real guides at a public link) but never the same: every pushed
   // branch gets them, a cloud session's claude/... branch too. So a preview's
   // guide passwords are not the live site's. Rate limits count apart (their own namespace ids;
@@ -102,9 +102,10 @@
   },
   // Secrets, set in the dashboard (never in this file): TURNSTILE_SECRET, and
   // each Field Guide audience's password, named in
-  // src/content/guides/access.json: GUIDES_PASSWORD (visitors) and
-  // GUIDES_PASSWORD_FOTOFILMIC (participants). Each password needs 6+
-  // characters, and the two must differ. GUIDES_COOKIE_SECRET is recommended:
+  // src/content/guides/access.json: GUIDES_PASSWORD (visitors),
+  // GUIDES_PASSWORD_FOTOFILMIC (participants) and GUIDES_PASSWORD_FOOD (the
+  // restaurant guide's guests). Each password needs 6+ characters, and they
+  // must all differ. GUIDES_COOKIE_SECRET is recommended:
   // 32+ random characters that sign the log-on cookies; without it the Worker
   // uses TURNSTILE_SECRET, and one under 24 characters signs together with
   // TURNSTILE_SECRET. Changing GUIDES_COOKIE_SECRET logs everyone out; so does

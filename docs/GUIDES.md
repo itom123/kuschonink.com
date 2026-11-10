@@ -452,6 +452,7 @@ both when the site is built.
 
 - `GUIDES_PASSWORD`：访客的密码；
 - `GUIDES_PASSWORD_FOTOFILMIC`：学员的密码；
+- `GUIDES_PASSWORD_FOOD`：餐厅导览（巴黎美食）的密码，读者显示为“来宾”（第 13 节）。没设之前，餐厅导览显示“尚未开放”；
 - `GUIDES_COOKIE_SECRET`（建议设置）：给登录 cookie 签名的密钥，这样别人伪造不了登录状态。
   用 32 个以上的随机字符，比如让密码管理器生成一个；不用记住它，也不要告诉别人。
   没设的话，Worker 用已有的 `TURNSTILE_SECRET` 签名；少于 24 个字符时，两个一起签名。
@@ -487,6 +488,9 @@ Passwords and keys **never** go in the repo. They are all Cloudflare secrets:
 
 - `GUIDES_PASSWORD`: the visitors' password;
 - `GUIDES_PASSWORD_FOTOFILMIC`: the participants' password;
+- `GUIDES_PASSWORD_FOOD`: the restaurant guide's (Eating in Paris), whose
+  readers show as Guest (section 13). Until it is set, that guide says it
+  isn't open yet;
 - `GUIDES_COOKIE_SECRET` (recommended): the key that signs the log-on
   cookies, so nobody can forge one. Use 32 or more random characters, for
   example from a password manager; you never need to remember it, and nobody
@@ -1288,17 +1292,21 @@ have a listed guide. When there is a real exhibitions guide, take
 
 ### 13.2 密码 The password
 
-餐厅导览用访客的密码（`access.json`：`"paris-restaurants": ["visitor"]`），学员的密码也能打开。读者已经登录摄影导览的话，打开餐厅导览不用再输密码。
+餐厅导览有自己的密码：读者“来宾”（`food`），密码是 Cloudflare secret `GUIDES_PASSWORD_FOOD`（`access.json`：`"paris-restaurants": ["food"]`）。访客和学员的密码打不开它，它的密码也打不开摄影导览。设置方法见第 7 节；PR 预览要另设一个（`npx wrangler preview base-config secret put GUIDES_PASSWORD_FOOD`）。没设之前，导览显示“尚未开放”，所以可以先合并、再设密码。
 
-如果想让餐厅导览用自己的密码：登录 cookie 一次只记一类读者，换一类读者登录会把另一类注销。所以要先改 Worker 的 cookie（每类读者一个），再加一类读者（第 6 节）。请让 Claude 一起做。
+每类读者有自己的登录 cookie（`kus98_guides_<读者>`），同一台设备可以同时登录摄影导览和餐厅导览。“注销”只清除能打开这份导览的 cookie，另一份导览照样开着。
 
-The restaurant guide opens with the visitors' password (`"paris-restaurants":
-["visitor"]` in `access.json`); the participants' password opens it too, and
-someone logged on to the photography guide needs no password again. For a
-password of its own: the log-on cookie holds one audience at a time, so logging
-on as another audience logs the first one out. That needs a change to the
-Worker's cookie (one per audience) before adding an audience (section 6): ask
-Claude for both together.
+The restaurant guide has a password of its own: its readers are Guest
+(`food`), and the password is the Cloudflare secret `GUIDES_PASSWORD_FOOD`
+(`"paris-restaurants": ["food"]` in `access.json`). The visitors' and
+participants' passwords don't open it, and it doesn't open the photography
+guide. Set it as in section 7; PR previews need one of their own
+(`npx wrangler preview base-config secret put GUIDES_PASSWORD_FOOD`). Until it
+is set, the guide says it isn't open yet, so it can be merged first.
+
+Each audience has its own log-on cookie (`kus98_guides_<audience>`), so one
+device can be logged on to the photography guide and the restaurant guide at
+once. Log Off clears only the cookies that open that guide.
 
 ### 13.3 类别和价位 Categories and prices
 

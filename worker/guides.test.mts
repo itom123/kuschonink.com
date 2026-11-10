@@ -1,7 +1,7 @@
 // npm test: the Field Guide's password gate (worker/guides.ts), against a
 // stand-in ASSETS, made-up audiences and made-up passwords.
 import { createHmac, pbkdf2Sync } from 'node:crypto';
-import { COOKIE, MIN_PEPPER, REMEMBER_S, SESSION_S, TILE_BROWSER_S, TILE_EDGE_S, TILE_Z, cleanNext, closure, guideAudience, handleGuides, isGuidesPath, limitKey, makeToken, normalise, tileBounds, tileRange, topView, viewOf, type GuidesDeps } from './guides.ts';
+import { COOKIE, MIN_PEPPER, REMEMBER_S, SESSION_S, TILE_BROWSER_S, TILE_EDGE_S, TILE_Z, cleanNext, closure, cookieName, cookiesToClear, guideAudience, handleGuides, isGuidesPath, limitKey, makeToken, normalise, tileBounds, tileRange, topView, viewOf, type GuidesDeps } from './guides.ts';
 import type { AccessFile } from '../src/lib/guides/types';
 import realAccess from '../src/content/guides/access.json' with { type: 'json' };
 
@@ -82,7 +82,7 @@ function post(path: string, fields: Record<string, string> = {}, o: PostOpts = {
 const login = (slug: string, password: string, o: PostOpts & { remember?: boolean; next?: string } = {}) =>
   post(`/guides/${slug}/login`, { password, ...(o.remember ? { remember: '1' } : {}), next: o.next ?? '' }, o);
 const cookieOf = (res: Response) => (res.headers.get('set-cookie') ?? '').split(';')[0];
-const tokenOf = (cookie: string) => cookie.slice(COOKIE.length + 1);
+const tokenOf = (cookie: string) => cookie.slice(cookie.indexOf('=') + 1);
 async function cookieFor(slug: string, password: string, d = deps()) {
   return cookieOf(await run(login(slug, password), d));
 }
@@ -153,6 +153,7 @@ let memberCookie = '';
   const key = createHmac('sha256', PEPPER).update(`guides|key|v1|visitor\0${normalise(PW.visitor)}`).digest();
   const sig = createHmac('sha256', key).update(`guides|v1|visitor|${exp}`).digest('base64url');
   check('cookie value is v1.<aud>.<exp>.<HMAC> with the key from the pepper and the password', tokenOf(visitorCookie) === `v1.visitor.${exp}.${sig}`, visitorCookie);
+  check('the cookie is named for its audience: kus98_guides_visitor', visitorCookie.startsWith(`${cookieName('visitor')}=`) && cookieName('visitor') === 'kus98_guides_visitor', visitorCookie);
 }
 asked = [];
 await expectView('visitor cookie → the visitor view', get('/guides/city-one', visitorCookie), 'city-one visitor');
@@ -174,6 +175,12 @@ await expectView('member cookie → the member view', get('/guides/city-one', me
 await expectView('member cookie → open-day (visitor only): the visitor view', get('/guides/open-day', memberCookie), 'open-day visitor');
 await expectView('visitor cookie → members-only: a guide it may not open → log-on page', get('/guides/members-only', visitorCookie), null);
 await expectView('member cookie → members-only: the member view', get('/guides/members-only', memberCookie), 'members-only member');
+// One cookie per audience: a device keeps both, and each guide gets the best view of them.
+await expectView('visitor and member cookies together → members-only opens (member)', get('/guides/members-only', `${visitorCookie}; ${memberCookie}`), 'members-only member');
+await expectView('… and city-one gets the member view', get('/guides/city-one', `${visitorCookie}; ${memberCookie}`), 'city-one member');
+await expectView('a cookie made before, under the plain name, still opens its guide', get('/guides/city-one', `${COOKIE}=${tokenOf(visitorCookie)}`), 'city-one visitor');
+await expectView('a name says nothing: a visitor token under the member name is still a visitor', get('/guides/members-only', `${cookieName('member')}=${tokenOf(visitorCookie)}`), null);
+await expectView('only kus98_guides and kus98_guides_<audience> count', get('/guides/city-one', `kus98_guidesX=${tokenOf(visitorCookie)}; x_kus98_guides=${tokenOf(visitorCookie)}`), null);
 {
   const res = await run(login('members-only', PW.visitor, { json: true }));
   check('visitor password on members-only → 401 wrong_password, no cookie', res.status === 401 && (await res.json()).error === 'wrong_password' && !res.headers.has('set-cookie'));
@@ -625,7 +632,12 @@ await expectView('member cookie → members-only: the member view', get('/guides
 {
   const r = await run(post('/guides/city-one/logout'));
   const sc = r.headers.get('set-cookie') ?? '';
+  const all = r.headers.getSetCookie();
   check('log off (no JS) → 303 to the guide, cookie cleared', r.status === 303 && r.headers.get('location') === '/guides/city-one' && sc.startsWith(`${COOKIE}=;`) && sc.includes('Max-Age=0') && sc.includes('Path=/guides'), { s: r.status, sc });
+  check('… every cookie that opens city-one is cleared: the plain one and each audience\'s', all.map((c) => c.split('=')[0]).join() === [COOKIE, cookieName('visitor'), cookieName('member'), cookieName('staff')].join() && all.every((c) => c.includes('Max-Age=0') && c.includes('Path=/guides') && c.includes('HttpOnly')), all);
+  const mo = (await run(post('/guides/members-only/logout'))).headers.getSetCookie().map((c) => c.split('=')[0]);
+  check('log off members-only keeps the visitor cookie (visitors don\'t open it)', mo.includes(cookieName('member')) && mo.includes(cookieName('staff')) && !mo.includes(cookieName('visitor')), mo);
+  check('… and keeps a plain old cookie that holds a visitor', !cookiesToClear(ACCESS, 'members-only', `${COOKIE}=${tokenOf(visitorCookie)}`).includes(COOKIE) && cookiesToClear(ACCESS, 'members-only', `${COOKIE}=${tokenOf(memberCookie)}`).includes(COOKIE) && cookiesToClear(ACCESS, 'members-only', null).includes(COOKIE));
   const j = await run(post('/guides/city-one/logout', {}, { json: true }));
   check('log off (JSON) → 200 {ok:true}, cookie cleared', j.status === 200 && (await j.json()).ok === true && (j.headers.get('set-cookie') ?? '').includes('Max-Age=0'));
   const x = await run(post('/guides/city-one/logout', {}, { json: true, origin: 'https://evil.example', site: 'cross-site' }));
