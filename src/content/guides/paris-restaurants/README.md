@@ -11,7 +11,8 @@
 | `places.json` · `events.json` · `routes.json` | 暂时是空的 Empty for now |
 | `map.json` | 底图（和 paris-2026-11 相同）Base maps (the same as paris-2026-11) |
 
-- **类别就是分级 Categories are the tiers**：A 米其林指南（星级、必比登、其他入选），B 日常餐厅，C 咖啡与甜点（含几家酒吧）。A Michelin Guide (stars, Bib Gourmand, other picks), B everyday tables, C cafés and sweets (and a few bars).
+- **类别就是分级 Categories are the tiers**：A 米其林与餐厅周（米其林星级、必比登、其他入选，加上巴黎餐厅周的餐厅），B 日常餐厅，C 咖啡与甜点（含几家酒吧）。A Michelin & Restaurant Week (stars, Bib Gourmand, other picks, and the restaurants of Paris Restaurant Week), B everyday tables, C cafés and sweets (and a few bars).
+- **巴黎餐厅周 Paris Restaurant Week（restaurantweek.fr，2026 年 11 月 1–15 日）**：主题 `restaurant-week`；`price` 先写餐厅周套餐。**11 月 15 日以后**删掉这个主题和餐厅周的价格（或换成下一届的）。Theme `restaurant-week`; `price` starts with the event's menus. **After 15 November**, take the theme and the event prices out (or update them for the next edition).
 - **价位 `cost`**：`"€"` 人均 €25 以下，`"€€"` €25–50，`"€€€"` €50–100，`"€€€€"` €100 以上（一个人的餐费，不含酒水）。Per person, food only, without drinks.
 - **米其林 `award`**：`"3-stars"`、`"2-stars"`、`"1-star"`、`"bib"`、`"selected"`。以 2026 年米其林指南（法国）为准；每年三月新指南出来后核对一次。From the MICHELIN Guide France 2026; check again each March when the new guide comes out.
 - **菜系 `themes`**：`guide.json` 的 `themes` 里的编号，一到三个。One to three ids from `themes` in `guide.json`.

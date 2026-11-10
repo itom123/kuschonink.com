@@ -21,10 +21,10 @@
   "tiers": [
     {
       "id": "A",
-      "name": "Michelin Guide",
-      "nameZh": "米其林指南",
-      "text": "Stars, Bib Gourmand and the other picks of the 2026 Michelin Guide. Book ahead.",
-      "textZh": "2026 年米其林指南的星级餐厅、必比登推介和其他入选餐厅。请提前预订。",
+      "name": "Michelin & Restaurant Week",
+      "nameZh": "米其林与餐厅周",
+      "text": "Restaurants in the 2026 Michelin Guide (★, Bib Gourmand, Guide), and those taking part in Paris Restaurant Week, 1–15 November 2026, with their special menus. Book ahead.",
+      "textZh": "2026 年米其林指南的餐厅（★、必比登、指南），以及参加 2026 年 11 月 1–15 日巴黎餐厅周的餐厅和它们的特别菜单。请提前预订。",
       "weight": 3
     },
     {
@@ -58,6 +58,7 @@
     { "id": "selected", "name": "In the Michelin Guide, without a star", "nameZh": "入选米其林指南（无星）", "short": "Guide", "shortZh": "指南" }
   ],
   "themes": [
+    { "id": "restaurant-week", "name": "Paris Restaurant Week, 1–15 Nov", "nameZh": "巴黎餐厅周（11月1–15日）" },
     { "id": "french", "name": "French", "nameZh": "法餐" },
     { "id": "japanese", "name": "Japanese", "nameZh": "日料" },
     { "id": "korean", "name": "Korean", "nameZh": "韩餐" },
@@ -124,8 +125,8 @@
         {
           "lead": "Category.",
           "leadZh": "类别。",
-          "text": "Michelin Guide: stars (★), Bib Gourmand and the guide's other picks (Guide). Everyday tables: restaurants for any day. Cafés and sweets: coffee, tea, pastry, ice cream and a few bars.",
-          "textZh": "米其林指南：星级（★）、必比登推介和指南的其他入选餐厅（指南）。日常餐厅：哪天都可以去的餐厅。咖啡与甜点：咖啡、茶、甜点、冰淇淋，还有几家酒吧。"
+          "text": "Michelin & Restaurant Week: stars (★), Bib Gourmand and the guide's other picks (Guide), and the restaurants of Paris Restaurant Week. Everyday tables: restaurants for any day. Cafés and sweets: coffee, tea, pastry, ice cream and a few bars.",
+          "textZh": "米其林与餐厅周：星级（★）、必比登推介和指南的其他入选餐厅（指南），以及巴黎餐厅周的餐厅。日常餐厅：哪天都可以去的餐厅。咖啡与甜点：咖啡、茶、甜点、冰淇淋，还有几家酒吧。"
         },
         {
           "lead": "Price.",
@@ -147,6 +148,20 @@
         }
       ]
     },
+    "restaurant-week": {
+      "heading": "Paris Restaurant Week",
+      "headingZh": "巴黎餐厅周",
+      "paras": [
+        {
+          "text": "From 1 to 15 November 2026, the restaurants of Paris Restaurant Week offer set menus at a fixed price, often below their usual one; each says what it serves under Price. Choose Paris Restaurant Week in the Cuisine box to see them all.",
+          "textZh": "2026 年 11 月 1 日至 15 日，巴黎餐厅周的餐厅推出固定价格的套餐，往往比平时便宜；每家在“价位”里写着具体菜单。在“菜系”框里选“巴黎餐厅周”，就能看到全部参加的餐厅。"
+        },
+        {
+          "text": "Book these menus on restaurantweek.fr: some ask for a deposit, and you can cancel free of charge up to 24 hours before. After 15 November, the usual menus and prices apply.",
+          "textZh": "这些套餐要在 restaurantweek.fr 上预订：有的需要先付订金，提前 24 小时以上取消不收费。11 月 15 日以后恢复平时的菜单和价格。"
+        }
+      ]
+    },
     "prices": {
       "heading": "Prices and distinctions",
       "headingZh": "价格与评级",
@@ -160,14 +175,19 @@
   },
   "links": [
     {
+      "label": "Paris Restaurant Week",
+      "labelZh": "巴黎餐厅周",
+      "url": "https://restaurantweek.fr/fr"
+    },
+    {
       "label": "MICHELIN Guide: restaurants in Paris",
       "labelZh": "米其林指南：巴黎餐厅",
       "url": "https://guide.michelin.com/en/ile-de-france/paris/restaurants"
     }
   ],
   "credits": {
-    "points": "Points: a shared Google Maps list",
-    "pointsZh": "点位：一份共享的 Google 地图列表"
+    "points": "Points: a shared Google Maps list, and Paris Restaurant Week (restaurantweek.fr) with addresses from the Base Adresse Nationale",
+    "pointsZh": "点位：一份共享的 Google 地图列表，以及巴黎餐厅周（restaurantweek.fr），地址来自法国国家地址库（BAN）"
   },
   "map": {
     "centre": [2.3470, 48.8620],

@@ -1302,15 +1302,24 @@ Claude for both together.
 
 ### 13.3 类别和价位 Categories and prices
 
-- **类别就是分级**：A“米其林指南”（星级、必比登推介和指南的其他入选餐厅），B“日常餐厅”，C“咖啡与甜点”（含几家酒吧）。`labels.tier` 写了“类别”，所以导览上方有“类别”框。
+- **类别就是分级**：A“米其林与餐厅周”（米其林指南的星级、必比登推介和其他入选餐厅，加上巴黎餐厅周 restaurantweek.fr 的餐厅：这就是“米其林”那份名单），B“日常餐厅”，C“咖啡与甜点”（含几家酒吧）。每家是否真有米其林评级，看它的 ★、Bib 或“指南”标记。`labels.tier` 写了“类别”，所以导览上方有“类别”框。
+- **巴黎餐厅周（2026 年 11 月 1–15 日）**：参加的餐厅带主题 `restaurant-week`（“菜系”框里的第一项），`price` 先写餐厅周的套餐和价格，再写平时的价格，`links` 第一个是 restaurantweek.fr 上的预订页。活动结束后，把主题和餐厅周的价格删掉，或换成下一届的。
 - **价位**：`costs` 定义四档，`"€"` 人均 €25 以下、`"€€"` €25–50、`"€€€"` €50–100、`"€€€€"` €100 以上（一个人的餐费，不含酒水）。每家在 `items.json` 里写 `"cost": "€€"`，`price` / `priceZh` 写具体价格。
 - **米其林**：`"award": "1-star"`（`3-stars`、`2-stars`、`1-star`、`bib`、`selected`），列表和详情里显示 ★、Bib 或“指南”。以 2026 年米其林指南（法国）为准；每年三月新指南出来后，请 Claude 核对一次。
 - **菜系**：`themes`（法餐、日料、韩餐、中餐及其他亚洲菜、烤肉、拉面……），导览上方的“菜系”框。
 - 有类别或价位框的导览，三个框各自写着名字（“价位：不限”），在手机上并排一行。
 
-- **Categories are the tiers**: A Michelin Guide (stars, Bib Gourmand and the
-  guide's other picks), B Everyday tables, C Cafés and sweets (and a few bars).
-  `labels.tier` is "Category", so the guide has a Category box.
+- **Categories are the tiers**: A Michelin & Restaurant Week (the Michelin
+  Guide's stars, Bib Gourmand and other picks, and the restaurants of Paris
+  Restaurant Week, restaurantweek.fr: the "Michelin" list), B Everyday tables,
+  C Cafés and sweets (and a few bars). Whether a place really has a Michelin
+  distinction shows in its ★, Bib or Guide mark. `labels.tier` is "Category",
+  so the guide has a Category box.
+- **Paris Restaurant Week (1–15 November 2026)**: its restaurants carry the
+  theme `restaurant-week` (first in the Cuisine box); `price` gives the event's
+  menus and prices first, then the usual ones; the first of `links` is the
+  booking page on restaurantweek.fr. After the event, take the theme and the
+  event prices out, or update them for the next one.
 - **Price levels**: `costs` defines four, `"€"` under €25 a head, `"€€"`
   €25–50, `"€€€"` €50–100, `"€€€€"` over €100 (food for one, without drinks).
   Each place has `"cost": "€€"`, and its menu prices in `price` / `priceZh`.
