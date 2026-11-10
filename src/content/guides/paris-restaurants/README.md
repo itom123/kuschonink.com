@@ -29,18 +29,14 @@
 
 ## 待核实 Waiting for a check
 
-这些在列表里，但 2026 年 11 月 9 日还查不到可靠的信息，所以暂时没有放进导览。These are on the list but couldn't be identified on 9 November 2026, so they aren't in the guide yet:
+这些在 Google 列表里，但 2026 年 11 月 10 日还查不到足够的信息，所以暂时没有放进导览。These are on the Google list but couldn't be checked well enough on 10 November 2026, so they aren't in the guide yet:
 
-- Chez Elisa, 57 Rue Montcalm, 75018 Paris
-- pavillon lan, 9 Rue Monsieur le Prince, 75006 Paris
-- Kaï, 85 Rue du Faubourg Saint-Denis, 75010 Paris
-- Ora Farmhouse, 63 Rue Manin, 75019 Paris
-- Auberge Chez Rosito, 4 Rue du Pas de la Mule, 75003 Paris
-- AYAHUMA, 74 Rue Léon Frot, 75011 Paris
-- Chop Chop Love, 48 Rue du Faubourg Saint-Martin, 75010 Paris
-- Le Tê, 41 bis Rue de Montpensier, 75001 Paris
-- Café Isaka, 9 Rue Thérèse, 75001 Paris
-- Restaurant Tracé, 15 Rue de Richelieu, 75001 Paris
-- Le Crépuscule, 18 Rue Amélie, 75007 Paris
+- Chez Elisa, 57 Rue Montcalm, 75018 Paris（2026 年 1 月新开，网上还没有信息 new in January 2026, nothing online yet）
+- Pavillon Lan, 9 Rue Monsieur le Prince, 75006 Paris（查不到 not found）
+- Kaï, 85 Rue du Faubourg Saint-Denis, 75010 Paris（地图上有一家 Kaï Kaï bistrot，未能确认 a "Kaï Kaï bistrot" on the map, not confirmed）
 
-不放进来的 Left out: Pink Koï（已永久停业 closed for good）；Le Chambard（阿尔萨斯 Alsace）、Dr & Dr（柏林 Berlin）和 BattleKart（卡丁车 go-karts），都不在巴黎。 Not in Paris, or not a place to eat.
+不放进来的 Left out: Pink Koï（已永久停业 closed for good）、Tracé（2026 年停业 closed in 2026）；Le Chambard（阿尔萨斯 Alsace）、Dr & Dr（柏林 Berlin）和 BattleKart（卡丁车 go-karts），都不在巴黎 not in Paris, or not a place to eat。
+
+## 第二份名单：巴黎餐厅周 The second list: Paris Restaurant Week
+
+32 家来自 restaurantweek.fr（2026 年 11 月 10 日读取：每家一页，间隔几秒，没有被拦）。地址用法国国家地址库（BAN）定位。其中 4 家（Nhome、Magma、Chenapan、Maison Avoise）也在 Google 列表里。32 restaurants from restaurantweek.fr (read on 10 November 2026, one page per restaurant, a few seconds apart, never refused), placed with the Base Adresse Nationale. Four (Nhome, Magma, Chenapan, Maison Avoise) are on the Google list too.
