@@ -1,6 +1,6 @@
 // Field Guide (导览): the program's state, its URL query and its storage.
-// URL keys (non-defaults only): place, day, theme, q, listings=1, area, route,
-// view. A day chosen automatically (today) and the map camera never go in the
+// URL keys (non-defaults only): place, day, tier, cost, theme, q, listings=1,
+// area, route, view. A day chosen automatically (today) and the map camera never go in the
 // URL. localStorage kus98:guide = {heat, labels, sort} (never "Nearest first");
 // sessionStorage kus98:guide:view = {guide, cam, area, scroll}. Log Off clears both.
 import type { ISODate, Payload } from '../../lib/guides/types';
@@ -9,8 +9,8 @@ import { loadSort, saveSort } from './order';
 
 export type View = 'map' | 'places' | 'routes' | 'days' | 'info';
 export type Detail = 'closed' | 'half' | 'full';
-/** The Places list's order (order.ts): recommended (tier, then ref), name, area, open that day first, nearest first. */
-export type Sort = 'tier' | 'name' | 'zone' | 'open' | 'near';
+/** The Places list's order (order.ts): recommended (tier, then ref), name, area, price (cheapest first), open that day first, nearest first. */
+export type Sort = 'tier' | 'name' | 'zone' | 'cost' | 'open' | 'near';
 export const VIEWS: View[] = ['map', 'places', 'routes', 'days', 'info'];
 
 export interface GdState {
@@ -19,6 +19,10 @@ export interface GdState {
   day: 'any' | ISODate;
   /** The day was picked for the visitor (today), so it isn't written to the URL. */
   dayAuto: boolean;
+  /** One tier only ('' for all): the Category filter, when the guide has one (labels.tier). */
+  tier: string;
+  /** One price level only ('' for any): the Price filter, when the guide has price levels. */
+  cost: string;
   theme: string;
   q: string;
   listings: boolean;
@@ -58,6 +62,8 @@ export function initialState(p: Payload, query: string, prefs: Prefs, today: ISO
   const day = qDay && (qDay === 'any' || days.includes(qDay)) ? qDay : autoDay;
   const place = u.get('place');
   const theme = u.get('theme') ?? '';
+  const tier = u.get('tier') ?? '';
+  const cost = u.get('cost') ?? '';
   const route = u.get('route');
   const view = u.get('view') as View | null;
   const area = u.get('area');
@@ -65,12 +71,14 @@ export function initialState(p: Payload, query: string, prefs: Prefs, today: ISO
     place: place && ids.has(place) ? place : null,
     day,
     dayAuto: !(qDay && day === qDay),
+    tier: p.tierFilter && p.tiers.some((t) => t.id === tier) ? tier : '',
+    cost: (p.costs ?? []).some((c) => c.id === cost) ? cost : '',
     theme: p.themes.some((t) => t.id === theme) ? theme : '',
     q: (u.get('q') ?? '').slice(0, 80),
     listings: u.get('listings') === '1',
     area: area && p.map.views.some((v) => v.id === area) ? area : (p.map.views[0]?.id ?? ''),
     route: route && p.routes.some((r) => r.id === route) ? route : null,
-    view: view && VIEWS.includes(view) && (view !== 'days' || days.length > 0) ? view : null,
+    view: view && VIEWS.includes(view) && (view !== 'days' || days.length > 0) && (view !== 'routes' || p.routes.length > 0) ? view : null,
     detail: 'closed',
     // On by default in every scheme (red and maroon read on the grey map too); a saved choice wins.
     heat: prefs.heat ?? true,
@@ -84,6 +92,8 @@ export function toQuery(s: GdState, p: Payload): string {
   const u = new URLSearchParams();
   if (s.place) u.set('place', s.place);
   if (!s.dayAuto && p.window) u.set('day', s.day);
+  if (s.tier) u.set('tier', s.tier);
+  if (s.cost) u.set('cost', s.cost);
   if (s.theme) u.set('theme', s.theme);
   if (s.q) u.set('q', s.q);
   if (s.listings) u.set('listings', '1');

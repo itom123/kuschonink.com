@@ -5,3 +5,6 @@ dist/
 .dev.vars
 .env
 .DS_Store
+
+# Google Maps lists read by scripts/google-list.mjs (places only, kept an hour)
+.google-lists/

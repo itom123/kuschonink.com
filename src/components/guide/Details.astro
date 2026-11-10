@@ -20,11 +20,29 @@ const category = (id: string) => view.categories.find((c) => c.id === id)?.name 
 const has = (t?: BiT) => !!t && !!(t.en || t.zh);
 const dir = (name: string, address: string) => `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${name}, ${address}`)}&travelmode=walking`;
 const host = (u: string) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; } };
+// A place's own Google Maps page ("https://maps.google.com/?cid=…", as scripts/google-list.mjs writes it):
+// Open in Google Maps goes straight there, and it isn't listed again among the links.
+const isPlacePage = (u: string) => /^https:\/\/maps\.google\.com\/\?cid=\d{1,20}$/.test(u);
+const placePage = (links: string[]) => links.find(isPlacePage);
+const otherLinks = (links: string[]) => links.filter((u) => !isPlacePage(u));
 const listingOf = (id?: string) => (id ? view.listings.records.find((r) => r.id === id) : undefined);
 const eventsAt = (id: string) => view.events.filter((e) => e.place === id);
 const lang = view.listings.source.lang || undefined;
 const listingNote = has(view.defaults.listingNote) ? view.defaults.listingNote : W.notChecked;
 const loose = view.listings.records.filter((r) => !r.item);
+// A guide without days has no day status to show. A guide with price levels says "Price" rather than "Admission".
+const hasDays = !!view.window;
+const priced = view.costs.length > 0;
+const costOf = (id?: string) => (id ? view.costs.find((c) => c.id === id) : undefined);
+const awardOf = (id?: string) => (id ? view.awards.find((a) => a.id === id) : undefined);
+const costLabel = view.labels.cost.en ? view.labels.cost : W.costLabel;
+const awardLabel = view.labels.award.en ? view.labels.award : W.awardLabel;
+const themesLabel = view.labels.theme.en ? view.labels.theme : W.themes;
+/** "€€ (€25–50 a head)". */
+const costLine = (c: { name: BiT; text: BiT }): BiT => ({
+  en: c.text.en ? `${c.name.en} (${c.text.en})` : c.name.en,
+  zh: (c.text.zh || c.text.en) ? `${c.name.zh || c.name.en}（${c.text.zh || c.text.en}）` : c.name.zh || c.name.en,
+});
 ---
 <div class="gd-articles" data-gd-articles>
   {view.places.map((p) => (
@@ -59,10 +77,16 @@ const loose = view.listings.records.filter((r) => !r.item);
       <article class="gd-article gd-item" id={`gd-item-${it.id}`} data-gd-article={it.id} data-kind="item" data-gd-address={`${it.name}, ${it.address}`}>
         <p class="gd-kicker"><span class={`ico ico16 ico-pin-${it.tier.toLowerCase()}`} aria-hidden="true"></span> <Bi t={kicker(it.id, t?.name ?? { en: it.tier, zh: '' })} /></p>
         <h2 class="gd-name" tabindex="-1">{it.name}</h2>
-        {(it.subtitle || it.by) && <p class="gd-sub">{it.subtitle && <b>{it.subtitle}</b>}{it.subtitle && it.by && <br />}{it.by && <span class="gd-by">{it.by}</span>}</p>}
-        <div class="gd-status" data-gd-status><span class="gd-sq" data-code="choose-day" aria-hidden="true"></span><b data-gd-status-text><Bi t={W.chooseDay} /></b> <span class="gd-status-note" data-gd-status-note></span></div>
+        {(it.subtitle || it.by) && <p class="gd-sub">{it.subtitle && <b>{it.subtitleZh ? <Bi t={{ en: it.subtitle, zh: it.subtitleZh }} /> : it.subtitle}</b>}{it.subtitle && it.by && <br />}{it.by && <span class="gd-by">{it.by}</span>}</p>}
+        {(awardOf(it.award) || costOf(it.cost)) && (
+          <p class="gd-marks">
+            {awardOf(it.award) && <span class="gd-award"><Bi t={awardOf(it.award)!.short} /></span>}
+            {costOf(it.cost) && <span class="gd-cost"><Bi t={costOf(it.cost)!.name} /></span>}
+          </p>
+        )}
+        {hasDays && <div class="gd-status" data-gd-status><span class="gd-sq" data-code="choose-day" aria-hidden="true"></span><b data-gd-status-text><Bi t={W.chooseDay} /></b> <span class="gd-status-note" data-gd-status-note></span></div>}
         <p class="gd-actions">
-          <a class="button-link" href={mapsSearchUrl(it.name, it.address)} target="_blank" rel="noopener"><Bi t={W.openMaps} /></a>
+          <a class="button-link" href={placePage(it.links) ?? mapsSearchUrl(it.name, it.address)} target="_blank" rel="noopener"><Bi t={W.openMaps} /></a>
           <a class="button-link" href={dir(it.name, it.address)} target="_blank" rel="noopener"><Bi t={W.directions} /></a>
           <button type="button" class="gd-copy" data-gd-copy data-js-only><Bi t={W.copyAddress} /></button>
         </p>
@@ -72,18 +96,21 @@ const loose = view.listings.records.filter((r) => !r.item);
           <dt><Bi t={W.address} /></dt><dd>{it.address}</dd>
           {has(it.hours) && <><dt><Bi t={W.hours} /></dt><dd><Bi t={it.hours} /> <small>(<Bi t={W.publishedHours} />)</small></dd></>}
           {dates && <><dt><Bi t={W.dates} /></dt><dd><Bi t={dates} /></dd></>}
-          {(has(it.price) || has(view.defaults.price)) && <><dt><Bi t={W.price} /></dt><dd><Bi t={has(it.price) ? it.price : view.defaults.price} /></dd></>}
+          {awardOf(it.award) && <><dt><Bi t={awardLabel} /></dt><dd><Bi t={awardOf(it.award)!.name} /></dd></>}
+          {priced
+            ? (costOf(it.cost) || has(it.price) || has(view.defaults.price)) && <><dt><Bi t={costLabel} /></dt><dd>{costOf(it.cost) && <Bi t={costLine(costOf(it.cost)!)} />}{costOf(it.cost) && (has(it.price) || has(view.defaults.price)) && <br />}{(has(it.price) || has(view.defaults.price)) && <Bi t={has(it.price) ? it.price : view.defaults.price} />}</dd></>
+            : (has(it.price) || has(view.defaults.price)) && <><dt><Bi t={W.price} /></dt><dd><Bi t={has(it.price) ? it.price : view.defaults.price} /></dd></>}
           {it.minutes && <><dt><Bi t={W.allow} /></dt><dd><Bi t={W.minutes(it.minutes)} /></dd></>}
           {it.zone && <><dt><Bi t={W.area} /></dt><dd><Bi t={zone(it.zone)} /></dd></>}
-          {it.themes.length > 0 && <><dt><Bi t={W.themes} /></dt><dd class="gd-themes">{it.themes.map((id, i) => <>{i > 0 && ', '}<a href={`?theme=${encodeURIComponent(id)}`} data-gd-theme={id}><Bi t={theme(id)} /></a></>)}</dd></>}
+          {it.themes.length > 0 && <><dt><Bi t={themesLabel} /></dt><dd class="gd-themes">{it.themes.map((id, i) => <>{i > 0 && ', '}<a href={`?theme=${encodeURIComponent(id)}`} data-gd-theme={id}><Bi t={theme(id)} /></a></>)}</dd></>}
           {it.suggested && <><dt><Bi t={SW.suggested} /></dt><dd class="gd-suggested"><Bi t={SW.suggestedBy(it.suggested.by, it.suggested.own)} /></dd></>}
           {lst && <><dt><Bi t={view.labels.listing} /></dt><dd><details><summary>{lst.id}</summary><p class="gd-listing-text" lang={lang}>{lst.details}</p></details></dd></>}
         </dl>
         {has(it.note) && <p class="gd-caution"><Bi t={it.note} /></p>}
-        {(it.sourceUrl || it.links.length > 0) && (
+        {(it.sourceUrl || otherLinks(it.links).length > 0) && (
           <p class="gd-links">
             {it.sourceUrl && <a href={it.sourceUrl} target="_blank" rel="noopener"><Bi t={W.sourcePage} /></a>}
-            {it.links.map((u) => <a href={u} target="_blank" rel="noopener">{host(u)}</a>)}
+            {otherLinks(it.links).map((u) => <a href={u} target="_blank" rel="noopener">{host(u)}</a>)}
           </p>
         )}
       </article>

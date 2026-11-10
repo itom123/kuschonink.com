@@ -45,6 +45,11 @@ html.js .gd { height: 100%; container-type: size; }
 .gd-f { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .gd-f select, .gd-f input { height: var(--gd-ctl); box-sizing: border-box; font: 11px var(--ui-font); min-width: 0; }
 .gd-f-find { flex: 1 1 180px; }
+/* Drop-downs that name themselves ("Price: any"): an equal share of one row, the box below on a phone. */
+.gd-filters[data-compact] .gd-f:not(.gd-f-find) { flex: 1 1 0; max-width: 220px; }
+.gd-filters[data-compact] .gd-f:not(.gd-f-find) select { width: 100%; text-overflow: ellipsis; }
+.gd-filters[data-compact] .gd-f-find { flex-basis: 100%; }
+@container gd (min-width: 600px) { .gd-filters[data-compact] .gd-f-find { flex-basis: 180px; } }
 .gd-f-find input { flex: 1; width: 100%; font-family: var(--gd-sans); }
 /* Touch: the boxes are taller than 98.css's 21px, so its drop-down button (a fixed 16×17 picture) sat in the
    top corner. Here it fills the box's height, the arrow in its middle, as Windows draws a taller combo box:
@@ -153,6 +158,7 @@ table.gd-table .gd-col-main { overflow-wrap: break-word; overflow-wrap: anywhere
 table.gd-table .gd-row-sub { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; color: #404040; }
 /* The opening days (or the chosen day's status) · the area, on one line. */
 table.gd-table .gd-row-meta { display: block; margin-top: 1px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #404040; }
+.gd-row-marks { font-weight: bold; letter-spacing: 1px; }
 .gd-dot { margin: 0 4px; }
 .gd-row-day:empty + .gd-dot { display: none; }
 .gd-row-meta .gd-sq { display: inline-block; margin-right: 4px; vertical-align: -1px; }
@@ -225,6 +231,10 @@ html.js .gd-group-list:not([hidden]) { display: block; }
 .gd-name:focus-visible { outline: 1px dotted #000; outline-offset: 2px; }
 .gd-sub { margin: 0 0 0.5em; }
 .gd-by { font-style: italic; }
+/* A guide with distinctions or price levels: "★★  €€€€" under the name. */
+.gd-marks { display: flex; flex-wrap: wrap; gap: 4px 8px; margin: 0 0 0.5em; }
+.gd-marks > span { padding: 0 4px; border: 1px solid #808080; background: #fff; font-weight: bold; letter-spacing: 1px; }
+.gd-award { color: #800000; }
 .gd-status { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 6px; margin: 0.4em 0; padding: 3px 6px; border: 1px solid #000; background: #fff; font: 13px/1.3 var(--gd-sans); }
 .gd-sq { flex: none; width: 9px; height: 9px; border: 1px solid #000; background: #c0c0c0; align-self: center; }
 .gd-sq[data-code="scheduled"] { background: #00a000; }

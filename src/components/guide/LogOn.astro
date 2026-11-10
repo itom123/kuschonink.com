@@ -9,8 +9,12 @@
 // With more than one listed guide, a Guide list above the password picks which
 // guide's box this is: a drop-down list with JavaScript (logon.ts opens the
 // chosen guide's box in the same window), links to each guide's box without.
+// With guides of more than one kind (access.json "kinds"), tabs on top choose
+// what the reader wants to see ("Places to eat", "Exhibitions", "Photography"),
+// and the Guide list holds that kind's guides: a tab is a link to the kind's
+// first guide (this guide when it is one of them).
 import Bi from '../Bi.astro';
-import { text, type Bi as BiText } from '../../lib/i18n';
+import { attr, text, type Bi as BiText } from '../../lib/i18n';
 import '../../styles/guide-logon.css';
 
 interface Props {
@@ -19,13 +23,31 @@ interface Props {
   subtitle: BiText;
   /** The listed guides to choose from, this one among them (none, or one: no Guide list). Neutral public titles only. */
   guides?: { slug: string; title: BiText }[];
+  /** The tabs (two or more), each a kind and its listed guides' slugs; none without kinds. */
+  kinds?: { id: string; label: BiText; guides: string[] }[];
+  /** The tab this box opens on: a kind of this guide. */
+  kind?: string;
 }
-const { slug, title, subtitle, guides = [] } = Astro.props;
+const { slug, title, subtitle, guides = [], kinds = [], kind = '' } = Astro.props;
+const tabbed = kinds.length > 1;
+// With tabs, the Guide list holds the chosen kind's guides; logon.ts swaps them when another tab of this guide is chosen.
+const shown = tabbed ? guides.filter((g) => kinds.find((k) => k.id === kind)?.guides.includes(g.slug)) : guides;
+const kindsOf = (s: string) => kinds.filter((k) => k.guides.includes(s)).map((k) => k.id).join(' ');
 const resource = `\\\\XIANGYIN\\GUIDES\\${slug.toUpperCase()}`;
 const id = `gd-logon-${slug}`;
 const zhOr = (b: BiText) => b.zh || b.en;
 ---
-<div class="gd-logon" data-gd-logon data-gd-state="none" data-gd-slug={slug} data-gd-title-en={title.en} data-gd-title-zh={zhOr(title)}>
+<div class="gd-logon" data-gd-logon data-gd-state="none" data-gd-slug={slug} data-gd-title-en={title.en} data-gd-title-zh={zhOr(title)} data-gd-tabbed={tabbed ? '' : undefined}>
+  {tabbed && (
+    <menu role="tablist" class="gd-logon-kinds" {...attr('aria-label', { en: 'What would you like to see?', zh: '你想看什么？' })}>
+      {kinds.map((k) => (
+        <li role="tab" aria-selected={k.id === kind ? 'true' : 'false'}>
+          <a href={`/guides/${k.guides.includes(slug) ? slug : k.guides[0]}`} data-gd-kind={k.id} data-gd-kind-guides={k.guides.join(' ')}><Bi t={k.label} /></a>
+        </li>
+      ))}
+    </menu>
+  )}
+  <div class:list={['gd-logon-panel', { window: tabbed }]} role={tabbed ? 'tabpanel' : undefined}>
   <header class="gd-logon-splash">
     <span class="ico ico-guide gd-logon-icon" aria-hidden="true"></span>
     <div class="gd-logon-names">
@@ -41,15 +63,16 @@ const zhOr = (b: BiText) => b.zh || b.en;
         <span class="ico ico-keys gd-logon-keys" aria-hidden="true"></span>
         <div class="gd-logon-fields">
           <p class="gd-logon-intro" id={`${id}-intro`}><Bi t={{ en: 'You must supply a password to open:', zh: '必须提供密码才能打开：' }} /></p>
-          {guides.length > 1 && (
-            <div class="gd-logon-row gd-logon-guide">
+          {(shown.length > 1 || (tabbed && guides.length > 1)) && (
+            <div class="gd-logon-row gd-logon-guide" hidden={shown.length < 2}>
               <label for={`${id}-guide`} id={`${id}-guide-label`}><span data-l="en"><u>G</u>uide:</span><span data-l="zh" lang="zh-Hans">导览(<u>G</u>)：</span></label>
-              {/* No name: it is not sent. The password goes to the guide whose box this is. */}
+              {/* No name: it is not sent. The password goes to the guide whose box this is. Every listed guide is
+                  an option (data-kinds says under which tabs); logon.ts keeps those of the chosen tab. */}
               <select id={`${id}-guide`} autocomplete="off" data-gd-guide data-js-only>
-                {guides.map((g) => <option value={g.slug} selected={g.slug === slug} {...text(g.title)}>{g.title.en}</option>)}
+                {guides.map((g) => <option value={g.slug} selected={g.slug === slug} data-kinds={tabbed ? kindsOf(g.slug) : undefined} {...text(g.title)}>{g.title.en}</option>)}
               </select>
               <ul class="gd-logon-guides" aria-labelledby={`${id}-guide-label`}>
-                {guides.map((g) => (
+                {shown.map((g) => (
                   <li>{g.slug === slug ? <b aria-current="page"><Bi t={g.title} /></b> : <a href={`/guides/${g.slug}`}><Bi t={g.title} /></a>}</li>
                 ))}
               </ul>
@@ -83,6 +106,7 @@ const zhOr = (b: BiText) => b.zh || b.en;
       </div>
     </fieldset>
   </form>
+  </div>
 </div>
 
 <script>

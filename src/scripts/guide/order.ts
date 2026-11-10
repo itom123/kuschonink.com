@@ -14,6 +14,8 @@ export interface SortRow {
   tier?: string;
   /** Where the row's area comes in the guide's list of areas. */
   zone?: number;
+  /** Where the row's price level comes in the guide's list of levels (cheapest 0); none sorts last. */
+  cost?: number;
   /** The chosen day's status. */
   code?: StatusCode;
   /** Metres from the visitor (Where am I?); null without a position. */
@@ -40,6 +42,7 @@ export function sortRows<T extends SortRow>(rows: T[], sort: Sort): T[] {
   const cmp: (a: T, b: T) => number =
     sort === 'name' ? (a, b) => collator.compare(keys.get(a)!, keys.get(b)!) || byTier(a, b)
     : sort === 'zone' ? (a, b) => (a.zone ?? 999) - (b.zone ?? 999) || byTier(a, b)
+    : sort === 'cost' ? (a, b) => (a.cost ?? 999) - (b.cost ?? 999) || byTier(a, b)
     : sort === 'open' ? (a, b) => (OPEN[a.code!] ?? 3) - (OPEN[b.code!] ?? 3) || byTier(a, b)
     // Infinity - Infinity is NaN, which falls through to the tier.
     : sort === 'near' ? (a, b) => far(a) - far(b) || byTier(a, b)
@@ -48,15 +51,17 @@ export function sortRows<T extends SortRow>(rows: T[], sort: Sort): T[] {
 }
 
 /**
- * The order the list really uses. "Open that day first" needs a chosen day and
- * "Nearest first" a position; without them the list shows the default order.
+ * The order the list really uses. "Open that day first" needs a chosen day,
+ * "Nearest first" a position and "Price" a guide with price levels (a saved
+ * order is shared by every guide); without them the list shows the default order.
  */
-export function sortInUse(sort: Sort, dayChosen: boolean, located: boolean): Sort {
+export function sortInUse(sort: Sort, dayChosen: boolean, located: boolean, priced = true): Sort {
   if (sort === 'open' && !dayChosen) return DEFAULT_SORT;
   if (sort === 'near' && !located) return DEFAULT_SORT;
+  if (sort === 'cost' && !priced) return DEFAULT_SORT;
   return sort;
 }
 
 /** A saved order read back. Nearest first is never saved, since no position outlives a refresh. */
-export const loadSort = (v: unknown): Sort => (v === 'name' || v === 'zone' || v === 'open' ? v : DEFAULT_SORT);
+export const loadSort = (v: unknown): Sort => (v === 'name' || v === 'zone' || v === 'cost' || v === 'open' ? v : DEFAULT_SORT);
 export const saveSort = (s: Sort): Sort => (s === 'near' ? DEFAULT_SORT : s);

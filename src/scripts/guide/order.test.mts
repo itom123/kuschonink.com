@@ -37,6 +37,14 @@ ok(ids(sortRows(rows, 'open')) === 'A6 B12 B13 C1 A2 A10 D01', 'open first: walk
 // ---- Nearest first: metres, ties by tier; no distance last ----
 ok(ids(sortRows(rows, 'near')) === 'C1 A6 A10 B13 B12 A2 D01', 'nearest: by metres, a tie by tier, no position last', ids(sortRows(rows, 'near')));
 
+// ---- Price: the guide's levels, cheapest first, then tier; no level last ----
+{
+  const priced = [row('A1', 'Kei', { cost: 3 }), row('B2', 'Sam So', { cost: 0 }), row('B1', 'Pango', { cost: 1 }), row('C1', 'Café', { cost: 0 }), row('B3', 'Unknown')];
+  ok(ids(sortRows(priced, 'cost')) === 'B2 C1 B1 A1 B3', 'price: cheapest first, a tie by tier, no level last', ids(sortRows(priced, 'cost')));
+  ok(sortInUse('cost', false, false, true) === 'cost' && sortInUse('cost', false, false, false) === DEFAULT_SORT, 'price applies only to a guide with price levels');
+  ok(loadSort('cost') === 'cost' && saveSort('cost') === 'cost', 'price is remembered');
+}
+
 // ---- sortRows leaves its input alone ----
 const before = ids(rows);
 sortRows(rows, 'name');

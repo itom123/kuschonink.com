@@ -3,7 +3,8 @@
 // queue), the publisher and the routine's tools. Tested in dedupe.test.mts.
 //
 // Names lose accents, punctuation, case and filler words (gallery, galerie,
-// the, la…); web addresses lose "www.", the query and a trailing slash. Then:
+// the, la…); web addresses lose "www.", the query and a trailing slash (a
+// Google Maps place page keeps its place number, ?cid=…, which is the page). Then:
 // - the same web address → the same thing;
 // - within 50 m (or the same address) with similar names → the same venue;
 // - the same venue, dates that overlap (or unknown), and a shared artist or a
@@ -81,6 +82,9 @@ export function normUrl(u: string | undefined | null): string {
   }
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
   const host = url.hostname.toLowerCase().replace(/^www\./, '');
+  // A Google Maps place page ("maps.google.com/?cid=…") is told apart only by its place number.
+  const cid = /(^|\.)google\.[a-z.]+$/.test(host) ? url.searchParams.get('cid') : null;
+  if (cid && /^\d{1,20}$/.test(cid)) return `${host}/?cid=${cid}`;
   let path = decodeURIComponent(url.pathname).toLowerCase().replace(/\/+$/, '').replace(/\/index\.(html?|php)$/, '');
   path = path.replace(/^\/(en|fr|de|it|es|zh|cn|ja|ko)(?=\/|$)/, '');
   return host + path;

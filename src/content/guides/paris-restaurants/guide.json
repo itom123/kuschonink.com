@@ -1,0 +1,204 @@
+{
+  "_comment": "Places to eat in Paris: a long-term guide, no dates. Tiers are the categories (A Michelin Guide, B everyday tables, C cafés and sweets); costs are the price levels; awards are Michelin distinctions. See docs/GUIDES.md. 巴黎餐厅长期导览：分级就是类别（A 米其林，B 日常餐厅，C 咖啡与甜点），costs 是价位，awards 是米其林评级。",
+  "title": "Eating in Paris, from a bowl of noodles to three stars.",
+  "titleZh": "在巴黎吃饭：从一碗面到米其林三星。",
+  "subtitle": "{items} places to eat, sorted by category and price. Choose a cuisine or a price, and book the popular ones ahead.",
+  "subtitleZh": "{items} 个吃饭的地方，按类别和价位分好。可以选菜系或价位；热门的餐厅请提前预订。",
+  "public": {
+    "title": "Eating in Paris",
+    "titleZh": "巴黎美食",
+    "subtitle": "Restaurants and cafés",
+    "subtitleZh": "餐厅与咖啡馆"
+  },
+  "listed": true,
+  "kinds": ["food"],
+  "city": "Paris",
+  "cityZh": "巴黎",
+  "timezone": "Europe/Paris",
+  "timezoneLabel": "Paris time",
+  "timezoneLabelZh": "巴黎时间",
+  "checked": "2026-11-09",
+  "tiers": [
+    {
+      "id": "A",
+      "name": "Michelin & Restaurant Week",
+      "nameZh": "米其林与餐厅周",
+      "text": "Restaurants in the 2026 Michelin Guide (★, Bib Gourmand, Guide), and those taking part in Paris Restaurant Week, 1–15 November 2026, with their special menus. Book ahead.",
+      "textZh": "2026 年米其林指南的餐厅（★、必比登、指南），以及参加 2026 年 11 月 1–15 日巴黎餐厅周的餐厅和它们的特别菜单。请提前预订。",
+      "weight": 3
+    },
+    {
+      "id": "B",
+      "name": "Everyday tables",
+      "nameZh": "日常餐厅",
+      "text": "Bistros, noodle bars, grills and neighbourhood favourites, for any day.",
+      "textZh": "小酒馆、面馆、烤肉和街坊常去的小店，哪天都合适。",
+      "weight": 2
+    },
+    {
+      "id": "C",
+      "name": "Cafés and sweets",
+      "nameZh": "咖啡与甜点",
+      "text": "Coffee, tea, pastry and ice cream, and a few bars.",
+      "textZh": "咖啡、茶、甜点和冰淇淋，还有几家酒吧。",
+      "weight": 1
+    }
+  ],
+  "costs": [
+    { "id": "€", "text": "under €25 a head", "textZh": "人均 €25 以下" },
+    { "id": "€€", "text": "€25–50 a head", "textZh": "人均 €25–50" },
+    { "id": "€€€", "text": "€50–100 a head", "textZh": "人均 €50–100" },
+    { "id": "€€€€", "text": "over €100 a head", "textZh": "人均 €100 以上" }
+  ],
+  "awards": [
+    { "id": "3-stars", "name": "Three Michelin stars", "nameZh": "米其林三星", "short": "★★★", "shortZh": "★★★" },
+    { "id": "2-stars", "name": "Two Michelin stars", "nameZh": "米其林二星", "short": "★★", "shortZh": "★★" },
+    { "id": "1-star", "name": "One Michelin star", "nameZh": "米其林一星", "short": "★", "shortZh": "★" },
+    { "id": "bib", "name": "Bib Gourmand", "nameZh": "必比登推介", "short": "Bib", "shortZh": "必比登" },
+    { "id": "selected", "name": "In the Michelin Guide, without a star", "nameZh": "入选米其林指南（无星）", "short": "Guide", "shortZh": "指南" }
+  ],
+  "themes": [
+    { "id": "restaurant-week", "name": "Paris Restaurant Week, 1–15 Nov", "nameZh": "巴黎餐厅周（11月1–15日）" },
+    { "id": "french", "name": "French", "nameZh": "法餐" },
+    { "id": "japanese", "name": "Japanese", "nameZh": "日料" },
+    { "id": "korean", "name": "Korean", "nameZh": "韩餐" },
+    { "id": "asian", "name": "Chinese and other Asian", "nameZh": "中餐及其他亚洲菜" },
+    { "id": "mediterranean", "name": "Italian and Mediterranean", "nameZh": "意大利及地中海菜" },
+    { "id": "world", "name": "From further away", "nameZh": "其他风味" },
+    { "id": "grill", "name": "Grills and barbecue", "nameZh": "烤肉" },
+    { "id": "seafood", "name": "Fish and seafood", "nameZh": "海鲜" },
+    { "id": "noodles", "name": "Noodles and ramen", "nameZh": "面食与拉面" },
+    { "id": "tasting", "name": "Tasting menus", "nameZh": "品鉴菜单" },
+    { "id": "coffee-tea", "name": "Coffee and tea", "nameZh": "咖啡与茶" },
+    { "id": "sweets", "name": "Pastry and ice cream", "nameZh": "甜点与冰淇淋" },
+    { "id": "drinks", "name": "Wine and cocktails", "nameZh": "葡萄酒与鸡尾酒" }
+  ],
+  "zones": [
+    { "id": "louvre-opera", "name": "Louvre / Opéra", "nameZh": "卢浮宫／歌剧院" },
+    { "id": "marais", "name": "Marais", "nameZh": "玛黑区" },
+    { "id": "left-bank", "name": "Latin Quarter / Saint-Germain", "nameZh": "拉丁区／圣日耳曼" },
+    { "id": "eiffel", "name": "Eiffel Tower / 7th", "nameZh": "埃菲尔铁塔／7区" },
+    { "id": "west", "name": "Champs-Élysées / West", "nameZh": "香榭丽舍／西区" },
+    { "id": "canal", "name": "Pigalle / Canal Saint-Martin", "nameZh": "皮加勒／圣马丁运河" },
+    { "id": "bastille", "name": "Bastille / 11th", "nameZh": "巴士底／11区" },
+    { "id": "south", "name": "South / 13th–15th", "nameZh": "南部／13–15区" },
+    { "id": "north-east", "name": "North-East / 18th–20th", "nameZh": "东北部／18–20区" },
+    { "id": "outside", "name": "Outside Paris", "nameZh": "巴黎近郊" }
+  ],
+  "labels": {
+    "item": "Place to eat",
+    "itemZh": "餐厅",
+    "items": "Places to eat",
+    "itemsZh": "餐厅",
+    "subtitle": "Cuisine",
+    "subtitleZh": "菜式",
+    "by": "Chef",
+    "byZh": "主厨",
+    "tier": "Category",
+    "tierZh": "类别",
+    "theme": "Cuisine",
+    "themeZh": "菜系",
+    "cost": "Price",
+    "costZh": "价位",
+    "award": "Michelin Guide",
+    "awardZh": "米其林指南"
+  },
+  "texts": {
+    "about": {
+      "heading": "About this guide",
+      "headingZh": "关于本导览",
+      "paras": [
+        {
+          "text": "Places to eat in Paris, from a quick bowl of noodles to a three-star dinner. They come from a shared Google Maps list, and each was checked in November 2026 against the restaurant's own pages, the MICHELIN Guide and the press.",
+          "textZh": "从一碗面到米其林三星，这里是在巴黎吃饭的地方。名单来自一份共享的 Google 地图列表，2026年11月逐一对照了餐厅官网、米其林指南和媒体报道。"
+        },
+        {
+          "text": "This guide has no dates: it grows over time. Nothing has been booked for you.",
+          "textZh": "本导览没有固定日期，会不断更新。没有代为预订任何餐厅。"
+        }
+      ]
+    },
+    "how": {
+      "heading": "How to use it",
+      "headingZh": "使用方法",
+      "items": [
+        {
+          "lead": "Category.",
+          "leadZh": "类别。",
+          "text": "Michelin & Restaurant Week: stars (★), Bib Gourmand and the guide's other picks (Guide), and the restaurants of Paris Restaurant Week. Everyday tables: restaurants for any day. Cafés and sweets: coffee, tea, pastry, ice cream and a few bars.",
+          "textZh": "米其林与餐厅周：星级（★）、必比登推介和指南的其他入选餐厅（指南），以及巴黎餐厅周的餐厅。日常餐厅：哪天都可以去的餐厅。咖啡与甜点：咖啡、茶、甜点、冰淇淋，还有几家酒吧。"
+        },
+        {
+          "lead": "Price.",
+          "leadZh": "价位。",
+          "text": "€ under €25 a head, €€ €25–50, €€€ €50–100, €€€€ over €100: food for one person, without drinks. The Price box shows one level at a time; Sort by can put the cheapest first.",
+          "textZh": "€ 人均 €25 以下，€€ €25–50，€€€ €50–100，€€€€ €100 以上：一个人的餐费，不含酒水。“价位”框一次显示一个价位；“排序方式”可以把便宜的排在前面。"
+        },
+        {
+          "lead": "Cuisine.",
+          "leadZh": "菜系。",
+          "text": "Choose one in the Cuisine box, or type a dish, a name or a street in Find.",
+          "textZh": "在“菜系”框里选一种，或者在“查找”里输入菜名、店名或街道。"
+        },
+        {
+          "lead": "Booking.",
+          "leadZh": "预订。",
+          "text": "Starred and popular places fill up weeks ahead. Many restaurants close on Sunday and Monday, and for some weeks in August. Check the opening hours before you go.",
+          "textZh": "星级餐厅和热门餐厅往往要提前几周预订。很多餐厅周日、周一休息，八月还会停业几周。出发前请先确认营业时间。"
+        }
+      ]
+    },
+    "restaurant-week": {
+      "heading": "Paris Restaurant Week",
+      "headingZh": "巴黎餐厅周",
+      "paras": [
+        {
+          "text": "From 1 to 15 November 2026, the restaurants of Paris Restaurant Week offer set menus at a fixed price, often below their usual one; each says what it serves under Price. Choose Paris Restaurant Week in the Cuisine box to see them all.",
+          "textZh": "2026 年 11 月 1 日至 15 日，巴黎餐厅周的餐厅推出固定价格的套餐，往往比平时便宜；每家在“价位”里写着具体菜单。在“菜系”框里选“巴黎餐厅周”，就能看到全部参加的餐厅。"
+        },
+        {
+          "text": "Book these menus on restaurantweek.fr: some ask for a deposit, and you can cancel free of charge up to 24 hours before. After 15 November, the usual menus and prices apply.",
+          "textZh": "这些套餐要在 restaurantweek.fr 上预订：有的需要先付订金，提前 24 小时以上取消不收费。11 月 15 日以后恢复平时的菜单和价格。"
+        }
+      ]
+    },
+    "prices": {
+      "heading": "Prices and distinctions",
+      "headingZh": "价格与评级",
+      "paras": [
+        {
+          "text": "Prices are those the restaurant or the MICHELIN Guide gave in November 2026. Menus change with the seasons, so take them as a guide. Stars and Bib Gourmand are from the MICHELIN Guide France 2026.",
+          "textZh": "价格以2026年11月餐厅或米其林指南公布的为准。菜单随季节变化，仅供参考。星级和必比登推介来自2026年米其林指南（法国）。"
+        }
+      ]
+    }
+  },
+  "links": [
+    {
+      "label": "Paris Restaurant Week",
+      "labelZh": "巴黎餐厅周",
+      "url": "https://restaurantweek.fr/fr"
+    },
+    {
+      "label": "MICHELIN Guide: restaurants in Paris",
+      "labelZh": "米其林指南：巴黎餐厅",
+      "url": "https://guide.michelin.com/en/ile-de-france/paris/restaurants"
+    }
+  ],
+  "credits": {
+    "points": "Points: a shared Google Maps list, and Paris Restaurant Week (restaurantweek.fr) with addresses from the Base Adresse Nationale",
+    "pointsZh": "点位：一份共享的 Google 地图列表，以及巴黎餐厅周（restaurantweek.fr），地址来自法国国家地址库（BAN）"
+  },
+  "map": {
+    "centre": [2.3470, 48.8620],
+    "heatRadius": 500
+  },
+  "sensitive": {
+    "public": []
+  },
+  "defaults": {
+    "price": "Prices change: check the restaurant's own page.",
+    "priceZh": "价格会变动，请以餐厅官网为准。"
+  },
+  "suggestions": false
+}
