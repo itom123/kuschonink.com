@@ -1,18 +1,17 @@
 # The routine's copy of the Field Guide suggestions tool: see README.md.
-# Every 10 minutes it takes the files of the commit kuschonink.com runs (the tool,
+# When run, it takes the files of the commit kuschonink.com runs (the tool,
 # with that repository's own downloader, and this repository's own files, from
 # scripts/suggestions/routine-repo/ there), locks sharp's version for `npm ci`,
 # and commits them when they changed. It pushes with this repository's deploy
 # key (the secret SYNC_DEPLOY_KEY): the ruleset lets nothing else update a branch.
+#
+# Retired on 16 November 2026 with the Paris photography guide (paris-2026-11):
+# it runs only by hand now (Actions ▸ Sync ▸ Run workflow). To bring back the
+# schedule (every 10 minutes), restore the `schedule:` block from kuschonink.com's
+# git history; kuschonink.com's docs/GUIDES.md 11.6 says why its cron line must
+# be committed as the owner.
 name: Sync
 on:
-  schedule:
-    # Every 10 minutes, off the busy minute :00. GitHub runs a schedule for the
-    # account that wrote the last commit changing this line, so the sync's
-    # commits are credited to the owner (below). Commits by accounts without
-    # access to the copy left it never running, and turning the workflow off
-    # and on doesn't help: only a new value here, committed as the owner, does.
-    - cron: '4,14,24,34,44,54 * * * *'
   workflow_dispatch:
 permissions:
   contents: read
