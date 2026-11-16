@@ -5,6 +5,8 @@ import { projects, about, contact, site } from '../../lib/content';
 import { neighbours, exitsOf, house, rooms, type Room } from '../../lib/house';
 import Bi from '../Bi.astro';
 import { t, attr, chapter, statusZh, stairsTo } from '../../lib/i18n';
+import { films } from '../../lib/kino-site';
+import { clock } from '../../lib/kino';
 
 interface Props { room: Room }
 const { room } = Astro.props;
@@ -65,6 +67,18 @@ const nameOf = (r: Room) => (r.contents ? { en: `${r.en}: ${r.title}`, zh: `${r.
       <p><i><Bi t={t.writingsHere} /></i></p>
     )}
 
+    {page === 'kino' && (
+      <div class="kino-room">
+        <p><Bi t={{ en: 'The garage is a cinema now: dark, and a few steps down from the hall. The films play here at their full quality.', zh: '车库如今是一间影院：昏暗，从过道往下走几级台阶。影片在这里以完整画质放映。' }} /></p>
+        <h2><Bi t={{ en: 'Now showing', zh: '正在放映' }} /></h2>
+        <ul class="kino-room-films">
+          {films.map((f) => (
+            <li><a href={`/kino/${f.id}`}><Bi t={{ en: f.title, zh: f.titleZh ?? f.title }} /></a>{f.seconds ? ` (${clock(f.seconds)})` : ''}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+
     {page === 'colophon' && (
       <div class="prose">
         <div data-l="en">
@@ -92,6 +106,7 @@ const nameOf = (r: Room) => (r.contents ? { en: `${r.en}: ${r.title}`, zh: `${r.
     {!room.locked && <p class="simple-link"><a href={`/house/3d?room=${room.slug}`}><Bi t={t.seeIn3d} /></a></p>}
     {page === 'about' && <p class="simple-link"><a href="/about"><Bi t={{ en: 'Open About.doc', zh: '打开“关于.doc”' }} /></a></p>}
     {page === 'contact' && <p class="simple-link"><a href="/contact"><Bi t={{ en: 'Open Contact (New Message)', zh: '打开“联系”（新邮件）' }} /></a></p>}
+    {page === 'kino' && <p class="simple-link"><a href="/kino"><Bi t={{ en: 'Open Kino', zh: '打开 Kino' }} /></a></p>}
 
     <hr />
     {(exits.up || exits.down || exits.byDir.length > 0) && (

@@ -33,9 +33,10 @@ separate, hidden log-on for admin mode, checked on the server
   with an Image Viewer for the photographs), About.doc (`/about`, a document),
   Contact (`/contact`, a New Message window), Paint (`/paint`, for drawing
   something and sending it to the artist), The House (`/house/…`, a browser
-  window), Field Guide (`/guides`, behind passwords) and Help (`/help`).
-- **Pictures can't be saved.** The photographs and drawings are protected by
-  copyright: no right-click, press-and-hold or drag will save one, and
+  window), Kino (`/kino`, the films at full quality), Field Guide (`/guides`,
+  behind passwords) and Help (`/help`).
+- **Pictures and films can't be saved.** The photographs, drawings and films
+  are protected by copyright: no right-click, press-and-hold or drag will save one, and
   *Save Picture As...* (and *Save* in the Image Viewer) says why. What a
   visitor draws in Paint is theirs to keep, and admin mode is left alone. See
   [`docs/DESKTOP.md`](docs/DESKTOP.md#pictures-cant-be-saved).
@@ -310,6 +311,35 @@ choices and custom colours are in `localStorage` (`kus98:paint`).
 - **Tests:** `npm test` also runs the drawing handler (`worker/drawing.test.mts`,
   with real PNGs) and the fill (`src/scripts/paint/fill.test.mts`).
 
+### Kino (the films)
+
+**Kino** (`/kino`, on the desktop, in Start ▸ Programs and in the house's
+garage, chapter 7) shows the artist's moving-image works at their full quality,
+in a 1998-style media player. Each film plays from the Kino's own copy on
+Cloudflare R2 once it has been uploaded (protected HLS: every size up to the
+master's own, the best the visitor's connection carries, with a Quality menu),
+and from its YouTube video until then. Project pages show a "Showing in the
+Kino" card instead of an embed (`{ "type": "video", "film": "<id>" }`).
+
+- **Tickets, not files.** No page holds a film's address. The first Play opens
+  the **Box Office**, a Cloudflare Turnstile check; the Worker
+  (`worker/kino.ts`, on `/kino` and `/kino/*`) then sets a ticket, an
+  `HttpOnly` cookie for four hours, and only then says where the film is. The
+  pieces are encrypted (AES-128), their addresses carry a signature for that
+  film and that ticket, and a piece opened in a tab or on another site is
+  refused. Rate limits: 10 tickets a minute per visitor, 180 pieces a minute
+  per ticket. Screen recording can't be stopped this way (that would take DRM).
+- **No crawling.** `robots.txt` disallows `/kino`, the pages are `noindex` (also
+  `X-Robots-Tag`), and they are not in the sitemap.
+- **Adding a film**: `node scripts/kino/encode.mjs <master> <id>` (ffmpeg, on
+  your computer), `node scripts/kino/upload.mjs <id> <version>`, then add the
+  printed `stream` to the film in `src/content/kino.json`. The R2 bucket
+  `kuschonink-kino` must exist before a deploy. Step by step, costs, and what
+  the protection does and doesn't stop: [`docs/KINO.md`](docs/KINO.md).
+- **The guard.** After the build, `scripts/kino-guard.mjs` fails it if `dist/`
+  holds a film, a playlist or a key, if any public file holds a Kino film's
+  YouTube id, or if `/kino` could be crawled or skip the Worker.
+
 ### Field Guide (password)
 
 **Field Guide** (导览, `/guides`, on the desktop and in Start ▸ Programs) holds
@@ -399,7 +429,7 @@ and English: [`docs/GUIDES.md`](docs/GUIDES.md).
   loading in `src/lib/guides/`; the program and its map in `src/scripts/guide/`
   and `src/components/guide/`; styles in `src/styles/guide*.css`; the gate in
   `worker/guides.ts`.
-- **Tests:** `npm test` runs all 25 `*.test.mts` suites, in the order
+- **Tests:** `npm test` runs all 28 `*.test.mts` suites, in the order
   `package.json` lists them. The Field Guide's are `src/lib/guides/guides.test.mts`
   (day rules, time zones, audience filtering, the real data, broken copies),
   `worker/guides.test.mts` (the gate: views, cookies, log-on, log-off, tiles) and,
@@ -433,9 +463,11 @@ of the Cookies dialog (which covers what the site itself keeps).
 | `src/scripts/map.ts` | Map interaction (pan, zoom, floors, search) |
 | `src/components/house/` | Floorplan map and room panel |
 | `src/pages/paint.astro`, `src/scripts/paint/` | Paint, and sending a drawing to the artist |
+| `src/content/kino.json`, `src/lib/kino.ts` | Kino: the films, and the rules the pages, the player and the Worker share |
+| `src/pages/kino/`, `src/scripts/kino/`, `scripts/kino/` | Kino: its pages, the player and box office, encoding and uploading a film |
 | `src/content/guides/` | Field Guide: `access.json` (audiences) and one folder per guide |
 | `src/lib/guides/`, `src/scripts/guide/` | Field Guide: data rules and checks; the program in the browser |
-| `worker/` | The Worker: the contact form (`contact.ts`), Paint's drawings (`drawing.ts`) and the Field Guide's password gate (`guides.ts`) |
+| `worker/` | The Worker: the contact form (`contact.ts`), Paint's drawings (`drawing.ts`), the Field Guide's password gate (`guides.ts`) and the Kino's door (`kino.ts`) |
 | `src/layouts/Desktop.astro` | Every page: the Xiangyin 98 desktop with the page in a window |
 | `src/components/desktop/` | Window, taskbar, Start menu, desktop icons, start-up screens |
 | `src/scripts/desktop/` | The desktop shell: windows, menus, sounds, Control Panel… (see [`docs/DESKTOP.md`](docs/DESKTOP.md)) |
@@ -452,7 +484,7 @@ Every page is a list of **sections**. A section has a `theme` (`light` or
 | `text` | `html`. Classes you can use: `display`, `large`, `small`, `accent`, `align-center`, `align-right`; `<mark>` highlights |
 | `image` | `src`, `alt`, optional `caption`, `link` |
 | `gallery` | `style` (`slideshow`, `reel`, `fullscreen`, `masonry`, `strips`, `grid`) and `images` |
-| `video` | `url`, `youtubeId` or `vimeoId`, optional `caption` |
+| `video` | `film` (a Kino film's id: a card that opens it in the Kino), or `url`, `youtubeId` or `vimeoId`; optional `caption` |
 | `marquee` | `items` (scrolling text) |
 | `banner` | `images` shown full screen |
 | `contactForm` | Uses the fields in `site.json` |
@@ -471,6 +503,8 @@ Image `src` paths are relative to `src/assets/images`. Images may also have a
   `src/assets/images/...` with the new one, keeping the same file name. Astro
   generates all the web sizes (up to 2500 px wide, WebP) at build time.
 - **Restyle the house:** the colours are at the top of `src/styles/house.css`.
+- **Show a film at full quality in the Kino:** encode, upload and add its
+  `stream` to `src/content/kino.json` ([`docs/KINO.md`](docs/KINO.md), section 3).
 - **Update a Field Guide** (hours, dates, a closure, a new place): edit its JSON
   in `src/content/guides/<slug>/` on GitHub and commit to `main`. Recipes and
   direct edit links: [`docs/GUIDES.md`](docs/GUIDES.md).
@@ -506,7 +540,8 @@ Worker's *Settings → Domains & Routes*. Until then the site is available at
 `worker/index.ts` runs only for the paths listed in `assets.run_worker_first`
 (currently `/v1/contact/*`, the contact form and Paint's drawings, and
 `/guides` and `/guides/*`, the Field Guide's gate, which also sends `/guides` to
-the first listed guide). Everything else is served as static files.
+the first listed guide, `/v1/admin/*`, and `/kino` and `/kino/*`, the Kino's
+door). Everything else is served as static files.
 Add a path there and handle it in the Worker to add an API route.
 
 ## Migration notes

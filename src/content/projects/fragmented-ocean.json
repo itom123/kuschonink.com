@@ -41,9 +41,7 @@
       "blocks": [
         {
           "type": "video",
-          "provider": "youtube",
-          "url": "https://www.youtube.com/watch?v=S-m6E3DIjgI",
-          "youtubeId": "S-m6E3DIjgI"
+          "film": "fragmented-ocean"
         },
         {
           "type": "text",
@@ -71,9 +69,7 @@
       "blocks": [
         {
           "type": "video",
-          "provider": "youtube",
-          "url": "https://www.youtube.com/watch?v=3W6kb9AmRPw",
-          "youtubeId": "3W6kb9AmRPw"
+          "film": "an-entangled-past"
         },
         {
           "type": "text",

@@ -95,9 +95,7 @@
         },
         {
           "type": "video",
-          "provider": "youtube",
-          "url": "https://www.youtube.com/watch?v=3W6kb9AmRPw",
-          "youtubeId": "3W6kb9AmRPw"
+          "film": "an-entangled-past"
         }
       ]
     }

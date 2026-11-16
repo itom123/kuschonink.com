@@ -1,23 +1,40 @@
 ---
+// A video block. With `film` it is a card for that Kino film (kino.json): the
+// film plays only in the Kino (/kino/<film>), so no page holds its source.
+// Otherwise it embeds the YouTube or Vimeo video it names.
 import type { Block } from '../../lib/types';
 import Bi from '../Bi.astro';
 import Caption from '../Caption.astro';
 import { attr, t } from '../../lib/i18n';
+import { kinoFilm } from '../../lib/kino-site';
+import { clock } from '../../lib/kino';
 interface Props { block: Extract<Block, { type: 'video' }> }
 const { block } = Astro.props;
-const embed = block.youtubeId
-  ? `https://www.youtube-nocookie.com/embed/${block.youtubeId}`
-  : block.vimeoId
-    ? `https://player.vimeo.com/video/${block.vimeoId}`
-    : null;
+const film = block.film ? kinoFilm(block.film) : null;
+const embed = film
+  ? null
+  : block.youtubeId
+    ? `https://www.youtube-nocookie.com/embed/${block.youtubeId}`
+    : block.vimeoId
+      ? `https://player.vimeo.com/video/${block.vimeoId}`
+      : null;
 ---
 <figure class="block block-video">
-  {embed ? (
+  {film ? (
+    <a class="video-frame kino-card" href={`/kino/${film.id}`}>
+      <span class="kino-card-inner">
+        <span class="ico ico-kino" aria-hidden="true"></span>
+        <span class="kino-card-label"><Bi t={t.showingInKino} /></span>
+        <span class="kino-card-title"><Bi t={{ en: film.title, zh: film.titleZh ?? film.title }} />{film.seconds && <span class="kino-card-len"> ({clock(film.seconds)})</span>}</span>
+        <span class="kino-card-go"><span aria-hidden="true">▶ </span><Bi t={t.watchInKino} /></span>
+      </span>
+    </a>
+  ) : embed ? (
     <div class="video-frame">
       <iframe src={embed} {...attr('title', { en: block.caption ?? 'Video', zh: block.captionZh ?? block.caption ?? '视频' })} loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
-  ) : (
+  ) : block.url ? (
     <a href={block.url} target="_blank" rel="noopener"><Bi t={t.watchVideo} /></a>
-  )}
+  ) : null}
   <Caption text={block.caption} zh={block.captionZh} />
 </figure>

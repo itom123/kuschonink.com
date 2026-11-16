@@ -1,5 +1,5 @@
-// The site's pictures can't be saved: they are the artist's work, protected by
-// copyright. No browser menu on a picture (Shift+right-click, or press and hold
+// The site's pictures and films can't be saved: they are the artist's work,
+// protected by copyright. No browser menu on a picture (Shift+right-click, or press and hold
 // on Android, would offer to save it) and no dragging one out of a window. The
 // desktop's own right-click menu still works: its Save Picture As..., like the
 // Image Viewer's Save, says why instead (savePicture). desktop.css does the
@@ -12,8 +12,8 @@
 import { msgbox } from './dialogs';
 import { h } from './util';
 
-/** Pictures: photographs, canvases (the house in 3D), drawings in SVG (the façade, the plans). */
-const PICTURES = 'img, canvas, svg image';
+/** Pictures: photographs, canvases (the house in 3D), drawings in SVG (the façade, the plans), and the Kino's films (Save Video As). */
+const PICTURES = 'img, canvas, svg image, video';
 
 /** Admin mode is on (the same test as isAdminPage() in scripts/admin/api.ts). */
 const admin = () => document.documentElement.hasAttribute('data-admin');

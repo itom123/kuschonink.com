@@ -88,6 +88,7 @@ export function filesFor(url: string, all: readonly string[]): string[] {
   else if (p.startsWith('/house/appendix/')) want.push(c('perec'), c('house'));
   else if ((m = /^\/house\/drawer\/([a-z0-9-]+)$/.exec(p))) want.push(c(`writings/${m[1]}`), c('drawers'));
   else if (p === '/house' || p.startsWith('/house/')) want.push(c('house'));
+  else if (p === '/kino' || p.startsWith('/kino/')) want.push(c('kino'));
   else if (p === '/guides') want.push(...all.filter((f) => /^src\/content\/guides\/[a-z0-9-]+\/guide\.json$/.test(f)), c('guides/suggest'));
   else if ((m = /^\/guides\/([a-z0-9-]+)/.exec(p))) want.push(...GUIDE_FILES.map((f) => c(`guides/${m![1]}/${f}`)));
   if (!want.length) want.push(c('site'));

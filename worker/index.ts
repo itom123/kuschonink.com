@@ -2,7 +2,8 @@
 // /v1/contact/*, /guides and /guides/* run this code: the contact form backend
 // (worker/contact.ts), Paint's "Send to Xiangyin" (worker/drawing.ts), the
 // Field Guide's password gate (worker/guides.ts) and its suggestions
-// (worker/suggest.ts), and admin mode on /v1/admin/* (worker/admin.ts).
+// (worker/suggest.ts), admin mode on /v1/admin/* (worker/admin.ts), and the
+// Kino's door on /kino and /kino/* (worker/kino.ts).
 // Two crons: the publisher every ten minutes
 // (worker/publish.ts) and, daily, the Guard's tidy-up and the privacy
 // clean-up (worker/privacy.ts).
@@ -10,11 +11,15 @@ import { EmailMessage } from 'cloudflare:email';
 // Who may open which guide: audience ids, secret NAMES and guide slugs only
 // (no guide content). Wrangler bundles the JSON into the Worker.
 import access from '../src/content/guides/access.json';
+// The Kino's films (titles, YouTube ids, which upload is on R2). Bundled too.
+import kinoJson from '../src/content/kino.json';
+import { loadKino, type KinoFile } from '../src/lib/kino.ts';
 import type { AccessFile } from '../src/lib/guides/types';
 import { ADMIN_PREFIX, adminSession, handleAdmin, type AdminDeps, type OutMail } from './admin';
 import { CONTACT_PATH, handleContact, type Deps, type EmailOut, type TurnstileResult } from './contact';
 import { DRAWING_PATH, handleDrawing } from './drawing';
 import { guideAudience, handleGuides, isGuidesPath, limitKey, MIN_PEPPER, type GuidesDeps } from './guides';
+import { handleKino, isKinoPath, MIN_SECRET as MIN_KINO_SECRET, type KinoDeps, type KinoObject } from './kino';
 import type { GuardApi } from './guard';
 import { github } from './github';
 import { buildMime, forBinding } from './mime';
@@ -82,6 +87,15 @@ interface Env {
   /** The routine's API trigger (https://api.anthropic.com/v1/claude_code/routines/trig_…/fire) and its token (secrets). */
   ROUTINE_FIRE_URL?: string;
   ROUTINE_TOKEN?: string;
+
+  /** Kino: the private R2 bucket with the films (films/<id>/<version>/…, keys/<id>/<version>.key). Read only. */
+  KINO?: { get(key: string, options?: { range?: Headers }): Promise<KinoObject | null> };
+  /** Rate limiting binding: Kino tickets asked for, per visitor. */
+  KINO_LIMIT: RateLimit;
+  /** Rate limiting binding: Kino media fetched, per ticket. Optional: without it every fetch is allowed. */
+  KINO_MEDIA_LIMIT?: RateLimit;
+  /** Signs Kino tickets and media links (a secret, 32+ random characters); without it the Field Guide's cookie key does, under its own label. */
+  KINO_SECRET?: string;
 }
 
 async function siteverify(secret: string, token: string, ip: string | null): Promise<TurnstileResult> {
@@ -260,6 +274,31 @@ function adminDeps(env: Env): AdminDeps {
   };
 }
 
+const kinoFilms = loadKino(kinoJson as KinoFile);
+
+const kinoDeps = (env: Env): KinoDeps => ({
+  films: kinoFilms,
+  secret: () => {
+    const own = env.KINO_SECRET?.trim() ?? '';
+    return own.length >= MIN_KINO_SECRET ? own : cookieSecretOf(env);
+  },
+  assets: (r) => env.ASSETS.fetch(r),
+  r2: async (key, range) => {
+    if (!env.KINO) throw new Error('no KINO binding');
+    return env.KINO.get(key, range ? { range: new Headers({ range }) } : undefined);
+  },
+  turnstile: {
+    secret: env.TURNSTILE_SECRET,
+    hostnames: new Set((env.TURNSTILE_HOSTNAMES || 'kuschonink.com,www.kuschonink.com').split(',').map((h) => h.trim()).filter(Boolean)),
+    verify: siteverify,
+  },
+  allow: async (key) => (await env.KINO_LIMIT.limit({ key })).success,
+  allowMedia: env.KINO_MEDIA_LIMIT ? async (key) => (await env.KINO_MEDIA_LIMIT!.limit({ key })).success : undefined,
+  random: (n) => crypto.getRandomValues(new Uint8Array(n)),
+  now: () => Date.now(),
+  log: (...args) => console.error(...args),
+});
+
 const DAILY = '17 3 * * *';
 
 export default {
@@ -268,6 +307,7 @@ export default {
     if (url.pathname === CONTACT_PATH) return handleContact(request, depsFor(env));
     if (url.pathname === DRAWING_PATH) return handleDrawing(request, depsFor(env));
     if (isGuidesPath(url.pathname)) return handleGuides(request, guidesDeps(env));
+    if (isKinoPath(url.pathname)) return handleKino(request, kinoDeps(env));
     if (url.pathname.startsWith(`${ADMIN_PREFIX}/`)) return handleAdmin(request, adminDeps(env));
     return env.ASSETS.fetch(request);
   },

@@ -89,6 +89,7 @@ export const GET: APIRoute = async () => {
       { url: '/contact', title: 'Contact', titleZh: '联系', icon: 'mail', ...TYPES.program },
       { url: '/paint', title: 'Paint', titleZh: '画图', icon: 'paint', ...TYPES.program },
       { url: '/guides', title: 'Field Guide', titleZh: '导览', icon: 'guide', ...TYPES.program },
+      { url: '/kino', title: 'Kino', titleZh: 'Kino', icon: 'kino', ...TYPES.program },
       { url: '/help', title: 'Help', titleZh: '帮助', icon: 'help', ...TYPES.help },
     ],
     help: (helpJson as { topics: { id: string; title: string; titleZh?: string; keywords: string[]; keywordsZh?: string[] }[] }).topics.map((t) => ({
