@@ -969,6 +969,10 @@ Suggest a Place…**. `http://127.0.0.1:8798/_dump` shows what was kept.
 
 ### 11.6 云端例程 The routine in Claude's cloud
 
+> **2026 年 11 月 16 日起停用**：巴黎摄影导览（`paris-2026-11`）结束后存档了，也不再收推荐（`"suggestions": false`）。所以例程（定时任务“Field Guide suggestions”）已经关掉，副本的 Sync 工作流也不再定时运行，只能手动运行。要重新启用：在 [claude.ai/code/routines](https://claude.ai/code/routines) 把任务打开，再从 git 历史里恢复 `scripts/suggestions/routine-repo/.github/workflows/sync.yml` 的 `schedule:` 部分（下面第 2 步说明了定时那一行为什么要用你的账号提交）。联系方式照样按期删除（Worker 每天的清理，不受影响）。
+>
+> **Retired on 16 November 2026**: the Paris photography guide (`paris-2026-11`) is archived and takes no more suggestions (`"suggestions": false`). So the routine (the scheduled task "Field Guide suggestions") is turned off, and the copy's Sync workflow no longer runs on a schedule, only by hand. To bring them back, turn the task on at [claude.ai/code/routines](https://claude.ai/code/routines) and restore the `schedule:` block of `scripts/suggestions/routine-repo/.github/workflows/sync.yml` from the git history (step 2 below says why its cron line must be committed as you). Contact details are still deleted when due: the Worker's daily clean-up carries on.
+
 推荐流程**不需要你的电脑开着**：收推荐、批准和拒绝、发布（每 10 分钟）和到期删除联系方式（每天）都在 Cloudflare
 的 Worker 里；核对和补全由 Claude Code 的云端定时任务（scheduled task，以前叫 routine，下面称“例程”）在 Anthropic
 的服务器上完成。这个任务**只挂一个仓库：工具的副本 `itom123/kuschonink-routine`**，从来不挂这个仓库；副本由它自己的
