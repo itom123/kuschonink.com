@@ -1,6 +1,5 @@
 // Starting up, logging on and off, shutting down, restarting, standing by.
 // Loaded only when needed (the first page of a session, or from the Start menu).
-import { consent } from './consent';
 import { msgbox, openDialog } from './dialogs';
 import { navigate } from './router';
 import { session } from './session';
@@ -132,32 +131,8 @@ function finish() {
   // The home page follows "Show this screen each time Xiangyin 98 starts".
   const welcome = wm.find('welcome');
   if (welcome && !settings.get().showWelcome) wm.close(welcome);
-  showBeginHint();
   wm.getActive()?.el.querySelector<HTMLElement>('[data-window-body]')?.focus({ preventScroll: true });
   return n;
-}
-
-/** "Click here to begin", pointing at Start, until Start is first opened. */
-export function showBeginHint() {
-  try {
-    if (sessionStorage.getItem('kus98:begun')) return;
-  } catch { /* ignore */ }
-  if (document.querySelector('.begin-hint')) return;
-  const hint = h('button', { type: 'button', class: 'begin-hint' }, [h('span', { class: 'begin-text' }, tr({ en: 'Click here to begin', zh: '单击这里开始' }))]);
-  document.body.appendChild(hint);
-  const done = () => {
-    hint.remove();
-    if (consent.allows('tab')) {
-      try { sessionStorage.setItem('kus98:begun', '1'); } catch { /* ignore */ }
-    }
-    document.removeEventListener('start:open', done);
-  };
-  hint.addEventListener('click', () => {
-    done();
-    document.querySelector<HTMLElement>('#k98-start > summary')?.click();
-  });
-  document.addEventListener('start:open', done);
-  setTimeout(() => hint.isConnected && hint.remove(), 25000);
 }
 
 function closeAll() {
