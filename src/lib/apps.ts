@@ -24,7 +24,7 @@ export const APPS: Record<AppId, AppInfo> = {
   house: { name: 'The House', icon: 'house', w: 1100, h: 760, max: true },
   help: { name: 'Help', icon: 'help', w: 800, h: 580 },
   guide: { name: 'Field Guide', icon: 'guide', w: 1100, h: 760, max: true },
-  kino: { name: 'Kino', icon: 'kino', w: 960, h: 660 },
+  kino: { name: 'Kino', icon: 'kino', w: 880, h: 700 },
   admin: { name: 'Administration', icon: 'keys', w: 980, h: 680 },
   error: { name: 'Error', icon: 'error', w: 460, h: 300 },
 };

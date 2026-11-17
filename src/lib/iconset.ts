@@ -697,6 +697,23 @@ export const ICONS: Record<string, Draw> = {
     c.rect(5, 4, 1, 12, 'b').rect(12, 4, 1, 12, 'b');
     return c;
   },
+  // Kino: the previous and next film (a bar and a triangle, as on a media player).
+  'tb-prev'() {
+    const c = new Canvas(20, 20);
+    c.rect(3, 4, 3, 12, 'k').rect(4, 5, 1, 10, 'n');
+    c.poly([[17, 3], [7, 10], [17, 17]], 'k');
+    c.poly([[15.6, 5.6], [9.4, 10], [15.6, 14.4]], 'n');
+    c.poly([[15.6, 5.6], [9.4, 10], [15.6, 9.6]], 'b');
+    return c;
+  },
+  'tb-next'() {
+    const c = new Canvas(20, 20);
+    c.rect(14, 4, 3, 12, 'k').rect(15, 5, 1, 10, 'n');
+    c.poly([[3, 3], [13, 10], [3, 17]], 'k');
+    c.poly([[4.4, 5.6], [10.6, 10], [4.4, 14.4]], 'n');
+    c.poly([[4.4, 5.6], [10.6, 10], [4.4, 9.6]], 'b');
+    return c;
+  },
   'tb-fullscreen'() {
     const c = new Canvas(20, 20);
     c.rect(4, 5, 12, 10, 'k').rect(5, 6, 10, 8, 'n').rect(5, 6, 10, 1, 'b');

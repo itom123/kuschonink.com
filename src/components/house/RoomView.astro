@@ -5,7 +5,9 @@ import { projects, about, contact, site } from '../../lib/content';
 import { neighbours, exitsOf, house, rooms, type Room } from '../../lib/house';
 import Bi from '../Bi.astro';
 import { t, attr, chapter, statusZh, stairsTo } from '../../lib/i18n';
-import { films } from '../../lib/kino-site';
+import { getImage } from 'astro:assets';
+import { img } from '../../lib/images';
+import { films, posterOf } from '../../lib/kino-site';
 import { clock } from '../../lib/kino';
 
 interface Props { room: Room }
@@ -20,6 +22,13 @@ const titleOf = (r: Room) => ({ en: r.title, zh: r.titleZh });
 const chapterLink = (r: Room) => ({ en: `${chapterOf(r).en}: ${r.title}`, zh: `${chapterOf(r).zh}：${r.titleZh}` });
 // The ways out of this room: up or down the stairs, and the rooms next door.
 const exits = exitsOf(room);
+// The Kino (the garage): its films' posters.
+const kinoFilms = page === 'kino'
+  ? await Promise.all(films.map(async (f) => {
+      const p = posterOf(f);
+      return { f, thumb: p ? (await getImage({ src: img(p), width: 320, height: 180, fit: 'cover', format: 'webp', quality: 72 })).src : '' };
+    }))
+  : [];
 const nameOf = (r: Room) => (r.contents ? { en: `${r.en}: ${r.title}`, zh: `${r.zh}：${r.titleZh}` } : { en: r.en, zh: r.zh || r.en });
 ---
 <aside class="room-panel" data-room-page={room.slug} aria-labelledby="room-title">
@@ -72,8 +81,13 @@ const nameOf = (r: Room) => (r.contents ? { en: `${r.en}: ${r.title}`, zh: `${r.
         <p><Bi t={{ en: 'The garage is a cinema now: dark, and a few steps down from the hall. The films play here at their full quality.', zh: '车库如今是一间影院：昏暗，从过道往下走几级台阶。影片在这里以完整画质放映。' }} /></p>
         <h2><Bi t={{ en: 'Now showing', zh: '正在放映' }} /></h2>
         <ul class="kino-room-films">
-          {films.map((f) => (
-            <li><a href={`/kino/${f.id}`}><Bi t={{ en: f.title, zh: f.titleZh ?? f.title }} /></a>{f.seconds ? ` (${clock(f.seconds)})` : ''}</li>
+          {kinoFilms.map(({ f, thumb }) => (
+            <li>
+              <a href={`/kino/${f.id}`}>
+                {thumb ? <img src={thumb} alt="" width="160" height="90" loading="lazy" /> : <span class="kino-room-blank"></span>}
+                <span><Bi t={{ en: f.title, zh: f.titleZh ?? f.title }} />{f.seconds ? <span class="kino-room-len"> · {clock(f.seconds)}</span> : ''}</span>
+              </a>
+            </li>
           ))}
         </ul>
       </div>

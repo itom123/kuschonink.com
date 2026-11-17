@@ -1,12 +1,13 @@
-// Kino's box office: before the first film, a ticket. The desktop asks about
-// cookies first (the ticket is one: kus98.consent.ask('kino')), then a small
-// "Box Office" dialog runs Cloudflare Turnstile. Most visitors only see it
-// for a moment: the check passes on its own ("Success!") and the dialog
-// closes. The token
+// Kino's ticket, invisible unless needed. Before the first film the desktop
+// asks about cookies if no choice allows them yet (the ticket is one:
+// kus98.consent.ask('kino')). Then Cloudflare Turnstile runs in a box on the
+// player's own screen, in its "interaction-only" form: for most visitors
+// nothing shows and the film just starts. Only when Cloudflare wants a person
+// to tick its box does the box appear, with one line saying why. The token
 // goes to POST /kino/ticket (worker/kino.ts), which sets the ticket: an
 // HttpOnly cookie this script never sees.
 import { TICKET_PATH, TURNSTILE_ACTION } from '../../lib/kino';
-import { desktop, dialog, h, setText, type Bi } from '../paint/dom';
+import { desktop, type Bi } from '../paint/dom';
 
 type TS = { render: (el: Element, o: object) => string; reset: (id?: string) => void; remove?: (id: string) => void };
 const TURNSTILE_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
@@ -35,116 +36,92 @@ function loadTurnstile(): Promise<TS> {
   return loading;
 }
 
-const SAY: Record<string, Bi> = {
-  checking: { en: 'Checking at the door… This takes a moment.', zh: '正在入口处验证……请稍候。' },
-  failed: { en: 'The check at the door didn’t pass. Please try again.', zh: '入口处的验证没有通过。请重试。' },
-  unreachable: { en: 'The check at the door could not be reached. Please try again in a moment.', zh: '暂时无法连接入口处的验证。请稍后再试。' },
-  busy: { en: 'Too many tickets just now. Please wait a minute, then try again.', zh: '刚才发出的入场券太多了。请等一分钟再试。' },
+/** What the screen says while the ticket is being had. */
+export const SAY: Record<string, Bi> = {
+  checking: { en: 'One moment…', zh: '请稍候……' },
+  asks: { en: 'Cloudflare asks you to confirm you’re a person, then the film starts.', zh: 'Cloudflare 请你确认自己是真人，确认后影片就会开始。' },
+  failed: { en: 'The check at the door didn’t pass. Press Play to try again.', zh: '入口处的验证没有通过。请按“播放”重试。' },
+  unreachable: { en: 'The check at the door could not be reached. Press Play to try again in a moment.', zh: '暂时无法连接入口处的验证。请稍后按“播放”重试。' },
+  busy: { en: 'Too many tickets just now. Please wait a minute, then press Play.', zh: '刚才发出的入场券太多了。请等一分钟再按“播放”。' },
   closed: { en: 'The Kino is closed just now. Please come back later.', zh: 'Kino 暂时关闭。请稍后再来。' },
+  cookies: { en: 'The Kino needs a cookie for your ticket. Allow cookies (Start ▸ Settings ▸ Cookies), then press Play.', zh: 'Kino 需要使用 Cookie 来保存你的入场券。请允许 Cookie（开始 ▸ 设置 ▸ Cookie），然后按“播放”。' },
 };
 
-export type TicketResult = 'ok' | 'cancelled' | 'cookies' | 'closed';
+export type TicketResult = 'ok' | 'cookies' | 'closed' | 'failed' | 'unreachable' | 'busy';
+
+interface TicketUi {
+  sitekey: string | undefined;
+  /** The box on the screen that Turnstile renders into. */
+  box: HTMLElement;
+  /** Say something on the screen (null: say nothing). */
+  say: (b: Bi | null) => void;
+}
 
 let pending: Promise<TicketResult> | null = null;
 
-/** A ticket for this browser: resolves 'ok' once the Worker has set it. One box office at a time. */
-export function getTicket(owner: Element, sitekey: string | undefined): Promise<TicketResult> {
-  pending ??= run(owner, sitekey).finally(() => (pending = null));
+/** A ticket for this browser: resolves 'ok' once the Worker has set it. One check at a time. */
+export function getTicket(ui: TicketUi): Promise<TicketResult> {
+  pending ??= run(ui).finally(() => (pending = null));
   return pending;
 }
 
-async function run(owner: Element, sitekey: string | undefined): Promise<TicketResult> {
+async function run(ui: TicketUi): Promise<TicketResult> {
   const consent = desktop() as unknown as { consent?: { ask(feature: string): Promise<boolean> } } | undefined;
   if (consent?.consent && !(await consent.consent.ask('kino'))) return 'cookies';
-  if (!sitekey) return 'closed';
-
-  return new Promise<TicketResult>((resolve) => {
-    let settled = false;
+  if (!ui.sitekey) return 'closed';
+  let ts: TS;
+  try {
+    ts = await loadTurnstile();
+  } catch {
+    return 'unreachable';
+  }
+  ui.say(SAY.checking);
+  const token = await new Promise<string | null>((resolve) => {
     let widget: string | undefined;
-    const finish = (r: TicketResult) => {
-      if (settled) return;
-      settled = true;
-      win.close();
-      resolve(r);
+    const finish = (t: string | null) => {
+      ui.box.classList.remove('is-asking');
+      if (widget) ts.remove?.(widget);
+      resolve(t);
     };
-    const status = h('p', { class: 'kino-bo-status', role: 'status', 'aria-live': 'polite' }, SAY.checking);
-    const box = h('div', { class: 'kino-bo-turnstile' });
-    const again = h('button', { type: 'button', hidden: true }, { en: 'Try Again', zh: '重试' });
-    const cancel = h('button', { type: 'button' }, { en: 'Cancel', zh: '取消' });
-    const body = h('div', { class: 'kino-bo' }, [
-      h('div', { class: 'kino-ticket', 'aria-hidden': 'true' }, [h('span', { class: 'kino-ticket-name' }, 'KINO'), h('span', { class: 'kino-ticket-admit' }, { en: 'ADMIT ONE', zh: '凭票入场' })]),
-      h('p', {}, {
-        en: 'Your ticket lets this browser watch the films for four hours. It is kept as a cookie until you close the browser, and says nothing about you.',
-        zh: '入场券让这个浏览器在四小时内观看影片。它以 Cookie 保存，关闭浏览器即失效，不包含任何关于你的信息。',
-      }),
-      box,
-      status,
-      h('div', { class: 'kino-bo-buttons' }, [again, cancel]),
-    ]);
-    const win = dialog({
-      title: { en: 'Box Office', zh: '售票处' },
-      icon: 'kino',
-      body,
-      owner,
-      className: 'kino-bo-dialog',
-      onClose: () => {
-        const w = window as unknown as { turnstile?: TS };
-        if (widget) w.turnstile?.remove?.(widget);
-        if (!settled) {
-          settled = true;
-          resolve('cancelled');
-        }
+    // Cloudflare's own limit is five minutes for someone to tick the box.
+    const timer = setTimeout(() => finish(null), 5 * 60 * 1000);
+    widget = ts.render(ui.box, {
+      sitekey: ui.sitekey,
+      action: TURNSTILE_ACTION,
+      appearance: 'interaction-only',
+      language: document.documentElement.dataset.lang === 'zh' ? 'zh-cn' : 'en',
+      callback: (t: string) => {
+        clearTimeout(timer);
+        finish(t);
+      },
+      'error-callback': () => {
+        clearTimeout(timer);
+        finish(null);
+      },
+      'expired-callback': () => {
+        clearTimeout(timer);
+        finish(null);
+      },
+      'before-interactive-callback': () => {
+        ui.box.classList.add('is-asking');
+        ui.say(SAY.asks);
+      },
+      'after-interactive-callback': () => {
+        ui.box.classList.remove('is-asking');
+        ui.say(SAY.checking);
       },
     });
-    cancel.addEventListener('click', () => finish('cancelled'));
-    const say = (b: Bi, retry = true) => {
-      setText(status, b);
-      again.hidden = !retry;
-    };
-    again.addEventListener('click', () => {
-      again.hidden = true;
-      setText(status, SAY.checking);
-      const w = window as unknown as { turnstile?: TS };
-      if (widget) w.turnstile?.reset(widget);
-      else void start();
-    });
-
-    const send = async (token: string) => {
-      let res: Response;
-      try {
-        res = await fetch(TICKET_PATH, { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify({ token }), credentials: 'same-origin' });
-      } catch {
-        return say(SAY.unreachable);
-      }
-      if (res.ok) return finish('ok');
-      const err = ((await res.json().catch(() => ({}))) as { error?: string }).error ?? '';
-      if (err === 'closed') {
-        say(SAY.closed, false);
-        return;
-      }
-      say(res.status === 429 ? SAY.busy : err === 'verification_unavailable' ? SAY.unreachable : SAY.failed);
-    };
-
-    const start = async () => {
-      let ts: TS;
-      try {
-        ts = await loadTurnstile();
-      } catch {
-        return say(SAY.unreachable);
-      }
-      if (settled) return;
-      widget = ts.render(box, {
-        sitekey,
-        action: TURNSTILE_ACTION,
-        // Always shown, in the space kept for it (kino.css): the dialog is sized once, as it opens.
-        appearance: 'always',
-        size: 'normal',
-        language: document.documentElement.dataset.lang === 'zh' ? 'zh-cn' : 'en',
-        callback: (token: string) => void send(token),
-        'error-callback': () => say(SAY.failed),
-        'expired-callback': () => say(SAY.failed),
-      });
-    };
-    void start();
   });
+  if (!token) return 'failed';
+  let res: Response;
+  try {
+    res = await fetch(TICKET_PATH, { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify({ token }), credentials: 'same-origin' });
+  } catch {
+    return 'unreachable';
+  }
+  if (res.ok) return 'ok';
+  const err = ((await res.json().catch(() => ({}))) as { error?: string }).error ?? '';
+  if (err === 'closed') return 'closed';
+  if (res.status === 429) return 'busy';
+  return err === 'verification_unavailable' ? 'unreachable' : 'failed';
 }

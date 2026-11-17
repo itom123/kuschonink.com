@@ -108,6 +108,8 @@ async function playOf(film: string, cookie: string) {
       { id: 'dup', title: 'b', titleZh: 'b', stream: { version: '2026', width: 1, height: 1080 } },
       { id: 'none', title: 'c', titleZh: 'c', note: 'only English', extra: 1 } as unknown as KinoFilm,
       { id: 'proj', title: 'd', titleZh: 'd', youtubeId: 'AAAAAAAAAAA', project: 'nope' },
+      { id: 'pic', title: 'e', titleZh: 'e', youtubeId: 'AAAAAAAAAAA', poster: '../secret.txt' },
+      { id: 'pic-ok', title: 'f', titleZh: 'f', youtubeId: 'AAAAAAAAAAA', poster: 'projects/hanabi/flux.jpg' },
     ],
   };
   const p = problems(bad, ['real-project']);
@@ -118,6 +120,7 @@ async function playOf(film: string, cookie: string) {
   check('problems: a bad stream (version, width) and no length', has('dup › stream.version') && has('dup › stream.width') && has('dup › seconds: a film on R2'), p);
   check('problems: no source, an untranslated note, an unknown field', has('none › youtubeId: a film needs') && has('none › noteZh') && has('none › extra: unknown field'), p);
   check('problems: an unknown project', has('proj › project: no project "nope"'), p);
+  check('problems: a poster must be a picture under src/assets/images', has('pic › poster') && !has('pic-ok ›'), p);
   let threw = '';
   try {
     loadKino(bad);

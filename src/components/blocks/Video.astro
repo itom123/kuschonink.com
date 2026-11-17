@@ -1,16 +1,21 @@
 ---
-// A video block. With `film` it is a card for that Kino film (kino.json): the
-// film plays only in the Kino (/kino/<film>), so no page holds its source.
+// A video block. With `film` it is the Kino's card for that film (kino.json):
+// the film's poster, a "Watch in the Kino" button and a caption, linking to
+// /kino/<film>. The film plays only in the Kino, so no page holds its source.
 // Otherwise it embeds the YouTube or Vimeo video it names.
+import { getImage } from 'astro:assets';
 import type { Block } from '../../lib/types';
 import Bi from '../Bi.astro';
 import Caption from '../Caption.astro';
 import { attr, t } from '../../lib/i18n';
-import { kinoFilm } from '../../lib/kino-site';
+import { img } from '../../lib/images';
+import { kinoFilm, posterOf } from '../../lib/kino-site';
 import { clock } from '../../lib/kino';
 interface Props { block: Extract<Block, { type: 'video' }> }
 const { block } = Astro.props;
 const film = block.film ? kinoFilm(block.film) : null;
+const posterPath = film ? posterOf(film) : null;
+const poster = posterPath ? await getImage({ src: img(posterPath), width: 1280, height: 720, fit: 'cover', format: 'webp', quality: 76 }) : null;
 const embed = film
   ? null
   : block.youtubeId
@@ -22,11 +27,11 @@ const embed = film
 <figure class="block block-video">
   {film ? (
     <a class="video-frame kino-card" href={`/kino/${film.id}`}>
-      <span class="kino-card-inner">
-        <span class="ico ico-kino" aria-hidden="true"></span>
+      {poster ? <img class="kino-card-poster" src={poster.src} alt="" width="1280" height="720" loading="lazy" /> : <span class="kino-card-noposter"><span class="ico ico-kino" aria-hidden="true"></span></span>}
+      <span class="kino-card-play"><span class="ico ico20 ico-tb-play" aria-hidden="true"></span><span><Bi t={t.watchInKino} /></span></span>
+      <span class="kino-card-caption">
+        <span class="kino-card-title"><Bi t={{ en: film.title, zh: film.titleZh ?? film.title }} />{film.seconds ? ` · ${clock(film.seconds)}` : ''}</span>
         <span class="kino-card-label"><Bi t={t.showingInKino} /></span>
-        <span class="kino-card-title"><Bi t={{ en: film.title, zh: film.titleZh ?? film.title }} />{film.seconds && <span class="kino-card-len"> ({clock(film.seconds)})</span>}</span>
-        <span class="kino-card-go"><span aria-hidden="true">▶ </span><Bi t={t.watchInKino} /></span>
       </span>
     </a>
   ) : embed ? (

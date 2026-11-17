@@ -322,8 +322,9 @@ master's own, the best the visitor's connection carries, with a Quality menu),
 and from its YouTube video until then. Project pages show a "Showing in the
 Kino" card instead of an embed (`{ "type": "video", "film": "<id>" }`).
 
-- **Tickets, not files.** No page holds a film's address. The first Play opens
-  the **Box Office**, a Cloudflare Turnstile check; the Worker
+- **Tickets, not files.** No page holds a film's address. The first Play runs
+  a Cloudflare Turnstile check on the screen, which shows nothing unless
+  Cloudflare asks the visitor to tick a box; the Worker
   (`worker/kino.ts`, on `/kino` and `/kino/*`) then sets a ticket, an
   `HttpOnly` cookie for four hours, and only then says where the film is. The
   pieces are encrypted (AES-128), their addresses carry a signature for that
@@ -465,7 +466,7 @@ of the Cookies dialog (which covers what the site itself keeps).
 | `src/components/house/` | Floorplan map and room panel |
 | `src/pages/paint.astro`, `src/scripts/paint/` | Paint, and sending a drawing to the artist |
 | `src/content/kino.json`, `src/lib/kino.ts` | Kino: the films, and the rules the pages, the player and the Worker share |
-| `src/pages/kino/`, `src/scripts/kino/`, `scripts/kino/` | Kino: its pages, the player and box office, encoding and uploading a film |
+| `src/pages/kino/`, `src/scripts/kino/`, `scripts/kino/` | Kino: Now Showing and the player, the ticket's check, encoding and uploading a film |
 | `src/content/guides/` | Field Guide: `access.json` (audiences) and one folder per guide |
 | `src/lib/guides/`, `src/scripts/guide/` | Field Guide: data rules and checks; the program in the browser |
 | `worker/` | The Worker: the contact form (`contact.ts`), Paint's drawings (`drawing.ts`), the Field Guide's password gate (`guides.ts`) and the Kino's door (`kino.ts`) |

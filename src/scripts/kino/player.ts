@@ -1,9 +1,12 @@
-// Kino's player: one film in the Kino's window (src/pages/kino/[film].astro).
-// The page holds no source. Play asks the Worker where the film plays from
-// (/kino/<film>/play); without a ticket, the box office gives one first
-// (ticket.ts). A film on R2 plays as HLS through hls.js (loaded only then),
-// or through the browser's own player where there is no Media Source (older
-// iPhones); a film still on YouTube plays in YouTube's player.
+// Kino's player: one film in the Kino's window (src/pages/kino/[film].astro),
+// laid out like Windows Media Player 6.4: the screen, the seek bar, the
+// control bar with its LCD panel, the clip panel. The page holds no source.
+// Play asks the Worker where the film plays from (/kino/<film>/play); without
+// a ticket, the check runs on the screen first (ticket.ts), and shows nothing
+// unless Cloudflare asks. A film on R2 plays as HLS through hls.js (loaded
+// only then), or through the browser's own player where there is no Media
+// Source (older iPhones); a film still on YouTube plays in YouTube's player,
+// and our own controls step aside (only Previous, Next and Full Screen stay).
 //
 // Like every page script (docs/DESKTOP.md): it starts once per window, finds
 // everything from its root, only answers keys while its window is in front,
@@ -11,7 +14,7 @@
 import type Hls from 'hls.js';
 import { clock } from '../../lib/kino';
 import { desktop, h, message, setAttr, setText, tr, type Bi } from '../paint/dom';
-import { getTicket } from './ticket';
+import { getTicket, SAY } from './ticket';
 
 type Play =
   | { kind: 'hls'; src: string; poster: string; width: number; height: number; exp: number }
@@ -29,13 +32,12 @@ const S: Record<string, Bi> = {
   stopped: { en: 'Stopped', zh: '已停止' },
   buffering: { en: 'Buffering…', zh: '正在缓冲……' },
   finished: { en: 'Finished', zh: '已结束' },
-  youtube: { en: 'Playing from YouTube', zh: '从 YouTube 播放' },
+  youtube: { en: 'Playing in YouTube’s player', zh: '在 YouTube 播放器中播放' },
 };
 const NOTE: Record<string, Bi> = {
-  cookies: { en: 'The Kino needs a cookie for your ticket. Allow cookies (Start ▸ Settings ▸ Cookies), then press Play again.', zh: 'Kino 需要使用 Cookie 来保存你的入场券。请允许 Cookie（开始 ▸ 设置 ▸ Cookie），然后再按“播放”。' },
-  cancelled: { en: 'No ticket yet. Press Play to try again.', zh: '还没有入场券。按“播放”重试。' },
-  closed: { en: 'The Kino is closed just now. Please come back later.', zh: 'Kino 暂时关闭。请稍后再来。' },
-  failed: { en: 'The film could not be opened. Please try again in a moment.', zh: '无法打开这部影片。请稍后再试。' },
+  ...SAY,
+  failed: { en: 'The film could not be opened. Press Play to try again in a moment.', zh: '无法打开这部影片。请稍后按“播放”重试。' },
+  door: SAY.failed,
   unsupported: { en: 'This browser can’t play the film. Please try another browser.', zh: '这个浏览器无法播放这部影片。请换一个浏览器试试。' },
 };
 
@@ -44,13 +46,16 @@ export class KinoPlayer {
   private readonly ac = new AbortController();
   private readonly film: string;
   private readonly seconds: number;
-  private readonly stage: HTMLElement;
   private readonly screen: HTMLElement;
-  private readonly curtain: HTMLElement;
-  private readonly note: HTMLElement;
+  private readonly poster: HTMLElement | null;
+  private readonly start: HTMLElement;
+  private readonly bigPlay: HTMLButtonElement;
+  private readonly check: HTMLElement;
+  private readonly msg: HTMLElement;
   private readonly seek: HTMLInputElement;
   private readonly volume: HTMLInputElement;
   private readonly time: HTMLElement;
+  private readonly lcd: HTMLElement;
   private readonly quality: HTMLSelectElement;
   private readonly fields: HTMLElement[];
   private video: HTMLVideoElement | null = null;
@@ -67,13 +72,16 @@ export class KinoPlayer {
     this.film = root.dataset.kinoFilm!;
     this.seconds = Number(root.dataset.kinoSeconds) || 0;
     const q = <T extends Element>(s: string) => root.querySelector<T>(s)!;
-    this.stage = q('[data-kino-stage]');
     this.screen = q('[data-kino-screen]');
-    this.curtain = q('[data-kino-curtain]');
-    this.note = q('[data-kino-note]');
+    this.poster = root.querySelector('[data-kino-poster]');
+    this.start = q('[data-kino-start]');
+    this.bigPlay = q('[data-kino-bigplay]');
+    this.check = q('[data-kino-check]');
+    this.msg = q('[data-kino-msg]');
     this.seek = q('[data-kino-seek]');
     this.volume = q('[data-kino-volume]');
     this.time = q('[data-kino-time]');
+    this.lcd = q('[data-kino-lcdstate]');
     this.quality = q('[data-kino-quality]');
     this.fields = [...this.win.querySelectorAll<HTMLElement>(':scope > [data-window-inner] > .status-bar > .status-bar-field')];
     this.bind();
@@ -85,7 +93,7 @@ export class KinoPlayer {
     const signal = this.ac.signal;
     this.root.addEventListener('click', (e) => {
       const b = (e.target as Element).closest<HTMLElement>('[data-kino-cmd]');
-      if (b && this.root.contains(b)) this.run(b.dataset.kinoCmd!);
+      if (b && this.root.contains(b) && !(b as HTMLButtonElement).disabled) this.run(b.dataset.kinoCmd!);
     }, { signal });
     this.seek.addEventListener('input', () => {
       const v = this.video;
@@ -95,19 +103,14 @@ export class KinoPlayer {
       this.showTime();
     }, { signal });
     this.seek.addEventListener('change', () => (this.seeking = false), { signal });
-    this.volume.addEventListener('input', () => {
-      if (!this.video) return;
-      this.video.volume = Number(this.volume.value) / 100;
-      this.video.muted = this.video.volume === 0;
-    }, { signal });
-    this.quality.addEventListener('change', () => {
-      if (this.hls) this.hls.currentLevel = Number(this.quality.value);
-      this.showQuality();
-    }, { signal });
+    this.volume.addEventListener('input', () => this.setVolume(Number(this.volume.value) / 100), { signal });
+    this.quality.addEventListener('change', () => this.pick(Number(this.quality.value)), { signal });
     // A double-click on the picture: Full Screen, as media players do.
-    this.screen.addEventListener('dblclick', () => this.video && this.fullScreen(), { signal });
+    this.screen.addEventListener('dblclick', (e) => {
+      if (!(e.target as Element).closest('button, .kino-check')) this.fullScreen();
+    }, { signal });
     document.addEventListener('keydown', (e) => this.key(e), { signal });
-    document.addEventListener('fullscreenchange', () => this.stage.classList.toggle('is-full', document.fullscreenElement === this.stage), { signal });
+    document.addEventListener('fullscreenchange', () => this.root.classList.toggle('is-full', document.fullscreenElement === this.root), { signal });
     // The window closes, or moves on to another page: stop and let go.
     this.win.addEventListener('desktop:close', () => this.destroy(), { once: true, signal });
     const gone = () => !this.root.isConnected && this.destroy();
@@ -128,7 +131,7 @@ export class KinoPlayer {
       this.video.load();
     }
     this.frame?.remove();
-    if (document.fullscreenElement === this.stage) void document.exitFullscreen().catch(() => {});
+    if (document.fullscreenElement === this.root) void document.exitFullscreen().catch(() => {});
   }
 
   /** The window is in front, so its keys are ours (as Paint's isActive). */
@@ -148,6 +151,7 @@ export class KinoPlayer {
         case 'k':
         case 'K':
           if (t?.closest('button, a')) return false;
+          if (this.kind === 'youtube') return false;
           this.run(v ? 'toggle' : 'play');
           return true;
         case 'f':
@@ -182,10 +186,10 @@ export class KinoPlayer {
     switch (cmd) {
       case 'play':
         if (v) void v.play().catch(() => {});
-        else void this.start();
+        else void this.begin();
         break;
       case 'toggle':
-        if (!v) void this.start();
+        if (!v) void this.begin();
         else if (v.paused || v.ended) void v.play().catch(() => {});
         else v.pause();
         break;
@@ -207,9 +211,10 @@ export class KinoPlayer {
 
   // ---- Starting a film ----
 
-  private async start() {
+  private async begin() {
     if (this.starting || this.kind) return;
     this.starting = true;
+    this.bigPlay.hidden = true;
     this.say(null);
     try {
       const play = await this.where();
@@ -235,11 +240,12 @@ export class KinoPlayer {
       if (res.ok) return (await res.json()) as Play;
       if (res.status === 401 && i === 0) {
         this.status(S.ticket);
-        const t = await getTicket(this.root, this.root.dataset.sitekey);
+        const t = await getTicket({ sitekey: this.root.dataset.sitekey, box: this.check, say: (b) => this.say(b) });
         if (t !== 'ok') {
-          this.fail(NOTE[t]);
+          this.fail(t === 'failed' ? NOTE.door : NOTE[t]);
           return null;
         }
+        this.say(null);
         continue;
       }
       this.fail(res.status === 503 ? NOTE.closed : NOTE.failed);
@@ -252,18 +258,18 @@ export class KinoPlayer {
     this.kind = 'youtube';
     const lang = document.documentElement.dataset.lang === 'zh' ? 'zh-Hans' : 'en';
     this.frame = h('iframe', {
-      class: 'kino-frame-yt',
+      class: 'kino-yt',
       src: `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&playsinline=1&hl=${lang}`,
       title: { en: this.root.dataset.kinoTitleEn ?? 'Film', zh: this.root.dataset.kinoTitleZh ?? '影片' },
       allow: 'autoplay; fullscreen; picture-in-picture; encrypted-media',
       allowfullscreen: true,
       referrerpolicy: 'strict-origin-when-cross-origin',
     });
-    this.curtain.hidden = true;
+    this.start.hidden = true;
+    if (this.poster) this.poster.hidden = true;
     this.screen.append(this.frame);
+    // YouTube's player has its own controls: ours step aside (CSS hides .kino-own).
     this.root.classList.add('is-youtube');
-    // YouTube's player has its own buttons; Full Screen stays ours (the whole stage).
-    this.enable(['fullscreen']);
     this.status(S.youtube);
     this.field(2, 'YouTube');
   }
@@ -278,14 +284,12 @@ export class KinoPlayer {
       disableremoteplayback: true,
       'aria-label': { en: this.root.dataset.kinoTitleEn ?? 'Film', zh: this.root.dataset.kinoTitleZh ?? '影片' },
     });
-    v.style.aspectRatio = `${p.width} / ${p.height}`;
     this.video = v;
     this.kind = 'hls';
     this.watch(v);
-    this.curtain.hidden = true;
     this.screen.append(v);
     this.root.classList.add('is-playing');
-    this.enable(['toggle', 'stop', 'mute', 'fullscreen']);
+    this.enable();
 
     let HlsClass: typeof Hls | null = null;
     try {
@@ -322,7 +326,12 @@ export class KinoPlayer {
       this.fail(NOTE.unsupported);
       return;
     }
-    void v.play().catch(() => this.status(S.paused));
+    void v.play().catch(() => {
+      // Autoplay refused (sound, a phone's power saving): Play brings it back.
+      this.status(S.paused);
+      this.bigPlay.hidden = false;
+      this.start.hidden = false;
+    });
   }
 
   /** The links ran out (or the ticket did): new ones, from where the film is. At most three times. */
@@ -341,7 +350,12 @@ export class KinoPlayer {
     const signal = this.ac.signal;
     const on = (ev: string, f: () => void) => v.addEventListener(ev, f, { signal });
     on('play', () => this.playing(true));
-    on('playing', () => this.status(S.playing));
+    on('playing', () => {
+      // The film is on the screen: the poster and Play step aside.
+      this.start.hidden = true;
+      if (this.poster) this.poster.hidden = true;
+      this.status(S.playing);
+    });
     on('pause', () => {
       this.playing(false);
       if (!v.ended && v.currentTime > 0) this.status(S.paused);
@@ -387,9 +401,7 @@ export class KinoPlayer {
   private levels() {
     const hls = this.hls;
     if (!hls) return;
-    const opts = hls.levels
-      .map((l, i) => ({ i, height: l.height }))
-      .sort((a, b) => b.height - a.height);
+    const opts = hls.levels.map((l, i) => ({ i, height: l.height })).sort((a, b) => b.height - a.height);
     const top = opts[0]?.height;
     this.quality.replaceChildren(
       option('-1', { en: 'Auto', zh: '自动' }),
@@ -405,10 +417,19 @@ export class KinoPlayer {
     if (!hls) return;
     const lvl = hls.levels[hls.currentLevel];
     const now = lvl ? `${lvl.height}p` : '';
-    this.field(2, hls.autoLevelEnabled ? (now ? { en: `Auto · ${now}`, zh: `自动 · ${now}` } : { en: 'Auto', zh: '自动' }) : now);
+    this.field(2, hls.autoLevelEnabled ? (now ? { en: `${now} (Auto)`, zh: `${now}（自动）` } : { en: 'Auto', zh: '自动' }) : now);
   }
 
+  private pick(level: number) {
+    if (!this.hls) return;
+    this.hls.currentLevel = level;
+    this.quality.value = String(level);
+    this.showQuality();
+  }
+
+  /** The state, in the LCD panel and the status bar. */
   private status(b: Bi) {
+    setText(this.lcd, b);
     this.field(0, b);
   }
 
@@ -417,9 +438,10 @@ export class KinoPlayer {
     if (f) setText(f, t);
   }
 
+  /** A line on the screen (null: none). */
   private say(b: Bi | null) {
-    this.note.hidden = !b;
-    if (b) setText(this.note, b);
+    this.msg.hidden = !b;
+    if (b) setText(this.msg, b);
   }
 
   private fail(b: Bi) {
@@ -428,16 +450,13 @@ export class KinoPlayer {
       void message({ title: { en: 'Kino', zh: 'Kino' }, text: b, icon: 'warning', owner: this.root });
       return;
     }
-    this.curtain.hidden = false;
+    this.start.hidden = false;
+    this.bigPlay.hidden = false;
     this.say(b);
   }
 
-  private enable(cmds: string[]) {
-    for (const c of cmds) this.root.querySelector<HTMLButtonElement>(`[data-kino-cmd="${c}"]`)?.removeAttribute('disabled');
-    if (cmds.includes('toggle')) {
-      this.seek.disabled = false;
-      this.volume.disabled = false;
-    }
+  private enable() {
+    for (const el of this.root.querySelectorAll<HTMLButtonElement | HTMLInputElement>('.kino-own[disabled]')) el.disabled = false;
   }
 
   private setVolume(x: number) {
@@ -446,14 +465,15 @@ export class KinoPlayer {
     this.video.muted = this.video.volume === 0;
   }
 
+  /** Full Screen: the whole player (picture and controls); Esc comes back. An iPhone only lets a video go full screen, in its own player. */
   private fullScreen() {
     const v = this.video as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
     if (document.fullscreenElement) {
       void document.exitFullscreen().catch(() => {});
       return;
     }
-    if (this.stage.requestFullscreen) void this.stage.requestFullscreen().catch(() => v?.webkitEnterFullscreen?.());
-    else v?.webkitEnterFullscreen?.(); // iPhone: only a video goes full screen, in the system's own player
+    if (this.root.requestFullscreen) void this.root.requestFullscreen().catch(() => v?.webkitEnterFullscreen?.());
+    else v?.webkitEnterFullscreen?.();
   }
 
   // ---- Menus ----
@@ -462,6 +482,7 @@ export class KinoPlayer {
     const d = desktop() as unknown as Kus98 | undefined;
     const v = this.video;
     const on = !!v && !v.paused && !v.ended;
+    const own = this.kind !== 'youtube';
     switch (name) {
       case 'file':
         return [
@@ -470,7 +491,7 @@ export class KinoPlayer {
           { label: '&Close', zh: '关闭(&C)', action: () => d?.close(this.win) },
         ];
       case 'view': {
-        const items: MenuSpec[] = [{ label: '&Full Screen', zh: '全屏(&F)', key: 'F', disabled: !this.video && !this.frame, action: () => this.fullScreen() }];
+        const items: MenuSpec[] = [{ label: '&Full Screen', zh: '全屏(&F)', key: 'F', action: () => this.fullScreen() }];
         const hls = this.hls;
         if (hls && hls.levels.length > 1) {
           const opts = hls.levels.map((l, i) => ({ i, height: l.height })).sort((a, b) => b.height - a.height);
@@ -484,10 +505,15 @@ export class KinoPlayer {
         }
         return items;
       }
-      case 'play':
+      case 'play': {
+        const prev = this.root.querySelector<HTMLAnchorElement>('a.kino-btn[href] .ico-tb-prev')?.parentElement as HTMLAnchorElement | undefined;
+        const next = this.root.querySelector<HTMLAnchorElement>('a.kino-btn[href] .ico-tb-next')?.parentElement as HTMLAnchorElement | undefined;
         return [
-          { label: on ? '&Pause' : '&Play', zh: on ? '暂停(&P)' : '播放(&P)', key: 'Space', disabled: this.kind === 'youtube', action: () => this.run(v ? 'toggle' : 'play') },
+          { label: on ? '&Pause' : '&Play', zh: on ? '暂停(&P)' : '播放(&P)', key: 'Space', disabled: !own, action: () => this.run(v ? 'toggle' : 'play') },
           { label: '&Stop', zh: '停止(&S)', disabled: !v, action: () => this.run('stop') },
+          { sep: true },
+          { label: 'P&revious Film', zh: '上一部(&R)', disabled: !prev, action: () => prev && void d?.open(prev.getAttribute('href')!) },
+          { label: '&Next Film', zh: '下一部(&N)', disabled: !next, action: () => next && void d?.open(next.getAttribute('href')!) },
           { sep: true },
           { label: '&Back 5 Seconds', zh: '后退 5 秒(&B)', key: '←', disabled: !v, action: () => v && (v.currentTime = Math.max(0, v.currentTime - 5)) },
           { label: '&Forward 5 Seconds', zh: '前进 5 秒(&F)', key: '→', disabled: !v, action: () => v && (v.currentTime += 5) },
@@ -496,18 +522,12 @@ export class KinoPlayer {
           { label: 'Volume &Up', zh: '增大音量(&U)', key: '↑', disabled: !v, action: () => this.setVolume((v?.volume ?? 1) + 0.1) },
           { label: 'Volume &Down', zh: '减小音量(&D)', key: '↓', disabled: !v, action: () => this.setVolume((v?.volume ?? 1) - 0.1) },
         ];
+      }
       case 'help':
         return kinoHelp(this.root);
       default:
         return null;
     }
-  }
-
-  private pick(level: number) {
-    if (!this.hls) return;
-    this.hls.currentLevel = level;
-    this.quality.value = String(level);
-    this.showQuality();
   }
 }
 
@@ -524,7 +544,7 @@ function option(value: string, t: string | Bi): HTMLOptionElement {
   return o;
 }
 
-/** Help ▸ Help Topics and About Kino (the lobby has the same). */
+/** Help ▸ Help Topics and About Kino (Now Showing has the same). */
 export function kinoHelp(owner: Element): MenuSpec[] {
   const d = desktop() as unknown as Kus98 | undefined;
   return [

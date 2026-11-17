@@ -58,7 +58,8 @@ function textOf(node: HTMLElement) {
 export function initTooltips() {
   document.addEventListener('pointerover', (e) => {
     if (e.pointerType !== 'mouse') return;
-    const node = (e.target as Element).closest?.<HTMLElement>('[title], [data-tip]');
+    // Not an iframe's title: that is the frame's accessible name (the Kino's YouTube player), not a tip.
+    const node = (e.target as Element).closest?.<HTMLElement>('[title]:not(iframe), [data-tip]');
     if (!node || node === current) return;
     const text = textOf(node);
     hideTip();
