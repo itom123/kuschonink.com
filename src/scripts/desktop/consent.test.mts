@@ -195,7 +195,7 @@ for (const [what, local] of [['blocked', new Blocked()], ['missing', null]] as c
   ok(session.length === 1 && f.cookies.length === 0 && f.dropped.length === 0, '… this tab’s memory stays, and neither the cookie nor Paint’s database is touched');
 }
 {
-  const session = new Store({ 'kus98:desk': '{}', 'kus98:begun': '1' });
+  const session = new Store({ 'kus98:desk': '{}', 'kus98:draft': 'Hello' });
   const f = fake(new Store({ [KEY]: choice('none') }), session);
   createConsent(f.env);
   ok(session.length === 0, 'None stored: this tab’s leftovers go at load');
