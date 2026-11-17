@@ -174,6 +174,12 @@ export interface GuideFile {
   defaults?: { price?: string; priceZh?: string; listingNote?: string; listingNoteZh?: string };
   /** File ▸ Suggest a Place… and the toolbar's Suggest. Default true; false for a guide the wizard doesn't fit (restaurants). */
   suggestions?: boolean;
+  /**
+   * An archived guide kept open as a record: a bar runs this text across the
+   * top of the guide, in place of the Today note ("This map is from …; many
+   * shows have ended"). Leave it out for a current guide.
+   */
+  archive?: { text: string; textZh?: string };
 }
 
 /** items.json: the recommended places. */
@@ -513,6 +519,8 @@ export interface GuideView {
   labels: { item: Bi; items: Bi; subtitle: Bi; by: Bi; listing: Bi; listings: Bi; tier: Bi; theme: Bi; cost: Bi; award: Bi };
   /** File ▸ Suggest a Place… and the toolbar's Suggest. */
   suggestions: boolean;
+  /** The archive bar's words, when the guide is kept as a record (GuideFile.archive). */
+  archive?: Bi;
   texts: Section[];
   links: { label: Bi; url: string }[];
   credits: { points: Bi; image: Bi; basemap: string };

@@ -99,6 +99,7 @@ const SCHEMA: Record<GuideFileName, S> = {
     sensitive: obj({ public: arr(str()) }, { rest: arr(str()) }),
     defaults: obj({ ...tx('price', false), ...tx('listingNote', false) }, { opt: true }),
     suggestions: opt(bool),
+    archive: obj({ ...tx('text') }, { opt: true }),
   }),
   items: obj({
     items: arr(

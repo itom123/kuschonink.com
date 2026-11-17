@@ -15,6 +15,7 @@ import PlacesTable from '../../../../components/guide/PlacesTable.astro';
 import RoutesPane from '../../../../components/guide/RoutesPane.astro';
 import DaysPane from '../../../../components/guide/DaysPane.astro';
 import InfoPane from '../../../../components/guide/InfoPane.astro';
+import ArchiveBar from '../../../../components/guide/ArchiveBar.astro';
 import { site } from '../../../../lib/content';
 import { attr, seoTitle } from '../../../../lib/i18n';
 import { SEP, type Tool } from '../../../../lib/chrome';
@@ -117,6 +118,7 @@ const opt = (d: string) => {
       data-tz-en={view.timezoneLabel.en}
       data-tz-zh={view.timezoneLabel.zh || view.timezoneLabel.en}
     >
+      {view.archive && <ArchiveBar t={view.archive} />}
       <p class="gd-note" data-gd-today hidden></p>
       <form class="gd-filters" data-gd-filters data-js-only role="search" data-compact={compact ? '' : undefined}>
         {hasDays && (

@@ -7,10 +7,10 @@
   "public": {
     "title": "Photography in Paris 2026",
     "titleZh": "巴黎摄影 2026",
-    "subtitle": "8 to 15 November 2026",
-    "subtitleZh": "2026年11月8日至15日"
+    "subtitle": "8 to 15 November 2026 (archive)",
+    "subtitleZh": "2026年11月8日至15日（存档）"
   },
-  "listed": false,
+  "listed": true,
   "kinds": ["photography", "exhibitions"],
   "city": "Paris",
   "cityZh": "巴黎",
@@ -656,5 +656,9 @@
     "listingNote": "Official-map record. Opening hours and dates may differ from the venue website. Verify before travelling.",
     "listingNoteZh": "官方地图记录。开放时间和日期可能与场馆网站不同。出发前请先核实。"
   },
-  "suggestions": false
+  "suggestions": false,
+  "archive": {
+    "text": "This map is from Paris Photo week, 8 to 15 November 2026. Many of these shows have ended, and many venues no longer show the work. It stays here as a record: check a venue's own page before you go.",
+    "textZh": "这张地图来自2026年11月8日至15日的巴黎摄影周。其中许多展览已经结束，不少场馆也不再展出这些作品。它留在这里作为记录：前往之前，请先查看场馆自己的网页。"
+  }
 }

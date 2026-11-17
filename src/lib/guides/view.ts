@@ -243,6 +243,7 @@ export function buildView(raw: RawGuide, slug: string, access: AccessFile, audie
       award: b(g.labels.award, g.labels.awardZh),
     },
     suggestions: g.suggestions !== false,
+    ...(g.archive ? { archive: b(g.archive.text, g.archive.textZh) } : {}),
     texts,
     links: (g.links || []).filter((l) => visible(l.audience)).map((l) => ({ label: b(l.label, l.labelZh), url: l.url })),
     credits: { points: b(g.credits?.points, g.credits?.pointsZh), image: b(g.credits?.image, g.credits?.imageZh), basemap: mp.attribution },

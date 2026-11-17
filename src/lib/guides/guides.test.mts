@@ -218,6 +218,14 @@ const base = (): RawGuide => ({
   const noZh = base();
   delete (noZh.items as { items: Record<string, unknown>[] }).items[0].whyZh;
   ok(checkGuide(noZh, 'paris-fixture', acc).length === 0 && buildView(noZh, 'paris-fixture', acc, 'visitor').items[0].why.zh === '', 'deleting whyZh passes, and why.zh is ""');
+  {
+    // An archived guide kept open: its bar's words in both languages; a current guide has none.
+    const arch = base();
+    (arch.guide as Record<string, unknown>).archive = { text: 'This map is from 2026; many shows have ended.', textZh: '这张地图来自2026年；许多展览已经结束。' };
+    const av = buildView(arch, 'paris-fixture', acc, 'visitor');
+    ok(checkGuide(arch, 'paris-fixture', acc).length === 0 && av.archive?.en.startsWith('This map') === true && av.archive.zh.startsWith('这张地图'), 'an archive bar: checked, and its words in both languages');
+    ok(vv.archive === undefined, 'a current guide has no archive bar');
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -263,6 +271,8 @@ const base = (): RawGuide => ({
     ['listing exception outside the guide\'s days', (g) => { g.listings.records[1].exceptions[0].date = '2026-11-20'; }, 'listings.json › D02 › exceptions[0].date', "outside the guide's days"],
     ['listing weekday twice', (g) => { g.listings.records[1].open = ['tue', 'tue']; }, 'listings.json › D02 › open', 'weekday twice'],
     ['listing bad access', (g) => { g.listings.records[1].access = 'booking'; }, 'listings.json › D02 › access', 'not one of'],
+    ['archive without its text', (g) => { g.guide.archive = { textZh: '存档' }; }, 'guide.json › archive › text', 'missing'],
+    ['archive text typo', (g) => { g.guide.archive = { text: 'Archive.', txetZh: 'x' }; }, 'guide.json › archive › txetZh', 'did you mean "textZh"'],
     ['deep unknown key', (g) => { g.items.items[0].image.credt = 'x'; }, 'items.json › A1 › image.credt', 'did you mean "credit"'],
     ['exception in the wrong year', (g) => { g.items.items[3].exceptions = [{ date: '2025-11-15', status: 'appointment' }]; }, 'items.json › B1 › exceptions[0].date', "outside the guide's days"],
     ['unknown placeholder in the subtitle', (g) => { g.guide.subtitle = '{exhibitions} to see'; }, 'guide.json › guide › subtitle', 'unknown placeholder {exhibitions}'],

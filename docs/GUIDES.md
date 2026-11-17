@@ -691,6 +691,7 @@ below). Any file may have a `_comment`, which is never shown.
 | `sensitive` | `{ public: [...], <读者 id>: [...] }`：防泄漏检查用的词 | Words for the leak guard |
 | `defaults?` | `{ price?, priceZh?, listingNote?, listingNoteZh? }` | Default price and listing note |
 | `suggestions?` | `false`：这份导览不收读者推荐（没有“推荐”按钮和菜单项）。默认 `true` | `false`: no Suggest button or menu item in this guide. Default `true` |
+| `archive?` | `{ text, textZh? }`：留作记录的存档导览顶部滚动的存档栏文字，代替“今天”提示（第 12 节）。当前的导览不写 | `{ text, textZh? }`: the words of the scrolling archive bar of a guide kept open as a record, in place of the Today note (section 12). Leave it out for a current guide |
 
 ### `items.json` (`items[]`)
 
@@ -999,9 +1000,9 @@ Suggest a Place…**. `http://127.0.0.1:8798/_dump` shows what was kept.
 
 ### 11.6 云端例程 The routine in Claude's cloud
 
-> **2026 年 11 月 16 日起停用**：巴黎摄影导览（`paris-2026-11`）结束后存档了，也不再收推荐（`"suggestions": false`）。所以例程（定时任务“Field Guide suggestions”）已经关掉，副本的 Sync 工作流也不再定时运行，只能手动运行。要重新启用：在 [claude.ai/code/routines](https://claude.ai/code/routines) 把任务打开，再从 git 历史里恢复 `scripts/suggestions/routine-repo/.github/workflows/sync.yml` 的 `schedule:` 部分（下面第 2 步说明了定时那一行为什么要用你的账号提交）。联系方式照样按期删除（Worker 每天的清理，不受影响）。
+> **2026 年 11 月 16 日起停用**：巴黎摄影导览（`paris-2026-11`）结束后存档了（11 月 17 日起它重新列出，带存档栏，留作记录，见第 12 节），也不再收推荐（`"suggestions": false`）。所以例程（定时任务“Field Guide suggestions”）已经关掉，副本的 Sync 工作流也不再定时运行，只能手动运行。要重新启用：在 [claude.ai/code/routines](https://claude.ai/code/routines) 把任务打开，再从 git 历史里恢复 `scripts/suggestions/routine-repo/.github/workflows/sync.yml` 的 `schedule:` 部分（下面第 2 步说明了定时那一行为什么要用你的账号提交）。联系方式照样按期删除（Worker 每天的清理，不受影响）。
 >
-> **Retired on 16 November 2026**: the Paris photography guide (`paris-2026-11`) is archived and takes no more suggestions (`"suggestions": false`). So the routine (the scheduled task "Field Guide suggestions") is turned off, and the copy's Sync workflow no longer runs on a schedule, only by hand. To bring them back, turn the task on at [claude.ai/code/routines](https://claude.ai/code/routines) and restore the `schedule:` block of `scripts/suggestions/routine-repo/.github/workflows/sync.yml` from the git history (step 2 below says why its cron line must be committed as you). Contact details are still deleted when due: the Worker's daily clean-up carries on.
+> **Retired on 16 November 2026**: the Paris photography guide (`paris-2026-11`) is archived (listed again from 17 November, with its archive bar, as a record: section 12) and takes no more suggestions (`"suggestions": false`). So the routine (the scheduled task "Field Guide suggestions") is turned off, and the copy's Sync workflow no longer runs on a schedule, only by hand. To bring them back, turn the task on at [claude.ai/code/routines](https://claude.ai/code/routines) and restore the `schedule:` block of `scripts/suggestions/routine-repo/.github/workflows/sync.yml` from the git history (step 2 below says why its cron line must be committed as you). Contact details are still deleted when due: the Worker's daily clean-up carries on.
 
 推荐流程**不需要你的电脑开着**：收推荐、批准和拒绝、发布（每 10 分钟）和到期删除联系方式（每天）都在 Cloudflare
 的 Worker 里；核对和补全由 Claude Code 的云端定时任务（scheduled task，以前叫 routine，下面称“例程”）在 Anthropic
@@ -1265,6 +1266,7 @@ Safety:
 - **`/guides/<城市>`**，如 `kuschonink.com/guides/paris`，进入这个城市排在最前面的那份列出的导览。想分享“当前的巴黎导览”，就发这个链接：明年的巴黎导览列出、排到前面以后，它自己就会跟过去。
 - **新的一年**：复制文件夹，命名为 `paris-2027-11`，在 `access.json` 里把它放在最前面，`"listed": true`。
 - **存档**：把旧导览的 `"listed"` 改成 `false`。它不再出现在密码对话框的选择里，`/guides` 和 `/guides/paris` 也不再进入它；但原来的地址照样能用，凭密码照样能打开。
+- **留作记录的存档**：想让过去的导览像作品集一样继续供人浏览，就让它保持 `"listed": true`，在 `guide.json` 里加 `"archive": { "text": "…", "textZh": "…" }`，再在 `access.json` 里把当前的导览排到它前面（`/guides` 和 `/guides/<城市>` 进入排在最前面的那份）。导览顶部会有一条存档栏，文字从右向左不停滚动，说明这是哪一次的地图、很多展览已经结束；它代替“今天”提示。鼠标停在上面时文字不动，系统设置了“减少动态效果”时文字不动并折行。公开副标题里可以写上“（存档）”。巴黎摄影导览（`paris-2026-11`）从 2026 年 11 月 17 日起就是这样。
 - **完全下线**：删掉它的两个文件夹（`src/content/guides/<名字>/` 和 `public/guides/<名字>/`）以及 `access.json` 里它的几行。之后这个地址显示“网页不存在”。不要把旧地址再用在另一份导览上。
 - **不得不改名时**（很少）：把两个文件夹改名，改 `access.json` 里 `guides` 和 `tiles` 的名字，再在 `moved` 里加一行 `"<旧名>": "<新名>"`。旧地址（包括后面的图片、瓦片、登录）会永久转到新地址；用旧名发来、还在 Notion 里的推荐照样能发布。例如，这份巴黎导览原来叫 `paris-photo-days-2026`。
 
@@ -1288,6 +1290,16 @@ ones are added by city and month.
 - **Archiving**: set the old guide's `"listed"` to `false`. It leaves the
   password box's choice, and `/guides` and `/guides/paris` stop going there,
   but its address still works and its password still opens it.
+- **An archive kept open as a record**: to keep a past guide in the password
+  box, like a portfolio, leave it `"listed": true`, add
+  `"archive": { "text": "…", "textZh": "…" }` to its `guide.json`, and put
+  the current guide before it in `access.json` (`/guides` and
+  `/guides/<city>` open the first listed one). An archive bar then runs
+  across the top of the guide, its words scrolling right to left: which
+  week the map is from, and that many shows have ended. It takes the Today
+  note's place. A mouse on it holds it still; with reduced motion the words
+  stand still and wrap. The public subtitle can say "(archive)". The Paris
+  photography guide (`paris-2026-11`) is kept this way from 17 November 2026.
 - **Taking one offline**: delete its two folders (`src/content/guides/<slug>/`
   and `public/guides/<slug>/`) and its lines in `access.json`. The address then
   shows "page not found". Never reuse an old address for another guide.

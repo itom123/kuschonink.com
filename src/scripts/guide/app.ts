@@ -831,7 +831,8 @@ export class GuideApp {
     const el = this.root.querySelector<HTMLElement>('[data-gd-today]');
     const w = this.p.window;
     if (!el) return;
-    if (!w) { el.hidden = true; if (this.noteBar) this.noteBar.hidden = true; return; }
+    // No days, or an archived guide (its archive bar says what the note would): no note.
+    if (!w || this.root.querySelector('[data-gd-archive]')) { el.hidden = true; if (this.noteBar) this.noteBar.hidden = true; return; }
     const t = this.today;
     const start = dayLabel(w.start), end = dayLabel(w.end);
     const line = (e: Payload['events'][number]) => ({ en: `${dayLabel(e.date).en}${e.start ? ' ' + e.start : ''} - ${e.title.en}`, zh: `${dayLabel(e.date).zh}${e.start ? ' ' + e.start : ''} - ${e.title.zh || e.title.en}` });
