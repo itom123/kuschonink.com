@@ -14,7 +14,7 @@ import { projects, site } from '../../lib/content';
 import { img } from '../../lib/images';
 import { floorZh, seoTitle } from '../../lib/i18n';
 import { roomForPage } from '../../lib/house';
-import { films, posterOf } from '../../lib/kino-site';
+import { showing as films, posterOf } from '../../lib/kino-site';
 import { clock } from '../../lib/kino';
 
 const room = roomForPage('kino');
@@ -29,13 +29,13 @@ const items = await Promise.all(
     const poster = posterOf(f);
     const thumb = poster ? (await getImage({ src: img(poster), width: 320, height: 180, fit: 'cover', format: 'webp', quality: 74 })).src : '';
     const project = f.project ? projects.find((p) => p.slug === f.project) : undefined;
-    const facts = [f.year, f.seconds ? clock(f.seconds) : null].filter(Boolean).join(' · ');
+    const facts = [f.year, f.seconds ? clock(f.seconds) : null].filter(Boolean);
     return {
       f,
       thumb,
       length: f.seconds ? clock(f.seconds) : '',
-      facts,
-      factsZh: facts,
+      facts: [...facts, f.password ? 'Needs a password' : null].filter(Boolean).join(' · '),
+      factsZh: [...facts, f.password ? '需要密码' : null].filter(Boolean).join(' · '),
       project: project ? `Project: ${project.title}` : '',
       projectZh: project ? `作品：${project.titleZh ?? project.title}` : '',
     };

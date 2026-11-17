@@ -48,6 +48,24 @@
 /* Cloudflare's box: nothing, until Cloudflare asks someone to tick it. */
 .kino-check:not(.is-asking) { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
 .kino-check.is-asking { min-width: 300px; min-height: 65px; }
+/* The password box (a film with "password": true), as Windows 98's "Enter Password". */
+.kino-pw { width: min(380px, 100%); box-sizing: border-box; padding: 3px; color: #000; text-align: left; background: var(--face); box-shadow: var(--raised-window); font: 11px var(--ui-font); }
+.kino-pw[hidden] { display: none; }
+.kino-pw[data-busy], .kino-pw[data-busy] * { cursor: progress; }
+.kino-pw-body { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 12px 8px 6px; }
+.kino-pw-keys { margin: 2px 0 0 2px; }
+.kino-pw-intro { margin: 0 0 10px; }
+.kino-pw-row { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 6px; }
+.kino-pw-row input { width: 100%; box-sizing: border-box; font: 11px var(--ui-font); }
+.kino-pw-buttons { display: flex; flex-direction: column; gap: 6px; }
+.kino-pw-buttons button { min-width: 75px; }
+.kino-pw-msg { margin: 8px 0 0; min-height: 16px; }
+.kino-pw-msg > span:not([hidden]) { display: flex; align-items: flex-start; gap: 4px; }
+@container (max-width: 400px) {
+  .kino-pw-body { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 8px 6px 4px; }
+  .kino-pw-keys { display: none; }
+  .kino-pw-buttons { flex-direction: row; justify-content: flex-end; }
+}
 /* A film still on YouTube: its player, 16:9, in the middle of the screen. */
 .kino-yt { position: absolute; inset: 0; margin: auto; width: min(100cqw - 4px, calc((100cqh - 4px) * 16 / 9)); height: min(100cqh - 4px, calc((100cqw - 4px) * 9 / 16)); border: 0; }
 

@@ -96,6 +96,8 @@ interface Env {
   KINO_MEDIA_LIMIT?: RateLimit;
   /** Signs Kino tickets and media links (a secret, 32+ random characters); without it the Field Guide's cookie key does, under its own label. */
   KINO_SECRET?: string;
+  /** The Kino's password (a secret, 6+ characters) for the films marked "password": true in kino.json. Without it, those films are closed. */
+  KINO_PASSWORD?: string;
 }
 
 async function siteverify(secret: string, token: string, ip: string | null): Promise<TurnstileResult> {
@@ -282,6 +284,7 @@ const kinoDeps = (env: Env): KinoDeps => ({
     const own = env.KINO_SECRET?.trim() ?? '';
     return own.length >= MIN_KINO_SECRET ? own : cookieSecretOf(env);
   },
+  password: () => env.KINO_PASSWORD,
   assets: (r) => env.ASSETS.fetch(r),
   r2: async (key, range) => {
     if (!env.KINO) throw new Error('no KINO binding');

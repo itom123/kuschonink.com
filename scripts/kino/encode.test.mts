@@ -1,6 +1,6 @@
 // npm test: the pure parts of encoding a film for the Kino (scripts/kino/ladder.mjs).
 // @ts-expect-error a plain .mjs module, no types
-import { bandwidth, ladder, levelFor, master, pieces, rate, versionFor } from './ladder.mjs';
+import { bandwidth, ladder, levelFor, master, pieces, rate, subtitlesFilter, subtitlesOf, variants, versionFor } from './ladder.mjs';
 
 let count = 0;
 let fails = 0;
@@ -49,6 +49,32 @@ check('versionFor: v + date + letter', versionFor(new Date('2026-11-16T12:00:00Z
   check('master: largest first, relative addresses, codecs', m.startsWith('#EXTM3U\n') && m.indexOf('1080p/index.m3u8') < m.indexOf('720p/index.m3u8') && m.includes('RESOLUTION=1920x1080,CODECS="avc1.640028,mp4a.40.2",FRAME-RATE=25.000') && !m.includes('http') && !m.includes('/kino/'), m);
   const silent: string = master([{ name: '360p', width: 640, height: 360, peak: 1, average: 1 }], { fps: 0, audio: false });
   check('master: a silent film has no audio codec', silent.includes('CODECS="avc1.64001f"') && !silent.includes('mp4a'), silent);
+}
+
+{
+  const v = { codec_type: 'video' };
+  const a = { codec_type: 'audio' };
+  const sub = (codec_name: string, language = '', def = 0) => ({ codec_type: 'subtitle', codec_name, tags: language ? { language } : undefined, disposition: { default: def } });
+  check('subtitles: none', subtitlesOf([v, a]).pick === null && subtitlesOf([v, a]).pictures.length === 0);
+  const one = subtitlesOf([v, a, sub('mov_text', 'eng')]);
+  check("subtitles: an MP4's text track (mov_text), saved as .srt", one.pick?.index === 0 && one.pick.ext === 'srt' && one.pick.lang === 'eng', one);
+  const many = subtitlesOf([v, sub('subrip', 'chi', 1), sub('subrip', 'eng'), sub('ass', 'fre')]);
+  check('subtitles: English before the default track', many.pick?.index === 1, many);
+  const def = subtitlesOf([v, sub('subrip', 'chi'), sub('ass', 'fre', 1)]);
+  check('subtitles: then the default track (ASS kept as .ass)', def.pick?.index === 1 && def.pick.ext === 'ass', def);
+  const pgs = subtitlesOf([v, sub('hdmv_pgs_subtitle', 'eng'), sub('dvd_subtitle')]);
+  check("subtitles: picture-based tracks are reported, not drawn", pgs.pick === null && pgs.pictures.join(',') === 'hdmv_pgs_subtitle,dvd_subtitle', pgs);
+  check('subtitlesFilter: a plain file name', subtitlesFilter('.subs-min-shi-e-v20261117a.srt') === 'subtitles=filename=.subs-min-shi-e-v20261117a.srt');
+  let threw = 0;
+  for (const bad of ['C:\\films\\a.srt', 'a b.srt', "a'.srt", 'x:y.srt', '../a.srt']) {
+    try {
+      subtitlesFilter(bad);
+    } catch {
+      threw++;
+    }
+  }
+  check('subtitlesFilter: never a path, a space, a quote or a colon', threw === 5, threw);
+  check('variants: the sizes a master playlist points at', variants('#EXTM3U\r\n#EXT-X-STREAM-INF:BANDWIDTH=1\r\n1080p/index.m3u8\r\n#EXT-X-STREAM-INF:BANDWIDTH=2\r\n720p/index.m3u8\r\n').join(',') === '1080p/index.m3u8,720p/index.m3u8');
 }
 
 console.log(fails ? `${fails} of ${count} FAILED` : `all ${count} passed`);

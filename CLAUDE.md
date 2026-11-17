@@ -18,7 +18,8 @@
   `GUIDES_PASSWORD_FOTOFILMIC`, `GUIDES_PASSWORD_FOOD`); `GUIDES_COOKIE_SECRET` signs its log-on
   cookies (`TURNSTILE_SECRET` stands in when it isn't set; a secret under 24
   characters signs together with `TURNSTILE_SECRET`). `KINO_SECRET` signs the
-  Kino's tickets. For local testing use made-up values in the gitignored
+  Kino's tickets; `KINO_PASSWORD` is the password for its films marked
+  `"password": true`. For local testing use made-up values in the gitignored
   `.dev.vars`.
 - **Writing**: British English, short plain sentences, written from the
   visitor's side. The interface is bilingual (`{ en, zh }`, Simplified Chinese

@@ -33,6 +33,10 @@ export interface KinoFilm {
   /** The fallback: the film's YouTube video. */
   youtubeId?: string;
   stream?: KinoStream;
+  /** false: not in Now Showing, the garage or Previous/Next; its page and its project's card still work. */
+  listed?: boolean;
+  /** true: the film needs the Kino's password (the secret KINO_PASSWORD) before it plays. */
+  password?: boolean;
 }
 
 export interface KinoFile {
@@ -59,7 +63,7 @@ export const RESERVED = ['ticket', 'index', 'play', 'm', 'media'];
 export const FILM_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
 export const VERSION = /^v\d{8}[a-z]?$/;
-const FIELDS = new Set(['id', 'title', 'titleZh', 'year', 'seconds', 'project', 'note', 'noteZh', 'poster', 'youtubeId', 'stream']);
+const FIELDS = new Set(['id', 'title', 'titleZh', 'year', 'seconds', 'project', 'note', 'noteZh', 'poster', 'youtubeId', 'stream', 'listed', 'password']);
 const POSTER = /^[a-z0-9][a-z0-9/._-]*\.(?:jpe?g|png|webp)$/i;
 
 export const isKinoPath = (p: string) => p === KINO_PREFIX || p.startsWith(`${KINO_PREFIX}/`);
@@ -93,6 +97,7 @@ export function problems(data: KinoFile, projects?: readonly string[]): string[]
     if (f.note && !f.noteZh) say(id, 'noteZh', 'missing (the note has no Chinese)');
     if (f.year !== undefined && !(Number.isInteger(f.year) && f.year >= 1900 && f.year <= 2100)) say(id, 'year', 'not a year');
     if (f.seconds !== undefined && !(Number.isFinite(f.seconds) && f.seconds > 0 && f.seconds < 24 * 3600)) say(id, 'seconds', 'not a length in seconds');
+    for (const k of ['listed', 'password'] as const) if (f[k] !== undefined && typeof f[k] !== 'boolean') say(id, k, 'true or false');
     if (f.poster !== undefined && (typeof f.poster !== 'string' || !POSTER.test(f.poster) || f.poster.includes('..'))) say(id, 'poster', 'a picture under src/assets/images, e.g. projects/hanabi/flux.jpg');
     if (f.youtubeId !== undefined && !YOUTUBE_ID.test(f.youtubeId)) say(id, 'youtubeId', 'not a YouTube video id (11 characters)');
     if (f.stream !== undefined) {

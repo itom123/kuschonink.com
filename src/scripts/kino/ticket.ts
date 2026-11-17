@@ -4,7 +4,8 @@
 // player's own screen, in its "interaction-only" form: for most visitors
 // nothing shows and the film just starts. Only when Cloudflare wants a person
 // to tick its box does the box appear, with one line saying why. The token
-// goes to POST /kino/ticket (worker/kino.ts), which sets the ticket: an
+// goes to POST /kino/ticket (worker/kino.ts), with the password when the
+// visitor typed one (a film that needs it), and the Worker sets the ticket: an
 // HttpOnly cookie this script never sees.
 import { TICKET_PATH, TURNSTILE_ACTION } from '../../lib/kino';
 import { desktop, type Bi } from '../paint/dom';
@@ -47,7 +48,7 @@ export const SAY: Record<string, Bi> = {
   cookies: { en: 'The Kino needs a cookie for your ticket. Allow cookies (Start ▸ Settings ▸ Cookies), then press Play.', zh: 'Kino 需要使用 Cookie 来保存你的入场券。请允许 Cookie（开始 ▸ 设置 ▸ Cookie），然后按“播放”。' },
 };
 
-export type TicketResult = 'ok' | 'cookies' | 'closed' | 'failed' | 'unreachable' | 'busy';
+export type TicketResult = 'ok' | 'cookies' | 'closed' | 'failed' | 'unreachable' | 'busy' | 'password';
 
 interface TicketUi {
   sitekey: string | undefined;
@@ -55,11 +56,13 @@ interface TicketUi {
   box: HTMLElement;
   /** Say something on the screen (null: say nothing). */
   say: (b: Bi | null) => void;
+  /** The Kino's password, as typed, for a film that needs it. */
+  password?: string;
 }
 
 let pending: Promise<TicketResult> | null = null;
 
-/** A ticket for this browser: resolves 'ok' once the Worker has set it. One check at a time. */
+/** A ticket for this browser: resolves 'ok' once the Worker has set it ('password': the password was wrong). One check at a time. */
 export function getTicket(ui: TicketUi): Promise<TicketResult> {
   pending ??= run(ui).finally(() => (pending = null));
   return pending;
@@ -115,13 +118,14 @@ async function run(ui: TicketUi): Promise<TicketResult> {
   if (!token) return 'failed';
   let res: Response;
   try {
-    res = await fetch(TICKET_PATH, { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify({ token }), credentials: 'same-origin' });
+    res = await fetch(TICKET_PATH, { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify(ui.password ? { token, password: ui.password } : { token }), credentials: 'same-origin' });
   } catch {
     return 'unreachable';
   }
   if (res.ok) return 'ok';
   const err = ((await res.json().catch(() => ({}))) as { error?: string }).error ?? '';
   if (err === 'closed') return 'closed';
+  if (err === 'password') return 'password';
   if (res.status === 429) return 'busy';
   return err === 'verification_unavailable' ? 'unreachable' : 'failed';
 }

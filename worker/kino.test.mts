@@ -1,6 +1,6 @@
 // npm test: the Kino's door (worker/kino.ts), against a stand-in ASSETS, a
 // stand-in R2 bucket on a Map, a stand-in Turnstile and a made-up secret.
-import { handleKino, MIN_SECRET, ticketOf, type KinoDeps, type KinoObject } from './kino.ts';
+import { b64u, handleKino, MIN_SECRET, ticketOf, type KinoDeps, type KinoObject } from './kino.ts';
 import { clock, loadKino, mediaLife, problems, sourceOf, TICKET_COOKIE, TICKET_S, TURNSTILE_ACTION, type KinoFile, type KinoFilm } from '../src/lib/kino.ts';
 import realKino from '../src/content/kino.json' with { type: 'json' };
 
@@ -19,7 +19,9 @@ const V = 'v20261116a';
 const FILMS: KinoFilm[] = [
   { id: 'on-r2', title: 'On R2', titleZh: '在 R2', seconds: 600, youtubeId: 'AAAAAAAAAAA', stream: { version: V, width: 1920, height: 1080 } },
   { id: 'on-youtube', title: 'On YouTube', titleZh: '在 YouTube', youtubeId: 'BBBBBBBBBBB' },
+  { id: 'locked', title: 'Locked', titleZh: '上锁', seconds: 300, password: true, stream: { version: V, width: 1920, height: 1080 } },
 ];
+const PASSWORD = 'Made-up Test Password';
 
 // ---- Stand-ins ----
 const R2 = new Map<string, Uint8Array>();
@@ -29,6 +31,9 @@ R2.set(`films/on-r2/${V}/1080p/index.m3u8`, bytes('#EXTM3U\n#EXT-X-KEY:METHOD=AE
 R2.set(`films/on-r2/${V}/1080p/seg_00000.ts`, bytes('0123456789'));
 R2.set(`films/on-r2/${V}/poster.jpg`, bytes('JPEG'));
 R2.set(`keys/on-r2/${V}.key`, bytes('sixteen-byte-key'));
+R2.set(`films/locked/${V}/master.m3u8`, bytes('#EXTM3U\n'));
+R2.set(`films/locked/${V}/1080p/seg_00000.ts`, bytes('LOCKED'));
+R2.set(`keys/locked/${V}.key`, bytes('another-16b-key!'));
 let r2Asked: string[] = [];
 async function r2(key: string, range?: string): Promise<KinoObject | null> {
   r2Asked.push(key);
@@ -55,11 +60,13 @@ let mediaKeys: string[] = [];
 let allowMedia = true;
 let now = NOW;
 let secret: string | undefined = SECRET;
+let password: string | undefined = PASSWORD;
 let hostnames = new Set(['kuschonink.com', 'www.kuschonink.com']);
 const logs: unknown[][] = [];
 const deps = (): KinoDeps => ({
   films: FILMS,
   secret: () => secret,
+  password: () => password,
   assets,
   r2,
   turnstile: { secret: 'turnstile-secret', hostnames, verify: async () => tsAnswer },
@@ -75,6 +82,7 @@ function reset() {
   allowMedia = true;
   now = NOW;
   secret = SECRET;
+  password = PASSWORD;
   hostnames = new Set(['kuschonink.com', 'www.kuschonink.com']);
   r2Asked = [];
   assetsAsked = [];
@@ -86,8 +94,8 @@ const get = (path: string, h: Record<string, string> = {}) => new Request(SITE +
 const post = (path: string, body: unknown, h: Record<string, string> = {}) =>
   new Request(SITE + path, { method: 'POST', body: typeof body === 'string' ? body : JSON.stringify(body), headers: { 'user-agent': UA, 'content-type': 'application/json', 'sec-fetch-site': 'same-origin', origin: SITE, 'cf-connecting-ip': '203.0.113.9', ...h } });
 const run = (r: Request) => handleKino(r, deps());
-async function getTicket(): Promise<string> {
-  const res = await run(post('/kino/ticket', { token: 'turnstile-token' }));
+async function getTicket(pw?: string): Promise<string> {
+  const res = await run(post('/kino/ticket', { token: 'turnstile-token', ...(pw === undefined ? {} : { password: pw }) }));
   const set = res.headers.get('set-cookie') ?? '';
   return set.split(';')[0];
 }
@@ -110,6 +118,8 @@ async function playOf(film: string, cookie: string) {
       { id: 'proj', title: 'd', titleZh: 'd', youtubeId: 'AAAAAAAAAAA', project: 'nope' },
       { id: 'pic', title: 'e', titleZh: 'e', youtubeId: 'AAAAAAAAAAA', poster: '../secret.txt' },
       { id: 'pic-ok', title: 'f', titleZh: 'f', youtubeId: 'AAAAAAAAAAA', poster: 'projects/hanabi/flux.jpg' },
+      { id: 'flags', title: 'g', titleZh: 'g', youtubeId: 'AAAAAAAAAAA', listed: 'no', password: 1 } as unknown as KinoFilm,
+      { id: 'flags-ok', title: 'h', titleZh: 'h', youtubeId: 'AAAAAAAAAAA', listed: false, password: true },
     ],
   };
   const p = problems(bad, ['real-project']);
@@ -121,6 +131,7 @@ async function playOf(film: string, cookie: string) {
   check('problems: no source, an untranslated note, an unknown field', has('none › youtubeId: a film needs') && has('none › noteZh') && has('none › extra: unknown field'), p);
   check('problems: an unknown project', has('proj › project: no project "nope"'), p);
   check('problems: a poster must be a picture under src/assets/images', has('pic › poster') && !has('pic-ok ›'), p);
+  check('problems: listed and password are true or false', has('flags › listed: true or false') && has('flags › password: true or false') && !has('flags-ok ›'), p);
   let threw = '';
   try {
     loadKino(bad);
@@ -163,10 +174,10 @@ async function playOf(film: string, cookie: string) {
   const set = res.headers.get('set-cookie') ?? '';
   const body = (await res.json()) as { ok: boolean; exp: number };
   check('a ticket: 200, the cookie, its expiry', res.status === 200 && body.ok === true && body.exp === NOW / 1000 + TICKET_S);
-  check('… HttpOnly, Secure, SameSite=Strict, Path=/kino, no Max-Age (gone when the browser closes)', set.startsWith(`${TICKET_COOKIE}=v1.`) && set.includes('HttpOnly') && set.includes('Secure') && set.includes('SameSite=Strict') && set.includes('Path=/kino') && !set.includes('Max-Age'), set);
+  check('… HttpOnly, Secure, SameSite=Strict, Path=/kino, no Max-Age (gone when the browser closes)', set.startsWith(`${TICKET_COOKIE}=v2.`) && /=v2\.[\w-]{22}\.\d{10}\.0\./.test(set) && set.includes('HttpOnly') && set.includes('Secure') && set.includes('SameSite=Strict') && set.includes('Path=/kino') && !set.includes('Max-Age'), set);
   check('… never cached', res.headers.get('cache-control') === 'private, no-store');
   const t = await ticketOf(get('/kino', { cookie: set.split(';')[0] }), deps());
-  check('… and it reads back as a ticket', !!t && t.tid.length === 22 && t.exp === NOW / 1000 + TICKET_S);
+  check('… and it reads back as a ticket, without the password', !!t && t.tid.length === 22 && t.exp === NOW / 1000 + TICKET_S && t.password === false);
   const local = await handleKino(new Request('http://localhost:8787/kino/ticket', { method: 'POST', body: '{"token":"x"}', headers: { 'user-agent': UA, origin: 'http://localhost:8787', 'sec-fetch-site': 'same-origin' } }), deps());
   check('on http://localhost the cookie is not Secure (wrangler dev)', local.status === 200 && !(local.headers.get('set-cookie') ?? '').includes('Secure'));
 
@@ -233,6 +244,69 @@ async function playOf(film: string, cookie: string) {
   now = NOW + (TICKET_S - 300) * 1000;
   const late = await playOf('on-r2', c);
   check('a token never outlasts its ticket', late.body?.exp === NOW / 1000 + TICKET_S);
+}
+
+// ---- The password ----
+{
+  reset();
+  const wrong = await run(post('/kino/ticket', { token: 't', password: 'not the password' }));
+  check('a wrong password: 403 "password", no ticket, logged without the guess', wrong.status === 403 && ((await wrong.json()) as { error: string }).error === 'password' && !wrong.headers.get('set-cookie') && logs.some((l) => l[0] === 'kino: wrong password' && l.length === 1));
+  allowTickets = false;
+  check('… and guesses count against KINO_LIMIT (429)', (await run(post('/kino/ticket', { token: 't', password: 'guess' }))).status === 429);
+  reset();
+  tsAnswer = { success: false, hostname: 'kuschonink.com', action: TURNSTILE_ACTION };
+  const noTs = await run(post('/kino/ticket', { token: 't', password: PASSWORD }));
+  check('the right password still needs Turnstile', noTs.status === 403 && ((await noTs.json()) as { error: string }).error === 'verification_failed');
+  reset();
+  const right = await run(post('/kino/ticket', { token: 't', password: `  ${PASSWORD.toUpperCase()} ` }));
+  const rset = right.headers.get('set-cookie') ?? '';
+  check('the right password (any case, spaces round it): a ticket that says so', right.status === 200 && ((await right.json()) as { password: boolean }).password === true && /=v2\.[\w-]{22}\.\d{10}\.1\./.test(rset), rset);
+  check('… the cookie never holds the password', !rset.toLowerCase().includes('password') && !rset.includes(btoa(PASSWORD)));
+  const pc = rset.split(';')[0];
+  const t = await ticketOf(get('/kino', { cookie: pc }), deps());
+  check('… and it reads back with the password', t?.password === true);
+
+  const plain = await getTicket();
+  const noPw = await run(get('/kino/locked/play', { cookie: plain }));
+  check('a password film on a ticket without it: 401 "password"', noPw.status === 401 && ((await noPw.json()) as { error: string }).error === 'password');
+  const none = await run(get('/kino/locked/play'));
+  check('… and with no ticket at all: 401 "password" (one check at the door, with the password)', none.status === 401 && ((await none.json()) as { error: string }).error === 'password');
+  const forgedP = plain.replace(/\.0\./, '.1.');
+  check('… a ticket edited to say "password given": 401', (await run(get('/kino/locked/play', { cookie: forgedP }))).status === 401);
+  const ok = await playOf('locked', pc);
+  check('a password film on a ticket with it: plays', ok.res.status === 200 && ok.body?.kind === 'hls', ok.body);
+  check('a public film plays on either ticket', (await playOf('on-r2', pc)).res.status === 200 && (await playOf('on-r2', plain)).res.status === 200);
+  check('two tickets (one without, one with): the one with the password counts', (await playOf('locked', `${plain}; ${pc}`)).res.status === 200);
+
+  const base = String(ok.body!.src).replace(/\/master\.m3u8$/, '');
+  const seg = await run(get(`${base}/1080p/seg_00000.ts`, { cookie: pc }));
+  check("the password film's pieces, with the password", seg.status === 200 && (await seg.text()) === 'LOCKED');
+  // A token is bound to its ticket's id; a ticket without the password with that same id can't be made without the key.
+  r2Asked = [];
+  check('… without it: 401, R2 never read', (await run(get(`${base}/key`, { cookie: plain }))).status === 401 && (await run(get(`${base}/key`))).status === 401 && r2Asked.length === 0);
+
+  password = 'A New Made-up Password';
+  check('a new password ends the tickets that had the old one', (await run(get('/kino/locked/play', { cookie: pc }))).status === 401 && (await run(get(`${base}/key`, { cookie: pc }))).status === 401);
+  check('… but not the tickets without one', (await playOf('on-r2', plain)).res.status === 200);
+  password = 'short';
+  const closed = await run(get('/kino/locked/play', { cookie: pc }));
+  check('no password set (or under 6 characters): the password films are closed (503)', closed.status === 503 && ((await closed.json()) as { error: string }).error === 'closed' && (await run(get(`${base}/key`, { cookie: pc }))).status === 503);
+  check('… a password given then: 503 "closed"', (await run(post('/kino/ticket', { token: 't', password: 'anything' }))).status === 503);
+  check('… and the public films play as before', (await playOf('on-r2', plain)).res.status === 200 && (await run(post('/kino/ticket', { token: 't' }))).status === 200);
+  password = undefined;
+  check('… likewise with no KINO_PASSWORD at all', (await run(get('/kino/locked/play', { cookie: pc }))).status === 503);
+
+  reset();
+  // A v1 ticket, as the Worker gave them before passwords: it still counts, without the password.
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const kbytes = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode('kino|key|v1'));
+  const kino = await crypto.subtle.importKey('raw', kbytes, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const tid = 'AAAAAAAAAAAAAAAAAAAAAA';
+  const exp = NOW / 1000 + 3600;
+  const sig = b64u(new Uint8Array(await crypto.subtle.sign('HMAC', kino, new TextEncoder().encode(`kino|ticket|v1|${tid}|${exp}`))));
+  const v1 = `${TICKET_COOKIE}=v1.${tid}.${exp}.${sig}`;
+  const t1 = await ticketOf(get('/kino', { cookie: v1 }), deps());
+  check('a v1 ticket still counts, without the password', t1?.tid === tid && t1.password === false && (await playOf('on-r2', v1)).res.status === 200 && (await run(get('/kino/locked/play', { cookie: v1 }))).status === 401);
 }
 
 // ---- The film itself ----

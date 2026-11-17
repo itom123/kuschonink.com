@@ -5,7 +5,7 @@ import details3dJson from '../content/house3d.json';
 import { projects, site, about, contact } from './content';
 import type { Block, Section } from './types';
 import { floorZh, t } from './i18n';
-import { films } from './kino-site';
+import { showing } from './kino-site';
 
 export type RoomContents =
   | { project: string }
@@ -465,7 +465,7 @@ function roomText(r: Room): string {
     if (c.page === 'about') sections = about.sections;
     if (c.page === 'contact') sections = contact.sections;
     // The Kino keeps its films: their titles and notes count.
-    if (c.page === 'kino') extra = films.map((f) => `${f.title} ${f.note ?? ''}`).join(' ');
+    if (c.page === 'kino') extra = showing.map((f) => `${f.title} ${f.note ?? ''}`).join(' ');
   }
   const html = sections.flatMap((s) => s.blocks).map((b) =>
     b.type === 'text' ? b.html : b.type === 'marquee' ? b.items.join(' ') : 'caption' in b && b.caption ? b.caption : '',
