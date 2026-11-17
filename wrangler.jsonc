@@ -9,7 +9,9 @@
   // tiles a guide's readers get (Plan IGN, fetched by the Worker and kept at the
   // edge), and suggestions from inside a guide (worker/suggest.ts); and for the
   // Kino on /kino and /kino/* (worker/kino.ts): its tickets, and its films,
-  // read from the private R2 bucket below. Its crons
+  // read from the private R2 bucket below; and for /v1/whoami, the start-up
+  // screen's network check (worker/whoami.ts): the visitor's own IP address and
+  // what Cloudflare knows about it, never kept or logged. Its crons
   // publish approved suggestions (worker/publish.ts) and keep contact details
   // only as long as promised (worker/privacy.ts).
   "main": "worker/index.ts",
@@ -18,7 +20,7 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "drop-trailing-slash",
-    "run_worker_first": ["/v1/contact/*", "/guides", "/guides/*", "/v1/admin/*", "/kino", "/kino/*"]
+    "run_worker_first": ["/v1/contact/*", "/guides", "/guides/*", "/v1/admin/*", "/kino", "/kino/*", "/v1/whoami"]
   },
   // Contact form email: can only ever send to this one verified inbox.
   "send_email": [

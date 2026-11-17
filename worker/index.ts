@@ -3,7 +3,8 @@
 // (worker/contact.ts), Paint's "Send to Xiangyin" (worker/drawing.ts), the
 // Field Guide's password gate (worker/guides.ts) and its suggestions
 // (worker/suggest.ts), admin mode on /v1/admin/* (worker/admin.ts), and the
-// Kino's door on /kino and /kino/* (worker/kino.ts).
+// Kino's door on /kino and /kino/* (worker/kino.ts), and the start-up
+// screen's network check on /v1/whoami (worker/whoami.ts).
 // Two crons: the publisher every ten minutes
 // (worker/publish.ts) and, daily, the Guard's tidy-up and the privacy
 // clean-up (worker/privacy.ts).
@@ -28,6 +29,7 @@ import { privacySweep } from './privacy';
 import { publish } from './publish';
 import { routineTrigger } from './routine';
 import { handleSuggest, type SuggestDeps } from './suggest';
+import { handleWhoami, WHOAMI_PATH } from './whoami';
 
 // The Durable Object class must be exported from the Worker's main module.
 export { Guard } from './guard-do';
@@ -96,6 +98,8 @@ interface Env {
   KINO_MEDIA_LIMIT?: RateLimit;
   /** Signs Kino tickets and media links (a secret, 32+ random characters); without it the Field Guide's cookie key does, under its own label. */
   KINO_SECRET?: string;
+  /** The Kino's password (a secret, 6+ characters) for the films marked "password": true in kino.json. Without it, those films are closed. */
+  KINO_PASSWORD?: string;
 }
 
 async function siteverify(secret: string, token: string, ip: string | null): Promise<TurnstileResult> {
@@ -282,6 +286,7 @@ const kinoDeps = (env: Env): KinoDeps => ({
     const own = env.KINO_SECRET?.trim() ?? '';
     return own.length >= MIN_KINO_SECRET ? own : cookieSecretOf(env);
   },
+  password: () => env.KINO_PASSWORD,
   assets: (r) => env.ASSETS.fetch(r),
   r2: async (key, range) => {
     if (!env.KINO) throw new Error('no KINO binding');
@@ -306,6 +311,7 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === CONTACT_PATH) return handleContact(request, depsFor(env));
     if (url.pathname === DRAWING_PATH) return handleDrawing(request, depsFor(env));
+    if (url.pathname === WHOAMI_PATH) return handleWhoami(request);
     if (isGuidesPath(url.pathname)) return handleGuides(request, guidesDeps(env));
     if (isKinoPath(url.pathname)) return handleKino(request, kinoDeps(env));
     if (url.pathname.startsWith(`${ADMIN_PREFIX}/`)) return handleAdmin(request, adminDeps(env));

@@ -8,6 +8,9 @@ import { loadKino, type KinoFile, type KinoFilm } from './kino';
 
 export const films: KinoFilm[] = loadKino(kinoJson as KinoFile, projects.map((p) => p.slug));
 
+/** The films Now Showing lists (and the garage, and Previous/Next): all but those with "listed": false. */
+export const showing: KinoFilm[] = films.filter((f) => f.listed !== false);
+
 /** A film by id; an unknown id stops the build (a project's video block naming a film that isn't in kino.json). */
 export function kinoFilm(id: string, where = 'a video block'): KinoFilm {
   const f = films.find((x) => x.id === id);

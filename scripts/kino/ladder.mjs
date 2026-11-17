@@ -88,3 +88,40 @@ export function versionFor(date, letter = 'a') {
   const d = date.toISOString().slice(0, 10).replace(/-/g, '');
   return `v${d}${letter}`;
 }
+
+/** Text subtitle tracks the subtitles filter can draw, and what to save them as first. */
+export const TEXT_SUBS = { mov_text: 'srt', subrip: 'srt', srt: 'srt', webvtt: 'srt', text: 'srt', ass: 'ass', ssa: 'ass' };
+
+/**
+ * The master's subtitle tracks, from ffprobe's streams: `pick`, the text track
+ * to draw into the picture (English first, then the default one, then the
+ * first), as { index (among the subtitle tracks), codec, ext, lang }, or null;
+ * and `pictures`, the picture-based tracks (a DVD's, a Blu-ray's), which can't
+ * be drawn this way.
+ */
+export function subtitlesOf(streams) {
+  const subs = (streams ?? [])
+    .filter((s) => s.codec_type === 'subtitle')
+    .map((s, n) => ({ n, codec: String(s.codec_name ?? ''), lang: String(s.tags?.language ?? '').toLowerCase(), def: s.disposition?.default === 1 }));
+  const score = (s) => (/^en/.test(s.lang) ? 2 : 0) + (s.def ? 1 : 0);
+  const best = subs.filter((s) => TEXT_SUBS[s.codec]).sort((a, b) => score(b) - score(a) || a.n - b.n)[0];
+  return {
+    pick: best ? { index: best.n, codec: best.codec, ext: TEXT_SUBS[best.codec], lang: best.lang } : null,
+    pictures: subs.filter((s) => !TEXT_SUBS[s.codec]).map((s) => s.codec),
+  };
+}
+
+/**
+ * The filter that draws a subtitle file into the picture. The file is a plain
+ * name in ffmpeg's working folder, so nothing in it needs escaping (a Windows
+ * path, with its drive letter and backslashes, would).
+ */
+export function subtitlesFilter(file) {
+  if (!/^[A-Za-z0-9._-]+$/.test(file)) throw new Error(`subtitlesFilter: "${file}" is not a plain file name`);
+  return `subtitles=filename=${file}`;
+}
+
+/** A master playlist's sizes: the variant playlists it points at ("1080p/index.m3u8"). */
+export function variants(masterPlaylist) {
+  return masterPlaylist.split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));
+}

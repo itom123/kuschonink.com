@@ -1,5 +1,6 @@
 // Starting up, logging on and off, shutting down, restarting, standing by.
 // Loaded only when needed (the first page of a session, or from the Start menu).
+import { biosLines, WHOAMI_PATH, type NetFacts } from '../../lib/netcheck';
 import { msgbox, openDialog } from './dialogs';
 import { navigate } from './router';
 import { session } from './session';
@@ -20,9 +21,30 @@ const BIOS = [
   'Detecting IDE Primary Master   ... XIANGYIN ARCHIVE',
   'Detecting IDE Primary Slave    ... THE HOUSE, 37 ROOMS',
   'Detecting IDE Secondary Master ... CD-ROM',
-  '',
-  'Starting Xiangyin 98...',
 ];
+const NET = 'Detecting Network Connection   ... ';
+const LAST = 'Starting Xiangyin 98...';
+
+/**
+ * The visitor's IP address and network, as cleanip.io shows them: Cloudflare's
+ * view of this request, from the Worker (worker/whoami.ts). Nothing is kept.
+ * null when it can't say (no Worker, offline, too slow).
+ */
+function netFacts(): Promise<NetFacts | null> {
+  const signal = typeof AbortSignal.timeout === 'function' ? AbortSignal.timeout(4000) : undefined;
+  return fetch(WHOAMI_PATH, { credentials: 'omit', cache: 'no-store', signal })
+    .then((r) => (r.ok ? (r.json() as Promise<NetFacts>) : null))
+    .then((f) => (f && typeof f.ip === 'string' ? f : null))
+    .catch(() => null);
+}
+
+function browserZone(): string | undefined {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 /** Everything behind the start-up screens is out of reach meanwhile. */
 function shield(on: boolean) {
@@ -43,27 +65,62 @@ function anyKeyOrClick(): Promise<void> {
   });
 }
 
-/** BIOS text, the sky splash, then the log-on box. Any key or click skips ahead. */
+/**
+ * BIOS text, with the visitor's IP address and network flashing past, the sky
+ * splash, then the log-on box. Any key or click skips ahead.
+ */
 export async function startUp() {
   html.dataset.boot = 'boot';
   shield(true);
+  const net = netFacts();
   const b = box();
+  const bios = b.querySelector<HTMLElement>('.boot-bios')!;
   const pre = b.querySelector<HTMLElement>('.bios-text')!;
   const msg = b.querySelector<HTMLElement>('[data-splash-msg]')!;
   msg.textContent = '';
   let skipped = false;
   const skip = anyKeyOrClick().then(() => (skipped = true));
   const wait = (ms: number) => Promise.race([sleep(ms), skip]);
+  // The network check waits at most 1.5 seconds more once its line is reached.
+  const facts = () => Promise.race([net, sleep(1500).then(() => null), skip.then(() => null)]);
+  // Lines that outgrow the screen scroll up, as on a console.
+  const put = (t: string) => {
+    pre.textContent += t;
+    bios.scrollTop = bios.scrollHeight;
+  };
   const reduce = reducedMotion.matches;
   b.dataset.step = 'bios';
   pre.textContent = '';
+  bios.scrollTop = 0;
   if (!reduce) {
     for (const line of BIOS) {
       if (skipped) break;
-      pre.textContent += `${line}\n`;
+      put(`${line}\n`);
       await wait(95);
     }
-    if (!skipped) await wait(300);
+    if (!skipped) {
+      put(NET);
+      const f = await facts();
+      if (!skipped) put(f ? 'OK\n\n' : 'NONE\n');
+      if (f) {
+        for (const line of biosLines(f, browserZone())) {
+          if (skipped) break;
+          put(`${line}\n`);
+          await wait(110);
+        }
+      }
+      if (!skipped) {
+        put(`\n${LAST}\n`);
+        await wait(f ? 1200 : 300);
+      }
+    }
+  } else {
+    // Reduce motion: no typing. The whole screen at once, if the check answers.
+    const f = await facts();
+    if (f && !skipped) {
+      put([...BIOS, `${NET}OK`, '', ...biosLines(f, browserZone()), '', LAST, ''].join('\n'));
+      await wait(2500);
+    }
   }
   b.dataset.step = 'splash';
   await wait(reduce || skipped ? 450 : 1900);

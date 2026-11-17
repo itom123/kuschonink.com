@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 // Kino: encode a film for the cinema, on your own computer.
 //
-//   node scripts/kino/encode.mjs <master file> <film id> [--version v20261116a] [--out kino-out] [--preset slow] [--crf 18]
+//   node scripts/kino/encode.mjs <master file> <film id> [--version v20261116a] [--out kino-out] [--preset slow] [--crf 18] [--no-subs]
 //
-// Needs ffmpeg and ffprobe (https://ffmpeg.org; on a Mac: brew install ffmpeg).
+// Needs ffmpeg and ffprobe (https://ffmpeg.org; on a Mac: brew install ffmpeg;
+// on Windows: winget install Gyan.FFmpeg). Works the same on Windows, macOS
+// and Linux; put the master's path in quotes.
 // Makes, in kino-out/ (gitignored), exactly what the private R2 bucket holds:
 //
 //   films/<id>/<version>/master.m3u8        every size, largest first
@@ -14,16 +16,28 @@
 //
 // Sizes: the master's own (never larger), then each standard one below it
 // (1080p, 720p, 480p, 360p for a 1080p master). H.264 High, CRF 18 capped per
-// size (12 Mbit/s at 1080p), a keyframe every 2 seconds, AAC 192k. Then:
+// size (12 Mbit/s at 1080p), a keyframe every 2 seconds, AAC 192k.
+//
+// Subtitles: the Kino's player shows no subtitle tracks, so a master with a
+// text subtitle track (an MP4's mov_text, SRT, ASS, WebVTT) has it drawn into
+// the picture at every size: English first, else the default track.
+// --no-subs leaves them out. A picture-based track (from a DVD or Blu-ray) is
+// only reported. Subtitles already in the picture stay as they are. Then:
 //   node scripts/kino/upload.mjs <film id> <version>
 // and paste the printed lines into src/content/kino.json (docs/KINO.md).
 import { spawnSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { bandwidth, ladder, levelFor, master, pieces, rate, versionFor } from './ladder.mjs';
+import { bandwidth, ladder, levelFor, master, pieces, rate, subtitlesFilter, subtitlesOf, versionFor } from './ladder.mjs';
 
 const args = process.argv.slice(2);
+const flag = (name) => {
+  const i = args.indexOf(`--${name}`);
+  if (i >= 0) args.splice(i, 1);
+  return i >= 0;
+};
+const noSubs = flag('no-subs');
 const opt = (name, dflt) => {
   const i = args.indexOf(`--${name}`);
   if (i < 0) return dflt;
@@ -35,12 +49,13 @@ const out = resolve(opt('out', 'kino-out'));
 const preset = opt('preset', 'slow');
 const crf = opt('crf', '18');
 let version = opt('version', '');
-const [input, id] = args;
+const [given, id] = args;
+const input = given ? resolve(given) : '';
 const die = (msg) => {
   console.error(`encode: ${msg}`);
   process.exit(1);
 };
-if (!input || !id) die('usage: node scripts/kino/encode.mjs <master file> <film id> [--version v20261116a] [--out kino-out]');
+if (!input || !id) die('usage: node scripts/kino/encode.mjs <master file> <film id> [--version v20261116a] [--out kino-out] [--no-subs]');
 if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)) die(`"${id}" is not a film id (lower-case letters, digits and hyphens)`);
 if (!existsSync(input)) die(`no file ${input}`);
 if (!version) {
@@ -51,15 +66,17 @@ if (!version) {
 }
 if (!/^v\d{8}[a-z]?$/.test(version)) die(`"${version}" is not a version (v + YYYYMMDD + an optional letter)`);
 
+// ffmpeg works in the output folder, so the subtitles filter reads a plain file name there.
 const run = (cmd, a, quiet = false) => {
-  const r = spawnSync(cmd, a, { stdio: quiet ? ['ignore', 'pipe', 'pipe'] : ['ignore', 'inherit', 'inherit'], encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  mkdirSync(out, { recursive: true });
+  const r = spawnSync(cmd, a, { cwd: out, stdio: quiet ? ['ignore', 'pipe', 'pipe'] : ['ignore', 'inherit', 'inherit'], encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true });
   if (r.error) die(`${cmd} could not start (${r.error.message}). Is ffmpeg installed?`);
   if (r.status !== 0) die(`${cmd} failed${quiet ? `: ${r.stderr}` : ''}`);
   return r.stdout;
 };
 
 // What the master is.
-const probe = JSON.parse(run('ffprobe', ['-v', 'error', '-show_entries', 'stream=codec_type,width,height,r_frame_rate:format=duration', '-of', 'json', input], true));
+const probe = JSON.parse(run('ffprobe', ['-v', 'error', '-show_entries', 'stream=codec_type,codec_name,width,height,r_frame_rate:stream_tags=language:stream_disposition=default:format=duration', '-of', 'json', input], true));
 const vs = probe.streams.find((s) => s.codec_type === 'video');
 if (!vs) die('the master has no picture');
 const audio = probe.streams.some((s) => s.codec_type === 'audio');
@@ -67,7 +84,12 @@ const fps = rate(vs.r_frame_rate);
 const duration = Number(probe.format?.duration) || 0;
 const gop = Math.max(1, Math.round(fps * 2));
 const rungs = ladder(vs.width, vs.height);
+const subs = subtitlesOf(probe.streams);
 console.log(`encode: ${input}: ${vs.width}×${vs.height}, ${fps.toFixed(3)} fps, ${duration.toFixed(1)} s${audio ? ', with sound' : ', silent'}`);
+if (subs.pick && !noSubs) console.log(`encode: subtitles: drawing the subtitle track (${subs.pick.codec}${subs.pick.lang ? `, ${subs.pick.lang}` : ""}) into the picture at every size (--no-subs leaves them out)`);
+else if (subs.pick) console.log('encode: subtitles: left out (--no-subs)');
+else if (subs.pictures.length) console.log(`encode: subtitles: the master's subtitle track (${subs.pictures.join(', ')}) is a picture-based one, which this script can't draw: the Kino will show the film without it`);
+else console.log('encode: subtitles: no subtitle track (any subtitles already in the picture stay as they are)');
 console.log(`encode: sizes ${rungs.map((r) => `${r.name} (${r.width}×${r.height})`).join(', ')} → ${join(out, 'films', id, version)}`);
 
 const dir = join(out, 'films', id, version);
@@ -81,6 +103,13 @@ writeFileSync(keyFile, randomBytes(16));
 const keyInfo = join(dir, '.keyinfo');
 writeFileSync(keyInfo, `../key\n${keyFile}\n${randomBytes(16).toString('hex')}\n`);
 
+// The subtitle track, saved as a file of its own beside the films, to draw from.
+const subsFile = subs.pick && !noSubs ? `.subs-${id}-${version}.${subs.pick.ext}` : null;
+if (subsFile) {
+  run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', input, '-map', `0:s:${subs.pick.index}`, '-c:s', subs.pick.ext === 'ass' ? 'copy' : 'srt', subsFile], true);
+  if (!existsSync(join(out, subsFile)) || !statSync(join(out, subsFile)).size) die('the subtitle track came out empty: try again with --no-subs');
+}
+
 const made = [];
 for (const r of rungs) {
   const rd = join(dir, r.name);
@@ -90,7 +119,7 @@ for (const r of rungs) {
   run('ffmpeg', [
     '-hide_banner', '-loglevel', 'error', '-stats', '-y', '-i', input,
     '-map', '0:v:0', ...(audio ? ['-map', '0:a:0'] : []),
-    '-vf', `scale=${r.width}:${r.height}:flags=lanczos,format=yuv420p`,
+    '-vf', `scale=${r.width}:${r.height}:flags=lanczos,${subsFile ? `${subtitlesFilter(subsFile)},` : ''}format=yuv420p`,
     '-c:v', 'libx264', '-profile:v', 'high', '-level', level, '-preset', preset, '-crf', crf,
     '-maxrate', String(r.maxrate), '-bufsize', String(r.maxrate * 2),
     '-g', String(gop), '-keyint_min', String(gop), '-sc_threshold', '0',
@@ -106,6 +135,7 @@ for (const r of rungs) {
   made.push({ ...r, ...bandwidth(list, (u) => statSync(join(rd, u)).size) });
 }
 rmSync(keyInfo);
+if (subsFile) rmSync(join(out, subsFile), { force: true });
 writeFileSync(join(dir, 'master.m3u8'), master(made, { fps, audio }));
 
 // The poster: a frame a tenth of the way in, at most 1080 high.

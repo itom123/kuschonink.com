@@ -10,8 +10,14 @@ html[data-boot] .boot { display: block; position: fixed; inset: 0; z-index: 7000
 .boot > * { display: none; }
 
 html[data-boot="boot"] .boot[data-step="bios"] .boot-bios {
-  display: block; position: absolute; inset: 0; padding: 22px 26px; color: #c0c0c0; background: #000;
+  display: block; position: absolute; inset: 0; padding: 22px 26px 44px; overflow: hidden; color: #c0c0c0; background: #000;
   font: 15px/1.4 "Courier New", Consolas, "Lucida Console", monospace;
+}
+/* A phone: smaller type, and a long address (IPv6) breaks anywhere. When the
+   lines outgrow the screen, boot.ts scrolls it up, as a console does. */
+@media (max-width: 600px) {
+  html[data-boot="boot"] .boot[data-step="bios"] .boot-bios { padding: 16px 14px 40px; font-size: 12px; }
+  .boot .bios-text { overflow-wrap: anywhere; }
 }
 .bios-head { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
 .bios-head .ico { width: 48px; height: 48px; filter: drop-shadow(1px 0 0 #c0c0c0) drop-shadow(-1px 0 0 #c0c0c0) drop-shadow(0 1px 0 #c0c0c0) drop-shadow(0 -1px 0 #c0c0c0); }

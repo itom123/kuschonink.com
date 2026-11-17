@@ -2,13 +2,18 @@
 // (assets.run_worker_first in wrangler.jsonc).
 //
 //   GET  /kino, /kino/<film>        the built pages, as ASSETS has them, marked noindex
-//   POST /kino/ticket               the box office: a Turnstile check, then a ticket
+//   POST /kino/ticket               the box office: a Turnstile check (and, for a
+//                                   film that needs it, the password), then a ticket
 //   GET  /kino/<film>/play          with a ticket: where the film plays from
 //   GET  /kino/<film>/m/<token>/…   with a ticket and that film's token: its playlists,
 //                                   pieces, key and poster, read from R2
 //
 // The ticket is a signed HttpOnly cookie (kus98_kino, Path=/kino, 4 hours, gone
-// when the browser closes). It holds a random id and nothing about the visitor.
+// when the browser closes). It holds a random id and nothing about the visitor,
+// and says whether the Kino's password was given (v2.<id>.<expiry>.<0|1>.<sig>).
+// A film with "password": true plays only on a ticket that says 1. Its
+// signature then covers a tag of the password too, so a new KINO_PASSWORD ends
+// those tickets. A v1 ticket (before passwords) counts as one without it.
 // A film's media token (in the path) is signed for that film, its upload and
 // that ticket's id, and lasts the film's length plus an hour: a link copied out
 // of the page is no use without the ticket, and the ticket is no use for
@@ -24,7 +29,7 @@
 // DRM (docs/KINO.md).
 import { FILM_ID, KINO_PREFIX, TICKET_COOKIE, TICKET_PATH, TICKET_S, TURNSTILE_ACTION, VERSION, mediaLife, sourceOf, type KinoFilm } from '../src/lib/kino.ts';
 import type { TurnstileResult } from './contact.ts';
-import { limitKey, sameOrigin } from './guides.ts';
+import { limitKey, MIN_PASSWORD, normalise, sameOrigin } from './guides.ts';
 
 export { isKinoPath } from '../src/lib/kino.ts';
 
@@ -40,6 +45,8 @@ export interface KinoDeps {
   films: KinoFilm[];
   /** The key that signs tickets and media tokens (24+ characters), or undefined: the Kino is closed. */
   secret: () => string | undefined;
+  /** The Kino's password (KINO_PASSWORD) for the films that need one; under 6 characters, or undefined: those films are closed. */
+  password?: () => string | undefined;
   /** env.ASSETS.fetch: the built pages and the 404 page. */
   assets: (req: Request) => Promise<Response>;
   /** An object in the Kino's R2 bucket (with a Range header, part of it), or null; throws without the binding. */
@@ -63,7 +70,10 @@ const PRIVATE = { ...BASE, 'cache-control': 'private, no-store', vary: 'Cookie' 
 const PAGE = { ...BASE, 'content-security-policy': "frame-ancestors 'none'", 'x-frame-options': 'DENY', 'referrer-policy': 'same-origin' };
 const MEDIA = { ...BASE, 'cross-origin-resource-policy': 'same-origin', 'referrer-policy': 'no-referrer' };
 
-const TICKET = /^v1\.([A-Za-z0-9_-]{22})\.(\d{10})\.([A-Za-z0-9_-]{43})$/;
+/** A ticket: v2.<id>.<expiry>.<password given: 0 or 1>.<sig>, or v1.<id>.<expiry>.<sig> from before passwords. */
+const TICKET = /^(?:v1\.([A-Za-z0-9_-]{22})\.(\d{10})|v2\.([A-Za-z0-9_-]{22})\.(\d{10})\.([01]))\.([A-Za-z0-9_-]{43})$/;
+/** A media token: v1.<ticket id>.<expiry>.<sig>. */
+const TOKEN = /^v1\.([A-Za-z0-9_-]{22})\.(\d{10})\.([A-Za-z0-9_-]{43})$/;
 /** /kino/<film>/m/<token>/<file> */
 const MEDIA_PATH = /^\/m\/(v1\.[A-Za-z0-9_-]{22}\.\d{10}\.[A-Za-z0-9_-]{43})\/(master\.m3u8|key|poster\.jpg|(\d{3,4}p)\/(index\.m3u8|seg_\d{5}\.ts))$/;
 /** Fetches that may read media: a script (hls.js), the video element, the poster. Never a page, a frame or an object. */
@@ -140,10 +150,11 @@ async function notFound(url: URL, deps: KinoDeps): Promise<Response> {
 // ---- The box office ----
 
 /**
- * POST /kino/ticket {"token": "<Turnstile token>"} → 200 {"ok": true, "exp": <unix s>}
- * and the ticket cookie. Refused: 405 (not a POST), 403 (another site, a bot,
- * Turnstile said no), 429 (too many), 503 (closed: no key, or Turnstile
- * unreachable).
+ * POST /kino/ticket {"token": "<Turnstile token>", "password"?: "…"} →
+ * 200 {"ok": true, "exp": <unix s>, "password": <given>} and the ticket cookie.
+ * Refused: 405 (not a POST), 403 (another site, a bot, Turnstile said no;
+ * "password": the wrong password), 429 (too many: wrong passwords count too),
+ * 503 (closed: no key, no password set, or Turnstile unreachable).
  */
 async function ticket(req: Request, url: URL, deps: KinoDeps): Promise<Response> {
   if (req.method !== 'POST') return json({ error: 'method' }, 405, { allow: 'POST' });
@@ -154,14 +165,18 @@ async function ticket(req: Request, url: URL, deps: KinoDeps): Promise<Response>
   const ip = req.headers.get('cf-connecting-ip');
   if (!(await deps.allow(visitor(ip)))) return json({ error: 'busy' }, 429, { 'retry-after': '60' });
   let token = '';
+  let given: string | null = null;
   try {
     const text = await readLimited(req, 4096);
-    const body = text ? (JSON.parse(text) as { token?: unknown }) : {};
+    const body = text ? (JSON.parse(text) as { token?: unknown; password?: unknown }) : {};
     if (typeof body.token === 'string') token = body.token;
+    if (typeof body.password === 'string' && body.password) given = body.password.slice(0, 256);
   } catch {
     token = '';
   }
   if (!token || token.length > 2048) return json({ error: 'verification_failed' }, 403);
+  const own = given === null ? null : passwordOf(deps);
+  if (given !== null && !own) return json({ error: 'closed' }, 503);
   let ts: TurnstileResult;
   try {
     ts = await deps.turnstile.verify(deps.turnstile.secret, token, ip);
@@ -175,18 +190,58 @@ async function ticket(req: Request, url: URL, deps: KinoDeps): Promise<Response>
     deps.log('kino: Turnstile refused', { success: ts.success, hostname: ts.hostname, action: ts.action, errors: ts['error-codes'] });
     return json({ error: 'verification_failed' }, 403);
   }
+  // The password after Turnstile, so every guess costs a check at the door as well as a place in KINO_LIMIT.
+  if (given !== null && !(await samePassword(given, own!))) {
+    deps.log('kino: wrong password');
+    return json({ error: 'password' }, 403);
+  }
+  const p = given !== null;
   const exp = Math.floor(deps.now() / 1000) + TICKET_S;
   const tid = b64u(deps.random(16));
-  const value = `v1.${tid}.${exp}.${await sign(key, `kino|ticket|v1|${tid}|${exp}`)}`;
+  const value = `v2.${tid}.${exp}.${p ? 1 : 0}.${await sign(key, ticketSigned(tid, exp, p, p ? await tagOf(key, own!) : ''))}`;
   const cookie = [`${TICKET_COOKIE}=${value}`, `Path=${KINO_PREFIX}`, 'HttpOnly', 'SameSite=Strict', ...(url.protocol === 'https:' ? ['Secure'] : [])].join('; ');
-  return json({ ok: true, exp }, 200, { 'set-cookie': cookie });
+  return json({ ok: true, exp, password: p }, 200, { 'set-cookie': cookie });
 }
 
-/** The ticket's id and expiry when the request carries a valid, unexpired ticket; else null. */
-export async function ticketOf(req: Request, deps: KinoDeps): Promise<{ tid: string; exp: number } | null> {
+const ticketSigned = (tid: string, exp: number | string, p: boolean, tag: string) => (p ? `kino|ticket|v2|${tid}|${exp}|1|${tag}` : `kino|ticket|v2|${tid}|${exp}|0`);
+
+/** The Kino's password, normalised as the Field Guide's are, or null when it isn't set (or is under 6 characters). */
+function passwordOf(deps: KinoDeps): string | null {
+  const raw = deps.password?.();
+  const pw = typeof raw === 'string' ? normalise(raw) : '';
+  return pw.length >= MIN_PASSWORD ? pw : null;
+}
+
+const sha256 = async (s: string) => new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(s)));
+
+/** The password given, against the Kino's (normalised), in constant time. */
+async function samePassword(given: string, own: string): Promise<boolean> {
+  const [g, o] = await Promise.all([sha256(normalise(given)), sha256(own)]);
+  let d = 0;
+  for (let i = 0; i < g.length; i++) d |= g[i] ^ o[i];
+  return d === 0;
+}
+
+let tagCache: { key: CryptoKey; pw: string; tag: string } | null = null;
+/** A tag of the password, signed with the Kino's key: what a "password given" ticket is bound to. */
+async function tagOf(key: CryptoKey, pw: string): Promise<string> {
+  if (tagCache?.key === key && tagCache.pw === pw) return tagCache.tag;
+  const tag = await sign(key, `kino|password|v1|${pw}`);
+  tagCache = { key, pw, tag };
+  return tag;
+}
+
+/**
+ * The ticket's id, expiry and whether the password was given, when the request
+ * carries a valid, unexpired ticket; else null. With several, the best one: a
+ * ticket with the password before one without.
+ */
+export async function ticketOf(req: Request, deps: KinoDeps): Promise<{ tid: string; exp: number; password: boolean } | null> {
   const key = await keyOf(deps);
   if (!key) return null;
   const now = Math.floor(deps.now() / 1000);
+  const pw = passwordOf(deps);
+  let best: { tid: string; exp: number; password: boolean } | null = null;
   let n = 0;
   for (const part of (req.headers.get('cookie') ?? '').split(';')) {
     const eq = part.indexOf('=');
@@ -194,12 +249,19 @@ export async function ticketOf(req: Request, deps: KinoDeps): Promise<{ tid: str
     if (++n > 4) break;
     const m = TICKET.exec(part.slice(eq + 1).trim());
     if (!m) continue;
-    const [, tid, exp, sig] = m;
+    const v2 = m[3] !== undefined;
+    const tid = v2 ? m[3] : m[1];
+    const exp = v2 ? m[4] : m[2];
+    const p = v2 && m[5] === '1';
     const e = Number(exp);
     if (e <= now || e > now + TICKET_S + 60) continue;
-    if (await verify(key, `kino|ticket|v1|${tid}|${exp}`, sig)) return { tid, exp: e };
+    if (p && !pw) continue; // the password is gone: so is what it opened
+    const data = v2 ? ticketSigned(tid, exp, p, p ? await tagOf(key, pw!) : '') : `kino|ticket|v1|${tid}|${exp}`;
+    if (!(await verify(key, data, m[6]))) continue;
+    if (!best || (p && !best.password)) best = { tid, exp: e, password: p };
+    if (p) break;
   }
-  return null;
+  return best;
 }
 
 // ---- Where a film plays from ----
@@ -207,14 +269,18 @@ export async function ticketOf(req: Request, deps: KinoDeps): Promise<{ tid: str
 /**
  * GET /kino/<film>/play, with a ticket. A film on R2:
  * {"kind": "hls", "src": ".../m/<token>/master.m3u8", "poster": ".../m/<token>/poster.jpg", "exp"}.
- * A film still on YouTube: {"kind": "youtube", "id"}. Without a ticket: 401.
+ * A film still on YouTube: {"kind": "youtube", "id"}. Without a ticket: 401
+ * "ticket"; a film that needs the password, without it: 401 "password" (and
+ * 503 "closed" while no password is set).
  */
 async function play(req: Request, url: URL, film: KinoFilm, deps: KinoDeps): Promise<Response> {
   if (req.method !== 'GET' && req.method !== 'HEAD') return json({ error: 'method' }, 405, { allow: 'GET, HEAD' });
   if (!fromHere(req)) return json({ error: 'forbidden' }, 403);
   const key = await keyOf(deps);
   if (!key) return json({ error: 'closed' }, 503);
+  if (film.password && !passwordOf(deps)) return json({ error: 'closed' }, 503);
   const t = await ticketOf(req, deps);
+  if (film.password && !t?.password) return json({ error: 'password' }, 401);
   if (!t) return json({ error: 'ticket' }, 401);
   if (sourceOf(film) === 'youtube') return json({ kind: 'youtube', id: film.youtubeId });
   const s = film.stream!;
@@ -236,9 +302,10 @@ async function media(req: Request, url: URL, film: KinoFilm, token: string, file
   if (dest && !MEDIA_DEST.has(dest)) return bare(403); // opened in a tab, a frame, an object
   const key = await keyOf(deps);
   if (!key) return bare(503);
+  if (film.password && !passwordOf(deps)) return bare(503);
   const t = await ticketOf(req, deps);
-  if (!t) return bare(401);
-  const [, tid, exp, sig] = TICKET.exec(token)!;
+  if (!t || (film.password && !t.password)) return bare(401);
+  const [, tid, exp, sig] = TOKEN.exec(token)!;
   const now = Math.floor(deps.now() / 1000);
   if (tid !== t.tid || Number(exp) <= now || Number(exp) > t.exp || !(await verify(key, mediaSigned(film, tid, exp), sig))) return bare(403);
   if (deps.allowMedia && !(await deps.allowMedia(`kino:${tid}`))) return bare(429, { 'retry-after': '10' });
