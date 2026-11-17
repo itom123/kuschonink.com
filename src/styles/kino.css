@@ -53,7 +53,9 @@
 
 /* The seek bar and the control bar. */
 .kino-transport { flex: none; display: flex; flex-direction: column; }
-.kino input.kino-seek { width: auto; margin: 7px 8px 3px; }
+/* 98.css draws a slider's thumb 21px tall on a 2px track: the sliders get the
+   thumb's height, so it stays in its own row instead of hanging over the buttons. */
+.kino input.kino-seek { display: block; box-sizing: border-box; width: auto; height: 22px; margin: 2px 8px 0; }
 .kino-bar { display: flex; align-items: center; gap: 1px; min-height: 30px; padding: 0 2px; }
 .kino .kino-btn {
   display: inline-grid; place-items: center; width: 30px; height: 28px; min-width: 0; min-height: 0; padding: 0; box-sizing: border-box;
@@ -72,7 +74,7 @@
 .kino-lcd-state { overflow: hidden; text-overflow: ellipsis; }
 .kino-lcd-time { font-variant-numeric: tabular-nums; }
 .kino-grow { flex: 1 1 0; min-width: 4px; }
-.kino input.kino-volume { flex: none; width: 76px; margin: 0 8px 0 4px; }
+.kino input.kino-volume { flex: none; box-sizing: border-box; width: 76px; height: 22px; margin: 0 8px 0 4px; }
 .kino-quality-label[hidden] { display: none; }
 .kino-quality { height: 21px; margin-right: 2px; }
 
