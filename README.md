@@ -20,8 +20,8 @@ first page of a visit starts up (a short BIOS screen and a splash) and asks the
 visitor to log on: everyone is Guest, and there's no password. Then the desktop
 appears with the page they asked for open in a window. The BIOS screen briefly
 shows the visitor's own connection, as [cleanip.io](https://cleanip.io/) does:
-IP address, place, network (ASN), and a rough purity score
-(`src/lib/netcheck.ts`, `worker/whoami.ts`). The site's owner has a
+IP address, place, network (ASN), IPQualityScore's fraud score, and a purity
+score (`src/lib/netcheck.ts`, `worker/whoami.ts`, `worker/ipqs.ts`). The site's owner has a
 separate, hidden log-on for admin mode, checked on the server
 ([`docs/ADMIN.md`](docs/ADMIN.md)).
 
@@ -487,7 +487,7 @@ of the Cookies dialog (which covers what the site itself keeps).
 | `src/pages/kino/`, `src/scripts/kino/`, `scripts/kino/` | Kino: Now Showing and the player, the ticket's check, encoding and uploading a film |
 | `src/content/guides/` | Field Guide: `access.json` (audiences) and one folder per guide |
 | `src/lib/guides/`, `src/scripts/guide/` | Field Guide: data rules and checks; the program in the browser |
-| `worker/` | The Worker: the contact form (`contact.ts`), Paint's drawings (`drawing.ts`), the Field Guide's password gate (`guides.ts`), the Kino's door (`kino.ts`) and the start-up screen's network check (`whoami.ts`) |
+| `worker/` | The Worker: the contact form (`contact.ts`), Paint's drawings (`drawing.ts`), the Field Guide's password gate (`guides.ts`), the Kino's door (`kino.ts`) and the start-up screen's network check (`whoami.ts`, with IPQualityScore in `ipqs.ts`) |
 | `src/layouts/Desktop.astro` | Every page: the Xiangyin 98 desktop with the page in a window |
 | `src/components/desktop/` | Window, taskbar, Start menu, desktop icons, start-up screens |
 | `src/scripts/desktop/` | The desktop shell: windows, menus, sounds, Control Panel… (see [`docs/DESKTOP.md`](docs/DESKTOP.md)) |

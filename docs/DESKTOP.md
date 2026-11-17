@@ -314,21 +314,32 @@ screen after 10 seconds if the shell fails to load.
 
 **The network check.** The BIOS screen shows the visitor's own connection
 for a moment, as [cleanip.io](https://cleanip.io/) does: IP address, place,
-ASN number and owner, network type, proxy/VPN/Tor, and a purity score from 0
-to 100 with a grade (F, D, C, B, A, A+). `boot.ts` asks `GET /v1/whoami` as
-start-up begins; the Worker (`worker/whoami.ts`) answers with what Cloudflare
-already knows about the request (`CF-Connecting-IP` and `request.cf`: city,
-region, country, ASN, its owner, time zone). Nothing is asked of anyone else,
-kept or logged, and the answer is `no-store`. `src/lib/netcheck.ts` (shared,
-tested by `worker/whoami.test.mts`) judges it: a Tor exit (country `T1`), a
-relay (Cloudflare WARP, iCloud Private Relay), a server network where VPNs and
-proxies live (known hosting ASNs, or words such as "hosting" in the owner's
-name), and an IP time zone whose UTC offset isn't the browser's each lower the
-score. It is a rough guess from these signs, not a blacklist lookup. If the
-check doesn't answer within 1.5 seconds of its line, the line says `NONE` and
-start-up goes on (as under `astro dev`, which has no Worker). With "reduce
-motion" the screen appears whole, without typing, for 2.5 seconds; any key or
-click skips it either way. Lines that outgrow a small screen scroll up.
+ASN number and owner, network type, proxy/VPN/Tor, IPQualityScore's fraud
+score, and a purity score from 0 to 100 with a grade (F, D, C, B, A, A+).
+`boot.ts` asks `GET /v1/whoami` as start-up begins. The Worker
+(`worker/whoami.ts`) answers with what Cloudflare already knows about the
+request (`CF-Connecting-IP` and `request.cf`: city, region, country, ASN, its
+owner, time zone), and with IPQualityScore's verdict on the address
+(`worker/ipqs.ts`) when the secret `IPQS_KEY` is set. IPQS gets the address
+alone, with the key in its `IPQS-KEY` header, and has 1.2 seconds to answer.
+Only its verdict (fraud score, VPN, proxy, Tor, recent abuse, bots, connection
+type) is kept, at the edge for 6 hours under an HMAC of the address, so a
+reload or the next page doesn't spend another lookup; `WHOAMI_LIMIT` allows 10
+lookups a minute per visitor. When IPQS's credits run out ("insufficient
+credits" in the Worker's log), the screen goes on without the fraud score.
+Nothing about the visitor is logged, and the answer is `no-store`.
+
+`src/lib/netcheck.ts` (shared, tested by `worker/whoami.test.mts`) judges it.
+The worst hiding sign counts: a Tor exit (country `T1`, or IPQS), a VPN or
+proxy (IPQS), a relay (Cloudflare WARP, iCloud Private Relay) or a server
+network (IPQS's connection type, or without IPQS known hosting ASNs and words
+such as "hosting" in the owner's name). Recent abuse, bots, and an IP time
+zone whose UTC offset isn't the browser's lower it further, and with IPQS the
+score is never above 100 minus its fraud score. If the check doesn't answer
+within 2 seconds of its line, the line says `NONE` and start-up goes on (as
+under `astro dev`, which has no Worker). With "reduce motion" the screen
+appears whole, without typing, for 2.5 seconds; any key or click skips it
+either way. Lines that outgrow a small screen scroll up.
 
 ### Cookies: the visitor's choice
 
