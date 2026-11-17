@@ -4,7 +4,8 @@
 // Field Guide's password gate (worker/guides.ts) and its suggestions
 // (worker/suggest.ts), admin mode on /v1/admin/* (worker/admin.ts), and the
 // Kino's door on /kino and /kino/* (worker/kino.ts), and the start-up
-// screen's network check on /v1/whoami (worker/whoami.ts).
+// screen's network check on /v1/whoami (worker/whoami.ts, with
+// IPQualityScore's verdict from worker/ipqs.ts).
 // Two crons: the publisher every ten minutes
 // (worker/publish.ts) and, daily, the Guard's tidy-up and the privacy
 // clean-up (worker/privacy.ts).
@@ -29,6 +30,7 @@ import { privacySweep } from './privacy';
 import { publish } from './publish';
 import { routineTrigger } from './routine';
 import { handleSuggest, type SuggestDeps } from './suggest';
+import { ipqsLookup } from './ipqs';
 import { handleWhoami, WHOAMI_PATH } from './whoami';
 
 // The Durable Object class must be exported from the Worker's main module.
@@ -100,6 +102,11 @@ interface Env {
   KINO_SECRET?: string;
   /** The Kino's password (a secret, 6+ characters) for the films marked "password": true in kino.json. Without it, those films are closed. */
   KINO_PASSWORD?: string;
+
+  /** IPQualityScore's API key (a secret): the start-up screen's fraud score. Without it, no lookup. */
+  IPQS_KEY?: string;
+  /** Rate limiting binding: IPQS lookups per minute per visitor. Optional: without it every lookup is allowed. */
+  WHOAMI_LIMIT?: RateLimit;
 }
 
 async function siteverify(secret: string, token: string, ip: string | null): Promise<TurnstileResult> {
@@ -304,6 +311,18 @@ const kinoDeps = (env: Env): KinoDeps => ({
   log: (...args) => console.error(...args),
 });
 
+/** The start-up screen's network check: IPQS's verdict, kept at the edge, a few lookups a minute per visitor. */
+const whoamiDeps = (env: Env) => ({
+  ipqs: (ip: string) =>
+    ipqsLookup(ip, {
+      key: env.IPQS_KEY,
+      fetch: (url, init) => fetch(url, init),
+      cache: (caches as unknown as { default?: GuidesDeps['cache'] }).default,
+      allow: env.WHOAMI_LIMIT ? async (a) => (await env.WHOAMI_LIMIT!.limit({ key: limitKey(a).replace(/^guides:/, 'whoami:') })).success : undefined,
+      log: (...args) => console.error(...args),
+    }),
+});
+
 const DAILY = '17 3 * * *';
 
 export default {
@@ -311,7 +330,7 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === CONTACT_PATH) return handleContact(request, depsFor(env));
     if (url.pathname === DRAWING_PATH) return handleDrawing(request, depsFor(env));
-    if (url.pathname === WHOAMI_PATH) return handleWhoami(request);
+    if (url.pathname === WHOAMI_PATH) return handleWhoami(request, whoamiDeps(env));
     if (isGuidesPath(url.pathname)) return handleGuides(request, guidesDeps(env));
     if (isKinoPath(url.pathname)) return handleKino(request, kinoDeps(env));
     if (url.pathname.startsWith(`${ADMIN_PREFIX}/`)) return handleAdmin(request, adminDeps(env));

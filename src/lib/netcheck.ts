@@ -1,10 +1,11 @@
 // The start-up screen's network check, after cleanip.io: the visitor's IP
-// address, where it is, the network (ASN) it belongs to, and a rough purity
-// score with what lowered it. The Worker (worker/whoami.ts) answers with what
-// Cloudflare already knows about the request; nothing is looked up anywhere
-// else, kept or logged. The browser adds its own time zone, and the BIOS
-// screen (src/scripts/desktop/boot.ts) types the lines below. No imports:
-// the Worker and `npm test` load this file as it is.
+// address, where it is, the network (ASN) it belongs to, IPQualityScore's
+// fraud score, and a purity score with what lowered it. The Worker
+// (worker/whoami.ts) answers with what Cloudflare already knows about the
+// request, and with IPQualityScore's verdict on the address when it is set up
+// (worker/ipqs.ts). The browser adds its own time zone, and the BIOS screen
+// (src/scripts/desktop/boot.ts) types the lines below. No imports: the Worker
+// and `npm test` load this file as it is.
 
 export const WHOAMI_PATH = '/v1/whoami';
 
@@ -20,6 +21,23 @@ export interface NetFacts {
   org?: string;
   /** IANA time zone of the IP's location. */
   timezone?: string;
+  /** IPQualityScore's verdict, when it answered (worker/ipqs.ts). */
+  ipqs?: IpqsFacts;
+}
+
+/** The part of IPQualityScore's answer the screen shows. Nothing else of it is kept. */
+export interface IpqsFacts {
+  /** 0 to 100; IPQS reads 75+ as suspicious, 85+ as high risk, 90+ as likely abuse. */
+  fraud: number;
+  proxy: boolean;
+  vpn: boolean;
+  tor: boolean;
+  /** Seen in recent abuse: fraud, chargebacks, compromised devices. */
+  abuse: boolean;
+  /** Bots seen on the address. */
+  bot: boolean;
+  /** IPQS's connection type: Residential, Mobile, Corporate, Data Center, Education. */
+  type?: string;
 }
 
 const text = (v: unknown, max = 120) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : undefined);
@@ -93,9 +111,25 @@ export interface Assessment {
   grade: 'A+' | 'A' | 'B' | 'C' | 'D' | 'F';
   /** What lowered the score, most serious first; empty for a clean address. */
   flags: string[];
-  /** Tor, Anonymous relay, Hosting or ISP. */
+  /** The kind of network: Tor, a relay, IPQS's connection type, or a guess from the ASN. */
   kind: string;
 }
+
+/** IPQS's own reading of its fraud score. */
+export function fraudBand(fraud: number): string {
+  if (fraud >= 90) return 'likely abuse';
+  if (fraud >= 85) return 'high risk';
+  if (fraud >= 75) return 'suspicious';
+  return 'low risk';
+}
+
+const TYPES: Record<string, string> = {
+  residential: 'Residential',
+  mobile: 'Mobile',
+  corporate: 'Business',
+  'data center': 'Hosting / data centre',
+  education: 'Education',
+};
 
 export function gradeOf(score: number): Assessment['grade'] {
   if (score >= 95) return 'A+';
@@ -108,28 +142,40 @@ export function gradeOf(score: number): Assessment['grade'] {
 
 /**
  * cleanip.io's purity score, roughly: 100 for an ordinary home or mobile
- * connection, less for a Tor exit, a relay, a server network (where VPNs and
- * proxies live), or an IP whose time zone isn't the browser's.
+ * connection, less for a Tor exit, a relay, a VPN or proxy, a server network
+ * (where VPNs and proxies live), recent abuse or bots, or an IP whose time zone
+ * isn't the browser's. Only the worst of the hiding signs counts. With
+ * IPQualityScore's verdict, the score is never above 100 minus its fraud score.
  */
 export function assess(f: NetFacts, browserTz: string | undefined, at = new Date()): Assessment {
+  const q = f.ipqs;
   const flags: string[] = [];
-  let score = 100;
-  let kind = 'ISP (home or mobile)';
-  const tor = f.country === 'T1';
+  let hiding = 0;
+  const mark = (flag: string, penalty: number) => {
+    flags.push(flag);
+    hiding = Math.max(hiding, penalty);
+  };
+  const tor = f.country === 'T1' || !!q?.tor;
   const relay = f.asn ? RELAYS[f.asn] : undefined;
-  const hosting = !relay && ((f.asn !== undefined && HOSTING_ASNS.has(f.asn)) || (!!f.org && HOSTING_WORDS.test(f.org)));
-  if (tor) {
-    flags.push('Tor exit');
-    score -= 80;
-    kind = 'Tor';
-  } else if (relay) {
-    flags.push(relay);
+  const hostingGuess = !relay && ((f.asn !== undefined && HOSTING_ASNS.has(f.asn)) || (!!f.org && HOSTING_WORDS.test(f.org)));
+  const type = q?.type ? TYPES[q.type.toLowerCase()] ?? q.type : undefined;
+  // IPQS's connection type, when it gave one, outranks the guess from the ASN.
+  const server = type ? type === TYPES['data center'] : hostingGuess;
+  if (tor) mark('Tor exit', 80);
+  else {
+    if (relay) mark(relay, 25);
+    if (q?.vpn) mark('VPN', 45);
+    else if (q?.proxy) mark('Proxy', 50);
+    else if (server && !relay) mark(q ? 'Server network' : 'Server network (VPN or proxy?)', 45);
+  }
+  let score = 100 - hiding;
+  if (q?.abuse) {
+    flags.push('Recent abuse');
     score -= 25;
-    kind = 'Anonymous relay';
-  } else if (hosting) {
-    flags.push('Server network (VPN or proxy?)');
-    score -= 45;
-    kind = 'Hosting / data centre';
+  }
+  if (q?.bot) {
+    flags.push('Bot activity');
+    score -= 15;
   }
   if (!tor && f.timezone && browserTz && f.timezone !== browserTz) {
     const a = offsetOf(f.timezone, at);
@@ -139,7 +185,9 @@ export function assess(f: NetFacts, browserTz: string | undefined, at = new Date
       score -= 20;
     }
   }
-  score = Math.max(0, Math.min(100, score));
+  if (q) score = Math.min(score, 100 - q.fraud);
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  const kind = tor ? 'Tor' : relay ? 'Anonymous relay' : type ?? (hostingGuess ? TYPES['data center'] : 'ISP (home or mobile)');
   return { score, grade: gradeOf(score), flags, kind };
 }
 
@@ -181,6 +229,7 @@ export function biosLines(f: NetFacts, browserTz: string | undefined, at = new D
     row('ASN Owner', f.org ?? 'Unknown'),
     row('Network Type', a.kind),
     row('Proxy/VPN/Tor', a.flags.length ? a.flags.join(', ') : 'None detected'),
+    ...(f.ipqs ? [row('IPQS Fraud Score', `${f.ipqs.fraud}/100 (${fraudBand(f.ipqs.fraud)})`)] : []),
     row('IP Purity Score', `${a.score}/100 (${a.grade})`),
   ];
 }

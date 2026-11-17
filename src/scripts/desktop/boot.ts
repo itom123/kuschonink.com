@@ -27,8 +27,8 @@ const LAST = 'Starting Xiangyin 98...';
 
 /**
  * The visitor's IP address and network, as cleanip.io shows them: Cloudflare's
- * view of this request, from the Worker (worker/whoami.ts). Nothing is kept.
- * null when it can't say (no Worker, offline, too slow).
+ * view of this request and IPQualityScore's verdict on the address, from the
+ * Worker (worker/whoami.ts). null when it can't say (no Worker, offline, too slow).
  */
 function netFacts(): Promise<NetFacts | null> {
   const signal = typeof AbortSignal.timeout === 'function' ? AbortSignal.timeout(4000) : undefined;
@@ -81,8 +81,9 @@ export async function startUp() {
   let skipped = false;
   const skip = anyKeyOrClick().then(() => (skipped = true));
   const wait = (ms: number) => Promise.race([sleep(ms), skip]);
-  // The network check waits at most 1.5 seconds more once its line is reached.
-  const facts = () => Promise.race([net, sleep(1500).then(() => null), skip.then(() => null)]);
+  // The network check waits at most 2 seconds more once its line is reached
+  // (the Worker gives IPQualityScore 1.2 seconds, then answers without it).
+  const facts = () => Promise.race([net, sleep(2000).then(() => null), skip.then(() => null)]);
   // Lines that outgrow the screen scroll up, as on a console.
   const put = (t: string) => {
     pre.textContent += t;

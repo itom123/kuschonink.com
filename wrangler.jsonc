@@ -10,8 +10,9 @@
   // edge), and suggestions from inside a guide (worker/suggest.ts); and for the
   // Kino on /kino and /kino/* (worker/kino.ts): its tickets, and its films,
   // read from the private R2 bucket below; and for /v1/whoami, the start-up
-  // screen's network check (worker/whoami.ts): the visitor's own IP address and
-  // what Cloudflare knows about it, never kept or logged. Its crons
+  // screen's network check (worker/whoami.ts): the visitor's own IP address,
+  // what Cloudflare knows about it, and IPQualityScore's verdict on it when
+  // IPQS_KEY is set (worker/ipqs.ts). Its crons
   // publish approved suggestions (worker/publish.ts) and keep contact details
   // only as long as promised (worker/privacy.ts).
   "main": "worker/index.ts",
@@ -45,7 +46,10 @@
     // Kino: 10 tickets a minute from one visitor; 180 pieces of film a minute on one ticket
     // (a film needs about 10 a minute; the rest is room for starting, seeking and changing quality).
     { "name": "KINO_LIMIT", "namespace_id": "4247", "simple": { "limit": 10, "period": 60 } },
-    { "name": "KINO_MEDIA_LIMIT", "namespace_id": "4248", "simple": { "limit": 180, "period": 60 } }
+    { "name": "KINO_MEDIA_LIMIT", "namespace_id": "4248", "simple": { "limit": 180, "period": 60 } },
+    // Start-up screen: at most 10 IPQualityScore lookups a minute for one visitor
+    // (a verdict already at the edge is not counted). It spares the IPQS credits.
+    { "name": "WHOAMI_LIMIT", "namespace_id": "4249", "simple": { "limit": 10, "period": 60 } }
   ],
   // Kino's films (docs/KINO.md): a private bucket, with no public address. The
   // Worker only reads it; scripts/kino/upload.mjs fills it. It must exist
@@ -102,7 +106,8 @@
       { "name": "GUIDES_TILE_LIMIT", "namespace_id": "5245", "simple": { "limit": 600, "period": 60 } },
       { "name": "ADMIN_LIMIT", "namespace_id": "5246", "simple": { "limit": 60, "period": 60 } },
       { "name": "KINO_LIMIT", "namespace_id": "5247", "simple": { "limit": 10, "period": 60 } },
-      { "name": "KINO_MEDIA_LIMIT", "namespace_id": "5248", "simple": { "limit": 180, "period": 60 } }
+      { "name": "KINO_MEDIA_LIMIT", "namespace_id": "5248", "simple": { "limit": 180, "period": 60 } },
+      { "name": "WHOAMI_LIMIT", "namespace_id": "5249", "simple": { "limit": 10, "period": 60 } }
     ],
     // The same films as the live site (the Worker only reads them).
     "r2_buckets": [{ "binding": "KINO", "bucket_name": "kuschonink-kino" }],
@@ -135,7 +140,10 @@
   // routine's API trigger). Kino: KINO_SECRET (32+ random characters) signs its
   // tickets and media links; without it the Field Guide's cookie key does, under
   // the Kino's own label. Changing it ends every ticket (visitors just get a new
-  // one). The Kino's box office uses TURNSTILE_SECRET. No "secrets.required":
+  // one). The Kino's box office uses TURNSTILE_SECRET. Start-up screen:
+  // IPQS_KEY, the IPQualityScore API key, for its fraud score; without it the
+  // screen shows only what Cloudflare knows. Leave it unset for previews (each
+  // lookup spends a credit). No "secrets.required":
   // it would limit what wrangler dev reads from .dev.vars.
   "observability": { "enabled": true }
 }
