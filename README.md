@@ -113,11 +113,19 @@ walls come from `house.json`, shared with the plan. Doors have frames and leaves
 open the way they swing, with the swing marked on the floor; the garage has its car door;
 glass and sliding doors are glazed. Each wall is built once, brick outside and white
 inside. The rest is traced from the drawings into `src/content/house3d.json`: the living
-room's picture window, the stairs (a wooden U round the core from the ground floor to the
-first floor, then a straight flight to the attic; none to the roof), the stairwells, and
-the garage as a cellar a few steps down from the hall with a small stair up to a narrow
-loft. Edit that file to correct a stair. The roof, columns, balustrades and
-corner stones are approximations from the south elevation and photos of the house.
+room's picture window, the attic's seven windows (where the attic plan puts them, sized by
+their codes: small ones under the eaves, a tall one in the north and east gables), the
+stairs (a wooden U round the core from the ground floor to the first floor, then a straight
+flight to the attic; none to the roof), the stairwells, and the garage as a cellar a few
+steps down from the hall with a small stair up to a narrow loft. Edit that file to correct
+a stair or a window; the build stops if a window isn't on a wall of a room that lists its
+code in `house.json`, or if, on a floor with traced windows, a code a room lists isn't
+traced. Floors without traced windows get a guessed one in each long outside wall. The roof follows the roof plan and the south elevation
+(`src/lib/house-shell.ts`): a main roof east to west, a wing running north into it and a
+gable over the attic terrace, all with ridges at 11.160 and eaves at 8.050. The attic's
+walls rise to it, so it stands a full storey: knee walls about 1.35 m high under the eaves,
+gables east, west and north. The columns, balustrades and corner stones are approximations
+from the south elevation and photos of the house.
 Both 3D views (this page and the small turning house on the floorplan) redraw when
 Chrome drops and restores their graphics context (a GPU process restart, a driver reset,
 sleep, GPU memory running short) and when the device pixel ratio changes (another monitor,
