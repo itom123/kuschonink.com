@@ -32,9 +32,7 @@
       "blocks": [
         {
           "type": "video",
-          "provider": "youtube",
-          "url": "https://www.youtube.com/watch?v=-esHL68qDgo",
-          "youtubeId": "-esHL68qDgo"
+          "film": "anterior-future"
         }
       ]
     }

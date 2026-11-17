@@ -659,6 +659,69 @@ export const ICONS: Record<string, Draw> = {
     }
     return c;
   },
+  // Kino: a film projector with its two reels, throwing a beam to the right.
+  kino() {
+    const c = N();
+    c.poly([[28, 17], [31, 12], [31, 28], [28, 23]], 'h');
+    for (const cx of [9, 20]) {
+      c.disc(cx, 8, 7, 'k');
+      c.disc(cx, 8, 6, 'd');
+      c.disc(cx, 8, 5, 'g');
+      c.disc(cx, 8, 1.6, 'k');
+      for (const [dx, dy] of [[-3, 0], [3, 0], [0, -3], [0, 3]]) c.disc(cx + dx, 8 + dy, 1, 'd');
+    }
+    c.line(9, 14, 20, 14, 'k');
+    c.rect(2, 14, 22, 12, 'k');
+    c.rect(3, 15, 20, 10, 's');
+    c.rect(3, 15, 19, 1, 'w').rect(3, 15, 1, 9, 'w');
+    c.rect(4, 24, 19, 1, 'g').rect(22, 16, 1, 9, 'g');
+    c.rect(6, 18, 9, 1, 'd').rect(6, 20, 9, 1, 'd').rect(6, 22, 9, 1, 'd');
+    c.rect(17, 18, 3, 3, 'k').rect(18, 19, 1, 1, 'r');
+    c.rect(23, 16, 6, 8, 'k');
+    c.rect(24, 17, 4, 6, 'n');
+    c.rect(24, 17, 2, 2, 'a');
+    c.rect(4, 26, 3, 4, 'k').rect(18, 26, 3, 4, 'k');
+    return c;
+  },
+  'tb-play'() {
+    const c = new Canvas(20, 20);
+    c.poly([[4, 2], [17, 10], [4, 18]], 'k');
+    c.poly([[5.4, 4.6], [14.6, 10], [5.4, 15.4]], 'e');
+    c.poly([[5.4, 4.6], [14.6, 10], [5.4, 9.6]], 'l');
+    return c;
+  },
+  'tb-pause'() {
+    const c = new Canvas(20, 20);
+    c.rect(4, 3, 5, 14, 'k').rect(11, 3, 5, 14, 'k');
+    c.rect(5, 4, 3, 12, 'n').rect(12, 4, 3, 12, 'n');
+    c.rect(5, 4, 1, 12, 'b').rect(12, 4, 1, 12, 'b');
+    return c;
+  },
+  // Kino: the previous and next film (a bar and a triangle, as on a media player).
+  'tb-prev'() {
+    const c = new Canvas(20, 20);
+    c.rect(3, 4, 3, 12, 'k').rect(4, 5, 1, 10, 'n');
+    c.poly([[17, 3], [7, 10], [17, 17]], 'k');
+    c.poly([[15.6, 5.6], [9.4, 10], [15.6, 14.4]], 'n');
+    c.poly([[15.6, 5.6], [9.4, 10], [15.6, 9.6]], 'b');
+    return c;
+  },
+  'tb-next'() {
+    const c = new Canvas(20, 20);
+    c.rect(14, 4, 3, 12, 'k').rect(15, 5, 1, 10, 'n');
+    c.poly([[3, 3], [13, 10], [3, 17]], 'k');
+    c.poly([[4.4, 5.6], [10.6, 10], [4.4, 14.4]], 'n');
+    c.poly([[4.4, 5.6], [10.6, 10], [4.4, 9.6]], 'b');
+    return c;
+  },
+  'tb-fullscreen'() {
+    const c = new Canvas(20, 20);
+    c.rect(4, 5, 12, 10, 'k').rect(5, 6, 10, 8, 'n').rect(5, 6, 10, 1, 'b');
+    for (const [x, y, dx, dy] of [[1, 1, 1, 1], [18, 1, -1, 1], [1, 18, 1, -1], [18, 18, -1, -1]]) {
+      c.line(x, y, x + 3 * dx, y, 'k').line(x, y, x, y + 3 * dy, 'k').line(x, y, x + 2 * dx, y + 2 * dy, 'k');
+    }
+    return c;
+  },
   'tb-stop'() {
     const c = new Canvas(20, 20);
     c.disc(10, 10, 9, 'k').disc(10, 10, 8, 'r');

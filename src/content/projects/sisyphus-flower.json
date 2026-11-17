@@ -30,9 +30,7 @@
       "blocks": [
         {
           "type": "video",
-          "provider": "youtube",
-          "url": "https://www.youtube.com/watch?v=cJwi4CwG0XM",
-          "youtubeId": "cJwi4CwG0XM"
+          "film": "sisyphus-flower"
         }
       ]
     }

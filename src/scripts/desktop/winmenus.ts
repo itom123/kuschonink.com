@@ -147,6 +147,7 @@ export function barMenu(win: wm.Win, name: string): MenuSpec[] {
         { label: '&About.doc', zh: '关于.doc(&A)', icon: 'document', action: open('/about') },
         { label: '&Contact', zh: '联系(&C)', icon: 'mail', action: open('/contact') },
         { label: 'Pai&nt', zh: '画图(&N)', icon: 'paint', action: open('/paint') },
+        { label: '&Kino', zh: 'Kino(&K)', icon: 'kino', action: open('/kino') },
       ];
     case 'favorites':
       return [

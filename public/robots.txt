@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+# The Kino's films are for visitors only: no crawling there (docs/KINO.md).
+Disallow: /kino
 
 Sitemap: https://kuschonink.com/sitemap.xml

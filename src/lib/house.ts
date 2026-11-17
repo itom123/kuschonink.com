@@ -1,13 +1,15 @@
 import houseJson from '../content/house.json';
 import perecJson from '../content/perec.json';
 import drawersJson from '../content/drawers.json';
+import details3dJson from '../content/house3d.json';
 import { projects, site, about, contact } from './content';
 import type { Block, Section } from './types';
 import { floorZh, t } from './i18n';
+import { films } from './kino-site';
 
 export type RoomContents =
   | { project: string }
-  | { page: 'about' | 'contact' | 'writings' | 'colophon' };
+  | { page: 'about' | 'contact' | 'writings' | 'colophon' | 'kino' };
 
 export interface RoomData {
   id: string;
@@ -138,7 +140,7 @@ function contentTitle(c?: RoomContents): { en: string; zh: string } | undefined 
     const p = projects.find((p) => p.slug === c.project);
     return p && { en: p.title, zh: p.titleZh ?? '' };
   }
-  return { about: t.about, contact: t.contact, writings: t.writings, colophon: t.colophon }[c.page];
+  return { about: t.about, contact: t.contact, writings: t.writings, colophon: t.colophon, kino: t.kino }[c.page];
 }
 
 function countBlocks(blocks: Block[]) {
@@ -462,6 +464,8 @@ function roomText(r: Room): string {
   } else if (c && 'page' in c) {
     if (c.page === 'about') sections = about.sections;
     if (c.page === 'contact') sections = contact.sections;
+    // The Kino keeps its films: their titles and notes count.
+    if (c.page === 'kino') extra = films.map((f) => `${f.title} ${f.note ?? ''}`).join(' ');
   }
   const html = sections.flatMap((s) => s.blocks).map((b) =>
     b.type === 'text' ? b.html : b.type === 'marquee' ? b.items.join(' ') : 'caption' in b && b.caption ? b.caption : '',
@@ -784,6 +788,43 @@ function arcPoints(r: RoomData): [number, number][] {
   return [...pts.slice(0, i + 1), ...curve, ...pts.slice(i + 1)];
 }
 
+interface WindowData { line: [number, number, number, number]; code: string; sill: number }
+
+/**
+ * The windows traced from a floor's plan (house3d.json), checked against house.json: each lies
+ * along a wall of a room on its floor that lists its code, and each code a room on that floor
+ * lists is traced once. Width and height come from the code (C1206: 1200 × 600 mm).
+ */
+function tracedWindows() {
+  const all = (details3dJson as unknown as { windows: Record<string, WindowData[]> }).windows ?? {};
+  return Object.entries(all).flatMap(([id, list]) => {
+    const floor = floors.find((f) => f.id === id);
+    if (!floor) throw new Error(`house3d.json: windows on unknown floor "${id}"`);
+    const left = new Map<string, string[]>(floor.rooms.map((r) => [r.id, [...(r.windows ?? [])]]));
+    const out = list.map((w) => {
+      const where = `house3d.json: window ${w.code} [${w.line.join(', ')}] on ${id}`;
+      const size = w.code.match(/^[A-Z]+(\d\d)(\d\d)$/);
+      if (!size) throw new Error(`${where}: a code like C1206 gives its width and height`);
+      const [x0, y0, x1, y1] = w.line;
+      if (x0 !== x1 && y0 !== y1) throw new Error(`${where} is not along x or y`);
+      if (Math.abs(Math.hypot(x1 - x0, y1 - y0) - Number(size[1]) * 100) > 1) throw new Error(`${where} is not ${Number(size[1]) * 100} mm wide`);
+      // The rooms whose walls it lies along (a window can span two rooms' walls, as on the stairs).
+      const along = floor.rooms.filter((r) => edgesOf(roomPoints(r)).some(([a0, b0, a1, b1]) =>
+        y0 === y1
+          ? b0 === b1 && b0 === y0 && Math.max(Math.min(x0, x1), Math.min(a0, a1)) < Math.min(Math.max(x0, x1), Math.max(a0, a1))
+          : a0 === a1 && a0 === x0 && Math.max(Math.min(y0, y1), Math.min(b0, b1)) < Math.min(Math.max(y0, y1), Math.max(b0, b1)),
+      ));
+      const room = along.find((r) => left.get(r.id)!.includes(w.code));
+      if (!room) throw new Error(`${where} is on no wall of a room that lists ${w.code} (on ${along.map((r) => r.id).join(', ') || 'no room'})`);
+      const codes = left.get(room.id)!;
+      codes.splice(codes.indexOf(w.code), 1);
+      return { floor: id, at: w.line, room: room.id, sill: w.sill, height: Number(size[2]) * 100 };
+    });
+    for (const [room, codes] of left) if (codes.length) throw new Error(`house3d.json: ${id}/${room} lists ${codes.join(', ')} in house.json, not traced on ${id}`);
+    return out;
+  });
+}
+
 export function model3d() {
   const m = (v: number) => Math.round(v) / 1000;
   const levels = floors.map((f) => levelMetres(f.level));
@@ -810,6 +851,7 @@ export function model3d() {
       })),
     ),
     walls: floors.flatMap((f) => (f.walls ?? []).map((w) => ({ floor: f.id, at: w.map(m) }))),
+    windows: tracedWindows().map((w) => ({ floor: w.floor, at: w.at.map(m), sill: m(w.sill), height: m(w.height) })),
     passages: floors.flatMap((f) => (f.passages ?? []).map((p) => ({ floor: f.id, id: p.id, points: p.poly.map(([x, y]) => [m(x), m(y)]) }))),
   };
 }

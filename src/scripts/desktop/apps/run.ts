@@ -37,6 +37,7 @@ const ALIASES: [string[], Action][] = [
   [['contact', 'mail', 'email', 'e-mail', 'new message', 'write', '联系', '邮件', '电子邮件', '新邮件', '写信'], { url: '/contact' }],
   [['paint', 'mspaint', 'pbrush', 'paint.exe', 'draw', 'drawing', 'sketch', '画图', '绘图', '画画', '画'], { url: '/paint' }],
   [['guide', 'guides', 'field guide', 'fieldguide', '导览'], { url: '/guides' }],
+  [['kino', 'cinema', 'films', 'film', 'movies', 'video', 'videos', 'media player', 'mplayer', 'mplayer2', '影院', '电影', '影片', '视频', '媒体播放器'], { url: '/kino' }],
   [['house', 'the house', 'facade', 'house.exe', '房子', '立面'], { url: '/house/facade' }],
   [['floorplan', 'floor plan', 'plan', 'map', '平面图', '地图'], { url: '/house' }],
   [['projects', 'project', 'image', 'images', 'work', 'works', 'explorer', 'portfolio', '作品', '图像'], { url: '/image' }],
@@ -59,7 +60,7 @@ const SUGGEST: { en: string; zh: string }[] = [
   { en: 'find', zh: '查找' },
 ];
 
-const STATIC = new Set(['/', '/image', '/image/all', '/about', '/contact', '/paint', '/help', '/guides', '/house', '/house/facade', '/house/appendix/index', '/house/appendix/chronology', '/house/appendix/checklist', '/house/appendix/rules']);
+const STATIC = new Set(['/', '/image', '/image/all', '/about', '/contact', '/paint', '/help', '/guides', '/kino', '/house', '/house/facade', '/house/appendix/index', '/house/appendix/chronology', '/house/appendix/checklist', '/house/appendix/rules']);
 
 const norm = normText;
 

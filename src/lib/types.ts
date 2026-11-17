@@ -22,7 +22,8 @@ export type Block =
   | { type: 'text'; html: string; htmlZh?: string }
   | ({ type: 'image' } & ImageRef)
   | { type: 'gallery'; style: 'slideshow' | 'reel' | 'fullscreen' | 'masonry' | 'strips' | 'grid'; images: ImageRef[] }
-  | { type: 'video'; provider: string; url: string; youtubeId?: string; vimeoId?: string; caption?: string; captionZh?: string }
+  /** A video: `film` shows a card for that Kino film (src/content/kino.json), which plays only in the Kino; otherwise an embed. */
+  | { type: 'video'; film?: string; provider?: string; url?: string; youtubeId?: string; vimeoId?: string; caption?: string; captionZh?: string }
   | { type: 'marquee'; items: string[]; itemsZh?: string[] }
   | { type: 'banner'; images: ImageRef[] }
   | { type: 'contactForm' };

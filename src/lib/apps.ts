@@ -1,7 +1,7 @@
 // The programs of Xiangyin 98 and which URLs open in which program.
 // No Astro imports: this file is also bundled into the browser (the shell).
 
-export type AppId = 'welcome' | 'explorer' | 'about' | 'contact' | 'paint' | 'house' | 'help' | 'guide' | 'admin' | 'error';
+export type AppId = 'welcome' | 'explorer' | 'about' | 'contact' | 'paint' | 'house' | 'help' | 'guide' | 'kino' | 'admin' | 'error';
 
 export interface AppInfo {
   /** Program name, shown in tooltips and Properties. */
@@ -24,6 +24,7 @@ export const APPS: Record<AppId, AppInfo> = {
   house: { name: 'The House', icon: 'house', w: 1100, h: 760, max: true },
   help: { name: 'Help', icon: 'help', w: 800, h: 580 },
   guide: { name: 'Field Guide', icon: 'guide', w: 1100, h: 760, max: true },
+  kino: { name: 'Kino', icon: 'kino', w: 880, h: 700 },
   admin: { name: 'Administration', icon: 'keys', w: 980, h: 680 },
   error: { name: 'Error', icon: 'error', w: 460, h: 300 },
 };
@@ -45,6 +46,7 @@ export function appFor(path: string): AppId {
   if (p === '/house' || p.startsWith('/house/')) return 'house';
   if (p === '/help') return 'help';
   if (p === '/guides' || p.startsWith('/guides/')) return 'guide';
+  if (p === '/kino' || p.startsWith('/kino/')) return 'kino';
   if (p === '/admin' || p.startsWith('/admin/')) return 'admin';
   return 'error';
 }
@@ -58,6 +60,7 @@ export function addressFor(path: string): string {
   if (p === '/paint') return 'C:\\xiangyin\\Paint';
   if (p === '/help') return 'C:\\xiangyin\\Help';
   if (p === '/guides' || p.startsWith('/guides/')) return 'C:\\xiangyin\\Guides' + p.slice('/guides'.length).replace(/\//g, '\\');
+  if (p === '/kino' || p.startsWith('/kino/')) return 'C:\\xiangyin\\Kino' + p.slice('/kino'.length).replace(/\//g, '\\');
   if (p === '/admin' || p.startsWith('/admin/')) return 'C:\\xiangyin\\Administration' + p.slice('/admin'.length).replace(/\//g, '\\');
   return 'C:\\xiangyin' + p.replace(/\//g, '\\');
 }
@@ -71,6 +74,7 @@ export function upOf(url: string): string | null {
   if (p.startsWith('/image/')) return '/image';
   if (p.startsWith('/house/') && p !== '/house/facade') return '/house';
   if (p.startsWith('/admin/')) return '/admin';
+  if (p.startsWith('/kino/')) return '/kino';
   return null;
 }
 

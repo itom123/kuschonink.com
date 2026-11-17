@@ -1,8 +1,19 @@
 {
-  "_comment": "Details for the 3D house (/house/3d), traced from the floor plans and from notes on how the house really is. Millimetres in plan coordinates, like house.json, which holds the doors, the passages and the extra walls (the 2D map draws them too). glazing: floor-to-ceiling windows in a wall (glass doors are doors, in house.json). stairs: the staircases as they are (u: up the east side, across the north, down the west side, round the core; flight: one straight run). wells: holes in a floor where stairs come up, as polygons. cellar: the garage's steps down from the hall, the stair up to the loft, and the loft.",
+  "_comment": "Details for the 3D house (/house/3d), traced from the floor plans and from notes on how the house really is. Millimetres in plan coordinates, like house.json, which holds the doors, the passages and the extra walls (the 2D map draws them too). glazing: floor-to-ceiling windows in a wall (glass doors are doors, in house.json). windows: windows traced from a floor's plan, on a wall of a room that lists the code in house.json (C1206 is 1200 mm wide and 600 mm high, which sets the height); sill: how high above the floor. A floor with traced windows gets no guessed ones. stairs: the staircases as they are (u: up the east side, across the north, down the west side, round the core; flight: one straight run). wells: holes in a floor where stairs come up, as polygons. cellar: the garage's steps down from the hall, the stair up to the loft, and the loft.",
   "glazing": {
     "f1": [
       { "_": "living room onto the porch: a floor-to-ceiling window, left of the glass door M-1", "line": [4000, 13400, 8300, 13400], "kind": "window" }
+    ]
+  },
+  "windows": {
+    "attic": [
+      { "_": "north-west room, west wall, 800 from its north corner", "line": [0, 3600, 0, 4800], "code": "C1206", "sill": 350 },
+      { "_": "the north gable, centred under the ridge, over the stairs", "line": [3150, 2800, 4650, 2800], "code": "C1518", "sill": 900 },
+      { "_": "bathroom, west wall, 500 from its north corner", "line": [0, 6100, 0, 7000], "code": "C0905", "sill": 350 },
+      { "_": "north-east room, north wall, 850 in from each side", "line": [11650, 6200, 13150, 6200], "code": "C1506", "sill": 350 },
+      { "_": "the east gable, centred under the ridge", "line": [14000, 8900, 14000, 10100], "code": "C1215", "sill": 900 },
+      { "_": "east room, south wall, 850 in from each side; the sill is the 7.350 on the south elevation", "line": [11650, 12800, 13150, 12800], "code": "C1506", "sill": 350 },
+      { "_": "west room, south wall, 600 in from each side; the sill is the 7.350 on the south elevation", "line": [600, 12800, 3000, 12800], "code": "C2406", "sill": 350 }
     ]
   },
   "stairs": {

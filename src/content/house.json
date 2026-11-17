@@ -1,5 +1,5 @@
 {
- "_comment": "The house. Rooms are rectangles in millimetres [x, y, width, height] traced from the 2008 renovation drawings. 'contents' decides what is in each room: {project: slug} or {page: about|contact|writings|colophon}. Rooms without contents are only described (inventory). 'locked' rooms cannot be entered. Each floor also lists its 'doors' ({at: [x0, y0, x1, y1] along a wall; kind: door, double, opening, glass, sliding or garage; code: the label on the drawing; hinge: start or end of 'at'; into: the room or passage the leaf swings into}), its 'passages' (floor that is no room: a lobby, a corridor) and its 'walls' (walls the rooms don't draw). The 2D map, the room pages and the 3D model all read these; the build checks every door sits on a wall and every room can be reached.",
+ "_comment": "The house. Rooms are rectangles in millimetres [x, y, width, height] traced from the 2008 renovation drawings. 'contents' decides what is in each room: {project: slug} or {page: about|contact|writings|colophon|kino}. Rooms without contents are only described (inventory). 'locked' rooms cannot be entered. Each floor also lists its 'doors' ({at: [x0, y0, x1, y1] along a wall; kind: door, double, opening, glass, sliding or garage; code: the label on the drawing; hinge: start or end of 'at'; into: the room or passage the leaf swings into}), its 'passages' (floor that is no room: a lobby, a corridor) and its 'walls' (walls the rooms don't draw). The 2D map, the room pages and the 3D model all read these; the build checks every door sits on a wall and every room can be reached.",
  "grid": {
   "columns": [
    0,
@@ -90,7 +90,7 @@
      ],
      "level": "−0.450",
      "contents": {
-      "project": "fragmented-ocean"
+      "page": "kino"
      }
     },
     {
@@ -242,7 +242,10 @@
        10800,
        13400
       ]
-     ]
+     ],
+     "contents": {
+      "project": "fragmented-ocean"
+     }
     },
     {
      "id": "porch",
@@ -1003,8 +1006,16 @@
        5600
       ],
       [
-       10800,
+       7800,
        5600
+      ],
+      [
+       7800,
+       6200
+      ],
+      [
+       10800,
+       6200
       ],
       [
        10800,

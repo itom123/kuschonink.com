@@ -10,7 +10,7 @@
     "subtitle": "8 to 15 November 2026",
     "subtitleZh": "2026年11月8日至15日"
   },
-  "listed": true,
+  "listed": false,
   "kinds": ["photography", "exhibitions"],
   "city": "Paris",
   "cityZh": "巴黎",
@@ -655,5 +655,6 @@
     "priceZh": "摄影节信息中未注明票价；请向场馆确认。",
     "listingNote": "Official-map record. Opening hours and dates may differ from the venue website. Verify before travelling.",
     "listingNoteZh": "官方地图记录。开放时间和日期可能与场馆网站不同。出发前请先核实。"
-  }
+  },
+  "suggestions": false
 }

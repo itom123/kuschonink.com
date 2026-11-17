@@ -4,13 +4,14 @@
 // house3d.json (traced from the plans and from notes on how the house really is).
 // "Blueprint" lays the original drawing on each floor.
 //
-// Not a survey: heights come from the floor levels; the roof, columns and balustrades
-// follow the south elevation and photos of the house.
+// Not a survey: heights come from the floor levels; the roof comes from the roof plan and the
+// south elevation (src/lib/house-shell.ts), and the attic's walls rise to it, gables and all;
+// the columns and balustrades follow the south elevation and photos of the house.
 // Plain three.js, no framework. Same page lifecycle as the 2D map (map.ts).
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { EAVE, GABLES } from '../lib/house-shell';
+import { EAVE, roofOf, type V3 } from '../lib/house-shell';
 import { countLosses, glSummary, onDprChange, showDiag } from './gl-diag';
 
 type Pt = [number, number];
@@ -37,6 +38,8 @@ interface DoorM { floor: string; at: Seg; kind: 'door' | 'double' | 'opening' | 
 interface Data {
   floors: FloorM[]; rooms: RoomM[]; grid: { columns: number[]; rows: number[] }; text: { noDoor: Bi };
   doors: DoorM[]; walls: { floor: string; at: Seg }[]; passages: { floor: string; id: string; points: Pt[] }[];
+  /** Windows traced from the plans (house3d.json, checked against house.json), in metres. */
+  windows: { floor: string; at: Seg; sill: number; height: number }[];
   furniture: Record<string, Furniture[]>; details: Details;
   scans: Record<string, { src: string; x: number; y: number; w: number; h: number }>;
 }
@@ -87,19 +90,22 @@ function inside([x, z]: Pt, poly: Pt[]) {
 const centroid = (r: RoomM): Pt => [r.rect[0] + r.rect[2] / 2, r.rect[1] + r.rect[3] / 2];
 const isZh = () => document.documentElement.dataset.lang === 'zh';
 
-/** The parts of wall a→b (straight along x or z) left after cutting out the openings that lie on it. */
-function cutWall(a: Pt, b: Pt, cuts: Seg[]): { pieces: [Pt, Pt][]; gaps: [number, number][] } {
+/**
+ * The parts of wall a→b (straight along x or z) left after cutting out the openings that lie on it,
+ * and the gaps: [from, to] along the line (x or z), and which of `cuts` made each.
+ */
+function cutWall(a: Pt, b: Pt, cuts: Seg[]): { pieces: [Pt, Pt][]; gaps: [number, number, number][] } {
   const alongX = Math.abs(b[1] - a[1]) < 1e-3, alongZ = Math.abs(b[0] - a[0]) < 1e-3;
   if (!alongX && !alongZ) return { pieces: [[a, b]], gaps: [] };
   const k = alongX ? 0 : 1, fixed = alongX ? a[1] : a[0];
   const lo = Math.min(a[k], b[k]), hi = Math.max(a[k], b[k]);
-  const gaps: [number, number][] = [];
-  for (const [x0, y0, x1, y1] of cuts) {
+  const gaps: [number, number, number][] = [];
+  cuts.forEach(([x0, y0, x1, y1], i) => {
     const onLine = alongX ? Math.abs(y0 - y1) < 1e-3 && Math.abs(y0 - fixed) < 0.15 : Math.abs(x0 - x1) < 1e-3 && Math.abs(x0 - fixed) < 0.15;
-    if (!onLine) continue;
+    if (!onLine) return;
     const c0 = Math.max(lo, Math.min(alongX ? x0 : y0, alongX ? x1 : y1)), c1 = Math.min(hi, Math.max(alongX ? x0 : y0, alongX ? x1 : y1));
-    if (c1 - c0 > 0.05) gaps.push([c0, c1]);
-  }
+    if (c1 - c0 > 0.05) gaps.push([c0, c1, i]);
+  });
   gaps.sort((p, q) => p[0] - q[0]);
   const at = (v: number): Pt => (alongX ? [v, fixed] : [fixed, v]);
   const pieces: [Pt, Pt][] = [];
@@ -206,6 +212,13 @@ function init() {
     wood: lambert(C.wood), furniture: lambert(C.furniture), locked: lambert(C.locked), ground: lambert(C.ground),
     roof: lambert(C.roof, { side: THREE.DoubleSide }), gable: lambert(C.brick, { side: THREE.DoubleSide }),
     glass: lambert(C.glass), floor: lambert(C.floor), door: lambert(C.door),
+    // Brick for the attic's gables, whose shapes are drawn in metres.
+    gableBrick: (() => {
+      const map = brickTex.clone();
+      map.repeat.set(1 / 1.2, 1 / 0.6);
+      map.needsUpdate = true;
+      return new THREE.MeshLambertMaterial({ map });
+    })(),
     pane: new THREE.MeshLambertMaterial({ color: 0x9fb6c2, transparent: true, opacity: 0.35, depthWrite: false, side: THREE.DoubleSide }),
     line: new THREE.LineBasicMaterial({ color: C.line }),
     edge: new THREE.LineBasicMaterial({ color: C.edge }),
@@ -248,14 +261,32 @@ function init() {
   const topRoomFloor = data.floors[data.floors.length - 2];
   const roomBySlug = new Map(data.rooms.map((r) => [r.slug, r]));
   const fullFor = (f: FloorM) => Math.min(FULL, Math.max(0.5, f.storey - 0.25));
+  const roof = roofOf(roofFloor.level);
+  /**
+   * How high a wall standing at (x, z) on floor f can rise and stay under the roof, all
+   * through its thickness: 10 cm below it (any closer, and the gables flecked the roof in
+   * Chrome's software renderer). Just outside the roof's edge, as high as the eaves.
+   */
+  function underRoof(f: FloorM, x: number, z: number) {
+    let low = Infinity;
+    for (const [dx, dz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) low = Math.min(low, roof.at(x + (dx * THICK) / 2, z + (dz * THICK) / 2) ?? EAVE);
+    return low - 0.1 - f.level;
+  }
 
-  /** `extra`: how much lower one side's floor is than the other's; the wall reaches down to it. */
-  interface Wall { mesh: THREE.Mesh; floor: string; map?: THREE.Texture; extra: number }
+  /**
+   * `extra`: how much lower one side's floor is than the other's; the wall reaches down to it.
+   * `knee`: on the attic, how high it stands with the roof on (its gable, if any, rises above).
+   */
+  interface Wall { mesh: THREE.Mesh; floor: string; map?: THREE.Texture; extra: number; knee?: number }
   const walls: Wall[] = [];
   interface FloorParts {
     group: THREE.Group; labels: CSS2DObject[];
     /** Windows, glazing, lintels and corner stones: shown only while the floor's walls stand at full height. */
     tall: THREE.Group;
+    /** The attic's walls above the knee, up to the roof: shown with the roof on. */
+    gables: THREE.Group;
+    /** Walls with their knee heights, to find what a door's lintel meets on the attic. */
+    runs: { a: Pt; b: Pt; knee: number }[];
     blueprint?: THREE.Mesh;
   }
   const parts = new Map<string, FloorParts>();
@@ -265,8 +296,9 @@ function init() {
     group.position.y = f.level;
     scene.add(group);
     const tall = new THREE.Group();
-    group.add(tall);
-    parts.set(f.id, { group, labels: [], tall });
+    const gables = new THREE.Group();
+    group.add(tall, gables);
+    parts.set(f.id, { group, labels: [], tall, gables, runs: [] });
   }
 
   // house3d.json in metres; doors, passages and extra walls (house.json) come in metres already.
@@ -312,6 +344,34 @@ function init() {
     return mesh;
   }
 
+  /**
+   * Where the floor below has a room or passage and floor f has neither, as rectangles
+   * [x0, z0, x1, z1]: cut on every corner of either floor, then joined along x.
+   */
+  function uncovered(below: FloorM, f: FloorM) {
+    const shapes = (id: string, indoorOnly: boolean) => [
+      ...data.rooms.filter((r) => r.floor === id && !(indoorOnly && r.outdoor)).map((r) => r.points),
+      ...passagesOf(id).map((p) => p.points),
+    ];
+    const under = shapes(below.id, true), over = shapes(f.id, false);
+    const cuts = (k: 0 | 1) => [...new Set([...under, ...over].flat().map((p) => Math.round(p[k] * 1000) / 1000))].sort((a, b) => a - b);
+    const xs = cuts(0), zs = cuts(1);
+    const out: [number, number, number, number][] = [];
+    for (let j = 0; j < zs.length - 1; j++) {
+      let run: [number, number] | null = null;
+      for (let k = 0; k < xs.length - 1; k++) {
+        const c: Pt = [(xs[k] + xs[k + 1]) / 2, (zs[j] + zs[j + 1]) / 2];
+        const open = under.some((p) => inside(c, p)) && !over.some((p) => inside(c, p));
+        if (open) run = [run?.[0] ?? xs[k], xs[k + 1]];
+        if (run && (!open || k === xs.length - 2)) {
+          out.push([run[0], zs[j], run[1], zs[j + 1]]);
+          run = null;
+        }
+      }
+    }
+    return out;
+  }
+
   /** Floor that is no room (the first floor's lobby, the attic corridor). */
   function passageSlab(points: Pt[]) {
     const shape = new THREE.Shape(points.map(([x, z]) => new THREE.Vector2(x, -z)));
@@ -337,9 +397,9 @@ function init() {
   interface Piece { a: Pt; b: Pt; nx: number; nz: number; exterior: boolean; base: number; extra: number; windows: boolean; extA: boolean; extB: boolean }
 
   /**
-   * Every wall on a floor, once: the rooms' edges and the extra walls, split where they meet so
-   * no two walls overlap (overlapping faces flicker), then joined again where they're alike.
-   * A wall with an outdoor room or nothing on one side is an outside wall.
+   * Every wall on a floor, once: the rooms' and passages' edges and the extra walls, split where
+   * they meet so no two walls overlap (overlapping faces flicker), then joined again where
+   * they're alike. A wall with an outdoor room or nothing on one side is an outside wall.
    */
   function wallPieces(f: FloorM): Piece[] {
     const lines = new Map<string, { alongX: boolean; at: number; spans: [number, number, boolean][] }>();
@@ -357,6 +417,7 @@ function init() {
       if (r.floor !== f.id || r.outdoor || r.locked) continue;
       r.points.forEach((p, i) => add(p, r.points[(i + 1) % r.points.length], false));
     }
+    for (const { points } of passagesOf(f.id)) points.forEach((p, i) => add(p, points[(i + 1) % points.length], false));
     for (const w of data.walls) if (w.floor === f.id) add([w.at[0], w.at[1]], [w.at[2], w.at[3]], true);
 
     const out: Piece[] = [];
@@ -401,20 +462,130 @@ function init() {
     return out;
   }
 
-  /** A wall with its doors and windows cut out: wall pieces, and a guessed window in long outside pieces. */
+  /**
+   * A wall with its doors and windows cut out: wall pieces, and a guessed window in long outside
+   * pieces (unless the floor's windows are traced). On the attic it rises to the roof.
+   */
   function wallRun(f: FloorM, p: Piece) {
     const { group, tall } = parts.get(f.id)!;
-    const cuts = [...doorsOf(f.id).map((d) => d.at), ...glazingOf(f.id).map((g) => g.line)];
-    const { pieces } = cutWall(p.a, p.b, cuts);
+    const openings = [
+      ...doorsOf(f.id).map((d) => ({ at: d.at, height: d.height })),
+      ...glazingOf(f.id).map((g) => ({ at: g.line, height: GLAZED })),
+    ];
+    const { pieces, gaps } = cutWall(p.a, p.b, openings.map((o) => o.at));
     const same = (u: Pt, v: Pt) => Math.abs(u[0] - v[0]) < 1e-6 && Math.abs(u[1] - v[1]) < 1e-6;
     // Pieces come back west to east (north to south); find which end of the run each touches.
     const lo = p.a[0] + p.a[1] <= p.b[0] + p.b[1] ? { at: p.a, ext: p.extA } : { at: p.b, ext: p.extB };
     const hi = lo.at === p.a ? { at: p.b, ext: p.extB } : { at: p.a, ext: p.extA };
+    // Heads of the openings, measured from the higher floor, as doorway() does.
+    const heads = gaps.map(([c0, c1, i]) => {
+      const mid: Pt = Math.abs(p.a[1] - p.b[1]) < 1e-3 ? [(c0 + c1) / 2, p.a[1]] : [p.a[0], (c0 + c1) / 2];
+      return { c0, c1, head: sidesOf(f, mid, p.nx, p.nz).high + openings[i].height };
+    });
+    const knee = f === topRoomFloor ? gableOn(f, p, lo, hi, heads) : undefined;
+    const guess = !data.windows.some((w) => w.floor === f.id);
     for (const [q0, q1] of pieces) {
-      wall(group, f.id, q0, q1, p.nx, p.nz, p.exterior, p.base, p.extra, same(q0, lo.at) && lo.ext, same(q1, hi.at) && hi.ext);
+      wall(group, f.id, q0, q1, p.nx, p.nz, p.exterior, p.base, p.extra, same(q0, lo.at) && lo.ext, same(q1, hi.at) && hi.ext, knee);
       const len = Math.hypot(q1[0] - q0[0], q1[1] - q0[1]);
-      if (p.windows && p.exterior && len >= 2.4) tall.add(windowOn([(q0[0] + q1[0]) / 2, (q0[1] + q1[1]) / 2], Math.atan2(-(q1[1] - q0[1]), q1[0] - q0[0]), p.nx, p.nz, len, p.base));
+      if (guess && p.windows && p.exterior && len >= 2.4) {
+        tall.add(windowOn([(q0[0] + q1[0]) / 2, (q0[1] + q1[1]) / 2], Math.atan2(-(q1[1] - q0[1]), q1[0] - q0[0]), p.nx, p.nz, Math.min(1.8, len * 0.45), 1.4, p.base + 0.9));
+      }
     }
+  }
+
+  /**
+   * An attic wall's gable: the wall above its knee, up to the roof's underside, with the
+   * openings whose heads reach above the knee cut out of it. Shown with the roof on.
+   * Returns the knee: how high the wall stands below its gable, above the floor.
+   */
+  function gableOn(f: FloorM, p: Piece, lo: { at: Pt; ext: boolean }, hi: { at: Pt; ext: boolean }, heads: { c0: number; c1: number; head: number }[]) {
+    const len = Math.hypot(hi.at[0] - lo.at[0], hi.at[1] - lo.at[1]);
+    const ux = (hi.at[0] - lo.at[0]) / len, uz = (hi.at[1] - lo.at[1]) / len;
+    // Along the wall from its west (or north) end, running on into the corners like wall() does.
+    const u0 = lo.ext ? -THICK / 2 : 0, u1 = len + (hi.ext ? THICK / 2 : 0);
+    const top = (u: number) => underRoof(f, lo.at[0] + ux * u, lo.at[1] + uz * u);
+    const along = (a: number, b: number) => {
+      const n = Math.max(1, Math.ceil((b - a) / 0.1));
+      return Array.from({ length: n + 1 }, (_, k) => a + ((b - a) * k) / n);
+    };
+    const knee = Math.min(...along(u0, u1).map(top));
+    const { gables, runs } = parts.get(f.id)!;
+    runs.push({ a: lo.at, b: hi.at, knee });
+    if (Math.max(...along(u0, u1).map(top)) - knee < 0.02) return knee; // a knee wall under the eaves: nothing above
+
+    // Openings reaching above the knee: a notch if they stop below the roof, else the gable splits.
+    const start0 = Math.abs(ux) > 0.5 ? lo.at[0] : lo.at[1];
+    const V = (u: number, y: number) => new THREE.Vector2(u, y);
+    const shapes: THREE.Shape[] = [];
+    let from = u0;
+    let notches: { g0: number; g1: number; head: number }[] = [];
+    const close = (to: number) => {
+      if (to - from > 0.02) {
+        const pts = [V(from, knee)];
+        for (const o of notches) pts.push(V(o.g0, knee), V(o.g0, o.head), V(o.g1, o.head), V(o.g1, knee));
+        pts.push(V(to, knee), ...along(from, to).reverse().map((u) => V(u, Math.max(knee, top(u)))));
+        shapes.push(new THREE.Shape(pts));
+      }
+      notches = [];
+    };
+    for (const { c0, c1, head } of heads.sort((m, o) => m.c0 - o.c0)) {
+      if (head <= knee + 0.01) continue;
+      const g0 = c0 - start0, g1 = c1 - start0;
+      if (head < Math.min(...along(g0, g1).map(top)) - 0.05) notches.push({ g0, g1, head });
+      else {
+        close(g0);
+        from = g1;
+      }
+    }
+    close(u1);
+    if (!shapes.length) return knee;
+
+    const geo = new THREE.ExtrudeGeometry(shapes, { depth: THICK, bevelEnabled: false }).translate(0, 0, -THICK / 2);
+    // Each shape's two faces come as one group (the back, then the front), its edges as another.
+    const groups = geo.groups.slice();
+    geo.clearGroups();
+    for (const g of groups) {
+      if (g.materialIndex === 0) {
+        geo.addGroup(g.start, g.count / 2, 0);
+        geo.addGroup(g.start + g.count / 2, g.count / 2, 1);
+      } else geo.addGroup(g.start, g.count, 2);
+    }
+    const dx = hi.at[0] - lo.at[0], dz = hi.at[1] - lo.at[1];
+    const plusZOut = -dz * p.nx + dx * p.nz > 0;
+    const outside = p.exterior ? M.gableBrick : M.wall;
+    const mesh = new THREE.Mesh(geo, [plusZOut ? M.wall : outside, plusZOut ? outside : M.wall, M.cream]);
+    mesh.rotation.y = Math.atan2(-dz, dx);
+    mesh.position.set(lo.at[0], 0, lo.at[1]);
+    mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), M.edge));
+    gables.add(mesh);
+    return knee;
+  }
+
+  /** On the attic, how high the wall a door is in stands below its gable. */
+  function kneeAt(f: FloorM, [x0, z0, x1, z1]: Seg) {
+    const mx = (x0 + x1) / 2, mz = (z0 + z1) / 2;
+    for (const { a, b, knee } of parts.get(f.id)!.runs) {
+      const alongX = Math.abs(a[1] - b[1]) < 1e-6;
+      const onLine = alongX ? Math.abs(z0 - z1) < 1e-3 && Math.abs(mz - a[1]) < 0.15 : Math.abs(x0 - x1) < 1e-3 && Math.abs(mx - a[0]) < 0.15;
+      const [v, p, q] = alongX ? [mx, a[0], b[0]] : [mz, a[1], b[1]];
+      if (onLine && v > Math.min(p, q) && v < Math.max(p, q)) return knee;
+    }
+    return null;
+  }
+
+  /** A window traced from the plan, on the outside face of its wall. */
+  function tracedWindow(f: FloorM, w: Data['windows'][number]) {
+    const [x0, z0, x1, z1] = w.at;
+    const len = Math.hypot(x1 - x0, z1 - z0);
+    const mid: Pt = [(x0 + x1) / 2, (z0 + z1) / 2];
+    let nx = (z1 - z0) / len, nz = -(x1 - x0) / len;
+    // Facing out, away from the room it lights.
+    if (indoorAt(spaceAt(f.id, [mid[0] + nx * 0.3, mid[1] + nz * 0.3]))) {
+      nx = -nx;
+      nz = -nz;
+    }
+    const { high } = sidesOf(f, mid, nx, nz);
+    return windowOn(mid, Math.atan2(-(z1 - z0), x1 - x0), nx, nz, len, w.height, high + w.sill);
   }
 
   data.floors.forEach((f, i) => {
@@ -427,7 +598,10 @@ function init() {
       group.add(slabMesh(r, f, i));
       group.add(outline(r.points, rel + 0.005));
       if (r.locked) {
-        group.add(edged(M.locked, r.rect[2], 2.2, r.rect[3], r.rect[0] + r.rect[2] / 2, rel, r.rect[1] + r.rect[3] / 2));
+        // Under the roof on the attic.
+        const [x, z, w, d] = r.rect;
+        const h = f === topRoomFloor ? Math.min(2.2, ...r.points.map(([px, pz]) => underRoof(f, px, pz) - rel)) : 2.2;
+        group.add(edged(M.locked, w, h, d, x + w / 2, rel, z + d / 2));
         continue;
       }
       if (r.outdoor) {
@@ -443,7 +617,7 @@ function init() {
           const out: Pt = [mid[0] + nx * 0.3, mid[1] + nz * 0.3];
           if (!here.some((o) => o !== r && inside(out, o.points))) balustrade(group, a, b, rel);
         }
-      } else addQuoins(f.id, r, indoorShapes, rel, fullFor(f));
+      } else addQuoins(f.id, r, indoorShapes, rel, (x, z) => (f === topRoomFloor ? Math.min(fullFor(f), underRoof(f, x, z) - rel) : fullFor(f)));
       for (const fu of data.furniture[r.slug] ?? []) group.add(cabinet(fu, rel));
       if (r.contents || r.stairs) {
         const el = document.createElement('div');
@@ -460,7 +634,10 @@ function init() {
       group.add(passageSlab(p.points));
       group.add(outline(p.points, 0.005));
     }
+    // The attic's floor runs on over the rooms below where it has none, under its eaves.
+    if (f === topRoomFloor) for (const [x0, z0, x1, z1] of uncovered(data.floors[i - 1], f)) group.add(edged(M.floor, x1 - x0, 0.2, z1 - z0, (x0 + x1) / 2, -0.2, (z0 + z1) / 2));
     for (const p of wallPieces(f)) wallRun(f, p);
+    for (const w of data.windows) if (w.floor === f.id) parts.get(f.id)!.tall.add(tracedWindow(f, w));
     for (const d of doorsOf(f.id)) doorway(f, d.at, d.kind, d.height, d.hinge, d.normal);
     for (const g of glazingOf(f.id)) doorway(f, g.line, 'window', GLAZED, null, [0, 0]);
     if (D.stairs.u?.from === f.id) group.add(uStair(floorById(D.stairs.u.to).level - f.level));
@@ -473,7 +650,7 @@ function init() {
    * One wall from a to b: brick outside if it's an outside wall, white inside, a cream top.
    * It runs on by half its thickness at an end that meets no other wall on the same line (to fill the corner).
    */
-  function wall(group: THREE.Group, floor: string, a: Pt, b: Pt, nx: number, nz: number, exterior: boolean, rel: number, extra: number, extA: boolean, extB: boolean) {
+  function wall(group: THREE.Group, floor: string, a: Pt, b: Pt, nx: number, nz: number, exterior: boolean, rel: number, extra: number, extA: boolean, extB: boolean, knee?: number) {
     const dx = b[0] - a[0], dz = b[1] - a[1];
     const len0 = Math.hypot(dx, dz);
     const ux = dx / len0, uz = dz / len0;
@@ -492,7 +669,7 @@ function init() {
     mesh.scale.set(len, LOW + extra, 1);
     mesh.add(new THREE.LineSegments(wallEdges, M.edge));
     group.add(mesh);
-    walls.push({ mesh, floor, map: brick?.map ?? undefined, extra });
+    walls.push({ mesh, floor, map: brick?.map ?? undefined, extra, knee });
   }
 
   /**
@@ -509,7 +686,8 @@ function init() {
     const [nx, nz] = alongX ? [0, 1] : [1, 0];
     const { base, high, exterior } = sidesOf(f, mid, nx, nz);
     // The opening is measured from the higher floor (you step down into the lower room).
-    const head = high + height, top = high + fullFor(f);
+    // On the attic the lintel meets the wall's gable (or the roof, over a knee wall).
+    const head = high + height, top = (f === topRoomFloor ? kneeAt(f, at) : null) ?? high + fullFor(f);
     if (top > head + 0.02) {
       const lintel = new THREE.Mesh(wallBox, exterior ? brickFor(w, top - head) : M.wall);
       lintel.rotation.y = alongX ? 0 : Math.PI / 2;
@@ -626,11 +804,13 @@ function init() {
     return g;
   }
 
-  /** A window with a cream frame and a cross bar, on the outside face of a wall. */
-  function windowOn(mid: Pt, theta: number, nx: number, nz: number, len: number, rel: number) {
-    const w = Math.min(1.8, len * 0.45), h = 1.4, sill = 0.9;
+  /**
+   * A window `w` wide and `h` high, its sill `sill` above the storey, on the outside face of a
+   * wall: a cream frame, a mullion, and a transom if it's tall.
+   */
+  function windowOn(mid: Pt, theta: number, nx: number, nz: number, w: number, h: number, sill: number) {
     const win = new THREE.Group();
-    win.position.set(mid[0] + nx * (THICK / 2 + 0.02), rel + sill + h / 2, mid[1] + nz * (THICK / 2 + 0.02));
+    win.position.set(mid[0] + nx * (THICK / 2 + 0.02), sill + h / 2, mid[1] + nz * (THICK / 2 + 0.02));
     win.rotation.y = theta;
     const box = (mat: THREE.Material, sx: number, sy: number, sz: number, py = 0) => {
       const m = new THREE.Mesh(unitBox, mat);
@@ -641,21 +821,22 @@ function init() {
     box(M.cream, w + 0.26, h + 0.26, 0.05);
     box(M.glass, w, h, 0.07);
     box(M.cream, 0.06, h, 0.09);
-    box(M.cream, w, 0.06, 0.09, h * 0.18);
+    if (h >= 1) box(M.cream, w, 0.06, 0.09, h * 0.18);
     return win;
   }
 
-  /** Corner stones (quoins) at the outside corners, alternating long and short. */
-  function addQuoins(floor: string, r: RoomM, indoor: Pt[][], rel: number, height: number) {
+  /** Corner stones (quoins) at the outside corners, alternating long and short, up to height(corner). */
+  function addQuoins(floor: string, r: RoomM, indoor: Pt[][], rel: number, height: (x: number, z: number) => number) {
     if (r.points.length !== 4) return;
     const [x, z, w, d] = r.rect;
     for (const [vx, vz, sx, sz] of [[x, z, -1, -1], [x + w, z, 1, -1], [x + w, z + d, 1, 1], [x, z + d, -1, 1]]) {
       const free = (p: Pt) => !indoor.some((o) => inside(p, o));
       if (!free([vx + sx * 0.4, vz + sz * 0.4]) || !free([vx + sx * 0.4, vz - sz * 0.4]) || !free([vx - sx * 0.4, vz + sz * 0.4])) continue;
-      const n = Math.floor(height / 0.3);
+      const edge = THICK / 2 + 0.03;
+      const n = Math.floor(height(vx + sx * edge, vz + sz * edge) / 0.3);
+      if (n < 1) continue;
       const inst = new THREE.InstancedMesh(unitBox, M.stone, n);
       const m4 = new THREE.Matrix4();
-      const edge = THICK / 2 + 0.03;
       for (let j = 0; j < n; j++) {
         const bx = j % 2 ? 0.55 : 0.32, bz = j % 2 ? 0.32 : 0.55;
         m4.compose(new THREE.Vector3(vx + sx * (edge - bx / 2), rel + j * 0.3, vz + sz * (edge - bz / 2)), new THREE.Quaternion(), new THREE.Vector3(bx, 0.27, bz));
@@ -780,63 +961,47 @@ function init() {
       col('f1', x, 14.85, -0.4, f2Level - 0.1); // the porch
       col('f2', x, 14.4, f2Level - 0.1, atticLevel - 0.1); // the south balcony, under the attic terrace
     }
+    // The east balcony, as in the photo; its flat roof is level with the attic's floor, as on the elevation.
     for (const z of [5.3, 8.5]) {
       col('f1', 16.35, z, GROUND - 0.05, f2Level - 0.1);
-      col('f2', 16.35, z, f2Level - 0.1, EAVE + 0.1); // the east balcony, as in the photo
+      col('f2', 16.35, z, f2Level - 0.1, atticLevel - 0.1);
     }
-    parts.get('f2')!.group.add(edged(M.cream, 2.9, 0.22, 4.1, 15.45, EAVE - f2Level, 6.9));
+    parts.get('f2')!.group.add(edged(M.cream, 2.9, 0.22, 4.1, 15.45, atticLevel - 0.22 - f2Level, 6.9));
   }
 
-  // ---- The roof: two gables facing east and one facing south ----
+  // ---- The roof, from the roof plan: three gables and the valleys where they meet ----
+  // The attic's walls make its gable ends; the one over the terrace, with no wall, is filled in.
   {
     const g = parts.get(roofFloor.id)!.group;
-    const base = EAVE - roofFloor.level;
-    for (const r of GABLES) gable(g, r.x[0], r.x[1], r.z[0], r.z[1], r.axis, base, r.ridge);
-    const roof = data.rooms.find((r) => r.floor === roofFloor.id);
+    const rel = ([x, y, z]: V3) => [x, y - roofFloor.level, z];
+    const mesh = (tris: V3[], mat: THREE.Material) => {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(tris.flatMap(rel), 3));
+      geo.computeVertexNormals();
+      g.add(new THREE.Mesh(geo, mat));
+    };
+    // Each piece is convex: fan it out from its middle, so every edge stays whole.
+    const fan = (poly: V3[]) => {
+      const c = [0, 1, 2].map((k) => poly.reduce((sum, p) => sum + p[k], 0) / poly.length) as V3;
+      return poly.flatMap((p, i) => [c, p, poly[(i + 1) % poly.length]]);
+    };
+    mesh(roof.slopes.flatMap((sl) => sl.pieces.flatMap(fan)), M.roof);
+    mesh(roof.ends.filter((e) => e.open).flatMap((e) => e.pts), M.gable);
+    // Its ridges and valleys, a little above the surface so they don't flicker in and out of it.
+    const lines = new THREE.BufferGeometry();
+    lines.setAttribute('position', new THREE.Float32BufferAttribute(roof.slopes.flatMap((sl) => sl.edges.flat().flatMap(([x, y, z]) => rel([x, y + 0.02, z]))), 3));
+    g.add(new THREE.LineSegments(lines, M.line));
+    for (const [a, b] of roof.trims) beam(g, rel(a), rel(b));
+    const top = data.rooms.find((r) => r.floor === roofFloor.id);
     g.traverse((o) => {
-      if ((o as THREE.Mesh).isMesh && roof) {
-        o.userData = { slug: roof.slug, roof: true };
+      if ((o as THREE.Mesh).isMesh && top) {
+        o.userData = { slug: top.slug, roof: true };
         slabs.push(o as THREE.Mesh);
       }
     });
   }
 
-  /** A pitched roof over [x0..x1] × [z0..z1], ridge along `axis`, boards along its edges. */
-  function gable(g: THREE.Group, x0: number, x1: number, z0: number, z1: number, axis: 'x' | 'z', eave: number, ridge: number) {
-    const v = (x: number, y: number, z: number) => [x, y, z];
-    let planes: number[][][], ends: number[][][];
-    if (axis === 'x') {
-      const zm = (z0 + z1) / 2;
-      planes = [
-        [v(x0, eave, z0), v(x1, eave, z0), v(x1, ridge, zm), v(x0, ridge, zm)],
-        [v(x0, ridge, zm), v(x1, ridge, zm), v(x1, eave, z1), v(x0, eave, z1)],
-      ];
-      ends = [[v(x0, eave, z0), v(x0, ridge, zm), v(x0, eave, z1)], [v(x1, eave, z0), v(x1, ridge, zm), v(x1, eave, z1)]];
-    } else {
-      const xm = (x0 + x1) / 2;
-      planes = [
-        [v(x0, eave, z0), v(xm, ridge, z0), v(xm, ridge, z1), v(x0, eave, z1)],
-        [v(xm, ridge, z0), v(x1, eave, z0), v(x1, eave, z1), v(xm, ridge, z1)],
-      ];
-      ends = [[v(x0, eave, z0), v(xm, ridge, z0), v(x1, eave, z0)], [v(x0, eave, z1), v(xm, ridge, z1), v(x1, eave, z1)]];
-    }
-    const quad = (q: number[][]) => [...q[0], ...q[1], ...q[2], ...q[0], ...q[2], ...q[3]];
-    const mk = (pos: number[], mat: THREE.Material) => {
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-      geo.computeVertexNormals();
-      g.add(new THREE.Mesh(geo, mat));
-      g.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), M.line));
-    };
-    mk(planes.flatMap(quad), M.roof);
-    mk(ends.flatMap((t) => t.flat()), M.gable);
-    for (const t of ends) {
-      beam(g, t[0], t[1]);
-      beam(g, t[1], t[2]);
-    }
-    beam(g, ends[0][0], ends[1][0]);
-    beam(g, ends[0][2], ends[1][2]);
-  }
+  /** A board along the roof's edge from p to q. */
   function beam(g: THREE.Group, p: number[], q: number[]) {
     const a = new THREE.Vector3(p[0], p[1], p[2]), b = new THREE.Vector3(q[0], q[1], q[2]);
     const m = new THREE.Mesh(beamGeo, M.cream);
@@ -904,17 +1069,16 @@ function init() {
       const p = parts.get(f.id)!;
       p.group.visible = i <= si;
       for (const l of p.labels) l.visible = !whole && i === si;
-      p.tall.visible = whole ? f !== topRoomFloor : i < si;
+      p.tall.visible = whole || i < si;
+      p.gables.visible = whole;
       const fromY = p.group.position.y, toY = floorY(f);
       tween(ms, (e) => (p.group.position.y = fromY + (toY - fromY) * e));
     });
     for (const w of walls) {
       const f = floorById(w.floor);
       const i = floorIndex.get(f.id)!;
-      let h = fullFor(f);
-      if (whole && f === topRoomFloor) h = EAVE - f.level; // under the roof
-      else if (!whole && i === si) h = LOW;
-      h += w.extra;
+      let h = (!whole && i === si ? LOW : fullFor(f)) + w.extra;
+      if (whole && w.knee !== undefined) h = w.knee - w.mesh.position.y; // the attic's walls, up to their gables
       const from = w.mesh.scale.y;
       if (Math.abs(from - h) < 0.01) continue;
       tween(ms, (e) => {

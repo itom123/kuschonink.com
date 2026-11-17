@@ -1,0 +1,43 @@
+{
+  "_comment": "Kino (/kino): the films shown in the cinema, in showing order. Each film plays from its 'stream' (protected HLS on Cloudflare R2, made by scripts/kino/encode.mjs and uploaded by scripts/kino/upload.mjs) when it has one, otherwise from 'youtubeId'. 'seconds' is the film's length; 'project' links its project page. Text fields have a Chinese twin (titleZh, noteZh). How to add a film: docs/KINO.md.",
+  "films": [
+    {
+      "id": "anterior-future",
+      "title": "Anterior Future",
+      "titleZh": "先将来",
+      "project": "anterior-future",
+      "note": "A look at my mother's family through the 10,000 photographs my grandfather left when he died.",
+      "noteZh": "透过外公生前留下的一万张老照片，回看我的母系家族。",
+      "youtubeId": "-esHL68qDgo"
+    },
+    {
+      "id": "sisyphus-flower",
+      "title": "Sisyphus Flower",
+      "titleZh": "西西弗斯之花",
+      "project": "sisyphus-flower",
+      "youtubeId": "cJwi4CwG0XM"
+    },
+    {
+      "id": "fragmented-ocean",
+      "title": "Fragmented Ocean",
+      "titleZh": "破碎的海洋",
+      "year": 2022,
+      "seconds": 51,
+      "project": "fragmented-ocean",
+      "note": "Installation space. The work as shown in <i>After the Waiting Room</i>.",
+      "noteZh": "装置空间。作品在“After the Waiting Room”中的现场记录。",
+      "youtubeId": "S-m6E3DIjgI"
+    },
+    {
+      "id": "an-entangled-past",
+      "title": "An Entangled Past",
+      "titleZh": "纠缠的过往",
+      "year": 2022,
+      "seconds": 35,
+      "project": "an-entangled-past",
+      "note": "Installation space at RCA 2022: <i>Gestalt Lost in Time</i> (book), <i>An Entangled Past</i> (triptych print) and <i>Fragmented Ocean</i> (installation).",
+      "noteZh": "RCA 2022 的装置空间：《迷失于时间的格式塔》（书）、《纠缠的过往》（三联版画）和《破碎的海洋》（装置）。",
+      "youtubeId": "3W6kb9AmRPw"
+    }
+  ]
+}

@@ -23,8 +23,9 @@ separate, hidden log-on for admin mode, checked on the server
 ([`docs/ADMIN.md`](docs/ADMIN.md)).
 
 - **The desktop**: icons for My Computer, Projects, The House, About.doc,
-  Contact, Help, Instagram and the Recycle Bin. Double-click to open; drag to
-  arrange; right-click almost anything for a menu (press and hold on a phone).
+  Contact, Paint, Kino, Field Guide, Help, Instagram and the Recycle Bin.
+  Double-click to open; drag to arrange; right-click almost anything for a
+  menu (press and hold on a phone).
 - **Windows** move, resize, minimise and maximise, and each has a button on the
   taskbar. The **Start menu** reaches every page, plus Find, Run, Help, the
   Control Panel, Log Off and Shut Down.
@@ -33,9 +34,10 @@ separate, hidden log-on for admin mode, checked on the server
   with an Image Viewer for the photographs), About.doc (`/about`, a document),
   Contact (`/contact`, a New Message window), Paint (`/paint`, for drawing
   something and sending it to the artist), The House (`/house/…`, a browser
-  window), Field Guide (`/guides`, behind passwords) and Help (`/help`).
-- **Pictures can't be saved.** The photographs and drawings are protected by
-  copyright: no right-click, press-and-hold or drag will save one, and
+  window), Kino (`/kino`, the films at full quality), Field Guide (`/guides`,
+  behind passwords) and Help (`/help`).
+- **Pictures and films can't be saved.** The photographs, drawings and films
+  are protected by copyright: no right-click, press-and-hold or drag will save one, and
   *Save Picture As...* (and *Save* in the Image Viewer) says why. What a
   visitor draws in Paint is theirs to keep, and admin mode is left alone. See
   [`docs/DESKTOP.md`](docs/DESKTOP.md#pictures-cant-be-saved).
@@ -111,11 +113,19 @@ walls come from `house.json`, shared with the plan. Doors have frames and leaves
 open the way they swing, with the swing marked on the floor; the garage has its car door;
 glass and sliding doors are glazed. Each wall is built once, brick outside and white
 inside. The rest is traced from the drawings into `src/content/house3d.json`: the living
-room's picture window, the stairs (a wooden U round the core from the ground floor to the
-first floor, then a straight flight to the attic; none to the roof), the stairwells, and
-the garage as a cellar a few steps down from the hall with a small stair up to a narrow
-loft. Edit that file to correct a stair. The roof, columns, balustrades and
-corner stones are approximations from the south elevation and photos of the house.
+room's picture window, the attic's seven windows (where the attic plan puts them, sized by
+their codes: small ones under the eaves, a tall one in the north and east gables), the
+stairs (a wooden U round the core from the ground floor to the first floor, then a straight
+flight to the attic; none to the roof), the stairwells, and the garage as a cellar a few
+steps down from the hall with a small stair up to a narrow loft. Edit that file to correct
+a stair or a window; the build stops if a window isn't on a wall of a room that lists its
+code in `house.json`, or if, on a floor with traced windows, a code a room lists isn't
+traced. Floors without traced windows get a guessed one in each long outside wall. The roof follows the roof plan and the south elevation
+(`src/lib/house-shell.ts`): a main roof east to west, a wing running north into it and a
+gable over the attic terrace, all with ridges at 11.160 and eaves at 8.050. The attic's
+walls rise to it, so it stands a full storey: knee walls about 1.35 m high under the eaves,
+gables east, west and north. The columns, balustrades and corner stones are approximations
+from the south elevation and photos of the house.
 Both 3D views (this page and the small turning house on the floorplan) redraw when
 Chrome drops and restores their graphics context (a GPU process restart, a driver reset,
 sleep, GPU memory running short) and when the device pixel ratio changes (another monitor,
@@ -310,6 +320,36 @@ choices and custom colours are in `localStorage` (`kus98:paint`).
 - **Tests:** `npm test` also runs the drawing handler (`worker/drawing.test.mts`,
   with real PNGs) and the fill (`src/scripts/paint/fill.test.mts`).
 
+### Kino (the films)
+
+**Kino** (`/kino`, on the desktop, in Start ▸ Programs and in the house's
+garage, chapter 7) shows the artist's moving-image works at their full quality,
+in a 1998-style media player. Each film plays from the Kino's own copy on
+Cloudflare R2 once it has been uploaded (protected HLS: every size up to the
+master's own, the best the visitor's connection carries, with a Quality menu),
+and from its YouTube video until then. Project pages show a "Showing in the
+Kino" card instead of an embed (`{ "type": "video", "film": "<id>" }`).
+
+- **Tickets, not files.** No page holds a film's address. The first Play runs
+  a Cloudflare Turnstile check on the screen, which shows nothing unless
+  Cloudflare asks the visitor to tick a box; the Worker
+  (`worker/kino.ts`, on `/kino` and `/kino/*`) then sets a ticket, an
+  `HttpOnly` cookie for four hours, and only then says where the film is. The
+  pieces are encrypted (AES-128), their addresses carry a signature for that
+  film and that ticket, and a piece opened in a tab or on another site is
+  refused. Rate limits: 10 tickets a minute per visitor, 180 pieces a minute
+  per ticket. Screen recording can't be stopped this way (that would take DRM).
+- **No crawling.** `robots.txt` disallows `/kino`, the pages are `noindex` (also
+  `X-Robots-Tag`), and they are not in the sitemap.
+- **Adding a film**: `node scripts/kino/encode.mjs <master> <id>` (ffmpeg, on
+  your computer), `node scripts/kino/upload.mjs <id> <version>`, then add the
+  printed `stream` to the film in `src/content/kino.json`. The R2 bucket
+  `kuschonink-kino` must exist before a deploy. Step by step, costs, and what
+  the protection does and doesn't stop: [`docs/KINO.md`](docs/KINO.md).
+- **The guard.** After the build, `scripts/kino-guard.mjs` fails it if `dist/`
+  holds a film, a playlist or a key, if any public file holds a Kino film's
+  YouTube id, or if `/kino` could be crawled or skip the Worker.
+
 ### Field Guide (password)
 
 **Field Guide** (导览, `/guides`, on the desktop and in Start ▸ Programs) holds
@@ -399,7 +439,7 @@ and English: [`docs/GUIDES.md`](docs/GUIDES.md).
   loading in `src/lib/guides/`; the program and its map in `src/scripts/guide/`
   and `src/components/guide/`; styles in `src/styles/guide*.css`; the gate in
   `worker/guides.ts`.
-- **Tests:** `npm test` runs all 25 `*.test.mts` suites, in the order
+- **Tests:** `npm test` runs all 28 `*.test.mts` suites, in the order
   `package.json` lists them. The Field Guide's are `src/lib/guides/guides.test.mts`
   (day rules, time zones, audience filtering, the real data, broken copies),
   `worker/guides.test.mts` (the gate: views, cookies, log-on, log-off, tiles) and,
@@ -433,9 +473,11 @@ of the Cookies dialog (which covers what the site itself keeps).
 | `src/scripts/map.ts` | Map interaction (pan, zoom, floors, search) |
 | `src/components/house/` | Floorplan map and room panel |
 | `src/pages/paint.astro`, `src/scripts/paint/` | Paint, and sending a drawing to the artist |
+| `src/content/kino.json`, `src/lib/kino.ts` | Kino: the films, and the rules the pages, the player and the Worker share |
+| `src/pages/kino/`, `src/scripts/kino/`, `scripts/kino/` | Kino: Now Showing and the player, the ticket's check, encoding and uploading a film |
 | `src/content/guides/` | Field Guide: `access.json` (audiences) and one folder per guide |
 | `src/lib/guides/`, `src/scripts/guide/` | Field Guide: data rules and checks; the program in the browser |
-| `worker/` | The Worker: the contact form (`contact.ts`), Paint's drawings (`drawing.ts`) and the Field Guide's password gate (`guides.ts`) |
+| `worker/` | The Worker: the contact form (`contact.ts`), Paint's drawings (`drawing.ts`), the Field Guide's password gate (`guides.ts`) and the Kino's door (`kino.ts`) |
 | `src/layouts/Desktop.astro` | Every page: the Xiangyin 98 desktop with the page in a window |
 | `src/components/desktop/` | Window, taskbar, Start menu, desktop icons, start-up screens |
 | `src/scripts/desktop/` | The desktop shell: windows, menus, sounds, Control Panel… (see [`docs/DESKTOP.md`](docs/DESKTOP.md)) |
@@ -452,7 +494,7 @@ Every page is a list of **sections**. A section has a `theme` (`light` or
 | `text` | `html`. Classes you can use: `display`, `large`, `small`, `accent`, `align-center`, `align-right`; `<mark>` highlights |
 | `image` | `src`, `alt`, optional `caption`, `link` |
 | `gallery` | `style` (`slideshow`, `reel`, `fullscreen`, `masonry`, `strips`, `grid`) and `images` |
-| `video` | `url`, `youtubeId` or `vimeoId`, optional `caption` |
+| `video` | `film` (a Kino film's id: a card that opens it in the Kino), or `url`, `youtubeId` or `vimeoId`; optional `caption` |
 | `marquee` | `items` (scrolling text) |
 | `banner` | `images` shown full screen |
 | `contactForm` | Uses the fields in `site.json` |
@@ -471,6 +513,8 @@ Image `src` paths are relative to `src/assets/images`. Images may also have a
   `src/assets/images/...` with the new one, keeping the same file name. Astro
   generates all the web sizes (up to 2500 px wide, WebP) at build time.
 - **Restyle the house:** the colours are at the top of `src/styles/house.css`.
+- **Show a film at full quality in the Kino:** encode, upload and add its
+  `stream` to `src/content/kino.json` ([`docs/KINO.md`](docs/KINO.md), section 3).
 - **Update a Field Guide** (hours, dates, a closure, a new place): edit its JSON
   in `src/content/guides/<slug>/` on GitHub and commit to `main`. Recipes and
   direct edit links: [`docs/GUIDES.md`](docs/GUIDES.md).
@@ -506,7 +550,8 @@ Worker's *Settings → Domains & Routes*. Until then the site is available at
 `worker/index.ts` runs only for the paths listed in `assets.run_worker_first`
 (currently `/v1/contact/*`, the contact form and Paint's drawings, and
 `/guides` and `/guides/*`, the Field Guide's gate, which also sends `/guides` to
-the first listed guide). Everything else is served as static files.
+the first listed guide, `/v1/admin/*`, and `/kino` and `/kino/*`, the Kino's
+door). Everything else is served as static files.
 Add a path there and handle it in the Worker to add an API route.
 
 ## Migration notes

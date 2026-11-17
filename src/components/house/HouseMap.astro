@@ -101,6 +101,8 @@ const mini = {
     ...model.doors.filter((d) => d.floor === f.id && glassy(d.kind)).map((d) => d.at),
     ...((details.glazing as Record<string, { line: number[] }[]>)[f.id] ?? []).map((g) => g.line.map((n) => n / 1000)),
   ]])),
+  // Windows traced from the plans (the attic's), with their sills and heights.
+  windows: Object.fromEntries(floors.map((f) => [f.id, model.windows.filter((w) => w.floor === f.id).map(({ at, sill, height }) => ({ at, sill, height }))])),
 };
 ---
 <div class="house-map" id="house-map" data-floor={initialFloor} data-current={current?.slug ?? ''} data-zoom-level="1" data-keep="house-map">

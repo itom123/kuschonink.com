@@ -66,4 +66,5 @@ export const MENU_ZH: Record<string, string> = {
   '&Colors': '颜色(&C)',
   'D&ays': '日期(&A)',
   '&Routes': '路线(&R)',
+  '&Play': '播放(&P)',
 };

@@ -44,6 +44,7 @@ Ground rules:
 | `src/styles/schemes.css` | Colour schemes (Standard, High Contrast White, Slate) |
 | `src/lib/guides/` | Field Guide: the shapes of a guide (`types.ts`), day rules, dates and map maths safe for the browser (`core.ts`), the interface's words, the checks, and the server-only loader that builds each audience's view and its browser data |
 | `src/scripts/guide/` | Field Guide in the browser: the window, panes, details sheet, menus, the map engine (camera, pins, labels, routes, heat) and the log-on box. It imports only `types.ts`, `core.ts` and `words.ts`, never guide content |
+| `src/lib/kino.ts`, `src/scripts/kino/`, `worker/kino.ts` | Kino: the films' rules (`kino.ts`, shared by the pages, the player and the Worker), the player and its ticket check in the browser, and the door on `/kino` that gives a ticket holder a film's source ([`docs/KINO.md`](KINO.md)) |
 | `worker/guides.ts` | The Field Guide's password gate: the log-on and log-off, the signed cookie, and which audience's page (and pictures) a request gets. It also sends `/guides` to the first listed guide, whose log-on box has the Guide list. It proxies the street-level tiles at `/guides/<slug>/tiles/{z}/{x}/{y}.png` (zooms 12–19, logged-on viewers only, inside the `tiles` box in `access.json`), fetching them from IGN so that IGN never sees the visitor |
 | `worker/admin.ts`, `worker/admin-files.ts`, `src/pages/admin/`, `src/scripts/admin/` | Admin mode: the hidden log-on at `/admin` (password and authenticator code, checked on the server), the suggestions queue, editing the site (Notepad, Changes, Upload Picture, New Project; Start ▸ Edit This Page...), admin on the desktop ([`docs/ADMIN.md`](ADMIN.md)) |
 
@@ -56,7 +57,7 @@ Ground rules:
 | `router.ts` | Opens pages in windows: fetches the page, swaps the window, keeps the browser's address and history in step. A page asked for twice is fetched once; a navigation that's overtaken stops waiting but doesn't cancel the request the newer one waits for |
 | `taskbar.ts`, `startmenu.ts`, `tray.ts` | Taskbar buttons, clock, Start menu (Documents ▸ remembers recent pages), volume |
 | `menu.ts`, `menubar.ts`, `winmenus.ts`, `contextmenu.ts` | One menu engine for the Start menu, menu bars and right-click menus (press and hold on touch, Shift+F10) |
-| `nosave.ts` | The site's pictures can't be saved: no browser menu on a picture, no dragging one out, and Save Picture As... says why (see [Pictures can't be saved](#pictures-cant-be-saved)) |
+| `nosave.ts` | The site's pictures and films can't be saved: no browser menu on a picture or a video, no dragging one out, and Save Picture As... says why (see [Pictures can't be saved](#pictures-cant-be-saved)) |
 | `icons.ts` | Icons on the desktop and in folders: select, double-click, drag, rubber band, arrow keys |
 | `dialogs.ts`, `properties.ts`, `aboutbox.ts` | Message boxes, dialog windows, Properties sheets |
 | `boot.ts`, `session.ts` | Start-up, log-on (everyone is Guest; the name can't be changed), log off, shut down, stand by |
@@ -72,7 +73,7 @@ Ground rules:
 Paint (`/paint`) is a program with a page, but its code lives apart, in
 `src/scripts/paint/`: it is page content (see below) and only talks to the
 shell through `window.kus98`. The Field Guide (`/guides`) works the same way,
-from `src/scripts/guide/`.
+from `src/scripts/guide/`, and so does Kino (`/kino`), from `src/scripts/kino/`.
 
 ## The window contract
 
@@ -177,7 +178,8 @@ The photographs and drawings are the artist's, protected by copyright:
 visitors can look at them but not keep them. `src/scripts/desktop/nosave.ts`
 and one rule in `desktop.css` see to it, on every page.
 
-- **No browser menu on a picture** (`img`, `canvas`, SVG `image`). A
+- **No browser menu on a picture** (`img`, `canvas`, SVG `image`) or a film
+  (`video`: the Kino's player has no download button either). A
   right-click still gets the desktop's own menu. Shift+right-click, and
   pressing and holding on a phone, get nothing: `nosave.ts` listens last (on
   `window`, after the desktop and page scripts) and turns down the browser's
@@ -253,6 +255,7 @@ Kept in this browser only, and only as far as the visitor allows (see
 | Cookie (30 min, renewed) | `kus98_session` | Needed | Logged on (so new tabs and refreshes skip the start-up). Every open page renews it each minute and as it goes; 30 minutes (`AWAY_MINUTES` in `session.ts`) after the last page of the site was open it runs out, and the next visit starts up again, BIOS and log-on included. A visit that starts at `/guides/…` sets it too. Always `Guest` |
 | Cookie (`HttpOnly`, `Secure`) | `__Host-kus98_admin` | Needed | Admin mode: a random session id; the session is on the server (the Guard). 12 hours. Set and read only by `worker/admin.ts` |
 | Cookie | `kus98_admin_ui` | Needed | Admin mode is on: tells the desktop to load the admin scripts (`html[data-admin]`). Grants nothing; the server checks every admin call |
+| Cookie (`HttpOnly`, `Path=/kino`) | `kus98_kino` | Needed | Kino: the ticket, after Cloudflare's check (a random id, signed by the Worker, `worker/kino.ts`). Until the browser closes, four hours at most. Asked for with `kus98.consent.ask('kino')` |
 | Cookie (`HttpOnly`, `Path=/guides`) | `kus98_guides_<audience>` (older: `kus98_guides`) | Needed | Field Guide: logged on with a guide password, and as which audience, one cookie per audience. Set and read only by the Worker (`worker/guides.ts`), signed with `GUIDES_COOKIE_SECRET` (or `TURNSTILE_SECRET` when that isn't set; a secret under 24 characters signs together with `TURNSTILE_SECRET`): 30 days with *Save this password*, otherwise until the browser closes (12 hours at most). File ▸ Log Off clears those that open that guide |
 | `localStorage` | `kus98:consent` | The choice | The visitor's choice about cookies (`consent.ts`): `{v: 1, level, at}`, with `level` `all`, `necessary` or `none` and `at` when it was made. Always written |
 |  | `kus98:settings` | Lasting | Settings that differ from the defaults (see `settings.ts`) |
@@ -265,8 +268,7 @@ Kept in this browser only, and only as far as the visitor allows (see
 |  | `kus98:guide` | Lasting | Field Guide: heat map and labels on or off, how the Places table is sorted (`{heat, labels, sort}`). Log Off clears it |
 |  | `lang` | Lasting | The language chosen with the 中/EN switch |
 | IndexedDB | `kus98-paint` | Lasting | Paint: the picture being drawn (a PNG), until File ▸ New |
-| `sessionStorage` | `kus98:begun` | This tab | The "Click here to begin" hint was used |
-|  | `kus98:desk` | This tab | For a refresh: the pages open in windows, front to back, minimised or not, how far each was scrolled, each one's Back and Forward |
+| `sessionStorage` | `kus98:desk` | This tab | For a refresh: the pages open in windows, front to back, minimised or not, how far each was scrolled, each one's Back and Forward |
 |  | `kus98:draft` | This tab | Contact: a message not sent yet (cleared once it's sent) |
 |  | `kus98:guide:view` | This tab | Field Guide: for a refresh, which guide was open, the map's camera and area, and how far the pane was scrolled (`{guide, cam, area, scroll}`). Log Off clears it |
 |  | `kus98:guide:suggest:<slug>` | This tab | Field Guide: a suggestion being written in Suggest a Place (what was typed, not the picture), so a refresh doesn't lose it; cleared once it's sent |
@@ -379,8 +381,9 @@ the 12 hours run out.
 request for the guide's cookie.
 
 **Not covered:** Cloudflare's own pieces, the anti-spam check on Contact,
-Paint's Send to Xiangyin and the Field Guide's Suggest a Place (Turnstile, in
-its own frame) and the analytics beacon (README, *Analytics*).
+Paint's Send to Xiangyin, the Kino's ticket check and the Field Guide's Suggest
+a Place (Turnstile, in its own frame), YouTube's player for a Kino film still
+on YouTube, and the analytics beacon (README, *Analytics*).
 
 **Keeping something new.** Decide its kind, ask `consent.allows()` (or use
 `stored()`), start its key with `kus98:` so a stricter choice removes it, write
@@ -442,6 +445,12 @@ Keep the passwords, and the key that signs the cookie, Cloudflare secrets;
 keep anything private out of browser scripts and public pages, and let a
 build-time check (like
 `scripts/guides-guard.mjs`) read `dist/` and fail the build on a leak.
+
+**Let only people in, not bots or links** (as the Kino does, without a
+password). The page stays public and holds no source; a check at the door
+(Turnstile) gets a short-lived signed `HttpOnly` ticket, and the Worker gives
+what the page plays only to a ticket holder, under addresses signed for that
+ticket (`worker/kino.ts`, [`docs/KINO.md`](KINO.md)).
 
 **Add a Help topic.** Add it to `src/content/help.json` (id, title, icon,
 keywords, html). It appears in Contents, Index and Search, and in Find.
