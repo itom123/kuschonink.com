@@ -132,6 +132,7 @@ export const t = {
   contact: { en: 'Contact', zh: '联系' },
   writings: { en: 'Writings', zh: '文字' },
   colophon: { en: 'Colophon', zh: '版本记录' },
+  kino: { en: 'Kino', zh: 'Kino' },
   address: { en: 'Address', zh: '地址' },
   start: { en: 'Start', zh: '开始' },
   desktop: { en: 'Desktop', zh: '桌面' },
@@ -166,6 +167,8 @@ export const t = {
   prevImage: { en: 'Previous image', zh: '上一张' },
   nextImage: { en: 'Next image', zh: '下一张' },
   watchVideo: { en: 'Watch video', zh: '观看视频' },
+  showingInKino: { en: 'Showing in the Kino', zh: '正在 Kino 放映' },
+  watchInKino: { en: 'Watch in the Kino', zh: '去 Kino 观看' },
   required: { en: 'required', zh: '必填' },
 } satisfies Record<string, Bi>;
 

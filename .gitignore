@@ -8,3 +8,6 @@ dist/
 
 # Google Maps lists read by scripts/google-list.mjs (places only, kept an hour)
 .google-lists/
+
+# Kino: films encoded on this computer (scripts/kino/encode.mjs), for the R2 bucket only
+kino-out/

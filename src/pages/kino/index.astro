@@ -1,0 +1,79 @@
+---
+// Kino: the cinema's lobby, "Now Showing". Each film opens in the same
+// window (/kino/<film>). The page holds titles and notes only: where a film
+// plays from is given by the Worker (worker/kino.ts) to a ticket holder.
+// Never indexed (noindex here and the Worker's X-Robots-Tag; robots.txt).
+import Desktop from '../../layouts/Desktop.astro';
+import Window from '../../components/desktop/Window.astro';
+import Bi from '../../components/Bi.astro';
+import { site } from '../../lib/content';
+import { floorZh, seoTitle } from '../../lib/i18n';
+import { roomForPage } from '../../lib/house';
+import { films } from '../../lib/kino-site';
+import { clock } from '../../lib/kino';
+
+const room = roomForPage('kino');
+const seo = {
+  ...seoTitle({ en: 'Kino', zh: 'Kino' }, site.name),
+  description: `Kino: the films of ${site.name}, shown at their full quality.`,
+  descriptionZh: `Kino：${site.name} 的影像作品，以完整画质放映。`,
+};
+const meta = (f: (typeof films)[number]) => [f.year, f.seconds ? clock(f.seconds) : null].filter(Boolean).join(' · ');
+---
+<Desktop seo={seo} noindex>
+  <Window
+    app="kino"
+    title={{ en: 'Now Showing - Kino', zh: '正在放映 - Kino' }}
+    variant="kino"
+    icon="kino"
+    address={false}
+    menus={['&File', '&View', '&Play', '&Help']}
+    bodyClass="kino-body flat"
+    alt={room ? `/house/${room.slug}` : undefined}
+    status={[
+      { en: `${films.length} film${films.length === 1 ? '' : 's'}`, zh: `${films.length} 部影片` },
+      room ? { en: `In the house: ${room.en}, ${room.floor.name.toLowerCase()}`, zh: `在房子里：${floorZh(room.floor.zh)}${room.zh}` } : site.name,
+    ]}
+  >
+    <div class="kino kino-lobby" data-kino data-kino-lobby>
+      <header class="kino-sign">
+        <h1 class="kino-sign-name">Kino</h1>
+        <p class="kino-sign-now"><Bi t={{ en: 'Now showing', zh: '正在放映' }} /></p>
+      </header>
+      <ul class="kino-list">
+        {films.map((f) => (
+          <li class="kino-item">
+            <a class="kino-item-link" href={`/kino/${f.id}`}>
+              <span class="kino-frame" aria-hidden="true"><span class="ico ico-kino"></span></span>
+              <span class="kino-item-text">
+                <span class="kino-item-title"><Bi t={{ en: f.title, zh: f.titleZh ?? f.title }} /></span>
+                {meta(f) && <span class="kino-item-meta">{meta(f)}</span>}
+                {f.note && (
+                  <span class="kino-item-note">
+                    <span data-l="en" set:html={f.note} />
+                    <span data-l="zh" lang="zh-Hans" set:html={f.noteZh ?? f.note} />
+                  </span>
+                )}
+              </span>
+              <span class="kino-item-go" aria-hidden="true">▶</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="kino-small">
+        <span class="ico ico16 ico-info" aria-hidden="true"></span>
+        <Bi t={{
+          en: 'The films play only here, in the Kino, at their full quality. A quick check at the door gives you a ticket for four hours; nothing can be downloaded.',
+          zh: '影片只在 Kino 放映，保持完整画质。入口处会做一次快速验证，给你一张四小时有效的入场券；影片不能下载。',
+        }} />
+        {' '}<a href="/help#kino"><Bi t={{ en: 'How the Kino works', zh: 'Kino 如何运作' }} /></a>
+      </p>
+    </div>
+  </Window>
+</Desktop>
+
+<script>
+  import { initKino } from '../../scripts/kino';
+  initKino();
+  document.addEventListener('astro:page-load', initKino);
+</script>

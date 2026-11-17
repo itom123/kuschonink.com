@@ -46,6 +46,10 @@ const NEEDS: [Bi, Bi][] = [
     { en: 'remembers that you typed a guide’s password. Without it, you can’t open a guide.', zh: '记住你已经键入过导览的密码。没有它，就无法打开导览。' },
   ],
   [
+    { en: 'Kino: ', zh: 'Kino：' },
+    { en: 'your ticket, for four hours at most, until you close the browser. Without it, the films don’t play.', zh: '你的入场券，最长四小时，关闭浏览器即失效。没有它，影片无法播放。' },
+  ],
+  [
     { en: 'Logging on: ', zh: '登录：' },
     {
       en: `keeps you logged on until you have been away for ${AWAY_MINUTES} minutes. Without it, you see the start-up and log-on every time you open or reload the site.`,
@@ -75,6 +79,7 @@ const NOW = (l: Level): Bi => ({ en: `Your choice now: ${NAMES[l].en}.`, zh: `�
 /** What the bar says, by what asked for it (kus98.consent.ask). */
 const BAR: Record<string, Bi> = {
   guide: { en: 'Field Guide needs a cookie to remember your password. Allow cookies?', zh: '导览需要使用 Cookie 来记住你的密码。允许使用 Cookie 吗？' },
+  kino: { en: 'Kino needs a cookie for your ticket. Allow cookies?', zh: 'Kino 需要使用 Cookie 来保存你的入场券。允许使用 Cookie 吗？' },
 };
 const BAR_OTHER: Bi = { en: 'This needs a cookie. Allow cookies?', zh: '这项功能需要使用 Cookie。允许使用 Cookie 吗？' };
 

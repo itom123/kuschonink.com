@@ -1,0 +1,116 @@
+/* Kino (/kino): the cinema's lobby and player, a media player of 1998 with a
+   dark screen. Sized from its window (container queries), never the viewport.
+   Also here: the Kino's card in a project page (blocks/Video.astro) and its
+   panel in the house's garage (house/RoomView.astro). */
+
+.kino-body { background: var(--face) !important; overflow: auto; }
+.kino { container-type: inline-size; min-height: 100%; box-sizing: border-box; display: flex; flex-direction: column; }
+
+/* ---- The lobby ---- */
+.kino-lobby { background: #111; color: #eee; padding: 0 0 12px; }
+.kino-sign { text-align: center; padding: 18px 12px 12px; background: radial-gradient(ellipse at 50% 0%, #3a2a10 0%, #111 70%); border-bottom: 2px solid #000; }
+.kino-sign-name {
+  display: inline-block; margin: 0; padding: 4px 22px 6px; font: 700 40px/1 Georgia, "Times New Roman", serif; letter-spacing: 0.18em;
+  color: #ffd75e; text-shadow: 0 0 6px #ff9b00, 0 0 1px #fff;
+  border: 3px double #ffd75e; background:
+    radial-gradient(circle, #fff3b0 0 2px, transparent 2.5px) 0 0 / 12px 12px,
+    #2a1a00;
+}
+.kino-sign-now { margin: 10px 0 0; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: #c9c9c9; }
+.kino-list { list-style: none; margin: 12px auto 0; padding: 0 12px; display: grid; gap: 10px; max-width: 760px; width: 100%; box-sizing: border-box; }
+.kino-item-link {
+  display: grid; grid-template-columns: 112px 1fr auto; gap: 12px; align-items: center; padding: 8px;
+  color: #000; text-decoration: none; background: var(--face); box-shadow: var(--raised);
+}
+.kino-item-link:hover .kino-item-title, .kino-item-link:focus-visible .kino-item-title { text-decoration: underline; }
+.kino-item-link:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
+.kino-item-link:active { box-shadow: var(--pressed); }
+.kino-frame {
+  aspect-ratio: 16 / 9; display: grid; place-items: center; background: #000; box-shadow: var(--sunken);
+  background-image: repeating-linear-gradient(90deg, #000 0 6px, #222 6px 9px), linear-gradient(#000, #000);
+  background-size: 100% 6px, 100% 100%; background-repeat: repeat-x; background-position: 0 2px, 0 0;
+}
+.kino-frame .ico { width: 32px; height: 32px; }
+.kino-item-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.kino-item-title { font-weight: 700; font-size: 14px; }
+.kino-item-meta { color: #333; font-size: 11px; }
+.kino-item-note { font-size: 11px; color: #222; overflow-wrap: anywhere; }
+.kino-item-go { font-size: 16px; color: #008000; padding: 0 6px; }
+.kino-small { max-width: 760px; margin: 14px auto 0; padding: 0 12px; box-sizing: border-box; font-size: 11px; color: #bbb; display: flex; gap: 6px; align-items: flex-start; flex-wrap: wrap; }
+.kino-small a { color: #ffd75e; }
+@container (max-width: 480px) {
+  .kino-item-link { grid-template-columns: 72px 1fr; }
+  .kino-item-go { display: none; }
+  .kino-sign-name { font-size: 30px; }
+}
+
+/* ---- The player ---- */
+/* The picture takes what the window leaves after the controls and the note; the note scrolls if it must. */
+.kino-player { background: var(--face); height: 100%; min-height: 340px; }
+.kino-stage { flex: 1 1 0; min-height: 160px; background: #000; display: flex; box-shadow: var(--sunken); margin: 4px 4px 0; padding: 2px; }
+.kino-screen { position: relative; flex: 1; background: #000; overflow: hidden; }
+.kino-video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.kino-frame-yt { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.kino-player.is-youtube .kino-screen { aspect-ratio: 16 / 9; }
+.kino-curtain { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; text-align: center; color: #eee;
+  background: repeating-linear-gradient(90deg, #5a0a12 0 14px, #7a1220 14px 22px, #4a0810 22px 30px); }
+.kino-curtain-title { margin: 0; font: 700 22px/1.2 Georgia, "Times New Roman", serif; color: #ffe6a8; text-shadow: 1px 1px 0 #000; }
+.kino-curtain-meta { margin: 0; font-size: 12px; color: #f2d0d0; }
+.kino-curtain-note { margin: 0; max-width: 34em; padding: 6px 10px; background: var(--tip); color: #000; border: 1px solid #000; font-size: 12px; }
+.kino-big-play { display: inline-flex; align-items: center; gap: 6px; min-width: 96px; min-height: 30px; font-weight: 700; }
+.kino-controls { flex: none; padding: 4px 6px 6px; display: flex; flex-direction: column; gap: 4px; }
+.kino input.kino-seek { width: auto; margin: 8px 6px 4px; }
+.kino-buttons { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.kino-btn { min-width: 30px; min-height: 26px; padding: 0 4px; display: inline-grid; place-items: center; }
+.kino-btn:disabled .ico { filter: grayscale(1) opacity(0.45); }
+.kino-sep { width: 2px; align-self: stretch; margin: 2px 3px; box-shadow: var(--thin-down); }
+.kino-time { font-variant-numeric: tabular-nums; min-width: 7.5em; padding: 2px 6px; background: #000; color: #0f0; font-family: "Courier New", monospace; font-size: 12px; box-shadow: var(--sunken); }
+.kino-grow { flex: 1; }
+.kino input.kino-volume { width: 80px; flex: none; margin: 0 6px; }
+.kino-quality { min-width: 7em; }
+.kino-info { flex: 0 1 auto; max-height: 35%; overflow: auto; padding: 8px 12px 12px; border-top: 1px solid var(--shadow); box-shadow: inset 0 1px var(--hi); }
+.kino-info h1 { font-size: 16px; margin: 0 0 2px; }
+.kino-meta { margin: 0 0 6px; color: #333; font-size: 11px; }
+.kino-info .prose p { margin: 0 0 6px; font-size: 12px; }
+.kino-links { margin: 6px 0 0; font-size: 11px; }
+@container (max-width: 480px) {
+  .kino input.kino-volume { display: none; }
+  .kino-time { min-width: 0; }
+}
+/* Full Screen (the Fullscreen API on the stage): only the picture and the controls' absence. */
+.kino-stage.is-full, .kino-stage:fullscreen { margin: 0; padding: 0; box-shadow: none; width: 100vw; height: 100vh; }
+.kino-stage:fullscreen .kino-video { max-height: 100vh; }
+@media (prefers-reduced-motion: no-preference) {
+  .kino-sign-name { animation: kino-glow 3s ease-in-out infinite alternate; }
+  @keyframes kino-glow { to { text-shadow: 0 0 10px #ffb000, 0 0 1px #fff; } }
+}
+
+/* ---- The Box Office (ticket.ts) ---- */
+.kino-bo { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px 12px; width: 324px; max-width: 100%; box-sizing: content-box; font-size: 12px; }
+.kino-bo p { margin: 0; }
+.kino-ticket {
+  align-self: center; display: flex; flex-direction: column; align-items: center; padding: 6px 22px; color: #6b0010; background: #ffe7a1;
+  border: 2px dashed #6b0010; outline: 3px solid #ffe7a1; font-family: Georgia, "Times New Roman", serif;
+}
+.kino-ticket-name { font-weight: 700; font-size: 18px; letter-spacing: 0.2em; }
+.kino-ticket-admit { font-size: 11px; letter-spacing: 0.25em; }
+/* Turnstile's box (300 × 65), kept from the start: the dialog is sized as it opens. */
+.kino-bo-turnstile { min-width: 300px; min-height: 65px; }
+.kino-bo-status { color: #000; }
+.kino-bo-buttons { display: flex; justify-content: flex-end; gap: 6px; }
+.kino-bo-buttons button { min-width: 75px; }
+
+/* ---- The Kino's card in a project page (a film plays only in the Kino) ---- */
+.kino-card { display: block; color: #eee; text-decoration: none; background: #111; }
+.kino-card-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 12px; text-align: center;
+  background: radial-gradient(ellipse at 50% 30%, #3a2a10 0%, #111 70%); }
+.kino-card .ico-kino { width: 32px; height: 32px; }
+.kino-card-label { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #c9c9c9; }
+.kino-card-title { font: 700 1.3em/1.2 Georgia, "Times New Roman", serif; color: #ffd75e; }
+.kino-card-len { font-weight: 400; font-size: 0.8em; color: #ddd; }
+.kino-card-go { margin-top: 4px; padding: 3px 12px; color: #000; background: var(--face, #c0c0c0); box-shadow: var(--raised, none); font-size: 12px; }
+.kino-card:hover .kino-card-go, .kino-card:focus-visible .kino-card-go { text-decoration: underline; }
+
+/* ---- The garage's panel in the house ---- */
+.kino-room h2 { font-size: 1em; margin: 0.8em 0 0.3em; }
+.kino-room-films { margin: 0; padding-left: 1.2em; }
