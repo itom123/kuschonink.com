@@ -1,6 +1,7 @@
 // The small house beside the floor buttons: the whole house in 3D, in plain lines, turning
 // slowly. It is built from the same rooms as the plan (walls where a room meets the outside,
-// the doors, glass and windows on the façade, the roof from the elevation).
+// the doors, glass and windows on the façade, the roof from the roof plan, the attic's walls
+// up to it).
 //
 // - Floors below yours stand whole; yours is cut open at waist height; floors above are faint.
 // - The room you're in is yellow, as on the plan.
@@ -8,12 +9,11 @@
 //
 // Drag it to turn it. With reduced motion it stands still, facing the front door.
 // Canvas 2D and a hand-rolled projection, so the map pages don't need three.js.
-import { EAVE, GABLES } from '../lib/house-shell';
+import { EAVE, roofOf, type V3 } from '../lib/house-shell';
 import { countLosses, onDprChange } from './gl-diag';
 
 type Pt = [number, number];
 type Seg = [number, number, number, number];
-type V3 = [number, number, number];
 
 /** Built in HouseMap.astro, in metres (plan x → x, plan y → z, up is y). */
 export interface MiniData {
@@ -23,6 +23,8 @@ export interface MiniData {
   fills: Record<string, Pt[][]>;
   doors: Record<string, Seg[]>;
   glazing: Record<string, Seg[]>;
+  /** Windows traced from the plans, by floor: sill and height above the floor. */
+  windows: Record<string, { at: Seg; sill: number; height: number }[]>;
 }
 
 export interface MiniState {
@@ -55,12 +57,15 @@ function inside([x, z]: Pt, poly: Pt[]) {
 
 interface Wall {
   a: Pt; b: Pt; n: Pt; y0: number; y1: number;
+  /** On the attic, its top under the roof: [metres from a, height], from a to b. */
+  top?: Pt[];
   /** Openings along the wall, as [from, to] in metres from a, with their kind. */
   openings: { u0: number; u1: number; kind: 'door' | 'glass' }[];
-  /** Windows in the solid stretches, [from, to] in metres from a. */
-  windows: [number, number][];
+  /** Windows: [from, to] in metres from a, and their sill and head heights. */
+  windows: { u0: number; u1: number; y0: number; y1: number }[];
 }
-interface Roof { pts: V3[]; n: V3; stripes: [V3, V3][] }
+/** A face of the roof: its pieces (filled), its edges (drawn) and tiles. */
+interface Face { pieces: V3[][]; edges: [V3, V3][]; n: V3; stripes: [V3, V3][] }
 
 export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: AbortSignal) {
   const ctx = canvas.getContext('2d');
@@ -73,6 +78,8 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
   const topRoomFloor = floors[floors.length - 2];
   const roomsOf = (id: string) => data.rooms.filter((r) => r.floor === id);
   const wallTop = (i: number) => (floors[i] === topRoomFloor ? EAVE : floors[i + 1].level);
+  const roof = roofOf(roofFloor.level);
+  const roofAt = (x: number, z: number) => roof.at(x, z) ?? EAVE;
 
   /** Openings that lie on the line a→b, as [u0, u1] from a. */
   function openingsOn(a: Pt, b: Pt, segs: Seg[]) {
@@ -98,9 +105,14 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
     const indoor = [...here.filter((r) => !r.outdoor).map((r) => r.points), ...(data.fills[f.id] ?? [])];
     const doors = (data.doors[f.id] ?? []);
     const glass = (data.glazing[f.id] ?? []);
+    const traced = data.windows[f.id] ?? [];
     const list: Wall[] = [];
-    for (const r of here) {
-      if (r.outdoor) continue;
+    // Rooms, and passages where they meet the outside (the attic corridor's north wall).
+    const shapes = [
+      ...here.filter((r) => !r.outdoor),
+      ...(data.fills[f.id] ?? []).map((points) => ({ points, level: f.level, stairs: false })),
+    ];
+    for (const r of shapes) {
       const n = r.points.length;
       for (let k = 0; k < n; k++) {
         const a = r.points[k], b = r.points[(k + 1) % n];
@@ -129,20 +141,33 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
               ...openingsOn(p, q, doors).map(([o0, o1]) => ({ u0: o0, u1: o1, kind: 'door' as const })),
               ...openingsOn(p, q, glass).map(([o0, o1]) => ({ u0: o0, u1: o1, kind: 'glass' as const })),
             ].sort((m, o) => m.u0 - o.u0);
-            // A window in the middle of each long solid stretch (not on the stairs), as in /house/3d.
-            const windows: [number, number][] = [];
-            if (!r.stairs && tall > 2.4) {
+            // The windows traced from the plan; else one in the middle of each long solid stretch
+            // (not on the stairs), as in /house/3d.
+            const windows: Wall['windows'] = [];
+            for (const w of traced) {
+              for (const [o0, o1] of openingsOn(p, q, [w.at])) windows.push({ u0: o0, u1: o1, y0: r.level + w.sill, y1: r.level + w.sill + w.height });
+            }
+            if (!traced.length && !r.stairs && tall > 2.4) {
               let v = 0;
               for (const o of [...openings, { u0: u1 - u0, u1: u1 - u0 }]) {
                 const piece = o.u0 - v;
                 if (piece >= 2.4) {
                   const w = Math.min(1.8, piece * 0.45), c = v + piece / 2;
-                  windows.push([c - w / 2, c + w / 2]);
+                  windows.push({ u0: c - w / 2, u1: c + w / 2, y0: r.level + 0.9, y1: r.level + 2.3 });
                 }
                 v = Math.max(v, o.u1);
               }
             }
-            list.push({ a: p, b: q, n: [nx, nz], y0: r.level, y1: wallTop(i), openings, windows });
+            // On the attic the walls rise to the roof: their gables, and the knee walls under the eaves.
+            let top: Pt[] | undefined;
+            if (f === topRoomFloor) {
+              const len = u1 - u0, k = Math.max(1, Math.ceil(len / 0.1));
+              top = Array.from({ length: k + 1 }, (_, j): Pt => {
+                const u = (len * j) / k;
+                return [u, roofAt(p[0] + ux * u, p[1] + uz * u)];
+              });
+            }
+            list.push({ a: p, b: q, n: [nx, nz], y0: r.level, y1: wallTop(i), top, openings, windows });
             start = -1;
           }
         }
@@ -151,75 +176,34 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
     walls.set(f.id, list);
   });
 
-  // The roof planes, with tiles as stripes running down the slope.
-  const roofs: Roof[] = [];
-  const ends: Roof[] = [];
-  for (const g of GABLES) {
-    const [x0, x1] = g.x, [z0, z1] = g.z;
-    const e = EAVE, r = roofFloor.level + g.ridge;
-    const v = (x: number, y: number, z: number): V3 => [x, y, z];
-    const tiles = (p: V3[], along: 0 | 2) => {
-      // p: eave start, eave end, ridge end, ridge start. Stripes every 0.7 m along the eave.
-      const len = Math.abs(p[1][along] - p[0][along]);
-      const n = Math.max(1, Math.round(len / 0.7));
-      const lerp = (m: V3, o: V3, t: number): V3 => [m[0] + (o[0] - m[0]) * t, m[1] + (o[1] - m[1]) * t, m[2] + (o[2] - m[2]) * t];
-      return Array.from({ length: n - 1 }, (_, k) => [lerp(p[0], p[1], (k + 1) / n), lerp(p[3], p[2], (k + 1) / n)] as [V3, V3]);
-    };
-    const plane = (p: V3[], along: 0 | 2) => {
-      const u = p[1].map((c, k) => c - p[0][k]), w = p[3].map((c, k) => c - p[0][k]);
-      let n: V3 = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]];
-      if (n[1] < 0) n = [-n[0], -n[1], -n[2]];
-      const l = Math.hypot(...n);
-      roofs.push({ pts: p, n: [n[0] / l, n[1] / l, n[2] / l], stripes: tiles(p, along) });
-    };
-    if (g.axis === 'x') {
-      const zm = (z0 + z1) / 2;
-      plane([v(x0, e, z0), v(x1, e, z0), v(x1, r, zm), v(x0, r, zm)], 0);
-      plane([v(x0, e, z1), v(x1, e, z1), v(x1, r, zm), v(x0, r, zm)], 0);
-      ends.push({ pts: [v(x0, e, z0), v(x0, r, zm), v(x0, e, z1)], n: [-1, 0, 0], stripes: [] });
-      ends.push({ pts: [v(x1, e, z0), v(x1, r, zm), v(x1, e, z1)], n: [1, 0, 0], stripes: [] });
-    } else {
-      const xm = (x0 + x1) / 2;
-      // A gable running into a taller roof (the south one into the main roof): it starts where
-      // it comes out of that roof's slope, so its ridge meets the slope and its eaves the eaves.
-      const host = GABLES.find((o) => o.axis === 'x' && o.x[0] <= x0 && o.x[1] >= x1 && z0 > (o.z[0] + o.z[1]) / 2 && z0 < o.z[1] && roofFloor.level + o.ridge > r);
-      let zr = z0, ze = z0;
-      if (host) {
-        const zm = (host.z[0] + host.z[1]) / 2, R = roofFloor.level + host.ridge;
-        zr = zm + ((R - r) / (R - e)) * (host.z[1] - zm);
-        ze = host.z[1];
-      }
-      plane([v(x0, e, ze), v(x0, e, z1), v(xm, r, z1), v(xm, r, zr)], 2);
-      plane([v(x1, e, ze), v(x1, e, z1), v(xm, r, z1), v(xm, r, zr)], 2);
-      if (!host) ends.push({ pts: [v(x0, e, z0), v(xm, r, z0), v(x1, e, z0)], n: [0, 0, -1], stripes: [] });
-      ends.push({ pts: [v(x0, e, z1), v(xm, r, z1), v(x1, e, z1)], n: [0, 0, 1], stripes: [] });
-    }
-  }
-  // The flat roof over the east balcony, on its columns (as in /house/3d).
-  ends.push({ pts: [[14.0, EAVE, 4.85], [16.9, EAVE, 4.85], [16.9, EAVE, 8.95], [14.0, EAVE, 8.95]], n: [0, 1, 0], stripes: [] });
-  /** Height of the roof over (x, z), for the dot when you're on the roof. */
-  const roofAt = (x: number, z: number) => {
-    let y = EAVE;
-    for (const g of GABLES) {
-      if (x < g.x[0] || x > g.x[1] || z < g.z[0] || z > g.z[1]) continue;
-      const r = roofFloor.level + g.ridge;
-      const t = g.axis === 'x' ? 1 - Math.abs(z - (g.z[0] + g.z[1]) / 2) / ((g.z[1] - g.z[0]) / 2) : 1 - Math.abs(x - (g.x[0] + g.x[1]) / 2) / ((g.x[1] - g.x[0]) / 2);
-      y = Math.max(y, EAVE + (r - EAVE) * t);
-    }
-    return y;
-  };
+  // The roof (shared with /house/3d), its slopes tiled with stripes running down them. The attic's
+  // walls make its gable ends; the one over the terrace, with no wall under it, is filled in.
+  const outline = (pts: V3[]) => pts.map((p, k): [V3, V3] => [p, pts[(k + 1) % pts.length]]);
+  const roofs: Face[] = roof.slopes.map((sl) => ({ pieces: sl.pieces, edges: sl.edges, n: sl.n, stripes: sl.stripes }));
+  const roofPts = roofs.flatMap((r) => r.pieces.flat());
+  const mid = (k: 0 | 2) => (Math.min(...roofPts.map((p) => p[k])) + Math.max(...roofPts.map((p) => p[k]))) / 2;
+  const ends: Face[] = roof.ends.filter((e) => e.open).map(({ pts }) => {
+    // Facing out, away from the middle of the roof.
+    const k = Math.abs(pts[0][0] - pts[2][0]) < 1e-6 ? 0 : 2;
+    const out = Math.sign(pts[0][k] - mid(k)) || 1;
+    const n: V3 = k === 0 ? [out, 0, 0] : [0, 0, out];
+    return { pieces: [pts], edges: outline(pts), n, stripes: [] };
+  });
+  // The flat roof over the east balcony, level with the attic's floor, on its columns (as in /house/3d).
+  const attic = topRoomFloor.level;
+  const flat: V3[] = [[14.0, attic, 4.85], [16.9, attic, 4.85], [16.9, attic, 8.95], [14.0, attic, 8.95]];
+  ends.push({ pieces: [flat], edges: outline(flat), n: [0, 1, 0], stripes: [] });
 
   // Columns from the elevation and photos (as in /house/3d): the porch and the east balcony.
-  const attic = topRoomFloor.level;
   const columns: [V3, V3][] = [
     ...[4.95, 9.45].map((x) => [[x, -0.4, 14.7], [x, attic - 0.1, 14.7]] as [V3, V3]),
-    ...[5.3, 8.5].map((z) => [[16.35, GROUND, z], [16.35, EAVE, z]] as [V3, V3]),
+    ...[5.3, 8.5].map((z) => [[16.35, GROUND, z], [16.35, attic, z]] as [V3, V3]),
   ];
 
   // ---- Fitting it in the box ----
   const xs = data.rooms.flatMap((r) => r.points.map((p) => p[0])), zs = data.rooms.flatMap((r) => r.points.map((p) => p[1]));
   const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cz = (Math.min(...zs) + Math.max(...zs)) / 2;
-  const top = Math.max(...roofs.flatMap((r) => r.pts.map((p) => p[1])));
+  const top = Math.max(...roofPts.map((p) => p[1]));
   const cy = (GROUND + top) / 2;
   const radius = Math.max(...data.rooms.flatMap((r) => r.points.map(([x, z]) => Math.hypot(x - cx, z - cz))));
   const cf = Math.cos(TILT), sf = Math.sin(TILT);
@@ -288,11 +272,23 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
   };
   const wallLen = (w: Wall) => Math.hypot(w.b[0] - w.a[0], w.b[1] - w.a[1]);
 
-  function drawWall(w: Wall, y1: number, details: boolean) {
+  /** How high the wall stands at u: its top under the roof on the attic, else y1. */
+  const topAt = (w: Wall, u: number, y1: number) => {
+    if (!w.top) return y1;
+    const k = w.top.findIndex(([v]) => v >= u);
+    if (k <= 0) return w.top[Math.max(0, k)][1];
+    const [v0, h0] = w.top[k - 1], [v1, h1] = w.top[k];
+    return h0 + ((h1 - h0) * (u - v0)) / (v1 - v0 || 1);
+  };
+
+  /** A wall up to y1 (cut open), or, on the attic, up to the roof. */
+  function drawWall(w: Wall, y1: number, details: boolean, cut: boolean) {
     const n: V3 = [w.n[0], 0, w.n[1]];
     const front = facing(n) > 0;
     const len = wallLen(w);
-    path([at(w, 0, w.y0, 0), at(w, len, w.y0, 0), at(w, len, y1, 0), at(w, 0, y1, 0)]);
+    const roofed = !cut && w.top;
+    if (roofed) path([at(w, 0, w.y0, 0), at(w, len, w.y0, 0), ...[...roofed].reverse().map(([u, h]) => at(w, u, h, 0))]);
+    else path([at(w, 0, w.y0, 0), at(w, len, w.y0, 0), at(w, len, y1, 0), at(w, 0, y1, 0)]);
     ctx!.fillStyle = front ? shade(n) : '#e6e6e6';
     ctx!.fill();
     style(INK, 0.8);
@@ -300,7 +296,7 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
     if (!details || !front) return;
     style(INK, 0.6);
     for (const o of w.openings) {
-      const h = Math.min(y1, w.y0 + (o.kind === 'glass' ? GLAZED : DOOR));
+      const h = Math.min(topAt(w, o.u0, y1), topAt(w, o.u1, y1), w.y0 + (o.kind === 'glass' ? GLAZED : DOOR));
       path([at(w, o.u0, w.y0), at(w, o.u1, w.y0), at(w, o.u1, h), at(w, o.u0, h)]);
       ctx!.fillStyle = o.kind === 'glass' ? '#cfd6da' : '#fff';
       ctx!.fill();
@@ -309,8 +305,8 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
       const step = o.kind === 'glass' ? 0.45 : (o.u1 - o.u0) / 2;
       for (let u = o.u0 + step; u < o.u1 - 0.1; u += step) line(at(w, u, w.y0), at(w, u, h));
     }
-    for (const [u0, u1] of w.windows) {
-      const y0 = w.y0 + 0.9, yt = Math.min(y1 - 0.2, y0 + 1.4);
+    for (const { u0, u1, y0, y1: head } of w.windows) {
+      const yt = Math.min(topAt(w, u0, y1) - 0.1, topAt(w, u1, y1) - 0.1, head);
       if (yt <= y0) continue;
       path([at(w, u0, y0), at(w, u1, y0), at(w, u1, yt), at(w, u0, yt)]);
       ctx!.fillStyle = '#cfd6da';
@@ -338,13 +334,19 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
 
   function drawRoof(highlight: boolean) {
     const faces = [...roofs.map((r) => ({ r, end: false })), ...ends.map((r) => ({ r, end: true }))];
-    faces.sort((m, o) => near(m.r.pts) - near(o.r.pts));
+    faces.sort((m, o) => near(m.r.pieces.flat()) - near(o.r.pieces.flat()));
     for (const { r, end } of faces) {
-      path(r.pts);
-      ctx!.fillStyle = highlight && !end ? HERE : shade(r.n, end ? 190 : 175, end ? 245 : 235);
-      ctx!.fill();
+      // Its pieces, outlined in their own colour so no seam shows between them; then its edges.
+      const fill = highlight && !end ? HERE : shade(r.n, end ? 190 : 175, end ? 245 : 235);
+      style(fill, 0.8);
+      ctx!.fillStyle = fill;
+      for (const piece of r.pieces) {
+        path(piece);
+        ctx!.fill();
+        ctx!.stroke();
+      }
       style(INK, 0.8);
-      ctx!.stroke();
+      for (const [p, q] of r.edges) line(p, q);
       style(highlight ? '#8a8a00' : '#777', 0.5);
       for (const [p, q] of r.stripes) line(p, q);
     }
@@ -353,12 +355,12 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
   function drawGhost(id: string, isRoof: boolean) {
     style('rgba(0,0,0,0.22)', 0.6, [2, 2]);
     if (isRoof) {
-      for (const r of [...roofs, ...ends]) { path(r.pts); ctx!.stroke(); }
+      for (const r of [...roofs, ...ends]) for (const [p, q] of r.edges) line(p, q);
       return;
     }
     for (const w of walls.get(id) ?? []) {
       const len = wallLen(w);
-      path([at(w, 0, w.y1, 0), at(w, len, w.y1, 0)], false);
+      path(w.top ? w.top.map(([u, h]) => at(w, u, h, 0)) : [at(w, 0, w.y1, 0), at(w, len, w.y1, 0)], false);
       ctx!.stroke();
     }
   }
@@ -415,7 +417,7 @@ export function startMini(canvas: HTMLCanvasElement, data: MiniData, signal: Abo
       const items: { d: number; draw: () => void }[] = [];
       for (const w of walls.get(f.id) ?? []) {
         const y1 = here ? Math.min(w.y1, w.y0 + LOW) : w.y1;
-        items.push({ d: near([at(w, wallLen(w) / 2, (w.y0 + y1) / 2, 0)]), draw: () => drawWall(w, y1, !here) });
+        items.push({ d: near([at(w, wallLen(w) / 2, (w.y0 + y1) / 2, 0)]), draw: () => drawWall(w, y1, !here, here) });
       }
       const y0 = i === 0 ? -Infinity : f.level, y1 = here ? f.level + LOW : wallTop(i);
       for (const [p, q] of columns) {
