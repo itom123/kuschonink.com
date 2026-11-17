@@ -60,7 +60,7 @@ Ground rules:
 | `nosave.ts` | The site's pictures and films can't be saved: no browser menu on a picture or a video, no dragging one out, and Save Picture As... says why (see [Pictures can't be saved](#pictures-cant-be-saved)) |
 | `icons.ts` | Icons on the desktop and in folders: select, double-click, drag, rubber band, arrow keys |
 | `dialogs.ts`, `properties.ts`, `aboutbox.ts` | Message boxes, dialog windows, Properties sheets |
-| `boot.ts`, `session.ts` | Start-up, log-on (everyone is Guest; the name can't be changed), log off, shut down, stand by |
+| `boot.ts`, `session.ts` | Start-up (with the network check, below), log-on (everyone is Guest; the name can't be changed), log off, shut down, stand by |
 | `sound.ts`, `trails.ts`, `tooltips.ts` | Sounds, pointer trails, yellow tooltips |
 | `textzoom.ts` | iPhone and iPad: a text box in use doesn't zoom the page (the desktop's text is under the 16px that sets iOS zooming) |
 | `screensaver.ts`, `whatsthis.ts` | Idle timer for the screen saver; What's This? notes |
@@ -302,6 +302,24 @@ the session skips them too). Away from the site for more
 than 30 minutes (every tab of it closed), the computer counts as switched off:
 the next visit starts up and logs on again. A safety net removes the start-up
 screen after 10 seconds if the shell fails to load.
+
+**The network check.** The BIOS screen shows the visitor's own connection
+for a moment, as [cleanip.io](https://cleanip.io/) does: IP address, place,
+ASN number and owner, network type, proxy/VPN/Tor, and a purity score from 0
+to 100 with a grade (F, D, C, B, A, A+). `boot.ts` asks `GET /v1/whoami` as
+start-up begins; the Worker (`worker/whoami.ts`) answers with what Cloudflare
+already knows about the request (`CF-Connecting-IP` and `request.cf`: city,
+region, country, ASN, its owner, time zone). Nothing is asked of anyone else,
+kept or logged, and the answer is `no-store`. `src/lib/netcheck.ts` (shared,
+tested by `worker/whoami.test.mts`) judges it: a Tor exit (country `T1`), a
+relay (Cloudflare WARP, iCloud Private Relay), a server network where VPNs and
+proxies live (known hosting ASNs, or words such as "hosting" in the owner's
+name), and an IP time zone whose UTC offset isn't the browser's each lower the
+score. It is a rough guess from these signs, not a blacklist lookup. If the
+check doesn't answer within 1.5 seconds of its line, the line says `NONE` and
+start-up goes on (as under `astro dev`, which has no Worker). With "reduce
+motion" the screen appears whole, without typing, for 2.5 seconds; any key or
+click skips it either way. Lines that outgrow a small screen scroll up.
 
 ### Cookies: the visitor's choice
 

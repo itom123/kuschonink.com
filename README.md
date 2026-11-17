@@ -18,7 +18,10 @@ npm run deploy    # build and deploy to Cloudflare Workers
 The whole site works like a computer from 1998, called **Xiangyin 98**. The
 first page of a visit starts up (a short BIOS screen and a splash) and asks the
 visitor to log on: everyone is Guest, and there's no password. Then the desktop
-appears with the page they asked for open in a window. The site's owner has a
+appears with the page they asked for open in a window. The BIOS screen briefly
+shows the visitor's own connection, as [cleanip.io](https://cleanip.io/) does:
+IP address, place, network (ASN), and a rough purity score
+(`src/lib/netcheck.ts`, `worker/whoami.ts`). The site's owner has a
 separate, hidden log-on for admin mode, checked on the server
 ([`docs/ADMIN.md`](docs/ADMIN.md)).
 
@@ -484,7 +487,7 @@ of the Cookies dialog (which covers what the site itself keeps).
 | `src/pages/kino/`, `src/scripts/kino/`, `scripts/kino/` | Kino: Now Showing and the player, the ticket's check, encoding and uploading a film |
 | `src/content/guides/` | Field Guide: `access.json` (audiences) and one folder per guide |
 | `src/lib/guides/`, `src/scripts/guide/` | Field Guide: data rules and checks; the program in the browser |
-| `worker/` | The Worker: the contact form (`contact.ts`), Paint's drawings (`drawing.ts`), the Field Guide's password gate (`guides.ts`) and the Kino's door (`kino.ts`) |
+| `worker/` | The Worker: the contact form (`contact.ts`), Paint's drawings (`drawing.ts`), the Field Guide's password gate (`guides.ts`), the Kino's door (`kino.ts`) and the start-up screen's network check (`whoami.ts`) |
 | `src/layouts/Desktop.astro` | Every page: the Xiangyin 98 desktop with the page in a window |
 | `src/components/desktop/` | Window, taskbar, Start menu, desktop icons, start-up screens |
 | `src/scripts/desktop/` | The desktop shell: windows, menus, sounds, Control Panel… (see [`docs/DESKTOP.md`](docs/DESKTOP.md)) |
@@ -557,8 +560,9 @@ Worker's *Settings → Domains & Routes*. Until then the site is available at
 `worker/index.ts` runs only for the paths listed in `assets.run_worker_first`
 (currently `/v1/contact/*`, the contact form and Paint's drawings, and
 `/guides` and `/guides/*`, the Field Guide's gate, which also sends `/guides` to
-the first listed guide, `/v1/admin/*`, and `/kino` and `/kino/*`, the Kino's
-door). Everything else is served as static files.
+the first listed guide, `/v1/admin/*`, `/kino` and `/kino/*`, the Kino's
+door, and `/v1/whoami`, the start-up screen's network check). Everything else
+is served as static files.
 Add a path there and handle it in the Worker to add an API route.
 
 ## Migration notes
