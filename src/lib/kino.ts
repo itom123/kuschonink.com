@@ -28,6 +28,8 @@ export interface KinoFilm {
   /** A short note (HTML). */
   note?: string;
   noteZh?: string;
+  /** The film's picture (lobby, before playing, project pages): a path under src/assets/images, as an image block's src. Without it, its project's first picture. */
+  poster?: string;
   /** The fallback: the film's YouTube video. */
   youtubeId?: string;
   stream?: KinoStream;
@@ -57,7 +59,8 @@ export const RESERVED = ['ticket', 'index', 'play', 'm', 'media'];
 export const FILM_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
 export const VERSION = /^v\d{8}[a-z]?$/;
-const FIELDS = new Set(['id', 'title', 'titleZh', 'year', 'seconds', 'project', 'note', 'noteZh', 'youtubeId', 'stream']);
+const FIELDS = new Set(['id', 'title', 'titleZh', 'year', 'seconds', 'project', 'note', 'noteZh', 'poster', 'youtubeId', 'stream']);
+const POSTER = /^[a-z0-9][a-z0-9/._-]*\.(?:jpe?g|png|webp)$/i;
 
 export const isKinoPath = (p: string) => p === KINO_PREFIX || p.startsWith(`${KINO_PREFIX}/`);
 
@@ -90,6 +93,7 @@ export function problems(data: KinoFile, projects?: readonly string[]): string[]
     if (f.note && !f.noteZh) say(id, 'noteZh', 'missing (the note has no Chinese)');
     if (f.year !== undefined && !(Number.isInteger(f.year) && f.year >= 1900 && f.year <= 2100)) say(id, 'year', 'not a year');
     if (f.seconds !== undefined && !(Number.isFinite(f.seconds) && f.seconds > 0 && f.seconds < 24 * 3600)) say(id, 'seconds', 'not a length in seconds');
+    if (f.poster !== undefined && (typeof f.poster !== 'string' || !POSTER.test(f.poster) || f.poster.includes('..'))) say(id, 'poster', 'a picture under src/assets/images, e.g. projects/hanabi/flux.jpg');
     if (f.youtubeId !== undefined && !YOUTUBE_ID.test(f.youtubeId)) say(id, 'youtubeId', 'not a YouTube video id (11 characters)');
     if (f.stream !== undefined) {
       const s = f.stream;

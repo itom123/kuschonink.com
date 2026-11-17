@@ -18,7 +18,7 @@
 **Kino** 是 Xiangyin 98 上的影院，用来放映影像作品。入口有三个：桌面图标（以及“开始 ▸ 程序 ▸ Kino”、“运行”里键入 `kino`），房子一层的**车库**（第 7 章，原来放《破碎的海洋》，它搬到了旁边的东房间），以及每个作品页面里的“正在 Kino 放映”卡片。地址是 `/kino`（“正在放映”）和 `/kino/<影片>`。
 
 - 每部影片有两种来源。上传到 Kino 自己的 R2 存储之后，它以**完整画质**播放（受保护的 HLS，1080p 母版就是 1080p，以后的 4K 母版就是 4K），并按观众的网速自动选择画质；还没上传的影片，暂时用它原来的 YouTube 视频播放。
-- 网页里不写任何影片地址。观众第一次按“播放”时，“售票处”对话框先做一次 Cloudflare Turnstile 验证（通常自动通过），然后发给这个浏览器一张**入场券**：一个只有服务器能读的 Cookie，四小时有效，关闭浏览器即失效。只有拿着入场券，Worker 才告诉播放器影片在哪里。
+- 网页里不写任何影片地址。观众第一次按“播放”时，Cloudflare Turnstile 在画面上悄悄做一次验证（通常什么也看不到；偶尔会请观众勾选一个方框），然后发给这个浏览器一张**入场券**：一个只有服务器能读的 Cookie，四小时有效，关闭浏览器即失效。只有拿着入场券，Worker 才告诉播放器影片在哪里。
 - Kino 的页面不进搜索引擎：`robots.txt` 禁止抓取 `/kino`，页面带 `noindex`，不在 sitemap 里。
 
 **Kino** is the cinema of Xiangyin 98, for the moving-image works. It has
@@ -33,9 +33,10 @@ on each project page. Its addresses are `/kino` (Now Showing) and
   at 1080p, a 4K master later at 4K), and the player picks the best size the
   visitor's connection carries. A film not uploaded yet plays from its
   YouTube video.
-- No page holds a film's address. The first time a visitor presses Play, the
-  **Box Office** runs a Cloudflare Turnstile check (it usually passes by
-  itself), then gives this browser a **ticket**: a cookie only the server can
+- No page holds a film's address. The first time a visitor presses Play, a
+  Cloudflare Turnstile check runs quietly on the screen (usually nothing
+  shows; now and then Cloudflare asks them to tick a box there), then gives
+  this browser a **ticket**: a cookie only the server can
   read, for four hours, gone when the browser closes. Only with a ticket does
   the Worker tell the player where the film is.
 - Search engines stay out: `robots.txt` disallows `/kino`, the pages are
@@ -50,7 +51,7 @@ on each project page. Its addresses are `/kino` (Now Showing) and
 3. （建议）Workers & Pages → kuschonink → Settings → Variables and Secrets，加一个 Secret：`KINO_SECRET`，32 个以上的随机字符，用来签发入场券。生成方法：
    `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`。
    不设也能用：那时用导览的 Cookie 密钥（`GUIDES_COOKIE_SECRET`，或 `TURNSTILE_SECRET`）签，但加上 Kino 自己的标签，互不通用。更换 `KINO_SECRET` 会让所有入场券失效，观众只需再领一张。
-4. “售票处”用联系表单的 Turnstile（`site.json` 的 `turnstileSiteKey`，和 Secret `TURNSTILE_SECRET`），动作名是 `kuschonink-kino`。不用另设。
+4. 入场验证用联系表单的 Turnstile（`site.json` 的 `turnstileSiteKey`，和 Secret `TURNSTILE_SECRET`），动作名是 `kuschonink-kino`。不用另设。
 
 Once only. After this, each film goes up as in section 3.
 
@@ -67,7 +68,7 @@ Once only. After this, each film goes up as in section 3.
    Without it the Field Guide's cookie key signs (`GUIDES_COOKIE_SECRET`, or
    `TURNSTILE_SECRET`), under the Kino's own label, so neither counts for the
    other. Changing `KINO_SECRET` ends every ticket; visitors just get a new one.
-4. The Box Office uses the contact form's Turnstile widget (`turnstileSiteKey`
+4. The ticket's check uses the contact form's Turnstile widget (`turnstileSiteKey`
    in `site.json`, and the secret `TURNSTILE_SECRET`) with the action
    `kuschonink-kino`. Nothing else to set.
 
@@ -86,7 +87,9 @@ Once only. After this, each film goes up as in section 3.
 3. **上映**：在 `src/content/kino.json` 里，把第 1 步打印的两行（`"seconds"` 和 `"stream"`）加到这部影片里，提交到 `main`。大约一分钟后，这部影片就用完整画质放映了。
 4. 确认网站上能播之后，可以把 YouTube 上的那份设为“私享”（private），网上就只剩 Kino 这一份了。
 
-新的影片：先在 `kino.json` 里加一条（`id`、`title`、`titleZh`，可选 `year`、`note`/`noteZh`、`project`），再照上面做。没有 YouTube 视频的影片，第一次提交时就要带上 `stream`。要在作品页面里放一张卡片，在那个作品的内容里加一个 `{ "type": "video", "film": "<影片id>" }` 块。
+新的影片：先在 `kino.json` 里加一条（`id`、`title`、`titleZh`，可选 `year`、`note`/`noteZh`、`project`、`poster`），再照上面做。没有 YouTube 视频的影片，第一次提交时就要带上 `stream`。要在作品页面里放一张卡片，在那个作品的内容里加一个 `{ "type": "video", "film": "<影片id>" }` 块。
+
+**海报**：每部影片在“正在放映”、播放前的画面、作品页面的卡片和车库里都显示一张图。默认用它所属作品的第一张图（和“作品”文件夹里的缩略图相同）；要换一张，在影片里写 `"poster": "projects/<作品>/<文件>.jpg"`（`src/assets/images` 下的路径，和图片块的 `src` 一样）。文件不存在时构建会停下。
 
 On your own computer (you need [ffmpeg](https://ffmpeg.org); on a Mac,
 `brew install ffmpeg`), from the top of the repository:
@@ -115,9 +118,17 @@ On your own computer (you need [ffmpeg](https://ffmpeg.org); on a Mac,
    Kino's is the only copy online.
 
 A new film: add it to `kino.json` first (`id`, `title`, `titleZh`, and if you
-like `year`, `note`/`noteZh`, `project`), then do the above. A film with no
-YouTube video needs its `stream` in its first commit. For a card on a project
-page, add a block `{ "type": "video", "film": "<film id>" }` to that project.
+like `year`, `note`/`noteZh`, `project`, `poster`), then do the above. A film
+with no YouTube video needs its `stream` in its first commit. For a card on a
+project page, add a block `{ "type": "video", "film": "<film id>" }` to that
+project.
+
+**Posters.** Each film shows a picture in Now Showing, on the screen before
+it plays, on its project page's card and in the garage. By default it is its
+project's first picture (the one the Projects folder shows). To choose
+another, give the film `"poster": "projects/<project>/<file>.jpg"`: a path
+under `src/assets/images`, as an image block's `src`. A file that isn't there
+stops the build.
 
 ## 4. 换片、撤片 Replacing or removing a film
 
@@ -197,7 +208,7 @@ copy private.
 | `src/lib/kino.ts` | The films' shape, the checks and the rules both sides share (no imports: pages, browser and Worker) |
 | `src/lib/kino-site.ts` | The films for the pages, checked against the projects at build time |
 | `src/pages/kino/index.astro`, `src/pages/kino/[film].astro` | Now Showing, and one film in the player |
-| `src/scripts/kino/` | The player (`player.ts`: hls.js, loaded only when a film plays; YouTube; controls, keys, menus), the Box Office (`ticket.ts`) |
+| `src/scripts/kino/` | The player (`player.ts`: hls.js, loaded only when a film plays; YouTube; controls, keys, menus), the ticket's check on the screen (`ticket.ts`) |
 | `src/styles/kino.css` | The Kino, its card on project pages, its panel in the garage |
 | `worker/kino.ts` | The door: pages, tickets, where a film plays from, its pieces and key from R2 |
 | `worker/kino.test.mts`, `scripts/kino/encode.test.mts` | Tests (`npm test`) |

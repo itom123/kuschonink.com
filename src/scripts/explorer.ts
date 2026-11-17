@@ -1,5 +1,7 @@
 // The Projects folder: views, the Web View pane, selection, Details sorting.
 // Page content: it works on its own and asks the desktop (window.kus98) for more.
+// Kino's Now Showing (src/pages/kino/index.astro) is the same kind of folder:
+// it keeps one view (data-fixed-view) and says its own hint (data-hint-en/zh).
 
 type View = 'thumbs' | 'list' | 'details';
 
@@ -87,9 +89,9 @@ export function initExplorerFolder() {
       initRows(table);
     }
 
-    // The view, kept in this browser (View menu, Views button).
+    // The view, kept in this browser (View menu, Views button). A folder with a fixed view keeps its own.
     const setView = (v: View) => (page.dataset.view = v);
-    if (k) {
+    if (k && !page.hasAttribute('data-fixed-view')) {
       setView(k.settings.get().explorerView);
       const off = k.settings.on((s) => {
         if (!page.isConnected) return off();
@@ -104,6 +106,7 @@ export function initExplorerFolder() {
     const wv = win?.querySelector<HTMLElement>('[data-webview]');
     const fields = win?.querySelectorAll<HTMLElement>(':scope > [data-window-inner] > .status-bar .status-bar-field');
     const count = list.querySelectorAll('.icon').length;
+    const hint = { en: page.dataset.hintEn ?? 'Double-click a project to open it.', zh: page.dataset.hintZh ?? '双击一件作品即可打开。' };
     list.addEventListener('icons:select', () => {
       const sel = [...list.querySelectorAll<HTMLElement>('.icon.selected')];
       const one = sel.length === 1 ? sel[0] : null;
@@ -126,7 +129,7 @@ export function initExplorerFolder() {
       }
       if (fields?.[1]) {
         if (one) bi(fields[1], one.dataset.facts ?? '', one.dataset.factsZh);
-        else bi(fields[1], 'Double-click a project to open it.', '双击一件作品即可打开。');
+        else bi(fields[1], hint.en, hint.zh);
       }
     });
   }

@@ -2,7 +2,8 @@
 // at build time against the projects. The rules are in ./kino (shared with the
 // browser and the Worker). A mistake stops the build with every problem listed.
 import kinoJson from '../content/kino.json';
-import { projects } from './content';
+import { imagesOf, projects } from './content';
+import { img } from './images';
 import { loadKino, type KinoFile, type KinoFilm } from './kino';
 
 export const films: KinoFilm[] = loadKino(kinoJson as KinoFile, projects.map((p) => p.slug));
@@ -16,3 +17,20 @@ export function kinoFilm(id: string, where = 'a video block'): KinoFilm {
 
 /** The films of a project, in showing order. */
 export const filmsOf = (project: string) => films.filter((f) => f.project === project);
+
+/**
+ * A film's picture, as a path under src/assets/images: its own `poster`, or
+ * else its project's first picture (the one the Projects folder shows), or
+ * null. A poster that isn't there stops the build.
+ */
+export function posterOf(f: KinoFilm): string | null {
+  if (f.poster) {
+    img(f.poster); // throws when the file is missing
+    return f.poster;
+  }
+  const p = f.project ? projects.find((x) => x.slug === f.project) : undefined;
+  return p ? imagesOf(p.sections)[0] ?? null : null;
+}
+
+// Every poster is checked once, at build time.
+for (const f of films) posterOf(f);

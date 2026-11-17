@@ -1,16 +1,20 @@
 ---
-// Kino: one film, in the cinema's player (styled after the media players of
-// 1998). The page holds no source: the player asks the Worker
-// (/kino/<film>/play) once the visitor has a ticket, then plays the film's
-// protected HLS from R2 (hls.js), or its YouTube video while it has none
-// (docs/KINO.md). Never indexed.
+// Kino: one film, in a player made after Windows Media Player 6.4: the
+// screen (the film's poster and Play until it starts), the seek bar, the
+// control bar with its LCD panel, and the clip panel. The page holds no
+// source: Play asks the Worker (/kino/<film>/play), which answers a ticket
+// holder only; the ticket's check runs on the screen and shows nothing unless
+// Cloudflare asks (src/scripts/kino/). A film on R2 plays its protected HLS;
+// one still on YouTube plays in YouTube's player (docs/KINO.md). Never indexed.
+import { getImage } from 'astro:assets';
 import Desktop from '../../layouts/Desktop.astro';
 import Window from '../../components/desktop/Window.astro';
 import Bi from '../../components/Bi.astro';
 import { site, projects } from '../../lib/content';
+import { img } from '../../lib/images';
 import { attr, seoTitle } from '../../lib/i18n';
 import { roomForPage } from '../../lib/house';
-import { films } from '../../lib/kino-site';
+import { films, posterOf } from '../../lib/kino-site';
 import { clock, sourceOf, type KinoFilm } from '../../lib/kino';
 
 export function getStaticPaths() {
@@ -25,11 +29,15 @@ const seo = {
   description: `${film.title}, a film by ${site.name}, in the Kino.`,
   descriptionZh: `《${title.zh}》，${site.name} 的影像作品，在 Kino 放映。`,
 };
+const posterPath = posterOf(film);
+const poster = posterPath ? (await getImage({ src: img(posterPath), width: 1600, height: 900, fit: 'cover', format: 'webp', quality: 80 })).src : '';
 const length = film.seconds ? clock(film.seconds) : '';
 const index = films.indexOf(film);
 const prev = films[index - 1];
 const next = films[index + 1];
 const quality = film.stream ? `${film.stream.height}p` : '';
+const ready = { en: 'Ready', zh: '就绪' };
+const tip = (en: string, zh: string) => attr('title', { en, zh });
 ---
 <Desktop seo={seo} noindex>
   <Window
@@ -41,11 +49,7 @@ const quality = film.stream ? `${film.stream.height}p` : '';
     menus={['&File', '&View', '&Play', '&Help']}
     bodyClass="kino-body flat"
     alt={project ? `/image/${project.slug}` : room ? `/house/${room.slug}` : undefined}
-    status={[
-      { en: 'Ready', zh: '就绪' },
-      length ? `0:00 / ${length}` : ' ',
-      quality || ' ',
-    ]}
+    status={[ready, length ? `0:00 / ${length}` : ' ', quality || ' ']}
   >
     <div
       class="kino kino-player"
@@ -57,58 +61,62 @@ const quality = film.stream ? `${film.stream.height}p` : '';
       data-kino-title-zh={title.zh}
       data-sitekey={site.contact.form.turnstileSiteKey || undefined}
     >
-      <div class="kino-stage" data-kino-stage>
-        <div class="kino-screen" data-kino-screen>
-          <div class="kino-curtain" data-kino-curtain>
-            <p class="kino-curtain-title"><Bi t={title} /></p>
-            {(film.year || length) && <p class="kino-curtain-meta">{[film.year, length].filter(Boolean).join(' · ')}</p>}
-            <button type="button" class="kino-big-play" data-kino-cmd="play" data-js-only>
-              <span class="ico ico20 ico-tb-play" aria-hidden="true"></span>
-              <Bi t={{ en: 'Play', zh: '播放' }} />
-            </button>
-            <p class="kino-curtain-note" data-kino-note hidden></p>
-            <noscript>
-              <p class="kino-curtain-note"><Bi t={{ en: 'The Kino needs JavaScript to show films.', zh: 'Kino 需要 JavaScript 才能放映影片。' }} /></p>
-            </noscript>
-          </div>
+      <div class="kino-screen" data-kino-screen>
+        {poster ? <img class="kino-poster" src={poster} alt="" width="1600" height="900" data-kino-poster /> : <span class="kino-poster kino-no-poster" data-kino-poster><span class="ico ico-kino" aria-hidden="true"></span></span>}
+        <div class="kino-start" data-kino-start>
+          <button type="button" class="kino-play-big" data-kino-cmd="play" data-kino-bigplay data-js-only>
+            <span class="ico ico20 ico-tb-play" aria-hidden="true"></span>
+            <span><Bi t={{ en: 'Play', zh: '播放' }} /></span>
+          </button>
+          <div class="kino-check" data-kino-check></div>
+          <p class="kino-msg" data-kino-msg role="status" aria-live="polite" hidden></p>
+          <noscript>
+            <p class="kino-msg"><Bi t={{ en: 'The Kino needs JavaScript to show films.', zh: 'Kino 需要 JavaScript 才能放映影片。' }} /></p>
+          </noscript>
         </div>
       </div>
 
-      <div class="kino-controls" data-js-only role="group" {...attr('aria-label', { en: 'Playback', zh: '播放控制' })}>
-        <input class="kino-seek" type="range" min="0" max="1000" step="1" value="0" data-kino-seek disabled {...attr('aria-label', { en: 'Position', zh: '播放位置' })} />
-        <div class="kino-buttons">
-          <button type="button" class="kino-btn" data-kino-cmd="toggle" disabled {...attr('title', { en: 'Play (Space)', zh: '播放（空格键）' })}><span class="ico ico20 ico-tb-play" data-kino-playicon aria-hidden="true"></span><span class="sr-only" data-kino-playlabel><Bi t={{ en: 'Play', zh: '播放' }} /></span></button>
-          <button type="button" class="kino-btn" data-kino-cmd="stop" disabled {...attr('title', { en: 'Stop', zh: '停止' })}><span class="ico ico20 ico-tb-stop" aria-hidden="true"></span><span class="sr-only"><Bi t={{ en: 'Stop', zh: '停止' }} /></span></button>
-          <span class="kino-sep" aria-hidden="true"></span>
-          <span class="kino-time" data-kino-time aria-live="off">{length ? `0:00 / ${length}` : '0:00'}</span>
+      <div class="kino-transport" data-js-only>
+        <input class="kino-seek kino-own" type="range" min="0" max="1000" step="1" value="0" data-kino-seek disabled {...attr('aria-label', { en: 'Position', zh: '播放位置' })} />
+        <div class="kino-bar" role="group" {...attr('aria-label', { en: 'Playback', zh: '播放控制' })}>
+          <button type="button" class="kino-btn kino-own" data-kino-cmd="toggle" {...tip('Play (Space)', '播放（空格键）')}><span class="ico ico20 ico-tb-play" data-kino-playicon aria-hidden="true"></span><span class="sr-only" data-kino-playlabel><Bi t={{ en: 'Play', zh: '播放' }} /></span></button>
+          <button type="button" class="kino-btn kino-own" data-kino-cmd="stop" disabled {...tip('Stop', '停止')}><span class="ico ico20 ico-tb-stop" aria-hidden="true"></span><span class="sr-only"><Bi t={{ en: 'Stop', zh: '停止' }} /></span></button>
+          <span class="kino-sep kino-own" aria-hidden="true"></span>
+          {prev
+            ? <a class="kino-btn" href={`/kino/${prev.id}`} {...tip(`Previous film: ${prev.title}`, `上一部：${prev.titleZh ?? prev.title}`)}><span class="ico ico20 ico-tb-prev" aria-hidden="true"></span><span class="sr-only"><Bi t={{ en: 'Previous film', zh: '上一部' }} /></span></a>
+            : <span class="kino-btn" aria-disabled="true"><span class="ico ico20 ico-tb-prev" aria-hidden="true"></span></span>}
+          {next
+            ? <a class="kino-btn" href={`/kino/${next.id}`} {...tip(`Next film: ${next.title}`, `下一部：${next.titleZh ?? next.title}`)}><span class="ico ico20 ico-tb-next" aria-hidden="true"></span><span class="sr-only"><Bi t={{ en: 'Next film', zh: '下一部' }} /></span></a>
+            : <span class="kino-btn" aria-disabled="true"><span class="ico ico20 ico-tb-next" aria-hidden="true"></span></span>}
+          <span class="kino-lcd" aria-hidden="true">
+            <span class="kino-lcd-state" data-kino-lcdstate><Bi t={ready} /></span>
+            <span class="kino-lcd-time" data-kino-time>{length ? `0:00 / ${length}` : '0:00'}</span>
+          </span>
           <span class="kino-grow"></span>
-          <button type="button" class="kino-btn" data-kino-cmd="mute" disabled {...attr('title', { en: 'Mute (M)', zh: '静音（M）' })}><span class="ico ico20 ico-speaker" data-kino-muteicon aria-hidden="true"></span><span class="sr-only"><Bi t={{ en: 'Mute', zh: '静音' }} /></span></button>
-          <input class="kino-volume" type="range" min="0" max="100" step="5" value="100" data-kino-volume disabled {...attr('aria-label', { en: 'Volume', zh: '音量' })} />
-          <span class="kino-sep" aria-hidden="true"></span>
-          <label class="kino-quality-label" data-kino-quality-wrap hidden>
+          <button type="button" class="kino-btn kino-own kino-wide" data-kino-cmd="mute" disabled {...tip('Mute (M)', '静音（M）')}><span class="ico ico20 ico-speaker" data-kino-muteicon aria-hidden="true"></span><span class="sr-only"><Bi t={{ en: 'Mute', zh: '静音' }} /></span></button>
+          <input class="kino-volume kino-own kino-wide" type="range" min="0" max="100" step="5" value="100" data-kino-volume disabled {...attr('aria-label', { en: 'Volume', zh: '音量' })} />
+          <label class="kino-quality-label kino-own kino-wide" data-kino-quality-wrap hidden>
             <span class="sr-only"><Bi t={{ en: 'Quality', zh: '画质' }} /></span>
-            <select class="kino-quality" data-kino-quality {...attr('title', { en: 'Quality', zh: '画质' })}></select>
+            <select class="kino-quality" data-kino-quality {...tip('Quality', '画质')}></select>
           </label>
-          <button type="button" class="kino-btn" data-kino-cmd="fullscreen" disabled {...attr('title', { en: 'Full Screen (F)', zh: '全屏（F）' })}><span class="ico ico20 ico-tb-fullscreen" aria-hidden="true"></span><span class="sr-only"><Bi t={{ en: 'Full Screen', zh: '全屏' }} /></span></button>
+          <button type="button" class="kino-btn" data-kino-cmd="fullscreen" {...tip('Full Screen (F)', '全屏（F）')}><span class="ico ico20 ico-tb-fullscreen" aria-hidden="true"></span><span class="sr-only"><Bi t={{ en: 'Full Screen', zh: '全屏' }} /></span></button>
         </div>
       </div>
 
-      <div class="kino-info">
-        <h1><Bi t={title} /></h1>
-        {(film.year || length) && <p class="kino-meta">{[film.year, length].filter(Boolean).join(' · ')}</p>}
+      <dl class="kino-clip">
+        <div class="kino-clip-row"><dt><Bi t={{ en: 'Film:', zh: '影片：' }} /></dt><dd><b><Bi t={title} /></b>{film.year && <span class="kino-clip-meta"> · {film.year}</span>}{length && <span class="kino-clip-meta"> · {length}</span>}</dd></div>
         {film.note && (
-          <div class="prose">
-            <p data-l="en" set:html={film.note} />
-            <p data-l="zh" lang="zh-Hans" set:html={film.noteZh ?? film.note} />
-          </div>
+          <div class="kino-clip-row"><dt><Bi t={{ en: 'About:', zh: '简介：' }} /></dt><dd><span data-l="en" set:html={film.note} /><span data-l="zh" lang="zh-Hans" set:html={film.noteZh ?? film.note} /></dd></div>
         )}
-        <p class="kino-links">
-          <a href="/kino"><Bi t={{ en: '← All films', zh: '← 全部影片' }} /></a>
-          {prev && <> · <a href={`/kino/${prev.id}`}><Bi t={{ en: `Previous: ${prev.title}`, zh: `上一部：${prev.titleZh ?? prev.title}` }} /></a></>}
-          {next && <> · <a href={`/kino/${next.id}`}><Bi t={{ en: `Next: ${next.title}`, zh: `下一部：${next.titleZh ?? next.title}` }} /></a></>}
-          {project && <> · <a href={`/image/${project.slug}`}><Bi t={{ en: `“${project.title}” in Projects`, zh: `“作品”中的《${project.titleZh ?? project.title}》` }} /></a></>}
-        </p>
-      </div>
+        <div class="kino-clip-row">
+          <dt><Bi t={{ en: 'See also:', zh: '另见：' }} /></dt>
+          <dd>
+            <a href="/kino"><Bi t={{ en: 'All films', zh: '全部影片' }} /></a>
+            {project && <> · <a href={`/image/${project.slug}`}><Bi t={{ en: `${project.title} in Projects`, zh: `“作品”中的《${project.titleZh ?? project.title}》` }} /></a></>}
+            {next && <> · <a href={`/kino/${next.id}`}><Bi t={{ en: `Next: ${next.title}`, zh: `下一部：${next.titleZh ?? next.title}` }} /></a></>}
+          </dd>
+        </div>
+      </dl>
     </div>
   </Window>
 </Desktop>

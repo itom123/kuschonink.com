@@ -1,15 +1,20 @@
 ---
-// Kino: the cinema's lobby, "Now Showing". Each film opens in the same
-// window (/kino/<film>). The page holds titles and notes only: where a film
-// plays from is given by the Worker (worker/kino.ts) to a ticket holder.
-// Never indexed (noindex here and the Worker's X-Robots-Tag; robots.txt).
+// Kino: Now Showing. A folder of films, made like the Projects folder
+// (src/pages/image/index.astro): a Web View pane, poster thumbnails, select
+// with a click, open with a double-click (src/scripts/explorer.ts). Each film
+// opens in the same window (/kino/<film>). The page holds titles, notes and
+// posters only: where a film plays from is given by the Worker
+// (worker/kino.ts) to a ticket holder. Never indexed (noindex here, the
+// Worker's X-Robots-Tag, robots.txt).
+import { getImage } from 'astro:assets';
 import Desktop from '../../layouts/Desktop.astro';
 import Window from '../../components/desktop/Window.astro';
 import Bi from '../../components/Bi.astro';
-import { site } from '../../lib/content';
+import { projects, site } from '../../lib/content';
+import { img } from '../../lib/images';
 import { floorZh, seoTitle } from '../../lib/i18n';
 import { roomForPage } from '../../lib/house';
-import { films } from '../../lib/kino-site';
+import { films, posterOf } from '../../lib/kino-site';
 import { clock } from '../../lib/kino';
 
 const room = roomForPage('kino');
@@ -18,7 +23,30 @@ const seo = {
   description: `Kino: the films of ${site.name}, shown at their full quality.`,
   descriptionZh: `Kino：${site.name} 的影像作品，以完整画质放映。`,
 };
-const meta = (f: (typeof films)[number]) => [f.year, f.seconds ? clock(f.seconds) : null].filter(Boolean).join(' · ');
+const plain = (html?: string) => (html ?? '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+const items = await Promise.all(
+  films.map(async (f) => {
+    const poster = posterOf(f);
+    const thumb = poster ? (await getImage({ src: img(poster), width: 320, height: 180, fit: 'cover', format: 'webp', quality: 74 })).src : '';
+    const project = f.project ? projects.find((p) => p.slug === f.project) : undefined;
+    const facts = [f.year, f.seconds ? clock(f.seconds) : null].filter(Boolean).join(' · ');
+    return {
+      f,
+      thumb,
+      length: f.seconds ? clock(f.seconds) : '',
+      facts,
+      factsZh: facts,
+      project: project ? `Project: ${project.title}` : '',
+      projectZh: project ? `作品：${project.titleZh ?? project.title}` : '',
+    };
+  }),
+);
+const n = films.length;
+const intro = {
+  en: `${n} film${n === 1 ? '' : 's'} by ${site.name}, shown at their full quality. Select a film to read about it; double-click to watch it.`,
+  zh: `${site.name} 的 ${n} 部影像作品，以完整画质放映。选中一部影片可查看介绍，双击即可观看。`,
+};
+const hint = { en: 'Double-click a film to watch it.', zh: '双击一部影片即可观看。' };
 ---
 <Desktop seo={seo} noindex>
   <Window
@@ -27,53 +55,73 @@ const meta = (f: (typeof films)[number]) => [f.year, f.seconds ? clock(f.seconds
     variant="kino"
     icon="kino"
     address={false}
-    menus={['&File', '&View', '&Play', '&Help']}
-    bodyClass="kino-body flat"
+    menus={['&File', '&Play', '&Help']}
+    bodyClass="folder-body kino-lobby-body"
     alt={room ? `/house/${room.slug}` : undefined}
     status={[
-      { en: `${films.length} film${films.length === 1 ? '' : 's'}`, zh: `${films.length} 部影片` },
+      { en: `${n} object(s)`, zh: `${n} 个对象` },
+      hint,
       room ? { en: `In the house: ${room.en}, ${room.floor.name.toLowerCase()}`, zh: `在房子里：${floorZh(room.floor.zh)}${room.zh}` } : site.name,
     ]}
   >
-    <div class="kino kino-lobby" data-kino data-kino-lobby>
-      <header class="kino-sign">
-        <h1 class="kino-sign-name">Kino</h1>
-        <p class="kino-sign-now"><Bi t={{ en: 'Now showing', zh: '正在放映' }} /></p>
-      </header>
-      <ul class="kino-list">
-        {films.map((f) => (
-          <li class="kino-item">
-            <a class="kino-item-link" href={`/kino/${f.id}`}>
-              <span class="kino-frame" aria-hidden="true"><span class="ico ico-kino"></span></span>
-              <span class="kino-item-text">
-                <span class="kino-item-title"><Bi t={{ en: f.title, zh: f.titleZh ?? f.title }} /></span>
-                {meta(f) && <span class="kino-item-meta">{meta(f)}</span>}
-                {f.note && (
-                  <span class="kino-item-note">
-                    <span data-l="en" set:html={f.note} />
-                    <span data-l="zh" lang="zh-Hans" set:html={f.noteZh ?? f.note} />
-                  </span>
-                )}
+    <aside class="webview kino-webview" slot="side" data-webview>
+      <div class="wv-head"><span class="ico ico-kino" aria-hidden="true"></span><h2>Kino</h2></div>
+      <div class="wv-rule" aria-hidden="true"></div>
+      <div class="wv-default">
+        <p><Bi t={intro} /></p>
+        <p><a href="/help#kino"><Bi t={{ en: 'How the Kino works', zh: 'Kino 如何运作' }} /></a></p>
+        {room && <p><a href={`/house/${room.slug}`}><Bi t={{ en: 'The Kino in the house', zh: '房子里的 Kino' }} /></a></p>}
+      </div>
+      <div class="wv-item" hidden>
+        <img class="wv-thumb" alt="" width="320" height="180" />
+        <b class="wv-name"></b>
+        <span class="wv-type"><Bi t={{ en: 'Film', zh: '影片' }} /></span>
+        <p class="wv-facts"></p>
+        <p class="wv-desc"></p>
+        <p class="wv-room"></p>
+      </div>
+    </aside>
+    <div class="folder-page kino-lobby" data-folder-page data-view="thumbs" data-fixed-view data-kino data-kino-lobby data-hint-en={hint.en} data-hint-zh={hint.zh}>
+      <h1 class="sr-only">Kino</h1>
+      <ul class="projects-view kino-films" aria-label="Kino">
+        {items.map(({ f, thumb, length, facts, factsZh, project, projectZh }) => (
+          <li>
+            <a
+              class="icon"
+              href={`/kino/${f.id}`}
+              data-icon-id={`kino-${f.id}`}
+              data-type="Film"
+              data-type-zh="影片"
+              data-thumb={thumb}
+              data-desc={plain(f.note)}
+              data-desc-zh={plain(f.noteZh ?? f.note)}
+              data-facts={facts}
+              data-facts-zh={factsZh}
+              data-room={project}
+              data-room-zh={projectZh}
+              draggable="false"
+            >
+              <span class="kino-poster-thumb">
+                {thumb ? <img class="thumb" src={thumb} alt="" width="160" height="90" loading="lazy" /> : <span class="thumb kino-no-poster"><span class="ico ico-kino" aria-hidden="true"></span></span>}
+                <span class="kino-play-badge" aria-hidden="true"></span>
+                {length && <span class="kino-length">{length}</span>}
               </span>
-              <span class="kino-item-go" aria-hidden="true">▶</span>
+              <span class="icon-label"><Bi t={{ en: f.title, zh: f.titleZh ?? f.title }} /></span>
             </a>
           </li>
         ))}
       </ul>
-      <p class="kino-small">
-        <span class="ico ico16 ico-info" aria-hidden="true"></span>
-        <Bi t={{
-          en: 'The films play only here, in the Kino, at their full quality. A quick check at the door gives you a ticket for four hours; nothing can be downloaded.',
-          zh: '影片只在 Kino 放映，保持完整画质。入口处会做一次快速验证，给你一张四小时有效的入场券；影片不能下载。',
-        }} />
-        {' '}<a href="/help#kino"><Bi t={{ en: 'How the Kino works', zh: 'Kino 如何运作' }} /></a>
-      </p>
     </div>
   </Window>
 </Desktop>
 
 <script>
+  import { initExplorerFolder } from '../../scripts/explorer';
   import { initKino } from '../../scripts/kino';
+  initExplorerFolder();
   initKino();
-  document.addEventListener('astro:page-load', initKino);
+  document.addEventListener('astro:page-load', () => {
+    initExplorerFolder();
+    initKino();
+  });
 </script>
