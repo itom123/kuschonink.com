@@ -7,7 +7,7 @@ import Bi from '../Bi.astro';
 import { t, attr, chapter, statusZh, stairsTo } from '../../lib/i18n';
 import { getImage } from 'astro:assets';
 import { img } from '../../lib/images';
-import { films, posterOf } from '../../lib/kino-site';
+import { showing, posterOf } from '../../lib/kino-site';
 import { clock } from '../../lib/kino';
 
 interface Props { room: Room }
@@ -24,7 +24,7 @@ const chapterLink = (r: Room) => ({ en: `${chapterOf(r).en}: ${r.title}`, zh: `$
 const exits = exitsOf(room);
 // The Kino (the garage): its films' posters.
 const kinoFilms = page === 'kino'
-  ? await Promise.all(films.map(async (f) => {
+  ? await Promise.all(showing.map(async (f) => {
       const p = posterOf(f);
       return { f, thumb: p ? (await getImage({ src: img(p), width: 320, height: 180, fit: 'cover', format: 'webp', quality: 72 })).src : '' };
     }))

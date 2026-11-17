@@ -7,6 +7,9 @@
 // only then), or through the browser's own player where there is no Media
 // Source (older iPhones); a film still on YouTube plays in YouTube's player,
 // and our own controls step aside (only Previous, Next and Full Screen stay).
+// A film that needs the Kino's password: the Worker answers "password", and
+// the password box opens on the screen; OK runs the check at the door with
+// the password, and the film starts.
 //
 // Like every page script (docs/DESKTOP.md): it starts once per window, finds
 // everything from its root, only answers keys while its window is in front,
@@ -26,6 +29,7 @@ type Kus98 = { menus?(el: Element, provider: (name: string) => MenuSpec[] | null
 const S: Record<string, Bi> = {
   ready: { en: 'Ready', zh: '就绪' },
   ticket: { en: 'Getting a ticket…', zh: '正在取票……' },
+  password: { en: 'Waiting for the password', zh: '等待输入密码' },
   opening: { en: 'Opening…', zh: '正在打开……' },
   playing: { en: 'Playing', zh: '正在播放' },
   paused: { en: 'Paused', zh: '已暂停' },
@@ -52,6 +56,7 @@ export class KinoPlayer {
   private readonly bigPlay: HTMLButtonElement;
   private readonly check: HTMLElement;
   private readonly msg: HTMLElement;
+  private readonly pw: HTMLFormElement | null;
   private readonly seek: HTMLInputElement;
   private readonly volume: HTMLInputElement;
   private readonly time: HTMLElement;
@@ -78,6 +83,7 @@ export class KinoPlayer {
     this.bigPlay = q('[data-kino-bigplay]');
     this.check = q('[data-kino-check]');
     this.msg = q('[data-kino-msg]');
+    this.pw = root.querySelector('[data-kino-pw]');
     this.seek = q('[data-kino-seek]');
     this.volume = q('[data-kino-volume]');
     this.time = q('[data-kino-time]');
@@ -107,7 +113,7 @@ export class KinoPlayer {
     this.quality.addEventListener('change', () => this.pick(Number(this.quality.value)), { signal });
     // A double-click on the picture: Full Screen, as media players do.
     this.screen.addEventListener('dblclick', (e) => {
-      if (!(e.target as Element).closest('button, .kino-check')) this.fullScreen();
+      if (!(e.target as Element).closest('button, .kino-check, .kino-pw')) this.fullScreen();
     }, { signal });
     document.addEventListener('keydown', (e) => this.key(e), { signal });
     document.addEventListener('fullscreenchange', () => this.root.classList.toggle('is-full', document.fullscreenElement === this.root), { signal });
@@ -226,9 +232,10 @@ export class KinoPlayer {
     }
   }
 
-  /** Where the film plays from; a ticket first when there is none. */
+  /** Where the film plays from; a ticket first when there is none (with the password, for a film that needs it). */
   private async where(): Promise<Play | null> {
-    for (let i = 0; i < 2; i++) {
+    let ticket = false;
+    for (let i = 0; i < 3; i++) {
       this.status(S.opening);
       let res: Response;
       try {
@@ -238,7 +245,13 @@ export class KinoPlayer {
         return null;
       }
       if (res.ok) return (await res.json()) as Play;
-      if (res.status === 401 && i === 0) {
+      const err = res.status === 401 ? (((await res.json().catch(() => ({}))) as { error?: string }).error ?? '') : '';
+      if (err === 'password' && i < 2) {
+        if (!(await this.askPassword())) return null;
+        continue;
+      }
+      if (res.status === 401 && !ticket) {
+        ticket = true;
         this.status(S.ticket);
         const t = await getTicket({ sitekey: this.root.dataset.sitekey, box: this.check, say: (b) => this.say(b) });
         if (t !== 'ok') {
@@ -252,6 +265,87 @@ export class KinoPlayer {
       return null;
     }
     return null;
+  }
+
+  /**
+   * The password box, on the screen. Resolves true once the Worker has given a
+   * ticket with the password; false on Cancel, or when the check at the door
+   * fails (the screen then says why). A wrong password keeps the box open.
+   */
+  private askPassword(): Promise<boolean> {
+    const form = this.pw;
+    if (!form) {
+      this.fail(NOTE.failed);
+      return Promise.resolve(false);
+    }
+    const input = form.querySelector<HTMLInputElement>('[data-kino-pw-input]')!;
+    const ok = form.querySelector<HTMLButtonElement>('[data-kino-pw-ok]')!;
+    const note = (which: string | null) => {
+      for (const el of form.querySelectorAll<HTMLElement>('[data-kino-pw-msg]')) el.hidden = el.dataset.kinoPwMsg !== which;
+    };
+    this.say(null);
+    this.status(S.password);
+    note(null);
+    form.hidden = false;
+    input.focus();
+    return new Promise<boolean>((resolve) => {
+      const ac = new AbortController();
+      const signal = ac.signal;
+      const busy = (on: boolean) => {
+        form.toggleAttribute('data-busy', on);
+        ok.disabled = on;
+        input.readOnly = on;
+      };
+      const done = (v: boolean) => {
+        ac.abort();
+        busy(false);
+        input.value = '';
+        form.hidden = true;
+        resolve(v);
+      };
+      const cancel = () => {
+        if (form.hasAttribute('data-busy')) return;
+        done(false);
+        this.status(S.ready);
+        this.bigPlay.hidden = false;
+        this.bigPlay.focus();
+      };
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (form.hasAttribute('data-busy')) return;
+        const given = input.value;
+        if (!given.trim()) return input.focus();
+        busy(true);
+        note(null);
+        this.status(S.ticket);
+        const t = await getTicket({ sitekey: this.root.dataset.sitekey, box: this.check, say: (b) => this.say(b), password: given });
+        busy(false);
+        if (this.dead || signal.aborted) return;
+        if (t === 'ok') {
+          this.say(null);
+          return done(true);
+        }
+        if (t === 'password' || t === 'busy') {
+          this.say(null);
+          this.status(S.password);
+          note(t === 'busy' ? 'wait' : 'wrong');
+          input.select();
+          input.focus();
+          return;
+        }
+        done(false);
+        this.fail(t === 'failed' ? NOTE.door : NOTE[t]);
+      }, { signal });
+      form.querySelector('[data-kino-pw-cancel]')!.addEventListener('click', cancel, { signal });
+      form.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          cancel();
+        }
+      }, { signal });
+      // The window closes while the box is open.
+      this.ac.signal.addEventListener('abort', () => done(false), { signal });
+    });
   }
 
   private youtube(id: string) {

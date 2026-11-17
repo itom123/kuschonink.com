@@ -339,11 +339,18 @@ Kino" card instead of an embed (`{ "type": "video", "film": "<id>" }`).
   film and that ticket, and a piece opened in a tab or on another site is
   refused. Rate limits: 10 tickets a minute per visitor, 180 pieces a minute
   per ticket. Screen recording can't be stopped this way (that would take DRM).
+- **A password, or hidden.** A film with `"password": true` in `kino.json`
+  plays only once the visitor has typed the Kino's password (the secret
+  `KINO_PASSWORD`) in a box on the screen; the ticket then says so. A film with
+  `"listed": false` is left out of Now Showing, the garage and Previous/Next,
+  but its page and its project's card still work.
 - **No crawling.** `robots.txt` disallows `/kino`, the pages are `noindex` (also
   `X-Robots-Tag`), and they are not in the sitemap.
 - **Adding a film**: `node scripts/kino/encode.mjs <master> <id>` (ffmpeg, on
-  your computer), `node scripts/kino/upload.mjs <id> <version>`, then add the
-  printed `stream` to the film in `src/content/kino.json`. The R2 bucket
+  your computer: Windows, macOS or Linux; a text subtitle track is drawn into
+  the picture), `node scripts/kino/upload.mjs <id> <version>` (which first
+  deletes the film's old version), then add the printed `seconds` and
+  `stream` to the film in `src/content/kino.json`. The R2 bucket
   `kuschonink-kino` must exist before a deploy. Step by step, costs, and what
   the protection does and doesn't stop: [`docs/KINO.md`](docs/KINO.md).
 - **The guard.** After the build, `scripts/kino-guard.mjs` fails it if `dist/`

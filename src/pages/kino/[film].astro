@@ -5,7 +5,9 @@
 // source: Play asks the Worker (/kino/<film>/play), which answers a ticket
 // holder only; the ticket's check runs on the screen and shows nothing unless
 // Cloudflare asks (src/scripts/kino/). A film on R2 plays its protected HLS;
-// one still on YouTube plays in YouTube's player (docs/KINO.md). Never indexed.
+// one still on YouTube plays in YouTube's player (docs/KINO.md). A film that
+// needs the Kino's password has a small password box on the screen, which
+// the player opens when the Worker asks for it. Never indexed.
 import { getImage } from 'astro:assets';
 import Desktop from '../../layouts/Desktop.astro';
 import Window from '../../components/desktop/Window.astro';
@@ -14,7 +16,7 @@ import { site, projects } from '../../lib/content';
 import { img } from '../../lib/images';
 import { attr, seoTitle } from '../../lib/i18n';
 import { roomForPage } from '../../lib/house';
-import { films, posterOf } from '../../lib/kino-site';
+import { films, showing, posterOf } from '../../lib/kino-site';
 import { clock, sourceOf, type KinoFilm } from '../../lib/kino';
 
 export function getStaticPaths() {
@@ -32,9 +34,10 @@ const seo = {
 const posterPath = posterOf(film);
 const poster = posterPath ? (await getImage({ src: img(posterPath), width: 1600, height: 900, fit: 'cover', format: 'webp', quality: 80 })).src : '';
 const length = film.seconds ? clock(film.seconds) : '';
-const index = films.indexOf(film);
-const prev = films[index - 1];
-const next = films[index + 1];
+// Previous and Next go through the films Now Showing lists; a hidden film has neither.
+const index = showing.indexOf(film);
+const prev = index < 0 ? undefined : showing[index - 1];
+const next = index < 0 ? undefined : showing[index + 1];
 const quality = film.stream ? `${film.stream.height}p` : '';
 const ready = { en: 'Ready', zh: '就绪' };
 const tip = (en: string, zh: string) => attr('title', { en, zh });
@@ -68,6 +71,31 @@ const tip = (en: string, zh: string) => attr('title', { en, zh });
             <span class="ico ico20 ico-tb-play" aria-hidden="true"></span>
             <span><Bi t={{ en: 'Play', zh: '播放' }} /></span>
           </button>
+          {film.password && (
+            <form class="kino-pw" data-kino-pw data-js-only hidden>
+              <div class="title-bar"><div class="title-bar-text"><Bi t={{ en: 'Enter Password', zh: '输入密码' }} /></div></div>
+              <div class="kino-pw-body">
+                <span class="ico ico-keys kino-pw-keys" aria-hidden="true"></span>
+                <div class="kino-pw-fields">
+                  <p class="kino-pw-intro" id={`kino-pw-intro-${film.id}`}><Bi t={{ en: 'This film needs a password.', zh: '这部影片需要密码。' }} /></p>
+                  {/* No name: it is not sent. It tells password managers what the password is for. */}
+                  <input type="text" value="Kino" autocomplete="username" readonly hidden />
+                  <div class="kino-pw-row">
+                    <label for={`kino-pw-${film.id}`}><span data-l="en"><u>P</u>assword:</span><span data-l="zh" lang="zh-Hans">密码(<u>P</u>)：</span></label>
+                    <input id={`kino-pw-${film.id}`} type="password" maxlength="256" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby={`kino-pw-intro-${film.id} kino-pw-msg-${film.id}`} data-kino-pw-input />
+                  </div>
+                  <p class="kino-pw-msg" id={`kino-pw-msg-${film.id}`} aria-live="polite">
+                    <span data-kino-pw-msg="wrong" hidden><span class="ico ico16 ico-error" aria-hidden="true"></span><span><Bi t={{ en: 'That password isn’t right. Type it again.', zh: '密码不正确。请重新键入。' }} /></span></span>
+                    <span data-kino-pw-msg="wait" hidden><span class="ico ico16 ico-warning" aria-hidden="true"></span><span><Bi t={{ en: 'Too many tries. Wait a minute, then try again.', zh: '尝试次数过多。请等一分钟，然后再试。' }} /></span></span>
+                  </p>
+                </div>
+                <div class="kino-pw-buttons">
+                  <button type="submit" class="default" data-kino-pw-ok><Bi t={{ en: 'OK', zh: '确定' }} /></button>
+                  <button type="button" data-kino-pw-cancel><Bi t={{ en: 'Cancel', zh: '取消' }} /></button>
+                </div>
+              </div>
+            </form>
+          )}
           <div class="kino-check" data-kino-check></div>
           <p class="kino-msg" data-kino-msg role="status" aria-live="polite" hidden></p>
           <noscript>
@@ -104,7 +132,7 @@ const tip = (en: string, zh: string) => attr('title', { en, zh });
       </div>
 
       <dl class="kino-clip">
-        <div class="kino-clip-row"><dt><Bi t={{ en: 'Film:', zh: '影片：' }} /></dt><dd><b><Bi t={title} /></b>{film.year && <span class="kino-clip-meta"> · {film.year}</span>}{length && <span class="kino-clip-meta"> · {length}</span>}</dd></div>
+        <div class="kino-clip-row"><dt><Bi t={{ en: 'Film:', zh: '影片：' }} /></dt><dd><b><Bi t={title} /></b>{film.year && <span class="kino-clip-meta"> · {film.year}</span>}{length && <span class="kino-clip-meta"> · {length}</span>}{film.password && <span class="kino-clip-meta"> · <Bi t={{ en: 'needs a password', zh: '需要密码' }} /></span>}</dd></div>
         {film.note && (
           <div class="kino-clip-row"><dt><Bi t={{ en: 'About:', zh: '简介：' }} /></dt><dd><span data-l="en" set:html={film.note} /><span data-l="zh" lang="zh-Hans" set:html={film.noteZh ?? film.note} /></dd></div>
         )}
