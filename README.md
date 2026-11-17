@@ -23,8 +23,9 @@ separate, hidden log-on for admin mode, checked on the server
 ([`docs/ADMIN.md`](docs/ADMIN.md)).
 
 - **The desktop**: icons for My Computer, Projects, The House, About.doc,
-  Contact, Help, Instagram and the Recycle Bin. Double-click to open; drag to
-  arrange; right-click almost anything for a menu (press and hold on a phone).
+  Contact, Paint, Kino, Field Guide, Help, Instagram and the Recycle Bin.
+  Double-click to open; drag to arrange; right-click almost anything for a
+  menu (press and hold on a phone).
 - **Windows** move, resize, minimise and maximise, and each has a button on the
   taskbar. The **Start menu** reaches every page, plus Find, Run, Help, the
   Control Panel, Log Off and Shut Down.
