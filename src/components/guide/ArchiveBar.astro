@@ -1,0 +1,31 @@
+---
+// Field Guide: the archive bar, for a guide kept open as a record (guide.json
+// "archive"). Its words run right to left across the top of the guide, like a
+// scrolling marquee of the time, over and over; it takes the Today note's
+// place (app.ts todayNote). Screen readers get the words once, from a hidden
+// copy; the moving copies are hidden from them. A mouse on the bar holds it
+// still, and with reduced motion the words stand still and wrap. CSS only, so
+// it moves without JavaScript too (src/styles/guide.css, .gd-fly).
+import Bi from '../Bi.astro';
+import { attr } from '../../lib/i18n';
+import type { Bi as BiT } from '../../lib/guides/types';
+
+interface Props { t: BiT }
+const { t } = Astro.props;
+const label: BiT = { en: 'Archive', zh: '存档' };
+// One run per language (the 中/EN switch shows one), each slow enough to read:
+// about 45 px a second, from a rough width per character.
+const runs = (t.zh && t.zh !== t.en ? [{ l: 'en', s: t.en, px: 6.5 }, { l: 'zh', s: t.zh, px: 13 }] : [{ l: '', s: t.en, px: 6.5 }])
+  .map((r) => ({ ...r, secs: Math.max(8, Math.round(([...r.s].length * r.px + 60) / 45)) }));
+---
+<div class="gd-fly" data-gd-archive role="note" {...attr('aria-label', label)}>
+  <b class="gd-fly-label" aria-hidden="true"><Bi t={label} /></b>
+  <p class="sr-only"><Bi t={t} /></p>
+  <div class="gd-fly-window" aria-hidden="true">
+    {runs.map((r) => (
+      <span class="gd-fly-track" data-l={r.l || undefined} lang={r.l === 'zh' ? 'zh-Hans' : undefined} style={`--gd-fly-s: ${r.secs}s`}>
+        <span>{r.s}</span><span>{r.s}</span><span>{r.s}</span>
+      </span>
+    ))}
+  </div>
+</div>

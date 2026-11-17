@@ -39,6 +39,8 @@ directly.
 - 内容全部是仓库里的 JSON 文件。改了 `main` 上的文件，大约一分钟后网站就更新。
   数据有错时构建会失败，网站保持原样，不会坏掉。
 - **地点的排序**：地点列表上方的“排序方式”默认是“推荐”（A、B、C 级依次排，同级按编号）。另外还有“名称”、“区域”（按导览里片区的顺序）、“当天开放的优先”（先在“日期”框里选定一天）和“离我最近”（先按“我在哪里？”）。选了别的排序后会出现“默认”按钮，单击即可恢复推荐顺序。“查看 ▸ 排序方式”菜单里是同样几种排序。排序只调整每一组之内的次序（参考点、当天闭馆的地点和官方条目各自是一组）。选择会记在这台设备上，“离我最近”除外。
+- **其他条目**：官方地图上没有被推荐的条目（巴黎导览有 58 个，编号 D 开头，灰色图钉），在地点列表上方勾选“显示全部其他条目”才出现。它们和推荐的展览一样有中英文说明、地址、开放时间、日期和图片，选定一天时也显示当天开不开放；法文原文收在“原文（法语）”里。勾选后它们也算进状态栏的展览数，比如“109 个展览”或“109 个展览中 N 个开放”；当天不开放的和展览一起归入“某日不开放”一组。它们没有主题、级别或价格，所以选了这些时不显示，也不进热力图。
+- **状态栏**：手机上或窗口太窄、一句话放不下时，状态栏的文字会像当年的滚动字幕一样移动：先停一下，再向左移出，从右边移回来，这样整句话都看得到。鼠标停在上面时文字不动；系统设置了“减少动态效果”时改为折行显示。
 - **我在哪里？**：只有按下按钮时，浏览器才会询问位置。之后地图上会出现一个红色的圆点，并显示“实时位置”标签，旁边有“停止”按钮。再按一次按钮、单击“停止”，或者刷新页面、注销、关闭窗口，都会关掉它；刷新之后它是关着的。最小化导览时，红点和它的“心跳”一起隐藏，还原后接着显示。位置只留在设备上，从不发送出去。浏览器不允许时，导览会说明怎样开启。
 - **街道地图**：底图被放大到超过原图大小的地方（城区底图周围的大区底图会最先被放大），街道级的地图瓦片由 Worker 从 IGN（Plan IGN）代为取得，地址是 `/guides/<名字>/tiles/{z}/{x}/{y}.png`，缩放级别 12 至 19，只给已登录的读者。城区底图放不满窗口时（比如竖着拿的平板），四周会补上大区底图和它的瓦片，不会露出灰色。范围由 `access.json` 的 `tiles` 决定（见第 10 节）。IGN 只看到 Worker，看不到访客。每位访客每分钟从 IGN 取图最多 600 块（已在缓存里的不算），超出的瓦片返回 429。
 - **地图手势**：在手机和平板上，地图的手势和地图应用（Google 地图、苹果地图）一样：一根手指拖动移动地图，快速一划地图会继续滑行；两根手指捏合缩放；轻点两下放大；轻点两下后按住，向下滑动放大、向上滑动缩小；两根手指同时轻点一下缩小。地图上的文字不会被选中，长按也不会弹出菜单。用鼠标时，双击放大，按住 Shift 键双击缩小，滚轮缩放。代码在 `src/scripts/guide/gestures.ts`。
@@ -78,6 +80,21 @@ past guides stay at their own addresses (section 12).
   Sorting only changes the order inside each group (reference points, places
   closed that day and official entries each stay together), and the choice is
   remembered on this device, except Nearest first.
+- **Other listings.** The official map's entries that aren't recommended (58
+  in the Paris guide, ids starting with D, grey pins) show once **Show all
+  other listings** above the Places list is ticked. Each has what a
+  recommended exhibition has: English and Chinese text, address, hours, dates
+  and picture, and whether it is open on the chosen day; the French original
+  folds away under **Original text (French)**. Ticked, they count in the
+  status bar's number of exhibitions ("109 exhibitions", "N of 109
+  exhibitions open"), and those closed that day join the exhibitions in the
+  "Closed on …" group. They have no theme, tier or price, so choosing one
+  leaves them out, and they stay out of the heat map.
+- **The status bar.** When a sentence doesn't fit (a phone, a narrow window),
+  the status bar scrolls it, as the scrolling messages of the time did: it
+  rests, slides left until it has gone, comes back in from the right and
+  rests again, so the whole sentence can be read. A mouse resting on it holds
+  it still; with reduced motion turned on, it wraps onto a second line instead.
 - **Where am I?** The browser asks for your position only when you press the
   button. A red dot then follows you on the map, with a **Live location** chip
   that has a **Stop** button. Pressing the button again, pressing **Stop**, or a
@@ -674,6 +691,7 @@ below). Any file may have a `_comment`, which is never shown.
 | `sensitive` | `{ public: [...], <读者 id>: [...] }`：防泄漏检查用的词 | Words for the leak guard |
 | `defaults?` | `{ price?, priceZh?, listingNote?, listingNoteZh? }` | Default price and listing note |
 | `suggestions?` | `false`：这份导览不收读者推荐（没有“推荐”按钮和菜单项）。默认 `true` | `false`: no Suggest button or menu item in this guide. Default `true` |
+| `archive?` | `{ text, textZh? }`：留作记录的存档导览顶部滚动的存档栏文字，代替“今天”提示（第 12 节）。当前的导览不写 | `{ text, textZh? }`: the words of the scrolling archive bar of a guide kept open as a record, in place of the Today note (section 12). Leave it out for a current guide |
 
 ### `items.json` (`items[]`)
 
@@ -738,6 +756,19 @@ below). Any file may have a `_comment`, which is never shown.
 | --- | --- | --- |
 | `source` | `{ name, url?, checked, lang, credit? }`：官方来源 | The official source |
 | `records[]` | `{ id, name, category, coordinates, details, url?, start?, end?, image? }`；`details` 是来源原文，用 `\n` 分行；`image` 和地点的一样 | Records in the source's own words, lines split by `\n`; `image` as for an item |
+| `start?`, `end?` | 这个点上活动的日期；一处有几档展览时，从第一档开始到最后一档结束，中间空着的日子写进 `exceptions`。可以在导览的日子以外 | The dates of what happens at this point; at a venue with several shows, from the first start to the last end, with any gap in `exceptions`. They may fall outside the guide's days |
+| `subtitle?`, `by?` | 展名（原文）、艺术家（正常大小写）；几档展览用 ` / ` 隔开 | Show title (original), artist(s) in normal case; several shows joined with ` / ` |
+| `address?` | 地址（原文），写法和地点一样；有了才有“复制地址” | Address (original), written as an item's; it brings Copy address |
+| `about?`/`aboutZh?` | 除地址和开放时间外，`details` 的全部内容的英文和中文：是什么、每档展览的名称（附意思）和日期、怎么进去 | Everything in `details` but the address and hours, in English and Chinese: what it is, each show with its title (and meaning) and dates, how to get in |
+| `hours?`/`hoursZh?`, `open?`, `holiday?`, `access?`, `exceptions?[]` | 和地点一样，决定选定一天时开不开放；例外只能在导览的日子里 | As for an item: they decide whether it is open on the chosen day. Exceptions only on the guide's days |
+| `price?`/`priceZh?`, `note?`/`noteZh?` | 门票、提醒 | Admission, caution |
+
+`listings.json` 的条目只有 `id`、`name`、`category`、`coordinates`、`details` 是必填的；没有 `about` 的条目只显示原文，和以前一样。重新导入官方地图时，保留编号和这些中英文字段。
+
+Only `id`, `name`, `category`, `coordinates` and `details` are required; a
+record without `about` shows the source's text alone, as before. On a
+re-import of the official map, keep the ids and these English and Chinese
+fields.
 
 ### `map.json`
 
@@ -969,9 +1000,9 @@ Suggest a Place…**. `http://127.0.0.1:8798/_dump` shows what was kept.
 
 ### 11.6 云端例程 The routine in Claude's cloud
 
-> **2026 年 11 月 16 日起停用**：巴黎摄影导览（`paris-2026-11`）结束后存档了，也不再收推荐（`"suggestions": false`）。所以例程（定时任务“Field Guide suggestions”）已经关掉，副本的 Sync 工作流也不再定时运行，只能手动运行。要重新启用：在 [claude.ai/code/routines](https://claude.ai/code/routines) 把任务打开，再从 git 历史里恢复 `scripts/suggestions/routine-repo/.github/workflows/sync.yml` 的 `schedule:` 部分（下面第 2 步说明了定时那一行为什么要用你的账号提交）。联系方式照样按期删除（Worker 每天的清理，不受影响）。
+> **2026 年 11 月 16 日起停用**：巴黎摄影导览（`paris-2026-11`）结束后存档了（11 月 17 日起它重新列出，带存档栏，留作记录，见第 12 节），也不再收推荐（`"suggestions": false`）。所以例程（定时任务“Field Guide suggestions”）已经关掉，副本的 Sync 工作流也不再定时运行，只能手动运行。要重新启用：在 [claude.ai/code/routines](https://claude.ai/code/routines) 把任务打开，再从 git 历史里恢复 `scripts/suggestions/routine-repo/.github/workflows/sync.yml` 的 `schedule:` 部分（下面第 2 步说明了定时那一行为什么要用你的账号提交）。联系方式照样按期删除（Worker 每天的清理，不受影响）。
 >
-> **Retired on 16 November 2026**: the Paris photography guide (`paris-2026-11`) is archived and takes no more suggestions (`"suggestions": false`). So the routine (the scheduled task "Field Guide suggestions") is turned off, and the copy's Sync workflow no longer runs on a schedule, only by hand. To bring them back, turn the task on at [claude.ai/code/routines](https://claude.ai/code/routines) and restore the `schedule:` block of `scripts/suggestions/routine-repo/.github/workflows/sync.yml` from the git history (step 2 below says why its cron line must be committed as you). Contact details are still deleted when due: the Worker's daily clean-up carries on.
+> **Retired on 16 November 2026**: the Paris photography guide (`paris-2026-11`) is archived (listed again from 17 November, with its archive bar, as a record: section 12) and takes no more suggestions (`"suggestions": false`). So the routine (the scheduled task "Field Guide suggestions") is turned off, and the copy's Sync workflow no longer runs on a schedule, only by hand. To bring them back, turn the task on at [claude.ai/code/routines](https://claude.ai/code/routines) and restore the `schedule:` block of `scripts/suggestions/routine-repo/.github/workflows/sync.yml` from the git history (step 2 below says why its cron line must be committed as you). Contact details are still deleted when due: the Worker's daily clean-up carries on.
 
 推荐流程**不需要你的电脑开着**：收推荐、批准和拒绝、发布（每 10 分钟）和到期删除联系方式（每天）都在 Cloudflare
 的 Worker 里；核对和补全由 Claude Code 的云端定时任务（scheduled task，以前叫 routine，下面称“例程”）在 Anthropic
@@ -1235,6 +1266,7 @@ Safety:
 - **`/guides/<城市>`**，如 `kuschonink.com/guides/paris`，进入这个城市排在最前面的那份列出的导览。想分享“当前的巴黎导览”，就发这个链接：明年的巴黎导览列出、排到前面以后，它自己就会跟过去。
 - **新的一年**：复制文件夹，命名为 `paris-2027-11`，在 `access.json` 里把它放在最前面，`"listed": true`。
 - **存档**：把旧导览的 `"listed"` 改成 `false`。它不再出现在密码对话框的选择里，`/guides` 和 `/guides/paris` 也不再进入它；但原来的地址照样能用，凭密码照样能打开。
+- **留作记录的存档**：想让过去的导览像作品集一样继续供人浏览，就让它保持 `"listed": true`，在 `guide.json` 里加 `"archive": { "text": "…", "textZh": "…" }`，再在 `access.json` 里把当前的导览排到它前面（`/guides` 和 `/guides/<城市>` 进入排在最前面的那份）。导览顶部会有一条存档栏，文字从右向左不停滚动，说明这是哪一次的地图、很多展览已经结束；它代替“今天”提示。鼠标停在上面时文字不动，系统设置了“减少动态效果”时文字不动并折行。公开副标题里可以写上“（存档）”。巴黎摄影导览（`paris-2026-11`）从 2026 年 11 月 17 日起就是这样。
 - **完全下线**：删掉它的两个文件夹（`src/content/guides/<名字>/` 和 `public/guides/<名字>/`）以及 `access.json` 里它的几行。之后这个地址显示“网页不存在”。不要把旧地址再用在另一份导览上。
 - **不得不改名时**（很少）：把两个文件夹改名，改 `access.json` 里 `guides` 和 `tiles` 的名字，再在 `moved` 里加一行 `"<旧名>": "<新名>"`。旧地址（包括后面的图片、瓦片、登录）会永久转到新地址；用旧名发来、还在 Notion 里的推荐照样能发布。例如，这份巴黎导览原来叫 `paris-photo-days-2026`。
 
@@ -1258,6 +1290,16 @@ ones are added by city and month.
 - **Archiving**: set the old guide's `"listed"` to `false`. It leaves the
   password box's choice, and `/guides` and `/guides/paris` stop going there,
   but its address still works and its password still opens it.
+- **An archive kept open as a record**: to keep a past guide in the password
+  box, like a portfolio, leave it `"listed": true`, add
+  `"archive": { "text": "…", "textZh": "…" }` to its `guide.json`, and put
+  the current guide before it in `access.json` (`/guides` and
+  `/guides/<city>` open the first listed one). An archive bar then runs
+  across the top of the guide, its words scrolling right to left: which
+  week the map is from, and that many shows have ended. It takes the Today
+  note's place. A mouse on it holds it still; with reduced motion the words
+  stand still and wrap. The public subtitle can say "(archive)". The Paris
+  photography guide (`paris-2026-11`) is kept this way from 17 November 2026.
 - **Taking one offline**: delete its two folders (`src/content/guides/<slug>/`
   and `public/guides/<slug>/`) and its lines in `access.json`. The address then
   shows "page not found". Never reuse an old address for another guide.

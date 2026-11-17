@@ -36,6 +36,20 @@ html.js .gd { height: 100%; container-type: size; }
 /* ---- The Today note (Paint's note strip) ---- */
 .gd-note { flex: none; margin: 0 0 2px; padding: 3px 6px; background: var(--tip); border: 1px solid #000; line-height: 14px; font: 13px/1.3 "Times New Roman", Times, serif; }
 .gd-note[hidden] { display: none; }
+/* The archive bar (ArchiveBar.astro): a label, then the words running right to left, three copies so the loop never shows a gap. */
+.gd-fly { flex: none; display: flex; align-items: center; gap: 6px; margin: 0 0 2px; padding: 3px 6px; overflow: hidden; background: var(--tip); border: 1px solid #000; font: 13px/1.3 "Times New Roman", Times, serif; }
+.gd-fly-label { flex: none; padding: 0 4px; color: #fff; background: #000080; font: bold 11px/15px var(--ui-font); }
+.gd-fly-window { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; }
+.gd-fly-track { display: inline-flex; animation: gd-fly var(--gd-fly-s, 30s) linear infinite; }
+.gd-fly-track > span { flex: none; padding-right: 4em; }
+.gd-fly:hover .gd-fly-track { animation-play-state: paused; }
+@keyframes gd-fly { to { transform: translateX(-33.3333%); } }
+@media (prefers-reduced-motion: reduce) {
+  .gd-fly-window { white-space: normal; }
+  .gd-fly-track { display: inline; animation: none; }
+  .gd-fly-track > span { padding: 0; }
+  .gd-fly-track > span + span { display: none; }
+}
 
 /* ---- Filter band: a toolbar band; only with JS ---- */
 .gd-filters {
@@ -296,7 +310,7 @@ html.js .gd.gd-failed .gd-article:not([hidden]) { display: block !important; bor
 :where(html[data-scheme="contrast"]) .gd-day.is-today { background: #fff; outline: 2px solid #000; }
 :where(html[data-scheme="contrast"]) table.gd-table tr.gd-shut td { text-decoration: line-through; }
 :where(html[data-scheme="contrast"]) table.gd-table tr.gd-shut:not(.highlighted) :is(td, .gd-row-name, .gd-row-sub, .gd-row-meta) { color: #000; }
-:where(html[data-scheme="contrast"]) .gd-caution, :where(html[data-scheme="contrast"]) .gd-note { background: #fff; }
+:where(html[data-scheme="contrast"]) .gd-caution, :where(html[data-scheme="contrast"]) .gd-note, :where(html[data-scheme="contrast"]) .gd-fly { background: #fff; }
 @media (forced-colors: active) {
   .gd-sq { forced-color-adjust: none; }
   .gd-pane, .gd-details, .gd-mapwrap { border: 1px solid CanvasText; }

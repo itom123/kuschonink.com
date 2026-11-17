@@ -121,8 +121,15 @@ const base = (): RawGuide => ({
   listings: {
     source: { name: 'Official map', checked: '2026-11-01', lang: 'fr' },
     records: [
-      { id: 'D01', name: 'Galerie Un', category: 'galleries', coordinates: [2.3377, 48.8607], details: 'Galerie\nexpo' },
-      { id: 'D02', name: 'Galerie Deux', category: 'galleries', coordinates: [2.34, 48.86], details: 'Galerie deux', image: { file: 'd02.jpg', credit: '© Someone Else', caption: 'Untitled, 2026' } },
+      // A show after the guide's days is fine for an official record (not for an item).
+      { id: 'D01', name: 'Galerie Un', category: 'galleries', coordinates: [2.3377, 48.8607], details: 'Galerie\nexpo', start: '2026-11-20', end: '2026-11-28' },
+      {
+        id: 'D02', name: 'Galerie Deux', category: 'galleries', coordinates: [2.34, 48.86], details: 'Galerie deux\nmardi-samedi 11h-19h', image: { file: 'd02.jpg', credit: '© Someone Else', caption: 'Untitled, 2026' },
+        subtitle: 'Sans titre', by: 'Anne Exemple', address: '2 Rue Deux, 75003 Paris',
+        about: 'Anne Exemple: Sans titre (Untitled), 1 to 30 November 2026.', aboutZh: 'Anne Exemple 的《Sans titre》（意为“无题”），2026年11月1日至30日。',
+        hours: 'Tue–Sat 11:00–19:00', hoursZh: '周二至周六 11:00–19:00', open: ['tue', 'wed', 'thu', 'fri', 'sat'], start: '2026-11-01', end: '2026-11-30',
+        exceptions: [{ date: '2026-11-14', status: 'closed', note: 'Private event', noteZh: '私人活动' }], price: 'Free', priceZh: '免费',
+      },
     ],
   },
   map: { views: [CITY, REGION], attribution: '© Base map' },
@@ -184,6 +191,17 @@ const base = (): RawGuide => ({
   ok(vv.map.views[0].src === '/guides/paris-fixture/map/city.jpg', 'map view src');
   ok(vv.listings.records[0].item === 'A1' && vv.listings.records[1].item === undefined, 'listings link back to their item');
   ok(vv.listings.records[1].image?.src === '/guides/paris-fixture/img/d02.jpg' && vv.listings.records[1].image.caption === 'Untitled, 2026' && vv.listings.records[1].image.alt.en === 'Galerie Deux' && !vv.listings.records[0].image, 'a listing record\'s picture: src, caption, alt from its name');
+  {
+    const d1 = vv.listings.records[0], d2 = vv.listings.records[1];
+    ok(d2.about.zh.includes('无题') && d2.hours.en === 'Tue–Sat 11:00–19:00' && d2.price.zh === '免费' && d2.subtitle === 'Sans titre' && d2.by === 'Anne Exemple' && d2.address === '2 Rue Deux, 75003 Paris', 'a listing in the guide\'s words: about, hours, price, show, artist, address');
+    ok(d2.open?.join() === 'tue,wed,thu,fri,sat' && d2.holiday === 'confirm' && d2.access === 'walk-in' && d2.exceptions[0].note.zh === '私人活动', 'a listing\'s day rule, with the defaults an item gets');
+    ok(d1.about.en === '' && d1.hours.en === '' && d1.address === '' && d1.exceptions.length === 0, 'a record without them still loads, with empty words');
+    const lp = buildPayload(vv).listings;
+    const p2 = lp.find((l) => l.id === 'D02')!;
+    ok(p2.open?.length === 5 && p2.start === '2026-11-01' && p2.exceptions.length === 1 && !JSON.stringify(lp).includes('无题') && !JSON.stringify(lp).includes('Rue Deux'), 'the payload has each listing\'s day rule, never its words');
+    ok(dayStatus(p2, '2026-11-09', vv.holidays).code === 'closed-weekday' && dayStatus(p2, '2026-11-14', vv.holidays).code === 'closed' && dayStatus(p2, '2026-11-12', vv.holidays).code === 'scheduled', 'a listing is open or closed by its own days');
+    ok(dayStatus(lp.find((l) => l.id === 'D01')!, '2026-11-12', vv.holidays).code === 'not-yet', 'a listing after the guide\'s days is "not yet" on them');
+  }
   ok(vv.items[1].image?.source?.en === 'Published by the venue' && vv.items[1].image.source.zh === '由场馆发布' && vv.items[0].image?.source === undefined, 'a picture\'s own "published by" comes through; without one, none');
   ok(vv.items[0].label && !vv.items[3].label && vv.items[3].holiday === 'closed' && vv.items[0].holiday === 'confirm', 'defaults: label for tier A, holiday confirm');
   ok(vv.audienceLabel.en === 'Visitor' && vv.window?.days.length === 8, 'audience label and window days');
@@ -200,6 +218,14 @@ const base = (): RawGuide => ({
   const noZh = base();
   delete (noZh.items as { items: Record<string, unknown>[] }).items[0].whyZh;
   ok(checkGuide(noZh, 'paris-fixture', acc).length === 0 && buildView(noZh, 'paris-fixture', acc, 'visitor').items[0].why.zh === '', 'deleting whyZh passes, and why.zh is ""');
+  {
+    // An archived guide kept open: its bar's words in both languages; a current guide has none.
+    const arch = base();
+    (arch.guide as Record<string, unknown>).archive = { text: 'This map is from 2026; many shows have ended.', textZh: '这张地图来自2026年；许多展览已经结束。' };
+    const av = buildView(arch, 'paris-fixture', acc, 'visitor');
+    ok(checkGuide(arch, 'paris-fixture', acc).length === 0 && av.archive?.en.startsWith('This map') === true && av.archive.zh.startsWith('这张地图'), 'an archive bar: checked, and its words in both languages');
+    ok(vv.archive === undefined, 'a current guide has no archive bar');
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -240,6 +266,13 @@ const base = (): RawGuide => ({
     ['bad enum', (g) => { g.routes.routes[1].mode = 'bike'; }, 'routes.json › marais › mode', 'not one of'],
     ['duplicate listing id', (g) => { g.listings.records[1].id = 'D01'; }, 'listings.json › D01 › id', 'used twice'],
     ['unknown category', (g) => { g.listings.records[1].category = 'cafes'; }, 'listings.json › D02 › category', 'not a category'],
+    ['listing field typo', (g) => { g.listings.records[1].aboutZH = 'x'; }, 'listings.json › D02 › aboutZH', 'did you mean "aboutZh"'],
+    ['listing zh times differ', (g) => { g.listings.records[1].hoursZh = '周二至周六 11:00–18:00'; }, 'listings.json › D02 › hoursZh', 'times'],
+    ['listing exception outside the guide\'s days', (g) => { g.listings.records[1].exceptions[0].date = '2026-11-20'; }, 'listings.json › D02 › exceptions[0].date', "outside the guide's days"],
+    ['listing weekday twice', (g) => { g.listings.records[1].open = ['tue', 'tue']; }, 'listings.json › D02 › open', 'weekday twice'],
+    ['listing bad access', (g) => { g.listings.records[1].access = 'booking'; }, 'listings.json › D02 › access', 'not one of'],
+    ['archive without its text', (g) => { g.guide.archive = { textZh: '存档' }; }, 'guide.json › archive › text', 'missing'],
+    ['archive text typo', (g) => { g.guide.archive = { text: 'Archive.', txetZh: 'x' }; }, 'guide.json › archive › txetZh', 'did you mean "textZh"'],
     ['deep unknown key', (g) => { g.items.items[0].image.credt = 'x'; }, 'items.json › A1 › image.credt', 'did you mean "credit"'],
     ['exception in the wrong year', (g) => { g.items.items[3].exceptions = [{ date: '2025-11-15', status: 'appointment' }]; }, 'items.json › B1 › exceptions[0].date', "outside the guide's days"],
     ['unknown placeholder in the subtitle', (g) => { g.guide.subtitle = '{exhibitions} to see'; }, 'guide.json › guide › subtitle', 'unknown placeholder {exhibitions}'],

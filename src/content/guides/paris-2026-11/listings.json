@@ -1,5 +1,5 @@
 {
-  "_comment": "Official Photo Days map entries (uMap #1453094), in French as published. Where a map caption left out the address, dates or opening hours, the record was completed from its own festival page (the record's url) on 7 Nov; D52's point is the Espace Landowski (Base Adresse Nationale). Pictures: the one each festival page publishes, with its credit. Keep the ids D01–D88 on any re-import. 官方地图条目，保留法文原文；地图说明缺少地址、日期或开放时间的，于11月7日按该条目自己的摄影节页面补全；图片为摄影节页面发布的图片及其署名。重新导入时保持编号不变。",
+  "_comment": "Official Photo Days map entries (uMap #1453094), in French as published. Where a map caption left out the address, dates or opening hours, the record was completed from its own festival page (the record's url) on 7 Nov; D52's point is the Espace Landowski (Base Adresse Nationale). Pictures: the one each festival page publishes, with its credit. The 58 records no item stands for also carry the guide's own fields (show, artist, address, about/aboutZh, hours, open, exceptions, price, note), written on 8 Nov from each caption and its festival page; `details` stays the source's French. Keep the ids D01–D88, and these fields, on any re-import. 官方地图条目，保留法文原文；地图说明缺少地址、日期或开放时间的，于11月7日按该条目自己的摄影节页面补全；图片为摄影节页面发布的图片及其署名。没有对应推荐条目的 58 个记录另有导览自己的中英文字段（展名、艺术家、地址、说明、开放时间、日期例外、门票、提醒），于11月8日按地图说明和摄影节页面写成；details 保留法文原文。重新导入时保持编号和这些字段不变。",
   "source": {
     "name": "Photo Days 2026 official map",
     "url": "https://umap.openstreetmap.fr/fr/map/photo-days-2026_1453094",
@@ -19,7 +19,22 @@
       "details": "Lectures de portfolio\ngratuites pour les photographes\ninscription obligatoire\n\nlundi 9 et mardi 10.11.2026\n16bis boulevard Montmartre — Paris 9e",
       "url": "https://photodays.paris/Lectures-de-portfolio",
       "start": "2026-11-09",
-      "end": "2026-11-10"
+      "end": "2026-11-10",
+      "image": {
+        "file": "D01.jpg",
+        "credit": "Photographer not named",
+        "caption": "L'Ecole des Arts Joailliers, nouveau lieu partenaire de Photo Days pour les Lectures de Portfolio 2024.",
+        "alt": "A gilded salon with tall windows, blue and grey sofas and a display case.",
+        "altZh": "金色装饰的沙龙，有高窗、蓝灰色沙发和一个展示柜。"
+      },
+      "address": "16 bis Boulevard Montmartre, 75009 Paris",
+      "about": "Free portfolio reviews for photographers, run by Photo Days at L’École des Arts Joailliers, in the Hôtel de Mercy-Argenteau, on 9 and 10 November 2026. All photographers are welcome. Registration is required and places are limited: once your request is accepted, you book a review with the professional of your choice.",
+      "aboutZh": "Photo Days 为摄影师举办的免费作品集评审，2026年11月9日和10日在 Hôtel de Mercy-Argenteau 内的 L’École des Arts Joailliers 举行。欢迎所有摄影师参加。必须报名，名额有限：申请通过后，再预约你选定的专业人士进行评审。",
+      "hours": "Mon 9 and Tue 10 Nov: 10:00–12:00, 13:30–15:30, 16:00–18:00",
+      "hoursZh": "11月9日（周一）和10日（周二）：10:00–12:00、13:30–15:30、16:00–18:00",
+      "access": "appointment",
+      "price": "Free; registration required.",
+      "priceZh": "免费；须报名。"
     },
     {
       "id": "D02",
@@ -30,7 +45,26 @@
         48.854541
       ],
       "details": "chez La Hune, 16 rue de l'Abbaye · Paris 6e\n\nRencontres d'artistes\nmardis 3, 10, 17, 24 nov 17h30-19h",
-      "url": "https://photodays.paris/Les-artistes-font-salon"
+      "url": "https://photodays.paris/Les-artistes-font-salon",
+      "start": "2026-11-03",
+      "end": "2026-11-24",
+      "image": {
+        "file": "D02.jpg",
+        "credit": "© Dominique Dugay pour Photo Days, 2026",
+        "alt": "People lean over photographs on a low table in a bookshop.",
+        "altZh": "书店里，人们俯身围着一张矮桌看照片。"
+      },
+      "address": "16 Rue de l’Abbaye, 75006 Paris",
+      "about": "Les artistes font salon (The artists hold a salon): informal meetings with artists at La Hune, the bookshop beside the Saint-Germain-des-Prés church. One session each Tuesday, 3 to 24 November 2026. Entry is free; book through the RSVP link on the festival page.",
+      "aboutZh": "《Les artistes font salon》（意为“艺术家的沙龙”）：在 Saint-Germain-des-Prés 教堂旁的 La Hune 书店，与艺术家轻松见面交流。2026年11月3日至24日，每周二一场。免费参加；请通过摄影节页面上的 RSVP 链接预约。",
+      "hours": "Tue 3, 10, 17 and 24 Nov, 17:30–19:00",
+      "hoursZh": "11月3日、10日、17日、24日（均为周二）17:30–19:00",
+      "open": [
+        "tue"
+      ],
+      "access": "appointment",
+      "price": "Free; booking required.",
+      "priceZh": "免费；须预约。"
     },
     {
       "id": "D03",
@@ -50,7 +84,12 @@
         "caption": "Hélène Giannecchini, I Want my People to be Remembered",
         "alt": "Exhibition image: Hélène Giannecchini, I Want my People to be Remembered",
         "altZh": "展览图片：Hélène Giannecchini, I Want my People to be Remembered"
-      }
+      },
+      "address": "7 Rue Francis de Pressensé, 75014 Paris",
+      "about": "Les Nuits Photo (Photo Nights) is a festival of the photographic film: films made from still photographs and sound. Its 6th edition is at the Cinéma L’Entrepôt, 27 to 29 November 2026.",
+      "aboutZh": "《Les Nuits Photo》（意为“摄影之夜”）是一个摄影电影节，放映用静态照片和声音构成的影片。第6届于2026年11月27日至29日在 Cinéma L’Entrepôt 举行。",
+      "hours": "Fri 27 Nov 18:00–01:00; Sat 28 Nov 13:00–01:00; Sun 29 Nov 13:00–22:00",
+      "hoursZh": "11月27日（周五）18:00–01:00；11月28日（周六）13:00–01:00；11月29日（周日）13:00–22:00"
     },
     {
       "id": "D04",
@@ -83,7 +122,15 @@
         "caption": "Lauréate 2025 Kieu-Anh Nguyen Phuong pour Fallen Noon, 2025",
         "alt": "Exhibition image: Lauréate 2025 Kieu-Anh Nguyen Phuong pour Fallen Noon, 2025",
         "altZh": "展览图片：Lauréate 2025 Kieu-Anh Nguyen Phuong pour Fallen Noon, 2025"
-      }
+      },
+      "address": "1 Place de la Concorde, Jardin des Tuileries, 75001 Paris",
+      "about": "The 20th StudioCollector Prize, presented by Nathalie Mamane Cohen in collaboration with Le Fresnoy, in the auditorium of the Jeu de Paume: a screening, then the award. The prize goes to an artist from Le Fresnoy – Studio national des arts contemporains. Free entry while seats last; registration is required (RSVP to communication@lefresnoy.net or on the festival page).",
+      "aboutZh": "第20届 StudioCollector 奖由 Nathalie Mamane Cohen 与 Le Fresnoy 合作颁发，在 Jeu de Paume 的报告厅举行：先放映，再颁奖。该奖颁给一位来自 Le Fresnoy – Studio national des arts contemporains 的艺术家。免费入场，座位有限；须报名（RSVP：发邮件至 communication@lefresnoy.net，或通过摄影节页面）。",
+      "hours": "Mon 23 Nov at 18:00 sharp",
+      "hoursZh": "11月23日（周一）18:00 准时开始",
+      "access": "appointment",
+      "price": "Free; registration required, while seats last.",
+      "priceZh": "免费；须报名，座位有限。"
     },
     {
       "id": "D06",
@@ -129,7 +176,38 @@
         "caption": "Lake Michigan-Chicago #9, 2022",
         "alt": "Exhibition image: Lake Michigan-Chicago #9, 2022",
         "altZh": "展览图片：Lake Michigan-Chicago #9, 2022"
-      }
+      },
+      "subtitle": "Grands Lacs. L’horizon commun des mers intérieures",
+      "by": "Robert Burley",
+      "address": "130 Rue du Faubourg Saint-Honoré, 75008 Paris",
+      "about": "The Centre culturel canadien shows Robert Burley: Grands Lacs. L’horizon commun des mers intérieures (Great Lakes. The shared horizon of the inland seas), 6 June to 14 November 2026. Burley photographed the Great Lakes basin, which straddles the border between Canada and the United States, from its many shores. The curator, Catherine Bédard, gives a tour on Monday 9 November at 18:00 (RSVP).",
+      "aboutZh": "Centre culturel canadien 展出 Robert Burley 的《Grands Lacs. L’horizon commun des mers intérieures》（意为“五大湖：内陆海共同的地平线”），2026年6月6日至11月14日。Burley 从众多湖岸出发，拍摄横跨加拿大与美国边境的五大湖流域。11月9日（周一）18:00，策展人 Catherine Bédard 带领参观（需 RSVP）。",
+      "hours": "Mon–Fri 10:00–18:00",
+      "hoursZh": "周一至周五 10:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri"
+      ],
+      "holiday": "closed",
+      "exceptions": [
+        {
+          "date": "2026-11-09",
+          "status": "open",
+          "note": "Late opening 10:00–21:00",
+          "noteZh": "延长开放 10:00–21:00"
+        },
+        {
+          "date": "2026-11-14",
+          "status": "open",
+          "note": "Special opening 14:00–20:30",
+          "noteZh": "特别开放 14:00–20:30"
+        }
+      ],
+      "price": "Free",
+      "priceZh": "免费"
     },
     {
       "id": "D09",
@@ -148,7 +226,19 @@
         "credit": "© Jindřich Štreit",
         "alt": "Exhibition image (Jindřich Štreit)",
         "altZh": "展览图片（Jindřich Štreit）"
-      }
+      },
+      "subtitle": "Humanity",
+      "by": "Jindřich Štreit",
+      "address": "18 Rue Bonaparte, 75006 Paris",
+      "about": "The Centre tchèque de Paris shows Jindřich Štreit: Humanity, 5 November 2026 to 16 January 2027. It is the Czech photographer’s first major retrospective in Paris, for his 80th birthday. Nearly 80 silver prints, some never shown before, portray people in marginalised regions of Bohemia and France in the 1990s.",
+      "aboutZh": "Centre tchèque de Paris 展出 Jindřich Štreit 的《Humanity》（意为“人性”），2026年11月5日至2027年1月16日。这是这位捷克摄影师在巴黎的首次大型回顾展，适逢他80岁生日。近80张银盐照片（部分从未展出）记录了1990年代波希米亚和法国边缘地区的居民。",
+      "hours": "Thu–Sat 13:00–19:00",
+      "hoursZh": "周四至周六 13:00–19:00",
+      "open": [
+        "thu",
+        "fri",
+        "sat"
+      ]
     },
     {
       "id": "D10",
@@ -168,7 +258,23 @@
         "caption": "Isabelle LE MINH, Manoeuvrability, installation Raw Loop, 2023",
         "alt": "Exhibition image: Isabelle LE MINH, Manoeuvrability, installation Raw Loop, 2023",
         "altZh": "展览图片：Isabelle LE MINH, Manoeuvrability, installation Raw Loop, 2023"
-      }
+      },
+      "subtitle": "A Rose is a Rose is the Last Rose of Summer",
+      "by": "Isabelle Le Minh",
+      "address": "107 Avenue de la République, 77340 Pontault-Combault",
+      "about": "The Centre Photographique d’Île-de-France (CPIF) shows Isabelle Le Minh: A Rose is a Rose is the Last Rose of Summer, 4 October to 20 December 2026, for the bicentenary of photography. Prints, installations and sound pieces take an offbeat look at photography’s history and industrial past.",
+      "aboutZh": "Centre Photographique d’Île-de-France（CPIF）展出 Isabelle Le Minh 的《A Rose is a Rose is the Last Rose of Summer》（意为“玫瑰就是玫瑰，就是夏日最后一朵玫瑰”），2026年10月4日至12月20日，是摄影术诞生两百周年纪念活动的一部分。展览通过照片、装置和声音作品，从另类的角度回看摄影的历史和它的工业往事。",
+      "hours": "Wed–Fri 13:00–18:00; Sat–Sun 14:00–18:00",
+      "hoursZh": "周三至周五 13:00–18:00；周六、周日 14:00–18:00",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "price": "Free",
+      "priceZh": "免费"
     },
     {
       "id": "D11",
@@ -188,7 +294,22 @@
         "caption": "Black waters #3, Paris 2026, Set design Maureen Coleman",
         "alt": "Exhibition image: Black waters #3, Paris 2026, Set design Maureen Coleman",
         "altZh": "展览图片：Black waters #3, Paris 2026, Set design Maureen Coleman"
-      }
+      },
+      "subtitle": "Rester Vivant(e)",
+      "by": "Group show: Stephan Zimmerli, Johanna Hullár, Sophie Ballmer, Tarik Hayward and others",
+      "address": "30 Rue Jean-Jacques Rousseau, 93230 Romainville",
+      "about": "Fondation Fiminco shows Rester Vivant(e) (Staying alive), 15 October to 29 November 2026, with Stephan Zimmerli, Johanna Hullár, the duo Sophie Ballmer and Tarik Hayward, Julie Semoroz, Santiago Martinez and Séverin Guelpa. Swiss artists in residence at the foundation explore slower, more collective ways of living, through sound, transformed materials and stories of place.",
+      "aboutZh": "Fondation Fiminco 展出群展《Rester Vivant(e)》（意为“活下去”），2026年10月15日至11月29日，参展艺术家有 Stephan Zimmerli、Johanna Hullár、Sophie Ballmer 与 Tarik Hayward 二人组、Julie Semoroz、Santiago Martinez 和 Séverin Guelpa。在基金会驻留的瑞士艺术家通过声音、改造过的材料和关于地方的叙事，探索更慢、更集体的生活方式。",
+      "hours": "Tue–Sun 14:00–18:00",
+      "hoursZh": "周二至周日 14:00–18:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ]
     },
     {
       "id": "D12",
@@ -221,7 +342,27 @@
         "caption": "Brassaï, L'événement, années 1930-40",
         "alt": "Exhibition image: Brassaï, L'événement, années 1930-40",
         "altZh": "展览图片：Brassaï, L'événement, années 1930-40"
-      }
+      },
+      "subtitle": "L’œil de Paris",
+      "by": "Brassaï",
+      "address": "9 Avenue de Trivaux, 92190 Meudon",
+      "about": "Hangar Y shows Brassaï: L’œil de Paris (The eye of Paris), 17 October 2026 to 21 February 2027, for the bicentenary of photography. A hundred posthumous prints come from the collection of his wife, Gilberte, and have stayed in the family until now. Curated by Philippe Ribeyrolles.",
+      "aboutZh": "Hangar Y 展出 Brassaï 的《L’œil de Paris》（意为“巴黎之眼”），2026年10月17日至2027年2月21日，是摄影术诞生两百周年纪念活动的一部分。一百张在他身后冲印的照片来自他妻子 Gilberte 的个人收藏，此前一直留在家族之中。策展人：Philippe Ribeyrolles。",
+      "hours": "Sat–Sun 11:00–19:00; also on public holidays and during school holidays",
+      "hoursZh": "周六、周日 11:00–19:00；公共假日和学校假期期间也开放",
+      "open": [
+        "sat",
+        "sun"
+      ],
+      "holiday": "open",
+      "exceptions": [
+        {
+          "date": "2026-11-11",
+          "status": "open",
+          "note": "Public holiday: open 11:00–19:00",
+          "noteZh": "公共假日开放 11:00–19:00"
+        }
+      ]
     },
     {
       "id": "D14",
@@ -267,7 +408,20 @@
         "caption": "Jakes' eyes, 2003",
         "alt": "Exhibition image: Jakes' eyes, 2003",
         "altZh": "展览图片：Jakes' eyes, 2003"
-      }
+      },
+      "subtitle": "Histoires d’amour",
+      "address": "Place Jean-Michel Basquiat, 75013 Paris",
+      "about": "La Fab. shows Histoires d’amour (Love stories), drawn entirely from the agnès b. collection, 20 November 2026 to 21 March 2027, for the bicentenary of photography. The show explores the many sides of affection, across periods.",
+      "aboutZh": "La Fab. 展出《Histoires d’amour》（意为“爱情故事”），作品全部来自 agnès b. 的收藏，2026年11月20日至2027年3月21日，是摄影术诞生两百周年纪念活动的一部分。展览跨越不同年代，探讨情感联系的多个侧面。",
+      "hours": "Wed–Sat 11:00–19:00; Sun 14:00–19:00",
+      "hoursZh": "周三至周六 11:00–19:00；周日 14:00–19:00",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ]
     },
     {
       "id": "D17",
@@ -286,7 +440,24 @@
         "credit": "© Julia Dupont",
         "alt": "Exhibition image (Julia Dupont)",
         "altZh": "展览图片（Julia Dupont）"
-      }
+      },
+      "subtitle": "Au milieu",
+      "by": "Marie Cantos, Claire Colin-Collin, Julia Dupont and Dorothée Volut",
+      "address": "100 Rue de Charenton, 75012 Paris",
+      "about": "Le 100 (Établissement Culturel Solidaire), a cultural venue with a social mission, shows Au milieu (In the middle), 5 to 28 November 2026. Photographs by Julia Dupont meet paintings by Claire Colin-Collin, with writing by Dorothée Volut and a sound piece by Marie Cantos to hear on headphones. Talk and book signing on Saturday 14 November at 16:00.",
+      "aboutZh": "Le 100（Établissement Culturel Solidaire，一家具有社会使命的文化空间）展出《Au milieu》（意为“在中间”），2026年11月5日至28日。Julia Dupont 的摄影与 Claire Colin-Collin 的绘画相互对话，另有 Dorothée Volut 的文字和 Marie Cantos 的一件用耳机收听的声音作品。11月14日（周六）16:00 有见面会和签售。",
+      "hours": "Mon–Sat 09:00–23:00",
+      "hoursZh": "周一至周六 09:00–23:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "price": "Free",
+      "priceZh": "免费"
     },
     {
       "id": "D18",
@@ -318,7 +489,23 @@
         "credit": "© Queenie F. CHARLES",
         "alt": "Exhibition image (Queenie F. CHARLES)",
         "altZh": "展览图片（Queenie F. CHARLES）"
-      }
+      },
+      "subtitle": "Trier le monde. Regards post-algorithmiques sur la collection de photographies",
+      "by": "Aarati Akapedi, Nouf Aljowaysir, Minne Atairu, Nicolas Gourault and Kaspar Ravel",
+      "address": "4 Rue de Freiberg, 94250 Gentilly",
+      "about": "Le Lavoir Numérique shows Trier le monde. Regards post-algorithmiques sur la collection de photographies (Sorting the world. Post-algorithmic views of the photography collection), 18 September 2026 to 14 March 2027. Two hundred years after photography’s invention, the show asks what becomes of the photograph, and of its claim to truth, when algorithms collect it. With Aarati Akapedi, Nouf Aljowaysir, Minne Atairu, Nicolas Gourault and Kaspar Ravel.",
+      "aboutZh": "Le Lavoir Numérique 展出《Trier le monde. Regards post-algorithmiques sur la collection de photographies》（意为“为世界分类：以后算法的眼光看摄影收藏”），2026年9月18日至2027年3月14日。在摄影术诞生两百年之际，展览追问：当照片由算法收集和收藏时，它还剩下什么，它记录现实、被默认为真实的能力又会怎样。参展艺术家：Aarati Akapedi、Nouf Aljowaysir、Minne Atairu、Nicolas Gourault、Kaspar Ravel。",
+      "hours": "Wed–Fri 13:30–18:30; Sat–Sun 13:30–19:00",
+      "hoursZh": "周三至周五 13:30–18:30；周六、周日 13:30–19:00",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "price": "Free",
+      "priceZh": "免费"
     },
     {
       "id": "D20",
@@ -338,7 +525,22 @@
         "caption": "Sans titre, in Dami (Fulmen), 2023, Thermogramme sur aluminium brossé",
         "alt": "Exhibition image: Sans titre, in Dami (Fulmen), 2023, Thermogramme sur aluminium brossé",
         "altZh": "展览图片：Sans titre, in Dami (Fulmen), 2023, Thermogramme sur aluminium brossé"
-      }
+      },
+      "subtitle": "Ici grand ouvert",
+      "by": "SMITH",
+      "address": "Place de la Libération, 94400 Vitry-sur-Seine",
+      "about": "MAC VAL, the museum of contemporary art of the Val-de-Marne, shows SMITH: Ici grand ouvert (Here, wide open), 23 May 2026 to 31 January 2027. Born in 1985, SMITH works across photography, moving image, installation, sculpture and performance. The artist gives a tour on Tuesday 10 November at 14:00 (RSVP).",
+      "aboutZh": "MAC VAL（Val-de-Marne 当代艺术博物馆）展出 SMITH 的《Ici grand ouvert》（意为“此处敞开”），2026年5月23日至2027年1月31日。SMITH 生于1985年，创作横跨摄影、动态影像、装置、雕塑和行为艺术。11月10日（周二）14:00，艺术家亲自导览（需 RSVP）。",
+      "hours": "Tue–Sun 11:00–18:00",
+      "hoursZh": "周二至周日 11:00–18:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ]
     },
     {
       "id": "D21",
@@ -358,7 +560,24 @@
         "caption": "Future Proof, British Vogue, septembre 2022, avec Mamuor Majeng, Nyaueth Riam, tenues Bottega Veneta",
         "alt": "Exhibition image: Future Proof, British Vogue, septembre 2022, avec Mamuor Majeng, Nyaueth Riam, tenues Bottega Veneta",
         "altZh": "展览图片：Future Proof, British Vogue, septembre 2022, avec Mamuor Majeng, Nyaueth Riam, tenues Bottega Veneta"
-      }
+      },
+      "subtitle": "Rafael Pavarotti. Photographe",
+      "by": "Rafael Pavarotti",
+      "address": "107 Rue de Rivoli, 75001 Paris",
+      "about": "The MAD (Musée des Arts décoratifs) shows Rafael Pavarotti. Photographe (Rafael Pavarotti. Photographer), 2 October 2026 to 2 May 2027, the Brazilian photographer’s first show in France. Over 200 prints, from fashion magazine covers to portraits of pop stars, hang alongside photographs from the museum’s collection.",
+      "aboutZh": "MAD（Musée des Arts décoratifs）展出《Rafael Pavarotti. Photographe》（意为“摄影师 Rafael Pavarotti”），2026年10月2日至2027年5月2日，这是这位巴西摄影师在法国的首次展览。200多张照片，从时尚杂志封面到流行明星肖像，与博物馆收藏的照片并置展出。",
+      "hours": "Tue–Sun 11:00–18:00; late opening Thu until 21:00",
+      "hoursZh": "周二至周日 11:00–18:00；周四夜场至 21:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "note": "Online booking recommended.",
+      "noteZh": "建议在网上预约。"
     },
     {
       "id": "D22",
@@ -377,7 +596,21 @@
         "credit": "courtesy Maison de Balzac",
         "alt": "Exhibition image (courtesy Maison de Balzac)",
         "altZh": "展览图片（courtesy Maison de Balzac）"
-      }
+      },
+      "subtitle": "De la vigne au verre. Le vin chez Balzac",
+      "address": "47 Rue Raynouard, 75016 Paris",
+      "about": "The Maison de Balzac shows De la vigne au verre. Le vin chez Balzac (From vine to glass. Wine in Balzac’s world), 26 November 2026 to 6 April 2027. Over 80 works trace what Balzac wrote about wine in his essays, novels and letters. Curated by Yves Gagneux and Laure Ménétrier.",
+      "aboutZh": "Maison de Balzac 展出《De la vigne au verre. Le vin chez Balzac》（意为“从葡萄园到酒杯：Balzac 笔下的葡萄酒”），2026年11月26日至2027年4月6日。80多件展品呈现 Balzac 在随笔、小说和书信中对葡萄酒的思考。策展人：Yves Gagneux 和 Laure Ménétrier。",
+      "hours": "Tue–Sun 10:00–18:00",
+      "hoursZh": "周二至周日 10:00–18:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ]
     },
     {
       "id": "D23",
@@ -397,7 +630,23 @@
         "caption": "Kwame BRATHWAITE, Radiah Frye lors d’une séance photo aux studios AJASS, vers 1970",
         "alt": "Exhibition image: Kwame BRATHWAITE, Radiah Frye lors d’une séance photo aux studios AJASS, vers 1970",
         "altZh": "展览图片：Kwame BRATHWAITE, Radiah Frye lors d’une séance photo aux studios AJASS, vers 1970"
-      }
+      },
+      "subtitle": "Black is Beautiful",
+      "by": "Kwame Brathwaite",
+      "address": "1 Rue de la Division du Général Leclerc, 94250 Gentilly",
+      "about": "The Maison de la Photographie Robert Doisneau, in Gentilly, shows Kwame Brathwaite: Black is Beautiful, 18 September 2026 to 14 March 2027. Brathwaite’s photographs helped spread the ‘Black is Beautiful’ slogan in the 1960s.",
+      "aboutZh": "Maison de la Photographie Robert Doisneau（位于 Gentilly）展出 Kwame Brathwaite 的《Black is Beautiful》，2026年9月18日至2027年3月14日。Brathwaite 的照片在1960年代帮助推广了“Black is Beautiful”这一口号。",
+      "hours": "Wed–Fri 13:30–18:30; Sat/Sun 13:30–19:00",
+      "hoursZh": "周三至周五 13:30–18:30；周六、周日 13:30–19:00",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "price": "Free",
+      "priceZh": "免费"
     },
     {
       "id": "D24",
@@ -417,7 +666,21 @@
         "caption": "Jean-François BAURET, Portrait de Maurice Estève, 1960",
         "alt": "Exhibition image: Jean-François BAURET, Portrait de Maurice Estève, 1960",
         "altZh": "展览图片：Jean-François BAURET, Portrait de Maurice Estève, 1960"
-      }
+      },
+      "by": "Jean-François Bauret",
+      "address": "11 Avenue du Président Wilson, 75116 Paris",
+      "about": "Portraits of artists by Jean-François Bauret, hung within the permanent collection of the Musée d’Art Moderne de Paris, 9 June 2026 to 4 January 2027.",
+      "aboutZh": "Musée d’Art Moderne de Paris 在常设展中陈列 Jean-François Bauret 拍摄的艺术家肖像，2026年6月9日至2027年1月4日。",
+      "hours": "Tue–Sun 10:00–18:00",
+      "hoursZh": "周二至周日 10:00–18:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ]
     },
     {
       "id": "D25",
@@ -429,13 +692,29 @@
       ],
       "details": "17 rue Geoffroy l’Asnier — Paris 4e\n\nSimone VEIL. Mes sœurs et moi\n10.2 — 29.11.2026\n\nImages de la rafle du « billet vert »\n10.5 — 31.12.2026\n\ndimanche-vendredi 10h-18h. nocturne le jeudi jusqu’à 21h",
       "url": "https://photodays.paris/memorial-de-la-shoah",
+      "start": "2026-02-10",
+      "end": "2026-12-31",
       "image": {
         "file": "D25.jpg",
         "credit": "© Archives familles Veil et Vernay",
         "caption": "La fratrie Jacob, Denise, Simone, Madeleine et Jean, vers 1930",
         "alt": "Exhibition image: La fratrie Jacob, Denise, Simone, Madeleine et Jean, vers 1930",
         "altZh": "展览图片：La fratrie Jacob, Denise, Simone, Madeleine et Jean, vers 1930"
-      }
+      },
+      "subtitle": "Simone Veil. Mes sœurs et moi / Images de la rafle du « billet vert »",
+      "address": "17 Rue Geoffroy l’Asnier, 75004 Paris",
+      "about": "Two shows: Simone Veil. Mes sœurs et moi (Simone Veil: my sisters and me), 10 February to 29 November 2026, and Images de la rafle du « billet vert » (Pictures of the ‘green ticket’ roundup), 10 May to 31 December 2026. The second shows previously unseen photographs of the roundup of 14 May 1941, the first roundup of Jews in France.",
+      "aboutZh": "两个展览：《Simone Veil. Mes sœurs et moi》（意为“Simone Veil：我的姐妹和我”），2026年2月10日至11月29日；《Images de la rafle du « billet vert »》（意为“‘绿色传唤单’大搜捕的影像”），2026年5月10日至12月31日。后者展出未曾公开的照片，记录1941年5月14日的大搜捕，那是法国第一次大规模逮捕犹太人。",
+      "hours": "Sun–Fri 10:00–18:00; late opening Thu until 21:00; closed Sat",
+      "hoursZh": "周日至周五 10:00–18:00；周四夜场至 21:00；周六闭馆",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sun"
+      ]
     },
     {
       "id": "D26",
@@ -466,7 +745,13 @@
         "caption": "Edin, un jeune membre des forces bosniaques, traverse une avenue exposée à la ligne de front avec les forces croates, à l’ouest de l’enclave. Mostar, Bosnie-Herzégovine, septembre 1993",
         "alt": "Exhibition image: Edin, un jeune membre des forces bosniaques, traverse une avenue exposée à la ligne de front avec les forces croates, à l’ouest de l’enclave. Mostar, Bosnie-Herzégovine, septembre 1993",
         "altZh": "展览图片：Edin, un jeune membre des forces bosniaques, traverse une avenue exposée à la ligne de front avec les forces croates, à l’ouest de l’enclave. Mostar, Bosnie-Herzégovine, septembre 1993"
-      }
+      },
+      "address": "Hôtel des Invalides, 129 Rue de Grenelle, 75007 Paris",
+      "about": "A visit to discover the Musée de l’Armée’s photograph collections, rich in new acquisitions, with the curators. On Tuesday 24 November 2026 only; booking required.",
+      "aboutZh": "与策展人一起参观 Musée de l’Armée 的摄影收藏，其中有许多新近购藏的作品。仅限2026年11月24日（周二）；须预约。",
+      "hours": "Tue 24 Nov at 10:00; booking required",
+      "hoursZh": "11月24日（周二）10:00；须预约",
+      "access": "appointment"
     },
     {
       "id": "D28",
@@ -499,7 +784,24 @@
         "caption": "Les troupes américaines prennent d’assaut la plage d’Omaha Beach lors du Débarquement, Normandie, France, 6 juin 1944",
         "alt": "Exhibition image: Les troupes américaines prennent d’assaut la plage d’Omaha Beach lors du Débarquement, Normandie, France, 6 juin 1944",
         "altZh": "展览图片：Les troupes américaines prennent d’assaut la plage d’Omaha Beach lors du Débarquement, Normandie, France, 6 juin 1944"
-      }
+      },
+      "subtitle": "Photographe de guerre",
+      "by": "Robert Capa",
+      "address": "4 Avenue du Colonel Henri Rol-Tanguy, 75014 Paris",
+      "about": "Robert Capa: Photographe de guerre (War photographer), 18 February to 20 December 2026. Over sixty vintage press prints, shown with magazines, documents and personal objects.",
+      "aboutZh": "Robert Capa 的《Photographe de guerre》（意为“战地摄影师”），2026年2月18日至12月20日。展出六十多张当年的新闻照片原作，以及杂志、文献和个人物品。",
+      "hours": "Tue–Sun 10:00–18:00; late opening Thu until 21:00 (last entry 20:00)",
+      "hoursZh": "周二至周日 10:00–18:00；周四夜场至 21:00（最晚入场 20:00）",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "note": "The official map gives Tue–Sun 10:00–17:30. Booking online is strongly recommended.",
+      "noteZh": "官方地图写的是周二至周日 10:00–17:30。强烈建议网上预约。"
     },
     {
       "id": "D30",
@@ -519,7 +821,21 @@
         "caption": "Fernand CUVILLE, France, Le grand entonnoir de la Cote 108, 116m de diamètre, 45m de profondeur, 1919",
         "alt": "Exhibition image: Fernand CUVILLE, France, Le grand entonnoir de la Cote 108, 116m de diamètre, 45m de profondeur, 1919",
         "altZh": "展览图片：Fernand CUVILLE, France, Le grand entonnoir de la Cote 108, 116m de diamètre, 45m de profondeur, 1919"
-      }
+      },
+      "subtitle": "Choisir la paix. Le combat d’Albert Kahn (1860–1940)",
+      "address": "2 Rue du Port, 92100 Boulogne-Billancourt",
+      "about": "Choisir la paix. Le combat d’Albert Kahn (1860–1940) (Choosing peace: Albert Kahn’s struggle), 13 October 2026 to 13 June 2027. It looks at Albert Kahn’s work for peace, through photographs from his Archives de la Planète and other works.",
+      "aboutZh": "《Choisir la paix. Le combat d’Albert Kahn (1860–1940)》（意为“选择和平：Albert Kahn 的奋斗”），2026年10月13日至2027年6月13日。展览通过他的 Archives de la Planète（星球档案）中的照片和其他作品，回顾 Albert Kahn 为和平所做的努力。",
+      "hours": "Tue–Sun 11:00–18:00",
+      "hoursZh": "周二至周日 11:00–18:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ]
     },
     {
       "id": "D31",
@@ -531,13 +847,28 @@
       ],
       "details": "37 quai Jacques Chirac — Paris 7e\n\nVoir Tahiti.\n29.9 — 31.1.2027\n\nVanuatu, archipel sous tension.\n15.10 — 5.4.2027\n\nPrix pour la Photographie 2024\n3.11 — 22.11.2026\n\nViolence silencieuse. Sous le regard de Roméo Mivekannin\n10.11 — 4.4.2027\n\nmardi-dimanche 10h30-19h / nocturne le jeudi jusqu'à 22h",
       "url": "https://photodays.paris/Musee-du-quai-Branly",
+      "start": "2026-09-29",
+      "end": "2027-04-05",
       "image": {
         "file": "D31.jpg",
         "credit": "Courtesy musée du quai Branly",
         "caption": "Gustave VIAUD (1836-1865), Papeete, [Pape’ete], le bord de mer entre Fare Ute et la boulangerie militaire, Tahiti, Pape‘ete, 22 août 1860",
         "alt": "Exhibition image: Gustave VIAUD (1836-1865), Papeete, [Pape’ete], le bord de mer entre Fare Ute et la boulangerie militaire, Tahiti, Pape‘ete, 22 août 1860",
         "altZh": "展览图片：Gustave VIAUD (1836-1865), Papeete, [Pape’ete], le bord de mer entre Fare Ute et la boulangerie militaire, Tahiti, Pape‘ete, 22 août 1860"
-      }
+      },
+      "address": "37 Quai Jacques Chirac, 75007 Paris",
+      "about": "Four shows. Voir Tahiti (Seeing Tahiti), 29 September 2026 to 31 January 2027, and Vanuatu, archipel sous tension (Vanuatu, an archipelago under strain), 15 October 2026 to 5 April 2027, show early photographs of both places. Prix pour la Photographie 2024 (2024 Photography Prize), work by the museum’s three 2024 prizewinners, 3 to 22 November 2026. Violence silencieuse. Sous le regard de Roméo Mivekannin (Silent violence: through the eyes of Roméo Mivekannin), 10 November 2026 to 4 April 2027.",
+      "aboutZh": "四个展览。《Voir Tahiti》（意为“看见塔希提”），2026年9月29日至2027年1月31日，以及《Vanuatu, archipel sous tension》（意为“瓦努阿图：紧张中的群岛”），2026年10月15日至2027年4月5日，展出这两地的早期照片。《Prix pour la Photographie 2024》（意为“2024年摄影奖”），展出该馆摄影奖三位2024年得主的作品，2026年11月3日至22日。《Violence silencieuse. Sous le regard de Roméo Mivekannin》（意为“无声的暴力：在 Roméo Mivekannin 的注视下”），2026年11月10日至2027年4月4日。",
+      "hours": "Tue–Sun 10:30–19:00; late opening Thu until 22:00",
+      "hoursZh": "周二至周日 10:30–19:00；周四夜场至 22:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ]
     },
     {
       "id": "D32",
@@ -569,7 +900,24 @@
         "credit": "© Pierre LEBRET",
         "alt": "Exhibition image (Pierre LEBRET)",
         "altZh": "展览图片（Pierre LEBRET）"
-      }
+      },
+      "subtitle": "La Habana Intangible",
+      "by": "Pierre Lebret",
+      "address": "35 Rue Blanche, 75009 Paris",
+      "about": "Pierre Lebret: La Habana Intangible (Intangible Havana), 4 to 24 November 2026. A solidarity show of photographs of Havana; sales of prints and books go to an association of artists in Havana.",
+      "aboutZh": "Pierre Lebret 的《La Habana Intangible》（意为“无形的哈瓦那”），2026年11月4日至24日。这是一场关于哈瓦那的声援摄影展；照片和书的销售所得将交给哈瓦那的一个艺术家协会。",
+      "hours": "Tue–Sat 12:00–19:00; Sun 12:00–18:00",
+      "hoursZh": "周二至周六 12:00–19:00；周日 12:00–18:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "note": "The official map gives the title as La Habana Invencible; the festival page says La Habana Intangible throughout.",
+      "noteZh": "官方地图上的展名是《La Habana Invencible》；摄影节页面通篇写作《La Habana Intangible》。"
     },
     {
       "id": "D34",
@@ -602,7 +950,26 @@
         "caption": "À l'origine du Coeur 200 LUX Tour",
         "alt": "Exhibition image: À l'origine du Coeur 200 LUX Tour",
         "altZh": "展览图片：À l'origine du Coeur 200 LUX Tour"
-      }
+      },
+      "subtitle": "À l’origine du Cœur",
+      "by": "Collectif Trigone",
+      "address": "Port de Solférino, Promenade Édouard-Glissant, 75007 Paris",
+      "about": "À l’origine du Cœur (At the origin of the heart), a project by the Collectif Trigone in the Caravane LUX, 11 to 15 November 2026. In a darkroom caravan, your heartbeat triggers a photograph, which is printed for you to take away.",
+      "aboutZh": "Collectif Trigone 在 Caravane LUX 中呈现的项目《À l’origine du Cœur》（意为“心的起源”），2026年11月11日至15日。在一辆暗房大篷车里，由你的心跳触发拍摄一张照片，冲印后交给你带走。",
+      "hours": "Daily 11:00–18:00",
+      "hoursZh": "每日 11:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "holiday": "open",
+      "note": "Near Mozza & Co. Wed 11 Nov is a preview day, from 11:00. Time slots are booked on the festival page; the print can take up to an hour, and you can collect it later in the day.",
+      "noteZh": "在 Mozza & Co 附近。11月11日（周三）为预展日，11:00 起开放。体验时段需在摄影节页面预约；冲印最长需要一小时，可以当天晚些时候再来取。"
     },
     {
       "id": "D36",
@@ -614,15 +981,24 @@
       ],
       "details": "13 rue Santeuil — Paris 5e\n\nDaniel BOURGAIS . Dana COJBUC . Nathalie JOFFRE . Maryam KHOSROVANI . Eléonore SIMON.\nVisite des ateliers d'artiste\nvendredi 20.11 et mardi 24.11 à 12h, sur inscription\n\nuniquement sur rdv",
       "url": "https://photodays.paris/Cesure",
-      "start": "2026-11-20",
-      "end": "2026-11-24",
+      "start": "2026-11-03",
+      "end": "2026-11-30",
       "image": {
         "file": "D36.jpg",
         "credit": "© Eléonore SIMON",
         "caption": "Le Bleu s'écrit sans bruit",
         "alt": "Exhibition image: Le Bleu s'écrit sans bruit",
         "altZh": "展览图片：Le Bleu s'écrit sans bruit"
-      }
+      },
+      "by": "Daniel Bourgais, Dana Cojbuc, Nathalie Joffre, Maryam Khosrovani, Éléonore Simon",
+      "address": "13 Rue Santeuil, 75005 Paris",
+      "about": "Five artists open their studios at Césure: Daniel Bourgais, Dana Cojbuc, Nathalie Joffre, Maryam Khosrovani and Éléonore Simon. Group studio visits with the artists on Friday 20 and Tuesday 24 November 2026 at 12:00; registration required. Other visits by appointment only, arranged with the artists.",
+      "aboutZh": "五位艺术家在 Césure 开放各自的工作室：Daniel Bourgais、Dana Cojbuc、Nathalie Joffre、Maryam Khosrovani 和 Éléonore Simon。2026年11月20日（周五）和24日（周二）12:00 有艺术家带领的集体参观，须报名。其他时间仅限预约，需与艺术家联系。",
+      "hours": "Group visits Fri 20 Nov and Tue 24 Nov at 12:00 sharp; otherwise by appointment",
+      "hoursZh": "11月20日（周五）和11月24日（周二）12:00 准时开始集体参观；其他时间仅限预约",
+      "access": "appointment",
+      "note": "Ask for a studio visit through each artist’s link on the festival page.",
+      "noteZh": "可通过摄影节页面上每位艺术家的链接申请参观工作室。"
     },
     {
       "id": "D37",
@@ -642,7 +1018,36 @@
         "caption": "Kekse, 1934-1938",
         "alt": "Exhibition image: Kekse, 1934-1938",
         "altZh": "展览图片：Kekse, 1934-1938"
-      }
+      },
+      "subtitle": "Hein Gorny Collections",
+      "by": "Hein Gorny",
+      "about": "Hein Gorny Collections: vintage prints by Hein Gorny (1904–1967), shown by Marc Barbey in a flat on the Île Saint-Louis, 7 November to 13 December 2026. Visits at 16:00 on 7, 8, 9, 15, 21 and 22 November and 12 and 13 December 2026; places are limited and booking is required. Extra visits by appointment: info@collectionregard.com.",
+      "aboutZh": "《Hein Gorny Collections》：Marc Barbey 在 Île Saint-Louis 的一间公寓里展出 Hein Gorny（1904–1967）的原版照片，2026年11月7日至12月13日。参观时间为11月7日、8日、9日、15日、21日、22日及12月12日、13日的 16:00；名额有限，须预约。其他时间可预约加场：info@collectionregard.com。",
+      "hours": "Visits at 16:00 on 7, 8, 9, 15, 21, 22 Nov and 12, 13 Dec; booking only",
+      "hoursZh": "11月7日、8日、9日、15日、21日、22日及12月12日、13日 16:00 参观；仅限预约",
+      "access": "appointment",
+      "exceptions": [
+        {
+          "date": "2026-11-08",
+          "status": "appointment",
+          "note": "Visit at 16:00; booking only",
+          "noteZh": "16:00 参观；仅限预约"
+        },
+        {
+          "date": "2026-11-09",
+          "status": "appointment",
+          "note": "Visit at 16:00; booking only",
+          "noteZh": "16:00 参观；仅限预约"
+        },
+        {
+          "date": "2026-11-15",
+          "status": "appointment",
+          "note": "Visit at 16:00; booking only",
+          "noteZh": "16:00 参观；仅限预约"
+        }
+      ],
+      "note": "Rue Jean du Bellay, on the Île Saint-Louis; the festival page gives no house number.",
+      "noteZh": "位于 Île Saint-Louis 的 Rue Jean du Bellay；摄影节页面没有给出门牌号。"
     },
     {
       "id": "D38",
@@ -662,7 +1067,13 @@
         "caption": "Diamantino et son équipe",
         "alt": "Exhibition image: Diamantino et son équipe",
         "altZh": "展览图片：Diamantino et son équipe"
-      }
+      },
+      "address": "46 Rue Jules Ferry, 93170 Bagnolet",
+      "about": "Diamantino Labo Photo is a film photography lab that makes traditional hand prints. Guided visit with Diamantino, the master printer, and his team on Friday 13 November 2026 at 15:00; registration required. Otherwise by appointment only.",
+      "aboutZh": "Diamantino Labo Photo 是一家胶片冲印实验室，以传统手工方式冲印照片。2026年11月13日（周五）15:00，冲印大师 Diamantino 和他的团队带领导览，须报名。其他时间仅限预约。",
+      "hours": "Guided visit Fri 13 Nov at 15:00; registration required",
+      "hoursZh": "11月13日（周五）15:00 导览；须报名",
+      "access": "appointment"
     },
     {
       "id": "D39",
@@ -695,7 +1106,16 @@
         "caption": "VOLUME",
         "alt": "Exhibition image: VOLUME",
         "altZh": "展览图片：VOLUME"
-      }
+      },
+      "subtitle": "AUX OISEAUX / SOUFFLE ARIDE",
+      "by": "LiLiROZE / Laura Bonnefous",
+      "address": "Gare de Lyon, Place Louis Armand, 75012 Paris",
+      "about": "Objectif FEMMES shows its 2025 prizewinners at the Gare de Lyon: LiLiROZE and Laura Bonnefous, with AUX OISEAUX (To the birds) and SOUFFLE ARIDE (Dry breath), 3 November to 3 December 2026. Free entry.",
+      "aboutZh": "Objectif FEMMES 在 Gare de Lyon 展出2025年获奖摄影师 LiLiROZE 和 Laura Bonnefous 的作品：《AUX OISEAUX》（意为“致鸟儿”）和《SOUFFLE ARIDE》（意为“干燥的气息”），2026年11月3日至12月3日。免费入场。",
+      "price": "Free",
+      "priceZh": "免费",
+      "note": "Hall 2, on the mezzanine.",
+      "noteZh": "2号大厅，夹层。"
     },
     {
       "id": "D41",
@@ -715,7 +1135,22 @@
         "caption": "Plume calamar, Port de pêche",
         "alt": "Exhibition image: Plume calamar, Port de pêche",
         "altZh": "展览图片：Plume calamar, Port de pêche"
-      }
+      },
+      "subtitle": "La Furie et la Foi",
+      "by": "Jérémy Charbaut",
+      "address": "Viaduc des Arts, 89 Avenue Daumesnil, 75012 Paris",
+      "about": "Jérémy Charbaut: La Furie et la Foi (Fury and faith), 17 to 29 November 2026, photographs of the Saint-François quarter of Le Havre.",
+      "aboutZh": "Jérémy Charbaut 的《La Furie et la Foi》（意为“狂怒与信仰”），2026年11月17日至29日，拍摄的是 Le Havre 的 Saint-François 街区。",
+      "hours": "Mon–Fri 18:00–20:00; Sat 15:00–20:00",
+      "hoursZh": "周一至周五 18:00–20:00；周六 15:00–20:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ]
     },
     {
       "id": "D42",
@@ -735,7 +1170,23 @@
         "caption": "A Home Made of Us, 2023-2026",
         "alt": "Exhibition image: A Home Made of Us, 2023-2026",
         "altZh": "展览图片：A Home Made of Us, 2023-2026"
-      }
+      },
+      "subtitle": "Voices in Motion",
+      "by": "Val Barros, Oleñka Carrasco, Myriam Cohenca, Tina Massumi",
+      "address": "8 Rue Galvani, 75017 Paris",
+      "about": "IWPA shows Voices in Motion at Odile Ouizeman’s gallery: women photographers in exile, with Val Barros, Oleñka Carrasco, Myriam Cohenca and Tina Massumi, 12 November to 18 December 2026. Visits by appointment only: write to info@iwpa.fr.",
+      "aboutZh": "IWPA 在 Odile Ouizeman 的画廊举办《Voices in Motion》，展出流亡女性摄影师 Val Barros、Oleñka Carrasco、Myriam Cohenca 和 Tina Massumi 的作品，2026年11月12日至12月18日。仅限预约参观：请写信至 info@iwpa.fr。",
+      "hours": "By appointment, Wed–Fri 15:00–19:00, Sat 11:00–19:00",
+      "hoursZh": "仅限预约，周三至周五 15:00–19:00，周六 11:00–19:00",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "access": "appointment",
+      "note": "Opening Thu 12 Nov from 18:00; RSVP on the festival page.",
+      "noteZh": "11月12日（周四）18:00 起开幕；请在摄影节页面报名。"
     },
     {
       "id": "D43",
@@ -768,7 +1219,28 @@
         "caption": "Coffee Cup, série Echoes of Fenjan",
         "alt": "Exhibition image: Coffee Cup, série Echoes of Fenjan",
         "altZh": "展览图片：Coffee Cup, série Echoes of Fenjan"
-      }
+      },
+      "subtitle": "Ovid’s Salon",
+      "by": "Toufic Beyhum, Selma Bella Zarhloul",
+      "address": "27 Rue Jean-Jacques Rousseau, 75001 Paris",
+      "about": "Toufic Beyhum and Selma Bella Zarhloul: Ovid’s Salon, 6 to 30 November 2026. Beyhum shows Echoes of the Fenjan, black-and-white portraits paired with coffee-cup readings; Bella Zarhloul shows Still Bodies, close studies of the body in very low natural light. Opening on Thursday 12 November, 15:00–17:00 (RSVP). Visits by appointment only.",
+      "aboutZh": "Toufic Beyhum 与 Selma Bella Zarhloul 的《Ovid’s Salon》，2026年11月6日至30日。Beyhum 展出《Echoes of the Fenjan》，黑白肖像与咖啡杯占卜的图像并置；Bella Zarhloul 展出《Still Bodies》，在极弱的自然光下近距离拍摄身体。11月12日（周四）15:00–17:00 开幕（须回复确认）。仅限预约参观。",
+      "hours": "By appointment, Sat 14:00–19:00",
+      "hoursZh": "仅限预约，周六 14:00–19:00",
+      "open": [
+        "sat"
+      ],
+      "access": "appointment",
+      "exceptions": [
+        {
+          "date": "2026-11-12",
+          "status": "appointment",
+          "note": "Opening 15:00–17:00 (RSVP)",
+          "noteZh": "开幕 15:00–17:00（须回复确认）"
+        }
+      ],
+      "note": "Third floor. Book with the gallery by phone or email; the details are on the festival page.",
+      "noteZh": "四楼。请通过电话或电子邮件向画廊预约，联系方式见摄影节页面。"
     },
     {
       "id": "D45",
@@ -780,13 +1252,28 @@
       ],
       "details": "80 rue des Vignoles — Paris 20e\n\nFrédéric GOYEAU\nSaving Daylight\n8.10 — 5.11.2026\n\nCONTACT\n11.11 — 28.11.2026\n\nmardi-vendredi 9h-17h",
       "url": "https://photodays.paris/Les-Trois-Bains",
+      "start": "2026-11-16",
+      "end": "2026-11-28",
       "image": {
         "file": "D45.jpg",
         "credit": "courtesy de l'artiste",
         "caption": "Frédéric Goyeau, Saving Daylight",
         "alt": "Exhibition image: Frédéric Goyeau, Saving Daylight",
         "altZh": "展览图片：Frédéric Goyeau, Saving Daylight"
-      }
+      },
+      "subtitle": "CONTACT",
+      "by": "Group show: members of Les Trois Bains",
+      "address": "80 Rue des Vignoles, 75020 Paris",
+      "about": "CONTACT, a group show by the members of Les Trois Bains, 16 to 28 November 2026, is built around the contact sheet and also takes visitors into a darkroom. Opening, with a contact-sheet session, on Wednesday 18 November, 18:30–22:30. The map caption gave 11 November as the start; the festival page now gives 16 November. The previous show, Frédéric Goyeau’s Saving Daylight, ended on 5 November.",
+      "aboutZh": "《CONTACT》是 Les Trois Bains 成员的群展，2026年11月16日至28日，以印样（contact sheet）为主题，观众还可以走进暗房。11月18日（周三）18:30–22:30 开幕，并有印样活动。地图说明写的是11月11日开展，摄影节页面现改为11月16日。上一档展览 Frédéric Goyeau 的《Saving Daylight》已于11月5日结束。",
+      "hours": "Tue–Fri 09:00–17:00",
+      "hoursZh": "周二至周五 09:00–17:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri"
+      ]
     },
     {
       "id": "D46",
@@ -806,7 +1293,25 @@
         "caption": "Relique, Verdun, 2025",
         "alt": "Exhibition image: Relique, Verdun, 2025",
         "altZh": "展览图片：Relique, Verdun, 2025"
-      }
+      },
+      "subtitle": "Le ciel et la terre après eux",
+      "by": "Chloe Sharrock",
+      "address": "116 Rue de Grenelle, 75007 Paris",
+      "about": "Chloe Sharrock: Le ciel et la terre après eux (The sky and the earth after them), 5 to 27 November 2026, in the Salle Béatrice Hodent de Broutelles at the Mairie du 7e. She is the third winner of the Musée de l’Armée photography residency, and the work traces what wars have left in the French landscape and in the museum’s collections. Part of the PhotoSaintGermain festival; guided visit with the artist on Friday 13 November at 16:00.",
+      "aboutZh": "Chloe Sharrock 的《Le ciel et la terre après eux》（意为“他们走后的天与地”），2026年11月5日至27日，在 Mairie du 7e 的 Salle Béatrice Hodent de Broutelles 展出。她是 Musée de l’Armée 摄影驻留项目的第三位获选者，作品追寻战争在法国土地上和博物馆藏品中留下的痕迹。属于 PhotoSaintGermain 摄影节；11月13日（周五）16:00 有艺术家导览。",
+      "hours": "Tue–Sat 14:00–18:00",
+      "hoursZh": "周二至周六 14:00–18:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "price": "Free",
+      "priceZh": "免费",
+      "note": "Hours from the festival pages; the official map gives the town hall’s own office hours instead.",
+      "noteZh": "开放时间以摄影节页面为准；官方地图上写的是区政府自身的办公时间。"
     },
     {
       "id": "D47",
@@ -839,7 +1344,12 @@
         "caption": "Caraïbes (II), 2025",
         "alt": "Exhibition image: Caraïbes (II), 2025",
         "altZh": "展览图片：Caraïbes (II), 2025"
-      }
+      },
+      "about": "A visit of the Neuflize OBC corporate collection, led by its curator, on Tuesday 1 December 2026 at 18:00, on Boulevard Haussmann (8th arrondissement). The collection, begun in 1997, holds nearly 1,000 photographs and videos on the human figure and memory. Registration required.",
+      "aboutZh": "Neuflize OBC 企业收藏导览，由收藏的策展人带领，2026年12月1日（周二）18:00，地点在 Boulevard Haussmann（巴黎第8区）。该收藏始于1997年，约有1000件摄影和录像作品，主题是人的形象与记忆。须报名。",
+      "hours": "Tue 1 Dec at 18:00",
+      "hoursZh": "12月1日（周二）18:00",
+      "access": "appointment"
     },
     {
       "id": "D49",
@@ -851,12 +1361,37 @@
       ],
       "details": "Mairie du 9e, 6 rue Drouot — Paris 9e\n\nLiLiROZE, Murmures\n3.11 — 8.11.2026\n\nCoco Amardeil, Yasmine Lavoine (Jeune Talent 2026), Lisa Miquet, Flore Prébay, Victoria Vinas. Photographes sélectionnées 2026\n10.11 — 23.11.2026\n\nLaura BONNEFOUS & Nina OLIVET, VOLUME\n24.11 — 30.11.2026\n\nlundi-vendredi 8h30-17h / samedi 9h-12h30",
       "url": "https://photodays.paris/Objectif-FEMMES",
+      "start": "2026-11-03",
+      "end": "2026-11-30",
       "image": {
         "file": "D49.jpg",
         "credit": "© LiliROZE",
         "alt": "Exhibition image (LiliROZE)",
         "altZh": "展览图片（LiliROZE）"
-      }
+      },
+      "subtitle": "Murmures / Photographes sélectionnées 2026 / VOLUME",
+      "by": "LiLiROZE / Coco Amardeil, Yasmine Lavoine, Lisa Miquet, Flore Prébay, Victoria Vinas / Laura Bonnefous & Nina Olivet",
+      "address": "6 Rue Drouot, 75009 Paris",
+      "about": "Objectif FEMMES, a festival of photography by women, shows three exhibitions in turn in the Salons Aguado of the Mairie du 9e. LiLiROZE: Murmures (Murmurs), 3 to 8 November 2026. The five photographers selected for 2026, Coco Amardeil, Yasmine Lavoine (Jeune Talent 2026, the Young Talent award), Lisa Miquet, Flore Prébay and Victoria Vinas, 10 to 23 November, with an opening on Thursday 12 November at 19:00 (registration required). Laura Bonnefous and Nina Olivet: VOLUME, 24 to 30 November.",
+      "aboutZh": "Objectif FEMMES 是女性摄影节，在 Mairie du 9e 的 Salons Aguado 依次举办三档展览。LiLiROZE 的《Murmures》（意为“低语”），2026年11月3日至8日。2026年入选的五位摄影师 Coco Amardeil、Yasmine Lavoine（Jeune Talent 2026，意为“年度青年才俊”）、Lisa Miquet、Flore Prébay 和 Victoria Vinas，11月10日至23日，11月12日（周四）19:00 开幕（须报名）。Laura Bonnefous 与 Nina Olivet 的《VOLUME》，11月24日至30日。",
+      "hours": "Mon–Fri 08:30–17:00, Sat 09:00–12:30",
+      "hoursZh": "周一至周五 08:30–17:00，周六 09:00–12:30",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "exceptions": [
+        {
+          "date": "2026-11-09",
+          "status": "closed",
+          "note": "Between two shows",
+          "noteZh": "两档展览之间"
+        }
+      ]
     },
     {
       "id": "D50",
@@ -876,7 +1411,24 @@
         "caption": "Les Vagues",
         "alt": "Exhibition image: Les Vagues",
         "altZh": "展览图片：Les Vagues"
-      }
+      },
+      "subtitle": "Brèches",
+      "by": "Group show: Elsa Leydier, Julien Lombardi, Marine Lanier, SMITH and others",
+      "about": "Brèches (Breaches), an open-air photography trail across the Parvis de La Défense, in Puteaux and Courbevoie, 17 September to 15 November 2026. Large prints by Elsa Leydier, Julien Lombardi, Marine Lanier, SMITH and others are pasted on the walls of the business district. Organised by COAL and Paris La Défense for the Les Extatiques 2026 season. Open access, in public space.",
+      "aboutZh": "《Brèches》（意为“裂口”），2026年9月17日至11月15日，是 Parvis de La Défense 上的露天摄影路线，横跨 Puteaux 和 Courbevoie。Elsa Leydier、Julien Lombardi、Marine Lanier、SMITH 等艺术家的大幅照片张贴在商务区的墙面上。由 COAL 与 Paris La Défense 为 Les Extatiques 2026 文化季举办。位于公共空间，自由参观。",
+      "hours": "Open-air trail in public space",
+      "hoursZh": "公共空间中的露天路线",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "price": "Free",
+      "priceZh": "免费"
     },
     {
       "id": "D51",
@@ -896,7 +1448,21 @@
         "caption": "Impluvium, Chromatographie",
         "alt": "Exhibition image: Impluvium, Chromatographie",
         "altZh": "展览图片：Impluvium, Chromatographie"
-      }
+      },
+      "subtitle": "Là où le sol pousse",
+      "by": "Anaïs Tondeur and guests",
+      "address": "261 Boulevard Raspail, 75014 Paris",
+      "about": "Anaïs Tondeur and her guests: Là où le sol pousse (Where the soil grows), 25 November to 23 December 2026, so it opens after this guide’s week. The exhibition treats soil as a living thing and brings together artists, scientists, writers and photographers around five kinds of ground: farmland, vineyard, forest, volcano and city.",
+      "aboutZh": "Anaïs Tondeur 及其邀请的嘉宾：《Là où le sol pousse》（意为“土壤生长的地方”），2026年11月25日至12月23日，在本导览这一周之后才开幕。展览把土壤看作有生命的存在，围绕农田、葡萄园、森林、火山和城市五种土地，汇集艺术家、科学家、作家和摄影师。",
+      "hours": "Wed–Sun 11:00–19:00; late opening Thu until 21:00",
+      "hoursZh": "周三至周日 11:00–19:00；周四夜场至 21:00",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ]
     },
     {
       "id": "D52",
@@ -908,13 +1474,29 @@
       ],
       "details": "Rencontres Photographiques de Boulogne-Billancourt\n6, 7 et 9.11.2026 à l’Espace Landowski, 28 avenue André Morizet — Boulogne-Billancourt (92)\nLectures des Rencontres, 4e édition, sur inscription\n\nSandra CALLIGARO\nÀ l'ombre des drapeaux blancs\n18.11.2026 – 28.11.2026\nexposition chez Initial LABO, 62 avenue Jean Baptiste Clément · Boulogne-Billancourt (92)",
       "url": "https://photodays.paris/rpbb",
+      "start": "2026-11-06",
+      "end": "2026-11-09",
       "image": {
         "file": "D52.jpg",
         "credit": "© Sandra CALLIGARO",
         "caption": "Mina et ses deux plus jeunes enfants, Kaboul, 2025",
         "alt": "Exhibition image: Mina et ses deux plus jeunes enfants, Kaboul, 2025",
         "altZh": "展览图片：Mina et ses deux plus jeunes enfants, Kaboul, 2025"
-      }
+      },
+      "address": "28 Avenue André Morizet, 92100 Boulogne-Billancourt",
+      "about": "The Rencontres Photographiques de Boulogne-Billancourt (RPBB) hold their portfolio reviews, Lectures des Rencontres (4th edition), at the Espace Landowski on 6, 7 and 9 November 2026; registration required. Their exhibition is at another address: Sandra Calligaro, À l’ombre des drapeaux blancs (In the shadow of the white flags), 18 to 28 November 2026, at Initial LABO, 62 Avenue Jean-Baptiste Clément, 92100 Boulogne-Billancourt. The opening date is still to be announced.",
+      "aboutZh": "Rencontres Photographiques de Boulogne-Billancourt（RPBB）于2026年11月6日、7日和9日在 Espace Landowski 举办作品集评审 Lectures des Rencontres（第4届），须报名。展览在另一个地址：Sandra Calligaro 的《À l’ombre des drapeaux blancs》（意为“在白旗的阴影下”），2026年11月18日至28日，地点是 Initial LABO，62 Avenue Jean-Baptiste Clément, 92100 Boulogne-Billancourt。开幕日期待公布。",
+      "hours": "Fri 6, Sat 7 and Mon 9 Nov; registration required",
+      "hoursZh": "11月6日（周五）、7日（周六）和9日（周一）；须报名",
+      "access": "appointment",
+      "exceptions": [
+        {
+          "date": "2026-11-08",
+          "status": "closed",
+          "note": "No reviews on Sunday 8 Nov.",
+          "noteZh": "11月8日（周日）没有评审。"
+        }
+      ]
     },
     {
       "id": "D53",
@@ -934,7 +1516,22 @@
         "caption": "Chaillot 2, 2006, série EXTRALIGHT, C-Print",
         "alt": "Exhibition image: Chaillot 2, 2006, série EXTRALIGHT, C-Print",
         "altZh": "展览图片：Chaillot 2, 2006, série EXTRALIGHT, C-Print"
-      }
+      },
+      "subtitle": "Lieux révélés / Rejouer le réel",
+      "address": "29 Boulevard Haussmann, 75009 Paris",
+      "about": "Two shows from the Société Générale art collection at its Agence centrale. Lieux révélés (Places revealed), 19 September to 26 November 2026: nine photographic works under the dome, free entry during the branch’s opening hours. Rejouer le réel (Replaying the real), on the fourth floor: ten artists, from Sonia Delaunay to Farah Atassi and Sacha Floch Poliakoff, in painting, drawing and tapestry; by appointment, on a date still to be announced.",
+      "aboutZh": "Société Générale 艺术收藏在其 Agence centrale 举办的两档展览。《Lieux révélés》（意为“被揭示的场所”），2026年9月19日至11月26日：穹顶下展出九件摄影作品，在银行营业时间内免费入场。《Rejouer le réel》（意为“重演现实”），位于五楼：汇集从 Sonia Delaunay 到 Farah Atassi 和 Sacha Floch Poliakoff 的十位艺术家，包括绘画、素描和挂毯作品；须预约，日期待公布。",
+      "hours": "Mon–Fri 09:00–18:00",
+      "hoursZh": "周一至周五 09:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri"
+      ],
+      "price": "Free",
+      "priceZh": "免费"
     },
     {
       "id": "D54",
@@ -952,7 +1549,15 @@
         "caption": "Sans Titre (Je suis là), 1997",
         "alt": "Exhibition image: Sans Titre (Je suis là), 1997",
         "altZh": "展览图片：Sans Titre (Je suis là), 1997"
-      }
+      },
+      "address": "17 Cours Valmy, 92800 Puteaux",
+      "about": "Free visits of the Société Générale art collection in the Tours Société Générale, the bank’s towers in Puteaux. Booking only; the festival page gives no dates.",
+      "aboutZh": "在 Société Générale 位于 Puteaux 的大楼 Tours Société Générale 免费参观 Société Générale 艺术收藏。仅限预约；摄影节页面未公布日期。",
+      "hours": "By booking only",
+      "hoursZh": "仅限预约",
+      "access": "appointment",
+      "price": "Free; booking required.",
+      "priceZh": "免费；须预约。"
     },
     {
       "id": "D55",
@@ -972,7 +1577,13 @@
         "caption": "Marie et Laura, 1986",
         "alt": "Exhibition image: Marie et Laura, 1986",
         "altZh": "展览图片：Marie et Laura, 1986"
-      }
+      },
+      "by": "Jean-François Bauret",
+      "about": "A guided visit of the studio of photographer Jean-François Bauret (1932–2014), led by his wife, Claude Bauret-Allard, on Saturday 28 November 2026. The studio on Rue des Batignolles, kept as it was, served as his shop, studio and home. By appointment only: book at reservation@photodays.paris.",
+      "aboutZh": "摄影师 Jean-François Bauret（1932–2014）工作室导览，由他的妻子 Claude Bauret-Allard 带领，2026年11月28日（周六）。这间位于 Rue des Batignolles 的工作室保持原样，曾是他的店铺、摄影棚和住所。仅限预约：请发邮件至 reservation@photodays.paris。",
+      "hours": "Sat 28 Nov, by appointment only",
+      "hoursZh": "11月28日（周六），仅限预约",
+      "access": "appointment"
     },
     {
       "id": "D56",
@@ -992,7 +1603,15 @@
         "caption": "Fracture/Voilure I, 2026",
         "alt": "Exhibition image: Fracture/Voilure I, 2026",
         "altZh": "展览图片：Fracture/Voilure I, 2026"
-      }
+      },
+      "subtitle": "Dialogue 6 : Fracture/Voilure",
+      "by": "Sylvie Bonnot",
+      "address": "5 Rue de l’Ancienne Mairie, 92100 Boulogne-Billancourt",
+      "about": "Sylvie Bonnot: Dialogue 6 : Fracture/Voilure (Dialogue 6: Fracture/Sails), 9 November 2026 to 20 March 2027. Frank Horvat’s studio sets his work beside Sylvie Bonnot’s material experiments, in which the photograph is peeled off, broken up and transformed. Opening on Saturday 14 November from 18:00. By booking only, at billetweb.fr/studio-frank-horvat-dialogue.",
+      "aboutZh": "Sylvie Bonnot 的《Dialogue 6 : Fracture/Voilure》（意为“对话 6：断裂/帆”），2026年11月9日至2027年3月20日。Frank Horvat 工作室把他的作品与 Sylvie Bonnot 的材料实验并置，在她的作品中，照片被剥离、碎裂并转化。11月14日（周六）18:00 起开幕。仅限预约，请在 billetweb.fr/studio-frank-horvat-dialogue 预订。",
+      "hours": "By booking only",
+      "hoursZh": "仅限预约",
+      "access": "appointment"
     },
     {
       "id": "D57",
@@ -1025,7 +1644,14 @@
         "caption": "Illumination, Hokkaidō, Japon 2025",
         "alt": "Exhibition image: Illumination, Hokkaidō, Japon 2025",
         "altZh": "展览图片：Illumination, Hokkaidō, Japon 2025"
-      }
+      },
+      "subtitle": "Au temps du temps, itinérance japonaise",
+      "by": "Muriel Pénicaud",
+      "address": "73 Rue du Faubourg Saint-Honoré, 75008 Paris",
+      "about": "Muriel Pénicaud: Au temps du temps, itinérance japonaise (In the time of time: a Japanese journey), 1 October 2026 to 8 January 2027, at the we are_ club. Photographs from some ten trips to Japan over twenty years. Opening on Monday 9 November at 18:00.",
+      "aboutZh": "Muriel Pénicaud 的《Au temps du temps, itinérance japonaise》（意为“在时间的时间里：日本漫游”），2026年10月1日至2027年1月8日，在 we are_ 俱乐部展出。作品来自她二十年间约十次日本之行。11月9日（周一）18:00 开幕。",
+      "note": "No opening hours are published; check with the venue first.",
+      "noteZh": "未公布开放时间；请先向场馆确认。"
     },
     {
       "id": "D59",
@@ -1058,7 +1684,25 @@
         "caption": "Aile de fer, 2025-2026",
         "alt": "Exhibition image: Aile de fer, 2025-2026",
         "altZh": "展览图片：Aile de fer, 2025-2026"
-      }
+      },
+      "subtitle": "Mains d’œuvre",
+      "by": "Véronique Ellena",
+      "address": "Place Salvador Allende, 94000 Créteil",
+      "about": "Véronique Ellena: Mains d’œuvre (Working hands), 19 September to 19 December 2026, part of the 200LUX exhibition of the Réseau LUX festivals at the MAC (Maison des Arts et de la Culture) in Créteil. The series follows apprentice workers and craftspeople at a vocational training centre, the AFPA in Bourg-en-Bresse. Talk with the artist on Saturday 14 November at 15:00 (RSVP). Free entry.",
+      "aboutZh": "Véronique Ellena 的《Mains d’œuvre》（意为“劳作的双手”），2026年9月19日至12月19日，属于 Créteil 的 MAC（Maison des Arts et de la Culture）举办的 Réseau LUX 联合展览 200LUX。该系列记录 Bourg-en-Bresse 的职业培训中心 AFPA 里的学徒工人和手工艺人。11月14日（周六）15:00 有艺术家见面会（须预约）。免费入场。",
+      "hours": "Tue–Sat 11:00–18:00",
+      "hoursZh": "周二至周六 11:00–18:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "price": "Free",
+      "priceZh": "免费",
+      "note": "The festival page gives Tue–Fri 10:00–18:00, Sat 12:00–18:00; check before going.",
+      "noteZh": "摄影节页面写的是周二至周五 10:00–18:00，周六 12:00–18:00；前往前请先确认。"
     },
     {
       "id": "D61",
@@ -1091,7 +1735,30 @@
         "caption": "Salve, 2026",
         "alt": "Exhibition image: Salve, 2026",
         "altZh": "展览图片：Salve, 2026"
-      }
+      },
+      "subtitle": "SALVE",
+      "by": "Alexandra Catiere",
+      "address": "11 Rue Berryer, 75008 Paris",
+      "about": "Alexandra Catiere: SALVE, 4 to 28 November 2026, in the Rotonde Balzac, in the gardens of the Hôtel Salomon de Rothschild (Fondation des Artistes). She won the Photo Days call for projects on Balzac & le vin (Balzac and wine), and her new work is shown in dialogue with Balzac’s world. The opening was on 4 November; guided visits on Monday 9 November at 17:00 and Saturday 14 November at 11:00 (RSVP). By appointment only: book at reservation@photodays.paris.",
+      "aboutZh": "Alexandra Catiere 的《SALVE》，2026年11月4日至28日，在 Hôtel Salomon de Rothschild（Fondation des Artistes）花园里的 Rotonde Balzac 展出。她是 Photo Days“Balzac & le vin”（意为“Balzac 与葡萄酒”）征集项目的获选者，新作与 Balzac 的世界形成对话。开幕已于11月4日举行；11月9日（周一）17:00 和11月14日（周六）11:00 有导览（须预约）。仅限预约：请发邮件至 reservation@photodays.paris。",
+      "hours": "By appointment, Tue–Sat 10:00–12:00 and 14:00–18:00",
+      "hoursZh": "仅限预约，周二至周六 10:00–12:00、14:00–18:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "access": "appointment",
+      "exceptions": [
+        {
+          "date": "2026-11-09",
+          "status": "appointment",
+          "note": "Guided visit at 17:00 (RSVP)",
+          "noteZh": "17:00 导览（须预约）"
+        }
+      ]
     },
     {
       "id": "D63",
@@ -1111,7 +1778,25 @@
         "caption": "Looking for the Masters in Ricardo’s Golden Shoes, Hommage à Eadweard MUYBRIDGE, « Homme montant des escaliers, 1887 », 2014",
         "alt": "Exhibition image: Looking for the Masters in Ricardo’s Golden Shoes, Hommage à Eadweard MUYBRIDGE, « Homme montant des escaliers, 1887 », 2014",
         "altZh": "展览图片：Looking for the Masters in Ricardo’s Golden Shoes, Hommage à Eadweard MUYBRIDGE, « Homme montant des escaliers, 1887 », 2014"
-      }
+      },
+      "subtitle": "Looking for the Masters",
+      "by": "Catherine Balet",
+      "address": "12 Place du Panthéon, 75005 Paris",
+      "about": "Sorbonne Artgallery, in the Soufflot wing of Université Paris 1 Panthéon-Sorbonne, shows Catherine Balet: Looking for the Masters, 2 to 30 November 2026, curated by Aline Pujo. In nine prints, Balet restages famous portraits from the history of photography, from Man Ray to Robert Capa, with her model Ricardo Martinez Paz, a man in his seventies. Opening and round table on Mon 16 Nov, 18:00–20:00; RSVP. Entry is free, but you must download the entry pass online before you go.",
+      "aboutZh": "Sorbonne Artgallery 位于 Université Paris 1 Panthéon-Sorbonne 的 Soufflot 翼楼，展出 Catherine Balet 的《Looking for the Masters》，2026年11月2日至30日，策展人 Aline Pujo。在九幅作品中，Balet 让七十多岁的模特 Ricardo Martinez Paz 重新演绎摄影史上的经典肖像，从 Man Ray 到 Robert Capa。11月16日（周一）18:00–20:00 开幕并举行圆桌讨论，需回复确认出席。免费入场，但须先在网上下载入场凭证。",
+      "hours": "Mon–Sat 10:00–18:00",
+      "hoursZh": "周一至周六 10:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "access": "appointment",
+      "price": "Free; download the entry pass online first.",
+      "priceZh": "免费；须先在网上下载入场凭证。"
     },
     {
       "id": "D64",
@@ -1156,7 +1841,38 @@
         "credit": "© Marc RIBOUD, courtesy Galerie Arcturus",
         "alt": "Exhibition image (Marc RIBOUD, courtesy Galerie Arcturus)",
         "altZh": "展览图片（Marc RIBOUD, courtesy Galerie Arcturus）"
-      }
+      },
+      "subtitle": "La géométrie devient poésie, vie, émotion",
+      "by": "Marc Riboud",
+      "address": "5 Rue Jacques Callot, 75006 Paris",
+      "about": "Galerie Arcturus shows Marc Riboud: La géométrie devient poésie, vie, émotion (Geometry becomes poetry, life, emotion), 5 to 16 November 2026. Vintage prints and signed modern prints, ten years after Riboud’s death and in the bicentenary year of photography. The gallery has represented his work for more than 20 years.",
+      "aboutZh": "Galerie Arcturus 展出 Marc Riboud 的《La géométrie devient poésie, vie, émotion》（意为“几何变成诗意、生命与情感”），2026年11月5日至16日。展出早期原版照片和签名的现代冲印照片，正值 Riboud 逝世十周年，也是摄影术诞生两百周年。画廊代理他的作品已有20多年。",
+      "hours": "Mon–Sat 11:00–13:00 / 14:00–19:00; Sun by appointment",
+      "hoursZh": "周一至周六 11:00–13:00 / 14:00–19:00；周日仅限预约",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "exceptions": [
+        {
+          "date": "2026-11-08",
+          "status": "appointment",
+          "note": "Sunday: by appointment only.",
+          "noteZh": "周日：仅限预约。"
+        },
+        {
+          "date": "2026-11-15",
+          "status": "appointment",
+          "note": "Sunday: by appointment only.",
+          "noteZh": "周日：仅限预约。"
+        }
+      ],
+      "note": "The gallery’s own site also gives Sun 14:30–18:30; call before going on a Sunday.",
+      "noteZh": "画廊官网另写周日 14:30–18:30；周日前往请先打电话确认。"
     },
     {
       "id": "D67",
@@ -1176,7 +1892,32 @@
         "caption": "Alegra, 2024",
         "alt": "Exhibition image: Alegra, 2024",
         "altZh": "展览图片：Alegra, 2024"
-      }
+      },
+      "subtitle": "FILL THE VOID",
+      "by": "Victor Vladimir Lazareff",
+      "address": "5 Rue de Médicis, 75006 Paris",
+      "about": "Au Médicis, an event space facing the Jardin du Luxembourg, shows Victor Vladimir Lazareff: FILL THE VOID, 10 to 15 November 2026. Three series taken around the world over ten years trace a young photographer’s coming of age. Opening Tue 10 Nov from 18:00; meet the artist on Thu 12 Nov, 16:00–18:00.",
+      "aboutZh": "Au Médicis 是位于 Jardin du Luxembourg 对面的活动空间，展出 Victor Vladimir Lazareff 的《FILL THE VOID》，2026年11月10日至15日。三组十年间在世界各地拍摄的系列作品，讲述一位年轻摄影师的成长。11月10日（周二）18:00 起开幕；11月12日（周四）16:00–18:00 与艺术家见面。",
+      "hours": "Tue–Sat 10:00–21:00; Wed 11 Nov 10:00–18:00",
+      "hoursZh": "周二至周六 10:00–21:00；11月11日（周三）10:00–18:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "holiday": "open",
+      "exceptions": [
+        {
+          "date": "2026-11-11",
+          "status": "open",
+          "note": "Holiday hours 10:00–18:00",
+          "noteZh": "假日开放时间 10:00–18:00"
+        }
+      ],
+      "note": "Listed until Sun 15 Nov, but it opens Tuesday to Saturday: Sat 14 Nov is the last day it is sure to be open.",
+      "noteZh": "展期写到11月15日（周日），但开放日为周二至周六：11月14日（周六）是确定开放的最后一天。"
     },
     {
       "id": "D68",
@@ -1196,7 +1937,21 @@
         "caption": "Matsu Kyoto 松京都, 2025",
         "alt": "Exhibition image: Matsu Kyoto 松京都, 2025",
         "altZh": "展览图片：Matsu Kyoto 松京都, 2025"
-      }
+      },
+      "subtitle": "KOMOREBI PROJECT",
+      "by": "Anne Valverde",
+      "address": "31 Rue Jacob, 75006 Paris",
+      "about": "Bruno Moinard Éditions, a publisher of contemporary furniture, shows Anne Valverde: KOMOREBI PROJECT, 3 to 28 November 2026. The series was made in Japan around komorebi, the Japanese word for sunlight filtering through the leaves of trees. Opening Tue 10 Nov, 18:00–21:00.",
+      "aboutZh": "当代家具出版商 Bruno Moinard Éditions 展出 Anne Valverde 的《KOMOREBI PROJECT》，2026年11月3日至28日。这组作品在日本拍摄，围绕 komorebi 展开，这个日语词指透过树叶洒下的阳光。11月10日（周二）18:00–21:00 开幕。",
+      "hours": "Tue–Sat 11:00–19:00; also by appointment",
+      "hoursZh": "周二至周六 11:00–19:00；也可预约参观",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ]
     },
     {
       "id": "D69",
@@ -1229,7 +1984,23 @@
         "caption": "Famille Ricasoli, Florence, 1984",
         "alt": "Exhibition image: Famille Ricasoli, Florence, 1984",
         "altZh": "展览图片：Famille Ricasoli, Florence, 1984"
-      }
+      },
+      "subtitle": "Ce qui restera de moi",
+      "by": "Group show: Rodney Graham, Thomas Ruff, Man Ray, Nan Goldin, Patrick Faigenbaum and others",
+      "address": "16 Boulevard des Invalides, 75007 Paris",
+      "about": "DARMO shows works from the photography collection of the film director and producer Claude Berri: Ce qui restera de moi (What will remain of me), 11 to 27 November 2026. The artists include Rodney Graham, Thomas Ruff, Man Ray, Nan Goldin, Araki, Bernd and Hilla Becher and Patrick Faigenbaum. Tour with the curator, Aline Pujo, on Fri 13 Nov at 14:00; RSVP.",
+      "aboutZh": "DARMO 展出电影导演兼制片人 Claude Berri 的摄影收藏：《Ce qui restera de moi》（意为“我身后留下的”），2026年11月11日至27日。参展艺术家包括 Rodney Graham、Thomas Ruff、Man Ray、Nan Goldin、Araki、Bernd 和 Hilla Becher 以及 Patrick Faigenbaum。11月13日（周五）14:00 由策展人 Aline Pujo 带领参观，需回复确认出席。",
+      "hours": "Mon–Fri 10:00–19:00",
+      "hoursZh": "周一至周五 10:00–19:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri"
+      ],
+      "note": "The festival page now gives 10 to 29 November; the map gives 11 to 27 November.",
+      "noteZh": "摄影节页面现在写的是11月10日至29日；地图上写的是11月11日至27日。"
     },
     {
       "id": "D71",
@@ -1267,13 +2038,36 @@
       ],
       "details": "24bis rue Saint Roch — Paris 1er\n\nPX3 & State of the World Price\n11.11 — 13.11.2026\n\nPhoto-Art\n18.11 — 28.11.2026\n\nmardi-samedi 11h-20h",
       "url": "https://photodays.paris/24b",
+      "start": "2026-11-11",
+      "end": "2026-11-28",
       "image": {
         "file": "D73.jpg",
         "credit": "© Elena DROZDOVA, may 2025",
         "caption": "P×3 2026 Fine Arts 1st Prize winner",
         "alt": "Exhibition image: P×3 2026 Fine Arts 1st Prize winner",
         "altZh": "展览图片：P×3 2026 Fine Arts 1st Prize winner"
-      }
+      },
+      "subtitle": "PX3 & State of the World Price / Photo-Art",
+      "address": "24 bis Rue Saint-Roch, 75001 Paris",
+      "about": "Galerie 24b. has two shows. First, 11 to 13 November 2026: the 2026 winners of the P×3 Prix de la Photographie Paris and the State of the World collection, curated by Hossein Farmani, with portfolio reviews and round tables every day; opening Wed 11 Nov, 18:00–21:00. Then Photo-Art, 18 to 28 November 2026: contemporary photographers chosen by Claude Riou, among them Alexandre Manuel Viegas, Silke Schoenborn and Nick Whittaker. Closed in between, from 14 to 17 November.",
+      "aboutZh": "Galerie 24b. 有两档展览。第一档在2026年11月11日至13日：P×3 Prix de la Photographie Paris 的2026年获奖作品和 State of the World 收藏，策展人 Hossein Farmani，每天有作品集评审和圆桌讨论；11月11日（周三）18:00–21:00 开幕。第二档《Photo-Art》在2026年11月18日至28日：Claude Riou 挑选的当代摄影师，包括 Alexandre Manuel Viegas、Silke Schoenborn 和 Nick Whittaker。两档展览之间（11月14日至17日）闭馆。",
+      "hours": "Tue–Sat 11:00–20:00",
+      "hoursZh": "周二至周六 11:00–20:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "exceptions": [
+        {
+          "date": "2026-11-14",
+          "status": "closed",
+          "note": "Between two shows",
+          "noteZh": "两档展览之间"
+        }
+      ]
     },
     {
       "id": "D74",
@@ -1293,7 +2087,31 @@
         "caption": "Edie Sedgwick Photomaton Portrait, 1966",
         "alt": "Exhibition image: Edie Sedgwick Photomaton Portrait, 1966",
         "altZh": "展览图片：Edie Sedgwick Photomaton Portrait, 1966"
-      }
+      },
+      "by": "Gerard Malanga",
+      "address": "La Fab., Place Jean-Michel Basquiat, 75013 Paris",
+      "about": "At La Fab., the galerie du jour agnès b. shows photographs by Gerard Malanga, 4 November 2026 to 10 January 2027. A central figure of Andy Warhol’s Factory, Malanga photographed his friends on the New York art scene of the 1960s and 1970s, among them Andy Warhol, William S. Burroughs, Lou Reed and Patti Smith. In partnership with the Bel Oeil collection, Nice.",
+      "aboutZh": "La Fab. 内的 galerie du jour agnès b. 展出 Gerard Malanga 的摄影作品，2026年11月4日至2027年1月10日。Malanga 是 Andy Warhol 的 Factory 的核心人物之一，拍摄了1960至70年代纽约艺术圈的朋友们，包括 Andy Warhol、William S. Burroughs、Lou Reed 和 Patti Smith。与尼斯的 Bel Oeil 收藏合作。",
+      "hours": "Wed–Sat 11:00–19:00; Sun 14:00–19:00",
+      "hoursZh": "周三至周六 11:00–19:00；周日 14:00–19:00",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "holiday": "closed",
+      "exceptions": [
+        {
+          "date": "2026-11-11",
+          "status": "closed",
+          "note": "Exceptional closure: La Fab. is closed to the public on 11 November.",
+          "noteZh": "临时闭馆：La Fab. 11月11日不对公众开放。"
+        }
+      ],
+      "price": "Free",
+      "priceZh": "免费"
     },
     {
       "id": "D75",
@@ -1339,7 +2157,20 @@
         "caption": "Motiongraph #418, West view from the bridge near Gutschau, River Lech, Gutschau, Reutte, Tyrol, Austria",
         "alt": "Exhibition image: Motiongraph #418, West view from the bridge near Gutschau, River Lech, Gutschau, Reutte, Tyrol, Austria",
         "altZh": "展览图片：Motiongraph #418, West view from the bridge near Gutschau, River Lech, Gutschau, Reutte, Tyrol, Austria"
-      }
+      },
+      "subtitle": "Huit Secondes",
+      "by": "Maciej Markowicz",
+      "address": "14 Rue des Jardins Saint-Paul, 75004 Paris",
+      "about": "Galerie XII shows Maciej Markowicz: Huit Secondes (Eight seconds), 10 November 2026 to 16 January 2027. He photographs from inside a vehicle turned into a camera, exposing each unique paper negative for eight seconds while crossing the bridges over the Seine. For the show, the gallery window onto the Village Saint-Paul courtyard is fitted with a lens, so the courtyard appears inside, live and upside down. Opening Sat 14 Nov from 15:30.",
+      "aboutZh": "Galerie XII 展出 Maciej Markowicz 的《Huit Secondes》（意为“八秒”），2026年11月10日至2027年1月16日。他在一辆改装成相机暗箱的车里拍摄，驶过塞纳河上的桥时让每张独一无二的相纸负片曝光八秒。为这次展览，画廊朝向 Village Saint-Paul 庭院的窗户装上了镜头，庭院的实时倒影会出现在室内。11月14日（周六）15:30 起开幕。",
+      "hours": "Wed–Fri 14:00–19:00; Sat 12:00–19:00; also by appointment",
+      "hoursZh": "周三至周五 14:00–19:00；周六 12:00–19:00；也可预约参观",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ]
     },
     {
       "id": "D78",
@@ -1359,7 +2190,25 @@
         "caption": "Paysage après le passage V",
         "alt": "Exhibition image: Paysage après le passage V",
         "altZh": "展览图片：Paysage après le passage V"
-      }
+      },
+      "subtitle": "Le Temps de la mer",
+      "by": "Changnam Lee",
+      "address": "62 Avenue Jean-Baptiste Clément, 92100 Boulogne-Billancourt",
+      "about": "Initial Labo, a photo lab with a bookshop and a shop, shows Changnam Lee: Le Temps de la mer (The time of the sea), 29 October to 14 November 2026. Long exposures of the waves off the east coast of South Korea, in carefully chosen blues, pinks, yellows and greens. Photo-book afternoon on Tue 10 Nov, 15:00–19:00: 27 photographers sign their latest books. Entry is free.",
+      "aboutZh": "Initial Labo 是一家设有书店和商店的摄影冲印实验室，展出 Changnam Lee 的《Le Temps de la mer》（意为“海的时间”），2026年10月29日至11月14日。作品以长时间曝光拍摄韩国东海岸的海浪，色彩为精心挑选的蓝、粉、黄、绿。11月10日（周二）15:00–19:00 摄影书专场：27位摄影师到场为新书签名。免费入场。",
+      "hours": "Tue–Sat 10:00–18:00; also by appointment",
+      "hoursZh": "周二至周六 10:00–18:00；也可预约参观",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "price": "Free",
+      "priceZh": "免费",
+      "note": "The festival page gives 10:00–19:00. Outside Paris, in Boulogne-Billancourt.",
+      "noteZh": "摄影节页面写的是 10:00–19:00。位于巴黎市外的 Boulogne-Billancourt。"
     },
     {
       "id": "D79",
@@ -1392,7 +2241,21 @@
         "caption": "Pierre JAHAN, Nu à l'épi, ca. 1945, Tirage argentique, photogramme",
         "alt": "Exhibition image: Pierre JAHAN, Nu à l'épi, ca. 1945, Tirage argentique, photogramme",
         "altZh": "展览图片：Pierre JAHAN, Nu à l'épi, ca. 1945, Tirage argentique, photogramme"
-      }
+      },
+      "subtitle": "a retrospective",
+      "by": "Pierre Jahan",
+      "address": "8 Rue Sainte-Anastase, 75003 Paris",
+      "about": "Galerie Jean-François Cazeau shows Pierre Jahan: a retrospective, 24 October to 23 December 2026. Born in 1909, Jahan belonged to the avant-garde that treated photography as an art. He experimented with photograms, double exposures, photomontage and photocollage.",
+      "aboutZh": "Galerie Jean-François Cazeau 展出 Pierre Jahan 的回顾展《a retrospective》，2026年10月24日至12月23日。Jahan 生于1909年，属于把摄影视为艺术的先锋一代。他尝试过物影照片、双重曝光、照片蒙太奇和照片拼贴。",
+      "hours": "Tue–Sat 11:00–19:00",
+      "hoursZh": "周二至周六 11:00–19:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ]
     },
     {
       "id": "D81",
@@ -1412,7 +2275,21 @@
         "caption": "série GenZ",
         "alt": "Exhibition image: série GenZ",
         "altZh": "展览图片：série GenZ"
-      }
+      },
+      "subtitle": "GenZ",
+      "by": "Stéphane Coutelle",
+      "address": "14 Rue des Taillandiers, 75011 Paris",
+      "about": "Galerie Jorge Alyskewycz shows Stéphane Coutelle: GenZ, 6 to 8 November 2026. The series is made of 250 studio portraits of Generation Z teenagers, taken between 2022 and 2026. The book, published by La Belle Étoile, is signed by the author during the show.",
+      "aboutZh": "Galerie Jorge Alyskewycz 展出 Stéphane Coutelle 的《GenZ》，2026年11月6日至8日。这组作品是2022至2026年间在影棚拍摄的250幅 Z 世代青少年肖像。配套的书由 La Belle Étoile 出版，展期内作者到场签名。",
+      "hours": "Fri 6 Nov 18:00–22:00; Sat 7 and Sun 8 Nov 11:00–19:00",
+      "hoursZh": "11月6日（周五）18:00–22:00；11月7日（周六）和8日（周日）11:00–19:00",
+      "open": [
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "note": "Sun 8 Nov is the last day.",
+      "noteZh": "11月8日（周日）是最后一天。"
     },
     {
       "id": "D82",
@@ -1445,7 +2322,21 @@
         "caption": "Andy Warhol and the rabbit, 1979, Épreuve gelatino-argentique rehaussée à la peinture à l'huile",
         "alt": "Exhibition image: Andy Warhol and the rabbit, 1979, Épreuve gelatino-argentique rehaussée à la peinture à l'huile",
         "altZh": "展览图片：Andy Warhol and the rabbit, 1979, Épreuve gelatino-argentique rehaussée à la peinture à l'huile"
-      }
+      },
+      "subtitle": "L’oiseau rare",
+      "by": "Elizabeth Lennard",
+      "address": "95 Rue de Seine, 75006 Paris",
+      "about": "Galerie Pixi · Marie-Victoire Poliakoff shows Elizabeth Lennard: L’oiseau rare (The rare bird), 1 October to 12 December 2026. Lennard, a photographer and film-maker, paints over her black-and-white prints with very fine oil paint. Her subjects include New York buildings, botanical gardens, India, Portugal and portraits.",
+      "aboutZh": "Galerie Pixi · Marie-Victoire Poliakoff 展出 Elizabeth Lennard 的《L’oiseau rare》（意为“珍稀之鸟”），2026年10月1日至12月12日。Lennard 是摄影师和电影导演，她在黑白照片上用极薄的油彩上色。题材包括纽约的建筑、植物园、印度、葡萄牙和人像。",
+      "hours": "Tue–Sat 14:30–19:00; mornings by appointment",
+      "hoursZh": "周二至周六 14:30–19:00；上午需预约",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ]
     },
     {
       "id": "D84",
@@ -1503,7 +2394,24 @@
         "credit": "© Julien Sunye",
         "alt": "Exhibition image (Julien Sunye)",
         "altZh": "展览图片（Julien Sunye）"
-      }
+      },
+      "subtitle": "SOLA. A declaration of natural feminine beauty.",
+      "by": "Group show: Sam Barton, Renato Buontempo, Steffen Drachen, Julien Sunye and others",
+      "address": "8 Square Sainte-Croix de la Bretonnerie, 75004 Paris",
+      "about": "SOLA, at Galerie Joseph in the Marais, shows fine-art prints by photographers from several countries, celebrating natural feminine beauty and standing against body shaming, 10 to 17 November 2026. Opening Tue 10 Nov, 18:00–21:30, with live harp music, after a collectors’ preview by booking, 16:00–18:00. Concerts on Wed 11 Nov 16:00–17:00, Fri 13 Nov 18:00–19:00 and Sat 14 Nov 18:00–19:00. Private visits, also with a chosen photographer, can be booked through contact@solaexhibition.com.",
+      "aboutZh": "SOLA 在 Marais 区的 Galerie Joseph 展出多国摄影师的艺术级照片，赞美女性的自然之美，反对身材羞辱，2026年11月10日至17日。11月10日（周二）18:00–21:30 开幕，现场有竖琴演奏；开幕前 16:00–18:00 为藏家预览，需预约。音乐会：11月11日（周三）16:00–17:00、11月13日（周五）18:00–19:00、11月14日（周六）18:00–19:00。私人参观（也可与某位摄影师一起）可通过 contact@solaexhibition.com 预约。",
+      "hours": "Daily 12:00–20:00; private visits by appointment 12:00–16:00",
+      "hoursZh": "每天 12:00–20:00；12:00–16:00 可预约私人参观",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "holiday": "open"
     },
     {
       "id": "D88",
