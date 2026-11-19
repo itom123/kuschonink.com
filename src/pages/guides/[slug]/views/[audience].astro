@@ -19,7 +19,7 @@ import ArchiveBar from '../../../../components/guide/ArchiveBar.astro';
 import { site } from '../../../../lib/content';
 import { attr, seoTitle } from '../../../../lib/i18n';
 import { SEP, type Tool } from '../../../../lib/chrome';
-import { guideCards, kindTabs, loadView, payloadJson, viewPaths } from '../../../../lib/guides/load';
+import { cityTabs, guideCards, loadView, payloadJson, viewPaths } from '../../../../lib/guides/load';
 import { dayLabel } from '../../../../lib/guides/core';
 import { W } from '../../../../lib/guides/words';
 import { SW } from '../../../../lib/guides/suggest-words';
@@ -59,12 +59,15 @@ const cards = guideCards();
 const guides = cards.length > 1
   ? cards.map((c) => ({ slug: c.slug, title: { en: c.publicTitle.en, zh: c.publicTitle.zh || c.publicTitle.en } }))
   : [];
-// Grouped by what readers can choose to see (access.json "kinds"), when listed guides answer two or more.
-const tabs = guides.length > 1 ? kindTabs() : [];
-const kinds = tabs.length > 1 ? tabs.map((t) => ({ id: t.id, label: { en: t.label.en, zh: t.label.zh || t.label.en }, guides: t.guides })) : [];
+// Grouped as the log-on box's tabs: by city (access.json "cities"), and in a city by what readers
+// can choose to see (access.json "kinds"). src/scripts/guide/app.ts decides which groups to show.
+const bi = (b: { en: string; zh: string }) => ({ en: b.en, zh: b.zh || b.en });
+const cities = guides.length > 1
+  ? cityTabs().map((t) => ({ id: t.id, label: bi(t.label), guides: t.guides, kinds: t.kinds.map((k) => ({ id: k.id, label: bi(k.label), guides: k.guides })) }))
+  : [];
 const safeJson = (v: unknown) => JSON.stringify(v).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
 const guidesJson = safeJson(guides);
-const kindsJson = safeJson(kinds);
+const citiesJson = safeJson(cities);
 // The filters: by tier when the guide names its tiers (labels.tier, "Category"), by price level when it has them.
 const colon = (t: { en: string; zh: string }) => ({ en: `${t.en}:`, zh: `${t.zh || t.en}：` });
 const tierLabel = view.labels.tier.en ? colon(view.labels.tier) : null;
@@ -179,7 +182,7 @@ const opt = (d: string) => {
       </div>
       <script type="application/json" data-gd-data set:html={payloadJson(view)}></script>
       {guides.length > 1 && <script type="application/json" data-gd-guides set:html={guidesJson}></script>}
-      {kinds.length > 1 && <script type="application/json" data-gd-kinds set:html={kindsJson}></script>}
+      {cities.length > 0 && <script type="application/json" data-gd-cities set:html={citiesJson}></script>}
     </div>
   </Window>
 </Desktop>

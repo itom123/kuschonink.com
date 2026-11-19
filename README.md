@@ -373,8 +373,9 @@ in `access.json` redirect for good (docs/GUIDES.md, section 12). A guide without
 dates is `<city>-<topic>`: `paris-restaurants` is a long-term guide to places to
 eat, with a Category (Michelin Guide, everyday, cafés), Price (€ to €€€€) and
 Cuisine filter, Michelin stars on each place, and no Days or Routes. The log-on
-box's tabs (`kinds` in `access.json`) let a reader choose what to see first:
-places to eat, exhibitions or photography (docs/GUIDES.md, section 13). On a computer the window
+box has two rows of tabs: a city (`cities` in `access.json`), then what to see
+there (`kinds`): places to eat, art, books, shops or photography (docs/GUIDES.md,
+section 13). On a computer the window
 shows a list, the map and the details side by side; on a phone it shows one at a
 time, and tapping a pin raises a details sheet. On a touch screen the map takes the
 gestures of a maps app (`src/scripts/guide/gestures.ts`): drag and flick, pinch,
@@ -384,7 +385,9 @@ as Internet Explorer did: no taskbar or title bar, the window's buttons at the
 end of the menu bar, the toolbar down the left. It works without JavaScript as
 one readable page. Wherever a base picture is magnified past 1:1 (the region
 round the city plan long before the plan itself), the map shows street-level
-tiles from IGN's Plan IGN. The Worker fetches them at
+tiles from IGN's Plan IGN, or OpenStreetMap's for a guide whose provider in
+`access.json` `tileProviders` is `"osm"` (Plan IGN covers France only). The
+Worker fetches them at
 `/guides/<slug>/tiles/{z}/{x}/{y}.png` (zooms 12 to 19), for logged-on viewers
 only and only inside the box `access.json` gives under `tiles` (in degrees, at
 most 3° each way, containing every base map), so IGN sees the Worker and never

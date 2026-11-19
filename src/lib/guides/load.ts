@@ -3,10 +3,11 @@
 // every guide's JSON at build time, checks it once (a bad file fails the build
 // and the old site stays live), and hands each page its audience's view.
 // No node: modules, so `astro check` and the Worker build stay happy.
-import type { AccessFile, GuideCard, GuideFile, GuideView, KindTab, Payload } from './types';
+import type { AccessFile, CityTab, GuideCard, GuideFile, GuideView, Payload } from './types';
 import { checkAll, type GuideFileName, type RawGuide } from './check.ts';
 import { buildPayload, buildView } from './view.ts';
-import { cityLine } from './address.ts';
+import { cityLine, citySlug } from './address.ts';
+import { cityTabsOf } from './tabs.ts';
 import accessJson from '../../content/guides/access.json';
 
 const files = import.meta.glob<unknown>('../../content/guides/*/*.json', { eager: true, import: 'default' });
@@ -79,6 +80,7 @@ export function publicInfo(slug: string): GuideCard {
     publicTitle: { en: p.title, zh: p.titleZh || '' },
     publicSubtitle: { en: p.subtitle || '', zh: p.subtitleZh || '' },
     kinds: [...(g.kinds || [])],
+    city: citySlug(g.city),
   };
 }
 
@@ -91,15 +93,13 @@ export function guideCards(): GuideCard[] {
 }
 
 /**
- * The log-on box's tabs: each kind in access.json order with its listed
- * guides (in access.json order), kinds without one left out. Fewer than two
- * tabs: the box has none (src/pages/guides/[slug]/locked.astro).
+ * The log-on box's tabs: each city in access.json order with its listed
+ * guides, and under it each kind those guides answer (src/lib/guides/tabs.ts).
+ * A row with fewer than two tabs isn't shown (src/pages/guides/[slug]/locked.astro).
  */
-export function kindTabs(): KindTab[] {
-  const cards = guideCards();
-  return (load().access.kinds || [])
-    .map((k) => ({ id: k.id, label: { en: k.label, zh: k.labelZh || '' }, guides: cards.filter((c) => c.kinds.includes(k.id)).map((c) => c.slug) }))
-    .filter((t) => t.guides.length > 0);
+export function cityTabs(): CityTab[] {
+  const a = load().access;
+  return cityTabsOf(guideCards(), a.cities, a.kinds);
 }
 
 /** Each city's newest listed guide, for /guides/<city> (src/lib/guides/address.ts): "paris:paris-2026-11 …". */

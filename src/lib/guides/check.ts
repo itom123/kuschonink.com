@@ -238,14 +238,21 @@ const SCHEMA: Record<GuideFileName, S> = {
   }),
 };
 
+/** Where street-level tiles can come from (worker/guides.ts fetches each its own way). */
+const TILE_PROVIDERS = ['ign', 'osm'] as const;
+
 const ACCESS_SCHEMA: S = obj({
   audiences: arr(obj({ id: str(), ...tx('label'), secret: str(), includes: arr(str(), { opt: true }) }), { rec: 'id', min: 1 }),
   guides: obj({}, { rest: arr(str(), { min: 1 }) }),
   // Street-level tile bounds per guide, [west, south, east, north] in degrees (checkTiles() looks closer).
   tiles: obj({}, { opt: true, rest: arr({ t: 'num' }, { min: 4 }) }),
+  // Where each guide's street-level tiles come from: "ign" (the default) or "osm" (checkTiles() looks closer).
+  tileProviders: obj({}, { opt: true, rest: { t: 'enum', of: TILE_PROVIDERS } }),
   // Old address → the guide's slug now (checkMoved() looks closer).
   moved: obj({}, { opt: true, rest: str() }),
-  // The log-on box's tabs: what a reader can choose to see. Each guide names its own in guide.json "kinds".
+  // The log-on box's top row: a tab per city. Each listed guide's city (guide.json "city") is one of them.
+  cities: arr(obj({ id: str(), ...tx('label') }), { opt: true, rec: 'id', min: 1 }),
+  // The city's own row of tabs: what a reader can choose to see. Each guide names its own in guide.json "kinds".
   kinds: arr(obj({ id: str(), ...tx('label') }), { opt: true, rec: 'id', min: 1 }),
 });
 
@@ -289,6 +296,14 @@ function checkTiles(c: Ctx, access: unknown, guides: Rec): void {
     if (!(w < e)) say(c, at, `west ${w} should be less than east ${e}. Write [west, south, east, north].`);
     if (!(s < n)) say(c, at, `south ${s} should be less than north ${n}. Write [west, south, east, north].`);
     if (w < e && s < n && (e - w > TILE_SPAN || n - s > TILE_SPAN)) say(c, at, `spans more than ${TILE_SPAN}° (${(e - w).toFixed(2)}° × ${(n - s).toFixed(2)}°). Tiles are for one region: cover the region view's area, no more.`);
+  }
+  // "tileProviders": a provider only says where a guide's tiles come from, so the guide needs bounds in "tiles".
+  const tiles = O(O(access).tiles);
+  for (const slug of Object.keys(O(O(access).tileProviders))) {
+    if (slug.startsWith('_')) continue;
+    const at: Loc = { id: 'tileProviders', path: slug };
+    if (!(slug in guides)) say(c, at, `${q(slug)} is not a guide in "guides".`);
+    else if (!Object.hasOwn(tiles, slug)) say(c, at, `${q(slug)} has no bounds in "tiles", so it has no street-level tiles to take from anywhere. Add its box there, or remove this line.`);
   }
 }
 
@@ -615,6 +630,10 @@ export function inspectGuide(raw: RawGuide, slug: string, access: AccessFile | n
     if (new Set(kinds).size !== kinds.length) say(c, { id: 'guide', path: 'kinds' }, 'lists a kind twice.');
     if (g.listed === true && known.length && !kinds.length)
       say(c, { id: 'guide', path: 'kinds' }, `is missing. A listed guide names its kind, so the log-on box can offer it. Known: ${known.join(', ')}.`);
+    // City: the log-on box's top row (access.json "cities"). A listed guide's city must be there, or no tab would offer it.
+    const cities = A(access?.cities).map((x) => O(x).id).filter(isStr);
+    if (g.listed === true && cities.length && isStr(g.city) && citySlug(g.city) && !cities.includes(citySlug(g.city)))
+      say(c, { id: 'guide', path: 'city' }, `${q(citySlug(g.city))} is not a city in access.json "cities", so the log-on box can't offer this guide. Known: ${cities.join(', ')}. Add it there first.`);
     A(g.holidays).forEach((h, i) => {
       const d = O(h).date;
       if (isStr(d) && isISODate(d) && !inWindow(d, win)) say(c, { id: 'holidays', path: `[${i}].date` }, `${q(d)} is outside the guide's days (${winText}). Check the year.`);
@@ -912,6 +931,13 @@ export function checkAccess(access: unknown, slugs: string[]): string[] {
   kinds.forEach((k, i) => {
     const id = O(k).id;
     if (isStr(id) && !/^[a-z][a-z0-9-]*$/.test(id)) say(c, { id: 'kinds', path: `[${i}].id` }, `${q(id)} should be lower case letters, digits and "-".`);
+  });
+  // A city's id is its guides' city in address form ("paris", "sao-paulo": src/lib/guides/address.ts).
+  const cities = A(O(access).cities);
+  dupes(c, cities, 'id', (id) => ({ id: 'cities', path: `id ${q(id)}` }));
+  cities.forEach((k, i) => {
+    const id = O(k).id;
+    if (isStr(id) && citySlug(id) !== id) say(c, { id: 'cities', path: `[${i}].id` }, `${q(id)} should be the city as it starts a guide's address: lower case, with hyphens and no accents (${q(citySlug(id))}).`);
   });
   checkTiles(c, access, guides);
   checkMoved(c, access, guides);

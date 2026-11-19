@@ -4,6 +4,7 @@ import { daysBetween, dayLabel, dayLabelLong, dayStatus, isISODate, mapsRouteUrl
 import { checkAccess, checkAll, checkGuide, inspectGuide, type RawGuide } from './check.ts';
 import { buildPayload, buildView } from './view.ts';
 import { cityGuide, cityLine, citySlug, currentSlug, slugNames } from './address.ts';
+import { cityTabsOf } from './tabs.ts';
 import type { AccessFile, DayRule } from './types';
 import accessJson from '../../content/guides/access.json' with { type: 'json' };
 
@@ -164,9 +165,9 @@ const base = (): RawGuide => ({
 // The fixture passes; views filter by audience.
 {
   const raw = base();
-  const probs = checkGuide(raw, 'paris-fixture', { ...access, moved: undefined, guides: { 'paris-fixture': ['visitor', 'fotofilmic'] } });
+  const probs = checkGuide(raw, 'paris-fixture', { ...access, moved: undefined, tileProviders: undefined, guides: { 'paris-fixture': ['visitor', 'fotofilmic'] } });
   ok(probs.length === 0, 'the fixture guide passes the checks', probs.join('\n  '));
-  const acc: AccessFile = { ...access, moved: undefined, guides: { 'paris-fixture': ['visitor', 'fotofilmic'] }, tiles: { 'paris-fixture': [2.07, 48.63, 2.8, 49.05] } };
+  const acc: AccessFile = { ...access, moved: undefined, tileProviders: undefined, guides: { 'paris-fixture': ['visitor', 'fotofilmic'] }, tiles: { 'paris-fixture': [2.07, 48.63, 2.8, 49.05] } };
   ok(checkAccess(acc, ['paris-fixture']).length === 0, 'access.json fixture passes', checkAccess(acc, ['paris-fixture']).join('\n  '));
   const rep = inspectGuide(raw, 'paris-fixture', acc);
   ok(rep.missingZh > 0, 'texts without Chinese are counted', String(rep.missingZh));
@@ -231,7 +232,7 @@ const base = (): RawGuide => ({
 // ---------------------------------------------------------------------------
 // Broken copies: each must fail with file › id › field.
 {
-  const acc: AccessFile = { ...access, moved: undefined, guides: { 'paris-fixture': ['visitor', 'fotofilmic'] }, tiles: { 'paris-fixture': [2.07, 48.63, 2.8, 49.05] } };
+  const acc: AccessFile = { ...access, moved: undefined, tileProviders: undefined, guides: { 'paris-fixture': ['visitor', 'fotofilmic'] }, tiles: { 'paris-fixture': [2.07, 48.63, 2.8, 49.05] } };
   type G = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   const cases: [string, (g: G) => void, string, string?][] = [
     ['bad date', (g) => { g.items.items[3].end = '2026-11-31'; }, 'guides/paris-fixture/items.json › B1 › end', 'not a real date'],
@@ -323,6 +324,37 @@ const base = (): RawGuide => ({
   {
     const bad = checkAccess({ ...access, kinds: [{ id: 'Food', label: 'Food' }, { id: 'x', label: 'X' }, { id: 'x', label: 'Y' }] }, Object.keys(access.guides));
     ok(bad.some((p) => p.includes('kinds') && p.includes('"Food" should be lower case')) && bad.some((p) => p.includes('kinds') && p.includes('used twice')), 'access.json kinds: lower case, each once', bad.join(' | '));
+  }
+  // Cities in access.json: each once, written as the start of an address; a listed guide's city is one of them.
+  {
+    const bad = checkAccess({ ...access, cities: [{ id: 'São Paulo', label: 'São Paulo' }, { id: 'paris', label: 'Paris' }, { id: 'paris', label: 'Paris' }] }, Object.keys(access.guides));
+    ok(bad.some((p) => p.includes('cities') && p.includes('"sao-paulo"')) && bad.some((p) => p.includes('cities') && p.includes('used twice')), 'access.json cities: address form, each once', bad.join(' | '));
+    const away = checkGuide(base(), 'paris-fixture', { ...acc, cities: [{ id: 'london', label: 'London' }] });
+    ok(away.length === 1 && away[0].includes('guide.json › guide › city') && away[0].includes('"paris" is not a city in access.json'), "a listed guide whose city isn't in access.json cities is reported", away.join(' | '));
+    const unlisted = structuredClone(base()) as G;
+    unlisted.guide.listed = false;
+    ok(checkGuide(unlisted as RawGuide, 'paris-fixture', { ...acc, cities: [{ id: 'london', label: 'London' }] }).length === 0 && checkGuide(base(), 'paris-fixture', { ...acc, cities: undefined }).length === 0, 'an unlisted guide, or no cities at all: nothing to report');
+  }
+  // Tile providers: "ign" or "osm", for a guide with tile bounds.
+  {
+    const tp = checkAccess({ ...acc, tileProviders: { 'paris-fixture': 'osm' } }, ['paris-fixture']);
+    ok(tp.length === 0, 'a tile provider for a guide with tile bounds passes', tp.join(' | '));
+    const bad = checkAccess({ ...acc, tiles: undefined, tileProviders: { 'paris-fixture': 'google', ghost: 'osm' } as unknown as AccessFile['tileProviders'] }, ['paris-fixture']);
+    ok(bad.some((p) => p.includes('tileProviders') && p.includes('google')) && bad.some((p) => p.includes('› tileProviders › ghost') && p.includes('not a guide')) && bad.some((p) => p.includes('› tileProviders › paris-fixture') && p.includes('no bounds in "tiles"')), 'tile providers: known names, known guides, guides with bounds', bad.join(' | '));
+  }
+  // The log-on box's tabs (src/lib/guides/tabs.ts): cities in access.json order, each with its own kinds.
+  {
+    const card = (slug: string, city: string, kinds: string[]) => ({ slug, city, kinds, publicTitle: { en: slug, zh: '' }, publicSubtitle: { en: '', zh: '' } });
+    const cards = [card('paris-food', 'paris', ['food']), card('london-food', 'london', ['food']), card('paris-photo', 'paris', ['photography', 'art']), card('london-art', 'london', ['art'])];
+    const cities = [{ id: 'london', label: 'London', labelZh: '伦敦' }, { id: 'rome', label: 'Rome' }, { id: 'paris', label: 'Paris' }];
+    const kinds = [{ id: 'food', label: 'Places to eat' }, { id: 'art', label: 'Art' }, { id: 'books', label: 'Books' }, { id: 'photography', label: 'Photography' }];
+    const t = cityTabsOf(cards, cities, kinds);
+    ok(t.map((c) => c.id).join() === 'london,paris' && t[0].label.zh === '伦敦' && t[1].label.zh === '', 'city tabs: access.json order; a city without a listed guide has none', JSON.stringify(t.map((c) => c.id)));
+    ok(t[0].guides.join() === 'london-food,london-art' && t[0].kinds.map((k) => `${k.id}:${k.guides.join('+')}`).join() === 'food:london-food,art:london-art', "a city's guides and kinds, in access.json order, without kinds it lacks", JSON.stringify(t[0]));
+    ok(t[1].kinds.map((k) => `${k.id}:${k.guides.join('+')}`).join() === 'food:paris-food,art:paris-photo,photography:paris-photo', 'a guide can be under two kinds of its city', JSON.stringify(t[1].kinds));
+    const one = cityTabsOf(cards, undefined, kinds);
+    ok(one.length === 1 && one[0].id === '' && one[0].guides.length === 4 && one[0].kinds.length === 3, 'no cities: one unnamed city with every listed guide, as before', JSON.stringify(one.map((c) => c.guides)));
+    ok(cityTabsOf([], cities, kinds).length === 0 && cityTabsOf(cards, cities, undefined).every((c) => c.kinds.length === 0), 'no listed guides: no tabs; no kinds: no second row');
   }
   // Keys starting with _ are notes, not fields.
   const g = structuredClone(base()) as G;

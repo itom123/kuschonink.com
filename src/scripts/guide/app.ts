@@ -38,20 +38,31 @@ const biData = (el: HTMLElement, k: string): Bi => ({ en: el.dataset[`${k}En`] ?
 export interface GuideLink { slug: string; title: Bi }
 /** What readers can choose to see, with its listed guides (File ▸ Open Guide... groups the guides by it). */
 export interface KindLink { id: string; label: Bi; guides: string[] }
+/** A city with its listed guides and its kinds (File ▸ Open Guide... groups the guides by it, as the log-on box's top row). */
+export interface CityLink { id: string; label: Bi; guides: string[]; kinds: KindLink[] }
 
-/** The kinds the page names, when listed guides answer two or more; else none. */
-function guideKinds(root: HTMLElement, guides: GuideLink[]): KindLink[] {
+type RawGroup = { id?: unknown; label?: { en?: unknown; zh?: unknown }; guides?: unknown; kinds?: unknown };
+/** One city or kind from the page, its guides cut down to the listed ones; null if it isn't one. */
+function group(r: RawGroup, known: Set<string>): KindLink | null {
+  if (typeof r?.id !== 'string' || typeof r.label?.en !== 'string' || !Array.isArray(r.guides)) return null;
+  const guides = r.guides.filter((x): x is string => typeof x === 'string' && known.has(x));
+  return guides.length ? { id: r.id, label: { en: r.label.en, zh: typeof r.label.zh === 'string' && r.label.zh ? r.label.zh : r.label.en }, guides } : null;
+}
+
+/** The cities the page names, each with its kinds; none if the page names none. */
+function guideCities(root: HTMLElement, guides: GuideLink[]): CityLink[] {
   try {
-    const raw: unknown = JSON.parse(root.querySelector('script[data-gd-kinds]')?.textContent ?? '[]');
+    const raw: unknown = JSON.parse(root.querySelector('script[data-gd-cities]')?.textContent ?? '[]');
     if (!Array.isArray(raw)) return [];
     const known = new Set(guides.map((g) => g.slug));
-    const out: KindLink[] = [];
-    for (const k of raw as { id?: unknown; label?: { en?: unknown; zh?: unknown }; guides?: unknown }[]) {
-      if (typeof k?.id !== 'string' || typeof k.label?.en !== 'string' || !Array.isArray(k.guides)) continue;
-      const gs = k.guides.filter((x): x is string => typeof x === 'string' && known.has(x));
-      if (gs.length) out.push({ id: k.id, label: { en: k.label.en, zh: typeof k.label.zh === 'string' && k.label.zh ? k.label.zh : k.label.en }, guides: gs });
+    const out: CityLink[] = [];
+    for (const c of raw as RawGroup[]) {
+      const city = group(c, known);
+      if (!city) continue;
+      const kinds = (Array.isArray(c.kinds) ? (c.kinds as RawGroup[]) : []).map((k) => group(k, known)).filter((k): k is KindLink => !!k);
+      out.push({ ...city, kinds });
     }
-    return out.length > 1 ? out : [];
+    return out;
   } catch {
     return [];
   }
@@ -97,8 +108,8 @@ export class GuideApp {
   readonly labels: { items: Bi; listings: Bi; title: Bi };
   /** The listed guides (public titles); File ▸ Open Guide... shows only when there are several. */
   readonly guides: GuideLink[];
-  /** The same guides by kind (none: one flat list). */
-  readonly kinds: KindLink[];
+  /** The same guides by city, each with its kinds (one city: no city folders). */
+  readonly cities: CityLink[];
   private session: Session;
   private hintTimer = 0;
   private urlTimer = 0;
@@ -143,7 +154,7 @@ export class GuideApp {
     // data-guide-*, not data-title-*: the 中/EN switch (lang.ts) would turn those into a tooltip.
     this.labels = { items: biData(root, 'items'), listings: biData(root, 'listings'), title: biData(root, 'guide') };
     this.guides = listedGuides(root);
-    this.kinds = guideKinds(root, this.guides);
+    this.cities = guideCities(root, this.guides);
     this.fields = [...this.win.querySelectorAll<HTMLElement>(':scope > [data-window-inner] > .status-bar > .status-bar-field')];
     if (this.fields[1]) { this.fields[1].setAttribute('role', 'status'); this.fields[1].setAttribute('aria-live', 'polite'); }
     this.today = todayIn(this.p.timezone);
@@ -1004,14 +1015,22 @@ export class GuideApp {
       ]));
     };
     const bySlug = new Map(this.guides.map((g) => [g.slug, g]));
-    // By kind (a guide can be under several), as the log-on box's tabs; else one list.
+    const folder = (label: Bi) => h('span', {}, [h('span', { class: 'ico ico16 ico-folder', 'aria-hidden': 'true' }), ' ', label]);
+    // In a city: a folder for each kind that holds two or more guides (a guide can be under several),
+    // then the city's other guides, each on its own.
+    const inCity = (slugs: string[], kinds: KindLink[]) => {
+      const grouped = kinds.filter((k) => k.guides.length > 1);
+      const done = new Set(grouped.flatMap((k) => k.guides));
+      return [
+        ...grouped.map((k) => h('li', { class: 'gd-open-kind' }, [folder(k.label), h('ul', {}, k.guides.map((slug) => link(bySlug.get(slug)!)))])),
+        ...slugs.filter((slug) => !done.has(slug)).map((slug) => link(bySlug.get(slug)!)),
+      ];
+    };
+    // By city, as the log-on box's top row, when there are two or more; else the one city's guides.
     const list = h('ul', { class: 'tree-view gd-open-list', 'aria-labelledby': ask.id },
-      this.kinds.length
-        ? this.kinds.map((k) => h('li', { class: 'gd-open-kind' }, [
-          h('span', {}, [h('span', { class: 'ico ico16 ico-folder', 'aria-hidden': 'true' }), ' ', k.label]),
-          h('ul', {}, k.guides.map((slug) => link(bySlug.get(slug)!))),
-        ]))
-        : this.guides.map(link));
+      this.cities.length > 1
+        ? this.cities.map((c) => h('li', { class: 'gd-open-city' }, [folder(c.label), h('ul', {}, inCity(c.guides, c.kinds))]))
+        : inCity(this.guides.map((g) => g.slug), this.cities[0]?.kinds ?? []));
     const cancel = h('button', { type: 'button' }, W.cancel);
     const win = dialog({
       title: W.openGuideTitle,

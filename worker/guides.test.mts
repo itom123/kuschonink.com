@@ -743,6 +743,19 @@ await expectView('only kus98_guides and kus98_guides_<audience> count', get('/gu
   upstream = [];
   const noCache = await run(get(inside, visitorCookie));
   check('no edge cache at all → still served, straight from IGN', noCache.status === 200 && upstream.length === 1, noCache.status);
+  // A guide whose provider is "osm" (access.json "tileProviders"): OpenStreetMap's own URL, the website as the
+  // Referer and a User-Agent naming the service (its tile usage policy), and the same caching as IGN.
+  upstream = [];
+  const osmStore = new Map<string, Kept>();
+  const osm = await run(get(inside, visitorCookie), deps({ access: { ...ACCESS, tileProviders: { 'city-one': 'osm' } }, cache: fakeCache(osmStore) }));
+  const osmUp = upstream[0];
+  const osmH = new Headers(osmUp?.init?.headers);
+  check('provider "osm" → the same tile from tile.openstreetmap.org, z/x/y only', osm.status === 200 && tileHeaders(osm) && upstream.length === 1 && osmUp.url === `https://tile.openstreetmap.org/18/${nd.x}/${nd.y}.png`, upstream.map((u) => u.url));
+  check('… with a User-Agent naming kuschonink.com, the website as Referer, no cookie, a timeout', /kuschonink\.com/.test(osmH.get('user-agent') ?? '') && osmH.get('referer') === 'https://kuschonink.com/' && !osmH.has('cookie') && osmUp?.init?.signal instanceof AbortSignal, [...osmH]);
+  check('… cached as IGN tiles are (30 days, 2xx only), under its own address', JSON.stringify(osmUp?.init?.cf?.cacheTtlByStatus) === JSON.stringify({ '200-299': TILE_EDGE_S, '400-599': 0 }) && osmStore.has(osmUp.url) && osmStore.size === 1, [...osmStore.keys()]);
+  check('… while a guide without a provider still gets IGN with no Referer', up.url.startsWith('https://data.geopf.fr/') && !h.has('referer'));
+  const osmOut = await run(get(path(18, r18.x1 + 1, r18.y1), visitorCookie), deps({ access: { ...ACCESS, tileProviders: { 'city-one': 'osm' } } }));
+  check('… and only inside the guide\'s box: one tile beyond → 404', osmOut.status === 404 && upstream.length === 1, osmOut.status);
   upstream = [];
   logs = [];
   const broken = await run(get(inside, visitorCookie), deps({ cache: { match: async () => { throw new Error('cache down'); }, put: async () => { throw new Error('cache down'); } } }));

@@ -17,7 +17,7 @@ directly.
 - [10. 字段说明 Field reference](#10-字段说明-field-reference)
 - [11. 读者推荐 Suggestions](#11-读者推荐-suggestions)
 - [12. 地址与存档 Addresses and the archive](#12-地址与存档-addresses-and-the-archive)
-- [13. 吃饭、看展、看摄影：餐厅导览 Eating, exhibitions, photography: the restaurant guide](#13-吃饭看展看摄影餐厅导览-eating-exhibitions-photography-the-restaurant-guide)
+- [13. 城市、类别和餐厅导览 Cities, kinds and the restaurant guide](#13-城市类别和餐厅导览-cities-kinds-and-the-restaurant-guide)
 
 ---
 
@@ -32,7 +32,7 @@ directly.
 - 没有选导览的中间页。从桌面图标、“开始 ▸ 程序 ▸ 导览”、“运行”或“查找”打开“导览”，
   或者直接输入 `kuschonink.com/guides`（有没有 JavaScript 都一样），都会直接进入第一份列出的导览
   （`guide.json` 里 `"listed": true`，按 `access.json` 里的顺序）：没登录时是密码对话框，已登录就是导览本身。
-  有不止一份导览时，在密码对话框里选择要看哪一份：上方的选项卡先选“吃饭的地方”“看展览”还是“看摄影”（第 13 节），再在“导览”框里选。一份都没列出时，`/guides` 只显示“这里还没有导览”。
+  有不止一份导览时，在密码对话框里选择要看哪一份：最上面一排选项卡先选城市（巴黎、伦敦），下面一排再选在那里看什么（“吃饭的地方”“看艺术”“逛书店”“逛商店”“看摄影”，第 13 节），最后在“导览”框里选。一份都没列出时，`/guides` 只显示“这里还没有导览”。
 - 输入密码后，服务器（Cloudflare Worker）决定你属于哪一类读者（audience），给你那一类读者的版本。
   “访客”（visitor）看到公开内容；“学员”（fotofilmic）看到访客的全部内容，另加只给学员的内容。
 - 导览页面不进搜索引擎（`noindex`，不在 sitemap 里）。
@@ -42,7 +42,7 @@ directly.
 - **其他条目**：官方地图上没有被推荐的条目（巴黎导览有 58 个，编号 D 开头，灰色图钉），在地点列表上方勾选“显示全部其他条目”才出现。它们和推荐的展览一样有中英文说明、地址、开放时间、日期和图片，选定一天时也显示当天开不开放；法文原文收在“原文（法语）”里。勾选后它们也算进状态栏的展览数，比如“109 个展览”或“109 个展览中 N 个开放”；当天不开放的和展览一起归入“某日不开放”一组。它们没有主题、级别或价格，所以选了这些时不显示，也不进热力图。
 - **状态栏**：手机上或窗口太窄、一句话放不下时，状态栏的文字会像当年的滚动字幕一样移动：先停一下，再向左移出，从右边移回来，这样整句话都看得到。鼠标停在上面时文字不动；系统设置了“减少动态效果”时改为折行显示。
 - **我在哪里？**：只有按下按钮时，浏览器才会询问位置。之后地图上会出现一个红色的圆点，并显示“实时位置”标签，旁边有“停止”按钮。再按一次按钮、单击“停止”，或者刷新页面、注销、关闭窗口，都会关掉它；刷新之后它是关着的。最小化导览时，红点和它的“心跳”一起隐藏，还原后接着显示。位置只留在设备上，从不发送出去。浏览器不允许时，导览会说明怎样开启。
-- **街道地图**：底图被放大到超过原图大小的地方（城区底图周围的大区底图会最先被放大），街道级的地图瓦片由 Worker 从 IGN（Plan IGN）代为取得，地址是 `/guides/<名字>/tiles/{z}/{x}/{y}.png`，缩放级别 12 至 19，只给已登录的读者。城区底图放不满窗口时（比如竖着拿的平板），四周会补上大区底图和它的瓦片，不会露出灰色。范围由 `access.json` 的 `tiles` 决定（见第 10 节）。IGN 只看到 Worker，看不到访客。每位访客每分钟从 IGN 取图最多 600 块（已在缓存里的不算），超出的瓦片返回 429。
+- **街道地图**：底图被放大到超过原图大小的地方（城区底图周围的大区底图会最先被放大），街道级的地图瓦片由 Worker 从 IGN（Plan IGN，只有法国）代为取得；`access.json` 的 `tileProviders` 写了 `"osm"` 的导览（比如伦敦）改从 OpenStreetMap 取得。地址是 `/guides/<名字>/tiles/{z}/{x}/{y}.png`，缩放级别 12 至 19，只给已登录的读者。城区底图放不满窗口时（比如竖着拿的平板），四周会补上大区底图和它的瓦片，不会露出灰色。范围由 `access.json` 的 `tiles` 决定（见第 10 节）。IGN 只看到 Worker，看不到访客。每位访客每分钟从 IGN 取图最多 600 块（已在缓存里的不算），超出的瓦片返回 429。
 - **地图手势**：在手机和平板上，地图的手势和地图应用（Google 地图、苹果地图）一样：一根手指拖动移动地图，快速一划地图会继续滑行；两根手指捏合缩放；轻点两下放大；轻点两下后按住，向下滑动放大、向上滑动缩小；两根手指同时轻点一下缩小。地图上的文字不会被选中，长按也不会弹出菜单。用鼠标时，双击放大，按住 Shift 键双击缩小，滚轮缩放。代码在 `src/scripts/guide/gestures.ts`。
 - **横屏**：手机横过来时，导览铺满整个屏幕（像 Internet Explorer 的“全屏”）：任务栏让开（最小化导览就会回来），标题栏的按钮移到菜单栏右端，旁边是中文/EN 切换和“今天”提示（轻点提示打开日期）；工具栏立在左边，状态栏只留给读屏软件。地图因此有原来两倍多的高度。密码对话框也一样，只是保留任务栏，标题和密码框左右并排。CSS 在 `src/styles/guide.css` 最后。
 
@@ -60,8 +60,9 @@ past guides stay at their own addresses (section 12).
   without JavaScript) all go straight to the first listed guide
   (`"listed": true` in `guide.json`, in `access.json` order): its password box,
   or the guide itself once logged on. With more than one guide, people choose
-  theirs in the password box: its tabs first ask what they want to see (Places
-  to eat, Exhibitions, Photography: section 13), then the Guide box. With none
+  theirs in the password box: its top row of tabs asks which city (Paris,
+  London), the row under it what they want to see there (Places to eat, Art,
+  Books, Shops, Photography: section 13), then the Guide box. With none
   listed, `/guides` only says there are no guides yet.
 - With a password, the server (the Cloudflare Worker) works out which
   **audience** the visitor belongs to and serves that audience's version.
@@ -104,7 +105,9 @@ past guides stay at their own addresses (section 12).
   device and is never sent anywhere. If the browser refuses, the guide says how
   to allow it.
 - **Street-level tiles.** Wherever a base picture is magnified past 1:1 (the
-  region round the city plan first), street tiles from Plan IGN take over.
+  region round the city plan first), street tiles from Plan IGN take over
+  (France only), or OpenStreetMap's for a guide whose provider in `access.json`
+  `tileProviders` is `"osm"` (London, say).
   Where the city plan doesn't fill the window (a tablet held upright, say),
   the region and its tiles fill the rest, so no grey shows. The Worker fetches
   them at `/guides/<slug>/tiles/{z}/{x}/{y}.png` for zooms 12 to 19, only for logged-on
@@ -613,6 +616,8 @@ The site doesn't break: when a build fails, the live site stays as it was.
 | `px but` (the guard) | 底图图片的像素大小和 `map.json` 里的 `width`、`height` 不一样，图钉会跑位 A base map's pixel size differs from `width` and `height` in `map.json`, so its pins would move | 改 `map.json` 的 `width`、`height`（和 `originX`、`originY`），或重新裁图 Fix `width`, `height` (and `originX`, `originY`) in `map.json`, or crop the picture to match |
 | `its size in pixels can't be read` (the guard) | 读不出底图的像素大小，文件可能坏了，或不是图片 The pixel size of a base map can't be read: the file may be damaged or not a picture | 重新导出为 JPEG、PNG 或 WebP Export it again as JPEG, PNG or WebP |
 | `is not a kind in access.json`, `A listed guide names its kind` | 导览的 `kinds` 写了 `access.json` 里没有的类型，或者列出的导览没写 `kinds` A guide's `kinds` names a kind `access.json` doesn't have, or a listed guide has no `kinds` | 改正拼写，或给导览加上 `"kinds": ["food"]` 之类 Fix the spelling, or give the guide `"kinds"` such as `["food"]` |
+| `is not a city in access.json "cities"` | 列出的导览的城市（`guide.json` 的 `city`）不在 `access.json` 的 `cities` 里 A listed guide's city (`city` in `guide.json`) isn't in `cities` in `access.json` | 在 `cities` 里加上这个城市，如 `{ "id": "lisbon", "label": "Lisbon", "labelZh": "里斯本" }` Add the city to `cities`, such as `{ "id": "lisbon", "label": "Lisbon", "labelZh": "里斯本" }` |
+| `has no bounds in "tiles"` | `tileProviders` 给一份没有瓦片范围的导览写了来源 `tileProviders` names a source for a guide with no box in `tiles` | 在 `tiles` 里加上它的范围，或删掉这一行 Add its box to `tiles`, or remove the line |
 | `is not a price level`, `is not a distinction` | 地点的 `cost` 或 `award` 不在 `guide.json` 的 `costs` 或 `awards` 里 An item's `cost` or `award` isn't in `costs` or `awards` in `guide.json` | 用已有的编号，如 `"€€"`、`"1-star"` Use an id that exists, such as `"€€"` or `"1-star"` |
 | `not a Field Guide file` | 导览文件夹里有一个不认识的 `.json` 文件 A `.json` file in a guide's folder that the Field Guide doesn't use | 删掉它，或改成已知的文件名 Delete it, or rename it to a known file name |
 | `there is no folder`, `not in access.json` | `access.json` 和文件夹对不上 `access.json` and the folders disagree | 两边一起改 Change both |
@@ -660,7 +665,9 @@ below). Any file may have a `_comment`, which is never shown.
 | `audiences[].includes?` | 也能看到哪些读者的内容 | Audiences whose content this one also sees |
 | `guides` | 导览名 → 能打开它的读者 | Guide slug → the audiences that may open it |
 | `moved?` | 旧地址 → 导览现在的名字，如 `{"paris-photo-days-2026": "paris-2026-11"}`。旧地址永久转到新地址，用旧名发来的推荐照样送到这份导览（第 12 节） | Old address → the guide's slug now. The old address redirects for good, and suggestions sent under the old name still reach the guide (section 12) |
-| `kinds?[]` | `{ id, label, labelZh? }`：读者可以选择看什么（密码对话框的选项卡和“打开导览”的分组），按这里的顺序。名称在输入密码前就显示，保持中性 | What readers can choose to see (the password box's tabs, File ▸ Open Guide's groups), in this order. The labels show before the password: keep them neutral |
+| `cities?[]` | `{ id, label, labelZh? }`：密码对话框最上面一排选项卡（每个城市一张）和“打开导览”最外层的文件夹，按这里的顺序。`id` 就是导览地址的开头（`guide.json` 的 `city` 小写、用连字符：`paris`、`london`），每份列出的导览的城市都要在这里。没有列出导览的城市不显示 | The password box's top row of tabs (one per city) and File ▸ Open Guide's top folders, in this order. The `id` starts the guides' addresses (`city` in `guide.json`, lower case with hyphens: `paris`, `london`); every listed guide's city must be here. A city with no listed guide shows no tab |
+| `kinds?[]` | `{ id, label, labelZh? }`：读者在一个城市里可以选择看什么（城市下面那排选项卡和“打开导览”的分组），按这里的顺序。一个城市只显示它列出的导览所属的类别。名称在输入密码前就显示，保持中性 | What readers can choose to see in a city (the tabs under the city's, File ▸ Open Guide's groups), in this order. A city shows only the kinds its listed guides have. The labels show before the password: keep them neutral |
+| `tileProviders?` | 导览名 → 街道级瓦片的来源：`"ign"`（Plan IGN，只有法国；没写的导览也用它）或 `"osm"`（OpenStreetMap，其他城市）。只用于在 `tiles` 里有范围的导览 | Guide slug → where its street-level tiles come from: `"ign"` (Plan IGN, France only; also what a guide without a line gets) or `"osm"` (OpenStreetMap, anywhere else). Only for a guide with a box in `tiles` |
 | `tiles?` | 导览名 → 街道级地图瓦片的范围 `[西, 南, 东, 北]`（度），一般就是大区底图的范围；写了才有瓦片。只写数字，不写地点。东西、南北各跨不超过 3°，并且要包住这份导览的每一张底图 | Guide slug → the area of its street-level tiles, `[west, south, east, north]` in degrees (usually the region view's area); without it the guide has no tiles. Numbers only, never a place. Each side spans at most 3°, and the box must hold every base map |
 
 ### `guide.json`
@@ -1311,30 +1318,57 @@ ones are added by city and month.
 
 ---
 
-## 13. 吃饭、看展、看摄影：餐厅导览 Eating, exhibitions, photography: the restaurant guide
+## 13. 城市、类别和餐厅导览 Cities, kinds and the restaurant guide
 
-### 13.1 读者先选看什么 Readers choose what to see
+### 13.1 读者先选城市，再选看什么 Readers choose a city, then what to see
 
-密码对话框上方有选项卡：**吃饭的地方**、**看展览**、**看摄影**。选项卡来自 `access.json` 的 `kinds`（顺序也在那里），每份导览在自己的 `guide.json` 里用 `"kinds"` 写明属于哪几类，主要的放在最前面：
+密码对话框上方有两排选项卡。最上面一排是城市（**巴黎**、**伦敦**），来自 `access.json` 的 `cities`（顺序也在那里）；城市的 `id` 就是导览地址的开头，也就是 `guide.json` 里 `city` 的小写写法。下面一排是在这个城市里看什么（**吃饭的地方**、**看艺术**、**逛书店**、**逛商店**、**看摄影**），来自 `access.json` 的 `kinds`；每份导览在自己的 `guide.json` 里用 `"kinds"` 写明属于哪几类，主要的放在最前面：
 
 - `paris-restaurants`：`["food"]`；
-- `paris-2026-11`：`["photography", "exhibitions"]`（它是摄影展导览，所以两张选项卡都有它）。
+- `paris-2026-11`：`["photography"]`。
 
-单击另一张选项卡，会打开那一类第一份导览的密码对话框；如果当前这份导览也属于那一类，就只换选项卡。一类里有不止一份导览时，“导览”框里列出这一类的导览。没有 JavaScript 时，选项卡就是链接。导览里的 **文件 ▸ 打开导览…** 也按这几类分组。至少有两类导览列出时才显示选项卡。
+一个城市只显示它列出的导览所属的类别：巴黎是“吃饭的地方”和“看摄影”，伦敦是“吃饭的地方”“看艺术”“逛书店”“逛商店”。单击另一个城市，会打开那个城市第一份列出的导览的密码对话框。单击另一类，会打开这个城市里那一类第一份导览的密码对话框；如果当前这份导览也属于那一类，就只换选项卡。一类里有不止一份导览时，“导览”框里列出这一类的导览。没有 JavaScript 时，选项卡就是链接。只有一个城市时没有城市那一排；一个城市只有一类时没有下面那一排。导览里的 **文件 ▸ 打开导览…** 也先按城市、再按类别分组（一类只有一份导览时，不另建文件夹）。
 
-以后有了真正的“看展览”导览，就把 `"exhibitions"` 从 `paris-2026-11` 里去掉，只写在新导览里。
+**以后加一个活动，比如伦敦的 Frieze 周（不用改代码）：**
 
-The password box has tabs on top: **Places to eat**, **Exhibitions**,
-**Photography**. They come from `kinds` in `access.json` (in that order), and
-each guide says which it is in its own `guide.json` `"kinds"`, its main one
-first: `paris-restaurants` is `["food"]`; `paris-2026-11` is
-`["photography", "exhibitions"]` (a guide to photography shows, so under both).
-Another tab opens the box of that kind's first guide, or, if this guide is of
-that kind too, only changes the tab. With several guides of one kind, the Guide
-box lists that kind's. Without JavaScript the tabs are links. **File ▸ Open
-Guide…** in a guide groups the guides the same way. The tabs show once two kinds
-have a listed guide. When there is a real exhibitions guide, take
-`"exhibitions"` out of `paris-2026-11`.
+1. 在 `access.json` 的 `kinds` 里加一类，如 `{ "id": "frieze", "label": "Frieze Week", "labelZh": "Frieze 周" }`，放在想要的位置。名称在输入密码前就会显示。
+2. 新建一份带日期的导览，名字按第 12 节写成 `london-2027-10`：`guide.json` 里 `"city": "London"`、`"kinds": ["frieze"]`，再写 `window`（日期范围）和 `event`（活动名称和日期）。其余照第 5 节。
+3. 在 `access.json` 的 `guides` 里加上它和能打开它的读者（如 `["london"]`）；要街道级地图的话，在 `tiles` 里加范围，在 `tileProviders` 里写 `"osm"`。
+
+列出以后，伦敦那一排就多出一张“Frieze 周”选项卡。活动结束后可以按第 12 节存档。
+
+The password box has two rows of tabs. The top row is the city (**Paris**,
+**London**), from `cities` in `access.json` (in that order); a city's `id`
+starts its guides' addresses, `city` in `guide.json` in lower case. The row
+under it is what to see in that city (**Places to eat**, **Art**, **Books**,
+**Shops**, **Photography**), from `kinds` in `access.json`; each guide says
+which it is in its own `guide.json` `"kinds"`, its main one first:
+`paris-restaurants` is `["food"]`; `paris-2026-11` is `["photography"]`.
+
+A city shows only the kinds its listed guides have: Paris has Places to eat and
+Photography; London has Places to eat, Art, Books and Shops. Another city opens
+the box of that city's first listed guide. Another kind opens the box of that
+kind's first guide in the city, or, if this guide is of that kind too, only
+changes the tab. With several guides of one kind, the Guide box lists that
+kind's. Without JavaScript the tabs are links. With one city there is no city
+row, and a city with one kind has no row under it. **File ▸ Open Guide…** in a
+guide groups the guides by city, then by kind (a kind with one guide gets no
+folder of its own).
+
+**Adding an event later, such as Frieze Week in London (no code):**
+
+1. Add a kind to `kinds` in `access.json`, such as
+   `{ "id": "frieze", "label": "Frieze Week", "labelZh": "Frieze 周" }`, where
+   you want its tab. The label shows before the password.
+2. Add a dated guide named as in section 12, `london-2027-10`: `"city":
+   "London"`, `"kinds": ["frieze"]`, a `window` (its days) and an `event` (its
+   name and dates) in `guide.json`. The rest is as in section 5.
+3. Add it to `guides` in `access.json` with the audiences that may open it
+   (such as `["london"]`); for street-level tiles, its box in `tiles` and
+   `"osm"` in `tileProviders`.
+
+Once it is listed, London's row gains a Frieze Week tab. Archive it after the
+event as in section 12.
 
 ### 13.2 密码 The password
 

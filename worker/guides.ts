@@ -63,6 +63,16 @@ export const TILE_Z = { min: 12, max: 19 };
  * the request, so this is not an open proxy.
  */
 const TILE_UPSTREAM = 'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/png';
+/**
+ * OpenStreetMap's standard tiles, for a guide whose provider is "osm" (access.json
+ * "tileProviders"; outside France, where Plan IGN has no streets). Its tile usage
+ * policy (operations.osmfoundation.org/policies/tiles) asks a proxy for exactly
+ * this URL, a User-Agent naming the service, a Referer naming the website, and
+ * caching for at least 7 days: the edge keeps each tile for 30 (TILE_EDGE_S).
+ * Only tiles a reader's map shows are fetched, never ahead.
+ */
+const OSM_UPSTREAM = 'https://tile.openstreetmap.org';
+const OSM_REFERER = 'https://kuschonink.com/';
 const TILE_UA = 'kuschonink.com Field Guide tile proxy (+https://kuschonink.com)';
 /** The edge keeps a tile for 30 days; a browser for a week, privately (the cookie decides who gets it). */
 export const TILE_EDGE_S = 30 * 86400;
@@ -628,7 +638,8 @@ export function tileRange(b: [number, number, number, number], z: number): { x0:
 }
 
 /**
- * One tile of Plan IGN for a visitor who may open the guide: fetched from IGN
+ * One tile of Plan IGN (or of OpenStreetMap, for a guide whose provider is
+ * "osm") for a visitor who may open the guide: fetched from IGN
  * by the Worker (so IGN sees the Worker, never the visitor), kept at the edge
  * for 30 days, and answered privately. Only tiles inside the guide's declared
  * bounds and between TILE_Z.min and TILE_Z.max exist; anything else is 404.
@@ -645,7 +656,8 @@ async function tile(req: Request, url: URL, sub: string, slug: string, deps: Gui
   const r = tileRange(box, z);
   if (x < r.x0 || x > r.x1 || y < r.y0 || y > r.y1) return notFound(url, deps);
 
-  const upstream = `${TILE_UPSTREAM}&TILEMATRIX=${z}&TILEROW=${y}&TILECOL=${x}`;
+  const osm = deps.access.tileProviders?.[slug] === 'osm';
+  const upstream = osm ? `${OSM_UPSTREAM}/${z}/${x}/${y}.png` : `${TILE_UPSTREAM}&TILEMATRIX=${z}&TILEROW=${y}&TILECOL=${x}`;
   const key = new Request(upstream, { method: 'GET' });
   let hit: Response | undefined;
   try {
@@ -659,7 +671,8 @@ async function tile(req: Request, url: URL, sub: string, slug: string, deps: Gui
     try {
       up = await deps.fetch(upstream, {
         method: 'GET',
-        headers: { 'user-agent': TILE_UA, accept: 'image/png' },
+        // OpenStreetMap also gets the website as the Referer (its policy); never the visitor's own page or query.
+        headers: osm ? { 'user-agent': TILE_UA, referer: OSM_REFERER, accept: 'image/png' } : { 'user-agent': TILE_UA, accept: 'image/png' },
         signal: AbortSignal.timeout(TILE_TIMEOUT_MS),
         // Only a good tile is kept for 30 days: an IGN 404 or 5xx is never held (cacheTtl would cover those too).
         cf: { cacheEverything: true, cacheTtlByStatus: { '200-299': TILE_EDGE_S, '400-599': 0 } },
