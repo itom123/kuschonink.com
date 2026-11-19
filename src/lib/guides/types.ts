@@ -61,15 +61,31 @@ export interface AccessFile {
    */
   moved?: Record<string, string>;
   /**
-   * What a reader can choose to see, in the order the log-on box offers them
-   * (its tabs): "Places to eat", "Exhibitions", "Photography". Each guide says
-   * which it answers in guide.json "kinds". Public: the labels show before the
-   * password, so keep them neutral.
+   * Guide slug → where the Worker gets its street-level tiles: "ign" (Plan IGN,
+   * also what a guide without an entry gets) or "osm" (OpenStreetMap's standard
+   * tiles, under its tile usage policy). Only for a guide with "tiles" bounds.
+   */
+  tileProviders?: Record<string, TileProvider>;
+  /**
+   * The log-on box's top row: one tab per city, in this order. A city's id is
+   * its guides' city in address form (guide.json "city" through citySlug():
+   * "paris", "london"). Public: the labels show before the password.
+   */
+  cities?: CityRecord[];
+  /**
+   * What a reader can choose to see in a city, in the order the log-on box
+   * offers them (the tabs under the city's): "Places to eat", "Art",
+   * "Photography". Each guide says which it answers in guide.json "kinds".
+   * Public: the labels show before the password, so keep them neutral.
    */
   kinds?: KindRecord[];
 }
 /** One choice in the log-on box: a kind of guide. */
 export interface KindRecord { id: string; label: string; labelZh?: string }
+/** One city in the log-on box's top row. */
+export interface CityRecord { id: string; label: string; labelZh?: string }
+/** Where a guide's street-level tiles come from (access.json "tileProviders"). */
+export type TileProvider = 'ign' | 'osm';
 export interface AudienceRecord {
   id: string;
   label: string;
@@ -551,10 +567,15 @@ export interface GuideCard {
   publicSubtitle: Bi;
   /** Its kinds (guide.json "kinds"), its main one first. */
   kinds: string[];
+  /** Its city in address form (guide.json "city" through citySlug(): "paris"). */
+  city: string;
 }
 
 /** A tab of the log-on box: a kind and its listed guides, in access.json order. */
 export interface KindTab { id: string; label: Bi; guides: string[] }
+
+/** A tab of the log-on box's top row: a city, its listed guides and its kinds' tabs, in access.json order. */
+export interface CityTab { id: string; label: Bi; guides: string[]; kinds: KindTab[] }
 
 // ---------------------------------------------------------------------------
 // What the browser gets: <script type="application/json" data-gd-data> inside

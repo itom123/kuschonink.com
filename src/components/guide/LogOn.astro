@@ -9,8 +9,11 @@
 // With more than one listed guide, a Guide list above the password picks which
 // guide's box this is: a drop-down list with JavaScript (logon.ts opens the
 // chosen guide's box in the same window), links to each guide's box without.
-// With guides of more than one kind (access.json "kinds"), tabs on top choose
-// what the reader wants to see ("Places to eat", "Exhibitions", "Photography"),
+// With guides from more than one city (access.json "cities"), a row of tabs on
+// top chooses the city: another city's tab is a link to its first guide. The
+// Guide list and the tabs below hold only this guide's city. With guides of
+// more than one kind there (access.json "kinds"), the city's own row of tabs
+// chooses what the reader wants to see ("Places to eat", "Art", "Photography"),
 // and the Guide list holds that kind's guides: a tab is a link to the kind's
 // first guide (this guide when it is one of them).
 import Bi from '../Bi.astro';
@@ -27,9 +30,12 @@ interface Props {
   kinds?: { id: string; label: BiText; guides: string[] }[];
   /** The tab this box opens on: a kind of this guide. */
   kind?: string;
+  /** The top row (two or more): each city, its first listed guide, and whether it is this guide's; none with one city. */
+  cities?: { id: string; label: BiText; first: string; here: boolean }[];
 }
-const { slug, title, subtitle, guides = [], kinds = [], kind = '' } = Astro.props;
+const { slug, title, subtitle, guides = [], kinds = [], kind = '', cities = [] } = Astro.props;
 const tabbed = kinds.length > 1;
+const citied = cities.length > 1;
 // With tabs, the Guide list holds the chosen kind's guides; logon.ts swaps them when another tab of this guide is chosen.
 const shown = tabbed ? guides.filter((g) => kinds.find((k) => k.id === kind)?.guides.includes(g.slug)) : guides;
 const kindsOf = (s: string) => kinds.filter((k) => k.guides.includes(s)).map((k) => k.id).join(' ');
@@ -37,7 +43,17 @@ const resource = `\\\\XIANGYIN\\GUIDES\\${slug.toUpperCase()}`;
 const id = `gd-logon-${slug}`;
 const zhOr = (b: BiText) => b.zh || b.en;
 ---
-<div class="gd-logon" data-gd-logon data-gd-state="none" data-gd-slug={slug} data-gd-title-en={title.en} data-gd-title-zh={zhOr(title)} data-gd-tabbed={tabbed ? '' : undefined}>
+<div class="gd-logon" data-gd-logon data-gd-state="none" data-gd-slug={slug} data-gd-title-en={title.en} data-gd-title-zh={zhOr(title)} data-gd-tabbed={tabbed ? '' : undefined} data-gd-citied={citied ? '' : undefined}>
+  {citied && (
+    <menu role="tablist" class="gd-logon-cities" {...attr('aria-label', { en: 'Which city?', zh: '哪个城市？' })}>
+      {cities.map((c) => (
+        <li role="tab" aria-selected={c.here ? 'true' : 'false'}>
+          <a href={`/guides/${c.here ? slug : c.first}`} data-gd-city={c.id} data-gd-city-first={c.first}><Bi t={c.label} /></a>
+        </li>
+      ))}
+    </menu>
+  )}
+  <div class:list={['gd-logon-city', { window: citied, 'gd-logon-city-tabbed': citied && tabbed }]} role={citied ? 'tabpanel' : undefined}>
   {tabbed && (
     <menu role="tablist" class="gd-logon-kinds" {...attr('aria-label', { en: 'What would you like to see?', zh: '你想看什么？' })}>
       {kinds.map((k) => (
@@ -106,6 +122,7 @@ const zhOr = (b: BiText) => b.zh || b.en;
       </div>
     </fieldset>
   </form>
+  </div>
   </div>
 </div>
 

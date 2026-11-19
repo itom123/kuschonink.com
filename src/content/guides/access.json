@@ -9,19 +9,28 @@
     "paris-restaurants": ["food"],
     "paris-2026-11": ["visitor", "fotofilmic"]
   },
-  "_tiles": "Street-level map tiles (Plan IGN, fetched by the Worker) for a guide: the area they cover as [west, south, east, north] in degrees, usually the region view's area. Only numbers here, never a place. 街道级地图瓦片（Plan IGN，由 Worker 代取）的覆盖范围：[西, 南, 东, 北]，单位为度，一般就是大区底图的范围。这里只写数字，不写地点。",
+  "_tiles": "Street-level map tiles (fetched by the Worker) for a guide: the area they cover as [west, south, east, north] in degrees, usually the region view's area. Only numbers here, never a place. 街道级地图瓦片（由 Worker 代取）的覆盖范围：[西, 南, 东, 北]，单位为度，一般就是大区底图的范围。这里只写数字，不写地点。",
   "tiles": {
     "paris-2026-11": [2.07, 48.63, 2.8, 49.05],
     "paris-restaurants": [2.07, 48.63, 2.8, 49.05]
   },
+  "_tileProviders": "Where a guide's street-level tiles come from: \"ign\" (Plan IGN, France only; also what a guide without a line here gets) or \"osm\" (OpenStreetMap, anywhere else). Only for a guide with a box in \"tiles\". 街道级瓦片从哪里来：\"ign\"（Plan IGN，只有法国；这里没写的导览也用它）或 \"osm\"（OpenStreetMap，其他城市）。只用于在 \"tiles\" 里有范围的导览。",
+  "tileProviders": {},
   "_moved": "Old addresses that still work: /guides/<old>/… goes to the guide's address now, for good, and suggestions sent under the old name still reach the guide. A guide's address is <city>-<yyyy>-<mm> and never changes once shared (docs/GUIDES.md, section 12); add a line here only if one ever has to. 旧地址：/guides/<旧名>/… 永久转到导览现在的地址，用旧名发来的推荐也照样送到这份导览。导览地址写作 <城市>-<年>-<月>，一经分享就不再改（docs/GUIDES.md 第12节）；只有地址不得不改时才在这里加一行。",
   "moved": {
     "paris-photo-days-2026": "paris-2026-11"
   },
-  "_kinds": "What a reader can choose to see: the tabs of the log-on box, in this order, and the groups of File ▸ Open Guide. Each guide names its own in guide.json \"kinds\", its main one first. The labels show before the password, so keep them neutral. 读者可以选择看什么：密码对话框上的选项卡（按这里的顺序）和“文件 ▸ 打开导览”里的分组。每份导览在 guide.json 的 \"kinds\" 里写明自己属于哪一类，主要的放在最前面。这些名称在输入密码前就会显示，请保持中性。",
+  "_cities": "The log-on box's top row: one tab per city, in this order, and the top folders of File ▸ Open Guide. A city's id is the start of its guides' addresses (guide.json \"city\" in lower case: \"paris\", \"london\"); every listed guide's city must be here. A city without a listed guide shows no tab. The labels show before the password. 密码对话框最上面一排选项卡：每个城市一张，按这里的顺序，也是“文件 ▸ 打开导览”里最外层的文件夹。城市的 id 就是它的导览地址开头（guide.json 里的 \"city\" 小写：\"paris\"、\"london\"）；每份列出的导览，它的城市都要在这里。没有列出导览的城市不显示选项卡。这些名称在输入密码前就会显示。",
+  "cities": [
+    { "id": "paris", "label": "Paris", "labelZh": "巴黎" },
+    { "id": "london", "label": "London", "labelZh": "伦敦" }
+  ],
+  "_kinds": "What a reader can choose to see in a city: the tabs under the city's tab, in this order, and the groups of File ▸ Open Guide. Each guide names its own in guide.json \"kinds\", its main one first. A city shows only the kinds its listed guides have, so an event (a week of fairs, say) is a kind here plus a guide that names it. The labels show before the password, so keep them neutral. 读者在一个城市里可以选择看什么：城市选项卡下面那排选项卡（按这里的顺序），也是“文件 ▸ 打开导览”里的分组。每份导览在 guide.json 的 \"kinds\" 里写明自己属于哪一类，主要的放在最前面。一个城市只显示它列出的导览所属的类别，所以一个活动（比如一周的艺博会）就是这里的一类，加上一份写明这一类的导览。这些名称在输入密码前就会显示，请保持中性。",
   "kinds": [
     { "id": "food", "label": "Places to eat", "labelZh": "吃饭的地方" },
-    { "id": "exhibitions", "label": "Exhibitions", "labelZh": "看展览" },
+    { "id": "art", "label": "Art", "labelZh": "看艺术" },
+    { "id": "books", "label": "Books", "labelZh": "逛书店" },
+    { "id": "shops", "label": "Shops", "labelZh": "逛商店" },
     { "id": "photography", "label": "Photography", "labelZh": "看摄影" }
   ]
 }

@@ -57,6 +57,23 @@ html:not(.js) .app-window[data-fit="dialog"] .window-inner { min-height: 0; }
 .gd-logon[data-gd-tabbed], html.js .app-window[data-fit="dialog"] .gd-logon[data-gd-tabbed] { gap: 0; }
 @media (pointer: coarse) { .gd-logon-kinds a { margin: 9px 10px; } }
 
+/* ---- Cities: the top row (access.json "cities"), a property sheet whose panel holds the city's own
+   tabs and panel. With one city it is no box at all. ---- */
+.gd-logon-city:not(.window) { display: contents; }
+.gd-logon-cities { width: min(436px, 100%); box-sizing: border-box; flex: none; }
+.gd-logon-cities > li { min-width: 0; }
+.gd-logon-cities a { white-space: nowrap; cursor: default; }
+.gd-logon-cities a[aria-disabled="true"] { cursor: progress; }
+.gd-logon-city.window {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  width: min(436px, 100%); box-sizing: border-box; padding: 16px 8px 12px;
+}
+/* The city's tabs sit on its panel and join their own panel, both as wide as it. */
+.gd-logon-city-tabbed.window { gap: 0; padding: 8px 6px 6px; }
+.gd-logon-city.window > .gd-logon-kinds, .gd-logon-city.window > .gd-logon-panel.window { width: 100%; }
+.gd-logon[data-gd-citied], html.js .app-window[data-fit="dialog"] .gd-logon[data-gd-citied] { gap: 0; }
+@media (pointer: coarse) { .gd-logon-cities a { margin: 9px 10px; } }
+
 /* ---- Splash: content fonts, no photographs ---- */
 .gd-logon-splash {
   display: flex; align-items: center; gap: 14px;
@@ -147,6 +164,20 @@ html.js .gd-logon-guides { display: none; }
   .gd-logon[data-gd-tabbed] { flex-direction: column; align-items: center; gap: 0; }
   .gd-logon[data-gd-tabbed] .gd-logon-kinds { width: min(660px, 100%); }
   .gd-logon-panel.window { flex-direction: row; align-items: flex-start; justify-content: center; gap: 18px; width: min(660px, 100%); padding: 10px 8px 12px; }
+  /* With cities: their tabs on top too, the splash beside the box inside the city's panel. */
+  .gd-logon[data-gd-citied] { flex-direction: column; align-items: center; gap: 0; }
+  .gd-logon[data-gd-citied] .gd-logon-cities { width: min(660px, 100%); }
+  .gd-logon-city.window { flex-direction: row; align-items: flex-start; justify-content: center; gap: 18px; width: min(660px, 100%); padding: 10px 8px 12px; }
+  /* Both rows: they share one line, the cities first, and the city's panel is no box, so the
+     password stays as high as with one row. */
+  .gd-logon[data-gd-citied][data-gd-tabbed] {
+    flex-flow: row wrap; align-content: flex-start; justify-content: flex-start;
+    width: min(676px, 100%); margin-inline: auto;
+  }
+  .gd-logon[data-gd-citied][data-gd-tabbed] .gd-logon-city.window { display: contents; }
+  .gd-logon[data-gd-citied][data-gd-tabbed] .gd-logon-cities { width: auto; flex: 0 0 auto; }
+  .gd-logon[data-gd-citied][data-gd-tabbed] .gd-logon-kinds { width: auto; flex: 0 1 auto; margin-left: 16px; }
+  .gd-logon[data-gd-citied][data-gd-tabbed] .gd-logon-panel.window { flex: 1 0 100%; width: 100%; }
 }
 
 /* ---- High Contrast ---- */
