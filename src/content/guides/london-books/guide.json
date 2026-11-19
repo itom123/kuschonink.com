@@ -1,0 +1,125 @@
+{
+  "_comment": "Bookshops in London: a long-term guide, no dates. Tiers are the categories (A destination bookshops, B specialists, C second-hand, comics and book arts). See docs/GUIDES.md. 伦敦书店长期导览：分级就是类别（A 值得专程去的书店，B 专门书店，C 二手书、漫画与书籍艺术）。",
+  "title": "Bookshops in London, from Charing Cross Road to Broadway Market.",
+  "titleZh": "伦敦的书店：从查令十字路到百老汇市场。",
+  "subtitle": "{items} bookshops, from big independents to specialists in art, poetry, comics and maps.",
+  "subtitleZh": "{items} 家书店，从大型独立书店到艺术、诗歌、漫画和地图专门店。",
+  "public": {
+    "title": "Bookshops in London",
+    "titleZh": "伦敦书店",
+    "subtitle": "Independent and specialist bookshops",
+    "subtitleZh": "独立书店与专门书店"
+  },
+  "listed": true,
+  "kinds": ["books"],
+  "city": "London",
+  "cityZh": "伦敦",
+  "timezone": "Europe/London",
+  "timezoneLabel": "London time",
+  "timezoneLabelZh": "伦敦时间",
+  "checked": "2026-11-19",
+  "tiers": [
+    { "id": "A", "name": "Destination bookshops", "nameZh": "值得专程去的书店", "text": "Worth a trip on their own.", "textZh": "本身就值得专程前往。", "weight": 3 },
+    { "id": "B", "name": "Specialists", "nameZh": "专门书店", "text": "One subject done well: art, design, poetry, travel, LGBTQ+.", "textZh": "专注一个领域：艺术、设计、诗歌、旅行、LGBTQ+。", "weight": 2 },
+    { "id": "C", "name": "Second-hand, comics and book arts", "nameZh": "二手书、漫画与书籍艺术", "text": "Second-hand and rare books, comics, and a place to make books.", "textZh": "二手书和珍本、漫画，以及一个可以自己做书的地方。", "weight": 1 }
+  ],
+  "themes": [
+    { "id": "general", "name": "General", "nameZh": "综合" },
+    { "id": "art-photography", "name": "Art and photography", "nameZh": "艺术与摄影" },
+    { "id": "design", "name": "Design and architecture", "nameZh": "设计与建筑" },
+    { "id": "rare-secondhand", "name": "Rare and second-hand", "nameZh": "珍本与二手书" },
+    { "id": "poetry-politics", "name": "Poetry and politics", "nameZh": "诗歌与政治" },
+    { "id": "comics", "name": "Comics", "nameZh": "漫画" },
+    { "id": "travel-maps", "name": "Travel and maps", "nameZh": "旅行与地图" },
+    { "id": "lgbtq", "name": "LGBTQ+", "nameZh": "LGBTQ+" },
+    { "id": "book-arts", "name": "Book arts and printing", "nameZh": "书籍艺术与印刷" }
+  ],
+  "zones": [
+    { "id": "west-end", "name": "West End", "nameZh": "西区" },
+    { "id": "city", "name": "City and Clerkenwell", "nameZh": "伦敦城与克勒肯维尔" },
+    { "id": "east", "name": "Shoreditch and Hackney", "nameZh": "肖迪奇与哈克尼" },
+    { "id": "north", "name": "King's Cross and North", "nameZh": "国王十字与北伦敦" },
+    { "id": "southbank", "name": "South Bank and Bermondsey", "nameZh": "南岸与伯蒙德赛" },
+    { "id": "west", "name": "Kensington, Chelsea and West", "nameZh": "肯辛顿、切尔西与西伦敦" },
+    { "id": "south", "name": "South London", "nameZh": "南伦敦" },
+    { "id": "further", "name": "Further out", "nameZh": "更远一些" }
+  ],
+  "labels": {
+    "item": "Bookshop",
+    "itemZh": "书店",
+    "items": "Bookshops",
+    "itemsZh": "书店",
+    "subtitle": "What it sells",
+    "subtitleZh": "主营",
+    "by": "Run by",
+    "byZh": "店主",
+    "tier": "Category",
+    "tierZh": "类别",
+    "theme": "Subject",
+    "themeZh": "题材"
+  },
+  "texts": {
+    "about": {
+      "heading": "About this guide",
+      "headingZh": "关于本导览",
+      "paras": [
+        {
+          "text": "Bookshops in London, from the big independents to small specialists. They come from shared Google Maps lists, and each was checked in November 2026 against the shop's own pages and the press.",
+          "textZh": "伦敦的书店，从大型独立书店到小型专门书店。名单来自几份共享的 Google 地图列表，2026年11月逐一对照了书店官网和媒体报道。"
+        },
+        {
+          "text": "This guide has no dates: it grows over time.",
+          "textZh": "本导览没有固定日期，会不断更新。"
+        }
+      ]
+    },
+    "how": {
+      "heading": "How to use it",
+      "headingZh": "使用方法",
+      "items": [
+        {
+          "lead": "Category.",
+          "leadZh": "类别。",
+          "text": "Destination bookshops: worth a trip on their own. Specialists: one subject done well. Second-hand, comics and book arts: older books, comics and a place to make books.",
+          "textZh": "值得专程去的书店：本身就值得专程前往。专门书店：专注一个领域。二手书、漫画与书籍艺术：旧书、漫画，以及一个可以自己做书的地方。"
+        },
+        {
+          "lead": "Subject.",
+          "leadZh": "题材。",
+          "text": "Choose one in the Subject box, or type a name or a street in Find.",
+          "textZh": "在“题材”框里选一个，或者在“查找”里输入店名或街道。"
+        },
+        {
+          "lead": "Opening hours.",
+          "leadZh": "营业时间。",
+          "text": "Small shops keep short hours, especially on Sunday. Check before you go.",
+          "textZh": "小书店营业时间较短，周日尤其如此。出发前请先确认。"
+        }
+      ]
+    }
+  },
+  "links": [
+    {
+      "label": "OpenStreetMap: copyright and licence",
+      "labelZh": "OpenStreetMap：版权与许可",
+      "url": "https://www.openstreetmap.org/copyright"
+    },
+    {
+      "label": "OpenStreetMap: report a map issue",
+      "labelZh": "OpenStreetMap：报告地图问题",
+      "url": "https://www.openstreetmap.org/fixthemap"
+    }
+  ],
+  "credits": {
+    "points": "Points: shared Google Maps lists; addresses and details from each shop's own pages and the press",
+    "pointsZh": "点位：几份共享的 Google 地图列表；地址和信息来自各书店官网和媒体报道"
+  },
+  "map": {
+    "centre": [-0.1300, 51.5065],
+    "heatRadius": 500
+  },
+  "sensitive": {
+    "public": []
+  },
+  "suggestions": false
+}

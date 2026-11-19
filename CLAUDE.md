@@ -15,7 +15,7 @@
 - **Never put a password or key in the repo** (files, commits, PR text). The
   Field Guide's passwords are Cloudflare secrets named in
   `src/content/guides/access.json` (`GUIDES_PASSWORD`,
-  `GUIDES_PASSWORD_FOTOFILMIC`, `GUIDES_PASSWORD_FOOD`); `GUIDES_COOKIE_SECRET` signs its log-on
+  `GUIDES_PASSWORD_FOTOFILMIC`, `GUIDES_PASSWORD_FOOD`, `GUIDES_PASSWORD_LONDON`); `GUIDES_COOKIE_SECRET` signs its log-on
   cookies (`TURNSTILE_SECRET` stands in when it isn't set; a secret under 24
   characters signs together with `TURNSTILE_SECRET`). `KINO_SECRET` signs the
   Kino's tickets; `KINO_PASSWORD` is the password for its films marked

@@ -1,0 +1,2782 @@
+{
+  "_comment": "The places, checked in November 2026 against their own pages and the press. 地点，2026年11月对照各家官网和媒体报道核实。",
+  "items": [
+    {
+      "id": "A1",
+      "tier": "A",
+      "name": "Barrafina",
+      "subtitle": "Spanish tapas counter",
+      "subtitleZh": "西班牙小吃吧台",
+      "zone": "west-end",
+      "themes": [
+        "mediterranean"
+      ],
+      "why": "A counter-seating tapas bar in Soho serving modern Spanish small plates and a daily blackboard of specials. It does not take bookings, so expect to queue at busy times.",
+      "whyZh": "苏豪区的吧台座位西班牙小吃吧，供应现代西班牙小菜和每日黑板特色菜。不接受订位，人多时需要排队。",
+      "address": "26-27 Dean St, London W1D 3LL",
+      "cost": "££",
+      "award": "selected",
+      "note": "Walk-ins only; queue early at peak times.",
+      "noteZh": "只接受walk-in，用餐高峰请早点去排队。",
+      "sourceUrl": "https://guide.michelin.com/gb/en/greater-london/london/restaurant/barrafina",
+      "links": [
+        "https://www.barrafina.com",
+        "https://maps.google.com/?cid=14208665277994686615"
+      ],
+      "coordinates": [
+        -0.1326682,
+        51.5141074
+      ]
+    },
+    {
+      "id": "A2",
+      "tier": "A",
+      "name": "Bouchon Racine",
+      "subtitle": "French bistro",
+      "subtitleZh": "法式小酒馆",
+      "by": "Henry Harris",
+      "zone": "city",
+      "themes": [
+        "french"
+      ],
+      "why": "Henry Harris's Lyon-style bouchon, upstairs from the Three Compasses pub near Smithfield. The menu is French bistro classics such as escargots, steak tartare and duck confit, with a French wine list.",
+      "whyZh": "亨利·哈里斯（Henry Harris）开的里昂小酒馆风格餐厅，位于史密斯菲尔德附近 Three Compasses 酒吧楼上。主打法式小酒馆经典菜，如焗蜗牛、鞑靼牛肉和油封鸭，酒单也以法国酒为主。",
+      "address": "Upstairs, 66 Cowcross St, London EC1M 6BP",
+      "hours": "Tue–Sat 12:00–15:00, 18:00–22:00",
+      "hoursZh": "周二至周六 12:00–15:00，18:00–22:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "cost": "£££",
+      "award": "selected",
+      "note": "Book through the website (OpenTable) or by phone; it is upstairs from the pub.",
+      "noteZh": "可通过官网（OpenTable）或电话订位；餐厅在酒吧楼上。",
+      "sourceUrl": "https://guide.michelin.com/gb/en/greater-london/london/restaurant/bouchon-racine",
+      "links": [
+        "https://bouchonracine.com",
+        "https://maps.google.com/?cid=6045449456122744906"
+      ],
+      "coordinates": [
+        -0.1038862,
+        51.5200328
+      ]
+    },
+    {
+      "id": "A3",
+      "tier": "A",
+      "name": "Core by Clare Smyth",
+      "subtitle": "Modern British fine dining",
+      "subtitleZh": "现代英式高级餐厅",
+      "by": "Clare Smyth",
+      "zone": "west",
+      "themes": [
+        "tasting",
+        "british"
+      ],
+      "why": "Clare Smyth's three-star restaurant in Notting Hill, serving British produce in seasonal or classic tasting menus or à la carte. A special-occasion dinner that needs booking well ahead.",
+      "whyZh": "克莱尔·史密斯（Clare Smyth）在诺丁山的米其林三星餐厅，用英国食材做季节套餐、经典套餐，也可单点。适合特别场合，需提前很久订位。",
+      "address": "92 Kensington Park Rd, London W11 2PN",
+      "hours": "Tue–Sat 18:30–21:45; Thu–Sat also 12:00–14:15; Sun and Mon closed",
+      "hoursZh": "周二至周六 18:30–21:45；周四至周六另有午餐 12:00–14:15；周日和周一休息",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "cost": "££££",
+      "award": "3-stars",
+      "price": "Tasting menus £275–285; à la carte £215 at lunch, £245 at dinner",
+      "priceZh": "品鉴套餐 £275–285；单点午餐 £215，晚餐 £245",
+      "note": "Book online in advance.",
+      "noteZh": "请提前在线预订。",
+      "sourceUrl": "https://guide.michelin.com/gb/en/greater-london/london/restaurant/core-by-clare-smyth",
+      "links": [
+        "https://corebyclaresmyth.com/",
+        "https://maps.google.com/?cid=4376616869303527628"
+      ],
+      "coordinates": [
+        -0.2031335,
+        51.5127727
+      ]
+    },
+    {
+      "id": "A4",
+      "tier": "A",
+      "name": "Jolene Bakery & Restaurant",
+      "subtitle": "Bakery and restaurant",
+      "subtitleZh": "面包房兼餐厅",
+      "zone": "east",
+      "themes": [
+        "sweets",
+        "mediterranean"
+      ],
+      "why": "A neighbourhood bakery on Newington Green, with pastries and bread made from flour milled in-house by day. In the evening there is a handwritten menu of sharing plates and house-made pasta, plus a short list of natural wines.",
+      "whyZh": "纽因顿格林的社区面包房，白天供应用自家磨粉烘焙的糕点和面包。晚上有手写的分享小菜和自制意面，酒单不长，以天然葡萄酒为主。",
+      "address": "21 Newington Grn, Mayville Estate, London N16 9PU",
+      "cost": "££",
+      "award": "selected",
+      "note": "The restaurant takes its own reservations.",
+      "noteZh": "餐厅自行接受订位。",
+      "sourceUrl": "https://guide.michelin.com/gb/en/greater-london/london/restaurant/jolene",
+      "links": [
+        "https://www.jolenebakery.com",
+        "https://maps.google.com/?cid=3109534013655747415"
+      ],
+      "coordinates": [
+        -0.0844365,
+        51.5513088
+      ]
+    },
+    {
+      "id": "A5",
+      "tier": "A",
+      "name": "Kikuchi",
+      "subtitle": "Sushi and omakase",
+      "subtitleZh": "寿司与主厨发办",
+      "by": "Masayuki Kikuchi",
+      "zone": "west-end",
+      "themes": [
+        "japanese",
+        "tasting"
+      ],
+      "why": "A small, tucked-away sushi bar on Hanway Street, best known for its counter omakase menu. Book ahead; counter seats are the ones diners rave about.",
+      "whyZh": "汉韦街上一家藏得很深的小寿司店，最出名的是吧台的主厨发办（omakase）套餐。建议提前订位，吧台座位口碑最好。",
+      "address": "14 Hanway St, London W1T 1UD",
+      "cost": "££££",
+      "price": "Counter omakase listed at £130 per person on OpenTable",
+      "priceZh": "OpenTable 上标注吧台发办套餐每人 £130",
+      "note": "Book through OpenTable or by phone.",
+      "noteZh": "可通过 OpenTable 或电话订位。",
+      "sourceUrl": "https://www.opentable.co.uk/r/kikuchi-london",
+      "links": [
+        "https://maps.google.com/?cid=11126435001446801500"
+      ],
+      "coordinates": [
+        -0.1316793,
+        51.5169339
+      ]
+    },
+    {
+      "id": "A6",
+      "tier": "A",
+      "name": "Kiln",
+      "subtitle": "Thai clay pot and grill",
+      "subtitleZh": "泰式砂锅与烧烤",
+      "zone": "west-end",
+      "themes": [
+        "southeast-asian",
+        "hotpot-grill"
+      ],
+      "why": "A small, lively Soho counter restaurant cooking clay pots, wok dishes and grills with flavours from Laos, Myanmar and Yunnan. Go early or expect to wait.",
+      "whyZh": "苏豪区一家小而热闹的吧台式餐厅，用砂锅、炒锅和炭火烧烤烹制菜肴，风味来自老挝、缅甸和云南。建议早点到，不然要排队。",
+      "address": "58 Brewer St, London W1F 9TL",
+      "cost": "££",
+      "award": "bib",
+      "note": "No bookings at the main restaurant, so arrive early; the ground-floor counter is the seat to try.",
+      "noteZh": "主餐厅不接受订位，建议早点到；一楼的吧台座位最值得争取。",
+      "sourceUrl": "https://guide.michelin.com/gb/en/greater-london/london/restaurant/kiln",
+      "links": [
+        "https://kilnsoho.com",
+        "https://maps.google.com/?cid=3638117081155949496"
+      ],
+      "coordinates": [
+        -0.136059,
+        51.5114007
+      ]
+    },
+    {
+      "id": "A7",
+      "tier": "A",
+      "name": "Lurra",
+      "subtitle": "Basque charcoal grill",
+      "subtitleZh": "巴斯克炭火烧烤",
+      "zone": "west-end",
+      "themes": [
+        "mediterranean",
+        "hotpot-grill"
+      ],
+      "why": "A Basque restaurant near Marble Arch that cooks over charcoal and wood, sister to Donostia a few doors along. Come for grilled whole fish, octopus and shared cuts, then the burnt Basque cheesecake.",
+      "whyZh": "大理石拱门附近的巴斯克餐厅，用炭火和木柴烹饪，姊妹店 Donostia 就在几步之外。可以点烤整鱼、章鱼和适合分食的肉类，最后来一份巴斯克烧焦芝士蛋糕。",
+      "address": "9 Seymour Pl, London W1H 5BA",
+      "hours": "Mon 17:30–22:30; Tue–Sat 12:00–15:00, 17:30–22:30; Sun 12:30–15:30",
+      "hoursZh": "周一 17:30–22:30；周二至周六 12:00–15:00，17:30–22:30；周日 12:30–15:30",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£££",
+      "note": "Book online.",
+      "noteZh": "请在线预订。",
+      "sourceUrl": "https://www.lurra.co.uk/",
+      "links": [
+        "https://www.lurra.co.uk/",
+        "https://maps.google.com/?cid=7801893027883676396"
+      ],
+      "coordinates": [
+        -0.1612466,
+        51.5147219
+      ]
+    },
+    {
+      "id": "A8",
+      "tier": "A",
+      "name": "manteca",
+      "subtitle": "Nose-to-tail Italian",
+      "subtitleZh": "意式全牲烹饪",
+      "zone": "east",
+      "themes": [
+        "mediterranean"
+      ],
+      "why": "A nose-to-tail Italian-inspired restaurant on Curtain Road with whole-animal butchery, hand-rolled pasta, wood-fired bread and its own salumeria. Plates are made for sharing, and the upstairs seats let you watch the chefs at work.",
+      "whyZh": "柯登路上的意式风格餐厅，主打整只动物的全牲烹饪，有手工意面、柴火面包和自家腌肉工坊。菜式适合分享，坐在楼上还能看到厨师备餐。",
+      "address": "49-51 Curtain Rd, London EC2A 3PT",
+      "cost": "££",
+      "award": "bib",
+      "sourceUrl": "https://guide.michelin.com/gb/en/greater-london/london/restaurant/manteca-1199276",
+      "links": [
+        "https://www.mantecarestaurant.co.uk/",
+        "https://maps.google.com/?cid=11687346030864055065"
+      ],
+      "coordinates": [
+        -0.0805726,
+        51.5240154
+      ]
+    },
+    {
+      "id": "A9",
+      "tier": "A",
+      "name": "Restaurant Elis",
+      "subtitle": "Brazilian-Italian sharing plates",
+      "subtitleZh": "巴西与意大利风味小盘菜",
+      "by": "Rafael Cagali",
+      "zone": "east",
+      "themes": [
+        "mediterranean",
+        "latin-american"
+      ],
+      "why": "A small, bright first-floor dining room in the Town Hall Hotel, named after the Brazilian singer Elis Regina. The chef, who also runs Da Terra, cooks sharing plates that blend Brazilian and Italian ideas.",
+      "whyZh": "位于 Town Hall Hotel 二楼的明亮小餐厅，店名取自巴西歌手 Elis Regina。主厨同时经营 Da Terra，做的是融合巴西和意大利风味的分享菜。",
+      "address": "1st floor, Town Hall Hotel, 8 Patriot Square, London E2 9NF",
+      "hours": "Mon–Sat 18:00–21:00; Thu–Sat also 12:30–14:30",
+      "hoursZh": "周一至周六 18:00–21:00；周四至周六另有 12:30–14:30",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "cost": "££",
+      "award": "selected",
+      "note": "Book through the restaurant site (OpenTable) or by phone.",
+      "noteZh": "可通过餐厅官网（OpenTable）或电话订位。",
+      "sourceUrl": "https://guide.michelin.com/gb/en/greater-london/london/restaurant/elis",
+      "links": [
+        "https://www.restaurantelis.co.uk",
+        "https://maps.google.com/?cid=14637820684326108927"
+      ],
+      "coordinates": [
+        -0.0557422,
+        51.5304798
+      ]
+    },
+    {
+      "id": "A10",
+      "tier": "A",
+      "name": "St. JOHN Bread and Wine",
+      "subtitle": "Nose-to-tail British",
+      "subtitleZh": "英式全猪全牛烹饪",
+      "by": "Fergus Henderson",
+      "zone": "east",
+      "themes": [
+        "british"
+      ],
+      "why": "The relaxed, more affordable sibling of St. JOHN in Spitalfields, with a short British menu that changes daily and makes use of the whole animal. Save room for the baked-to-order madeleines.",
+      "whyZh": "St. JOHN 位于 Spitalfields 的轻松版姊妹店，价格更亲民，英式菜单短小、每天更换，擅长整只动物全部利用的烹饪。别忘了留肚子给现烤的玛德琳。",
+      "address": "94-96 Commercial St, London E1 6LZ",
+      "hours": "Daily 12:00–15:00 (bar menu 15:00–17:00); supper Mon–Fri 17:30–21:30, Sat–Sun 18:00–21:30",
+      "hoursZh": "每天 12:00–15:00（15:00–17:00 供应酒吧菜单）；晚餐 周一至周五 17:30–21:30，周六至周日 18:00–21:30",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£££",
+      "award": "bib",
+      "price": "Starters from about £13; mains around £24–32; menu changes daily",
+      "priceZh": "前菜约 £13 起；主菜约 £24–32；菜单每天更换",
+      "note": "Book through the restaurant's own site; a 12.5% discretionary service charge is added.",
+      "noteZh": "请通过餐厅官网订位；账单会加收 12.5% 自愿服务费。",
+      "sourceUrl": "https://guide.michelin.com/us/en/greater-london/london/restaurant/st-john-bread-and-wine",
+      "links": [
+        "https://stjohnrestaurant.com/restaurants/bread-and-wine/",
+        "https://maps.google.com/?cid=16718733793397535835"
+      ],
+      "coordinates": [
+        -0.0742167,
+        51.5197373
+      ]
+    },
+    {
+      "id": "A11",
+      "tier": "A",
+      "name": "The Clove Club",
+      "subtitle": "Tasting menu restaurant",
+      "subtitleZh": "品鉴菜单餐厅",
+      "by": "Isaac McHale",
+      "zone": "city",
+      "themes": [
+        "tasting",
+        "british"
+      ],
+      "why": "Isaac McHale's tasting-menu restaurant in the historic Shoreditch Town Hall, cooking seasonal British produce around an open kitchen. It holds two MICHELIN stars.",
+      "whyZh": "Isaac McHale 在历史悠久的肖尔迪奇市政厅里开的品鉴菜单餐厅，开放式厨房，使用时令英国食材。获米其林二星。",
+      "address": "Shoreditch Town Hall, 380 Old St, London EC1V 9LT",
+      "cost": "££££",
+      "award": "2-stars",
+      "note": "Tasting-menu restaurant; book ahead.",
+      "noteZh": "品鉴菜单餐厅，建议提前订位。",
+      "sourceUrl": "https://guide.michelin.com/gb/en/greater-london/london/restaurant/the-clove-club",
+      "links": [
+        "https://www.thecloveclub.com/",
+        "https://maps.google.com/?cid=3731157389427735169"
+      ],
+      "coordinates": [
+        -0.0793365,
+        51.5271469
+      ]
+    },
+    {
+      "id": "B1",
+      "tier": "B",
+      "name": "Asakusa",
+      "subtitle": "Japanese izakaya",
+      "subtitleZh": "日式居酒屋",
+      "zone": "north",
+      "themes": [
+        "japanese"
+      ],
+      "why": "A long-running Japanese restaurant near Mornington Crescent with a wide menu of sushi, sashimi, yakitori, tempura and noodles. Handy for a relaxed dinner near Euston.",
+      "whyZh": "莫宁顿新月站附近一家老牌日本餐厅，菜单很全，有寿司、刺身、烤鸡串、天妇罗和面食。在尤斯顿一带想吃顿轻松的晚饭，是个方便的选择。",
+      "address": "265 Eversholt St, London NW1 1BA",
+      "cost": "££",
+      "sourceUrl": "https://hardens.com/az/restaurants/london/nw1/asakusa.htm",
+      "links": [
+        "https://asakusa.has.restaurant",
+        "https://maps.google.com/?cid=14735450751508652849"
+      ],
+      "coordinates": [
+        -0.1382826,
+        51.5340243
+      ]
+    },
+    {
+      "id": "B2",
+      "tier": "B",
+      "name": "Booking Office 1869",
+      "subtitle": "Grand bar and restaurant",
+      "subtitleZh": "气派的酒吧餐厅",
+      "zone": "north",
+      "themes": [
+        "british",
+        "drinks"
+      ],
+      "why": "An all-day bar and restaurant in St Pancras's old Victorian ticket hall, with a long emerald bar and a British-leaning menu. Good for a cocktail or a meal before or after a train.",
+      "whyZh": "位于圣潘克拉斯车站维多利亚时期旧售票大厅里的全天餐厅兼酒吧，有一条翠绿色长吧台，菜单偏英式。适合在乘火车前后来喝杯鸡尾酒或吃顿饭。",
+      "address": "St Pancras Renaissance London Hotel, Euston Rd, London NW1 2AR",
+      "hours": "Daily 07:00–11:00, 12:00–15:00, 17:00–22:00",
+      "hoursZh": "每天 07:00–11:00，12:00–15:00，17:00–22:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£££",
+      "note": "Reservations online or on 020 7841 3566; late licence.",
+      "noteZh": "可在线订位或致电 020 7841 3566；有延长营业许可。",
+      "sourceUrl": "https://stpancras.com/eat-drink/booking-office-1869",
+      "links": [
+        "https://stpancras.com/eat-drink/booking-office-1869",
+        "https://maps.google.com/?cid=15859984635292780670"
+      ],
+      "coordinates": [
+        -0.1258856,
+        51.5298282
+      ]
+    },
+    {
+      "id": "B3",
+      "tier": "B",
+      "name": "Chisou Knightsbridge",
+      "subtitle": "Japanese restaurant and sushi bar",
+      "subtitleZh": "日本料理与寿司吧",
+      "zone": "west",
+      "themes": [
+        "japanese",
+        "drinks"
+      ],
+      "why": "A traditional Japanese restaurant and sushi bar on Beauchamp Place, sister to the Mayfair original. It is known for sushi and sashimi, with robata dishes and a long sake and whisky list.",
+      "whyZh": "博尚坊（Beauchamp Place）上的传统日本料理店兼寿司吧，是梅费尔本店的姊妹店。以寿司和刺身见长，另有炉端烧，清酒和威士忌选择很多。",
+      "address": "31 Beauchamp Pl, London SW3 1NU",
+      "cost": "£££",
+      "sourceUrl": "https://www.hardens.com/az/restaurants/london/w1c/chisou.htm",
+      "links": [
+        "https://maps.google.com/?cid=4870601275245238132"
+      ],
+      "coordinates": [
+        -0.1640364,
+        51.4971411
+      ]
+    },
+    {
+      "id": "B4",
+      "tier": "B",
+      "name": "Co&Ko (Jeon's Kitchen)",
+      "subtitle": "Korean restaurant",
+      "subtitleZh": "韩国餐厅",
+      "zone": "west-end",
+      "themes": [
+        "korean"
+      ],
+      "why": "A small Korean restaurant on Berwick Street serving bibimbap, bulgogi, tteokbokki and Korean fried chicken. A casual, handy stop in Soho.",
+      "whyZh": "贝里克街上的一家小型韩国餐厅，供应拌饭、烤牛肉（bulgogi）、炒年糕和韩式炸鸡。在苏豪区随意吃一顿很方便。",
+      "address": "72 Berwick St, London W1F 8TD",
+      "cost": "££",
+      "price": "OpenTable lists about £26–40 per person",
+      "priceZh": "OpenTable 标注人均约 £26–40",
+      "note": "Book ahead, especially at weekends.",
+      "noteZh": "建议提前订位，周末尤其如此。",
+      "sourceUrl": "https://squaremeal.co.uk/restaurants/coko_18418",
+      "links": [
+        "https://maps.google.com/?cid=4321306316106055407"
+      ],
+      "coordinates": [
+        -0.1360693,
+        51.5147632
+      ]
+    },
+    {
+      "id": "B5",
+      "tier": "B",
+      "name": "Coco & Bibi",
+      "subtitle": "Korean fried chicken",
+      "subtitleZh": "韩式炸鸡与拌饭",
+      "zone": "west",
+      "themes": [
+        "korean"
+      ],
+      "why": "A small Korean place on Lillie Road with a short menu built around fried chicken (coco) and bibimbap (bibi). Prices are modest, and the chicken comes in several sauces.",
+      "whyZh": "里利路上的小型韩餐馆，菜单简短，主打炸鸡（coco）和拌饭（bibi）。价格不高，炸鸡有多种酱料可选。",
+      "address": "123 Lillie Rd, London SW6 7SX",
+      "hours": "Tue–Sat 11:00–15:00, 17:00–21:30; Sun 12:00–16:00, 17:00–21:30; Mon closed",
+      "hoursZh": "周二至周六 11:00–15:00，17:00–21:30；周日 12:00–16:00，17:00–21:30；周一休息",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "price": "Fried chicken from £13.50; bibimbap £13.45",
+      "priceZh": "炸鸡 £13.50 起；拌饭 £13.45",
+      "note": "Vegetable japchae is the only dish marked vegetarian.",
+      "noteZh": "只有蔬菜杂菜（japchae）标注为素食。",
+      "sourceUrl": "https://www.cocoandbibi.co.uk/menus",
+      "links": [
+        "https://www.cocoandbibi.co.uk/",
+        "https://maps.google.com/?cid=8587666146506359763"
+      ],
+      "coordinates": [
+        -0.2035268,
+        51.4847893
+      ]
+    },
+    {
+      "id": "B6",
+      "tier": "B",
+      "name": "Copita",
+      "subtitle": "Spanish tapas bar",
+      "subtitleZh": "西班牙小吃吧",
+      "zone": "west-end",
+      "themes": [
+        "mediterranean",
+        "drinks"
+      ],
+      "why": "A stool-and-standing tapas bar in Soho with a daily-changing menu of small plates and an all-Spanish wine list. No bookings, so expect to queue when it is busy.",
+      "whyZh": "苏豪区的站位和高脚凳式西班牙小吃吧，菜单每天更换，酒单全部是西班牙葡萄酒。不接受订位，人多时需要排队。",
+      "address": "27 D'Arblay St, London W1F 8EP",
+      "cost": "££",
+      "note": "Walk-in only; no bookings.",
+      "noteZh": "只接受walk-in，不接受订位。",
+      "sourceUrl": "https://www.hot-dinners.com/Gastroblog/Latest-news/barrica-launching-tapas-bar-copita-in-soho",
+      "links": [
+        "https://maps.google.com/?cid=11878492509851233341"
+      ],
+      "coordinates": [
+        -0.1360552,
+        51.514558
+      ]
+    },
+    {
+      "id": "B7",
+      "tier": "B",
+      "name": "Delina",
+      "subtitle": "Ethiopian and Eritrean cafe",
+      "subtitleZh": "埃塞俄比亚与厄立特里亚菜",
+      "by": "Nazareth Kelif",
+      "zone": "west",
+      "themes": [
+        "middle-eastern-african"
+      ],
+      "why": "A small Ethiopian and Eritrean kitchen in a railway arch at Shepherd's Bush Market. It serves stews and tibs with injera, and the traditional coffee ceremony is part of the experience.",
+      "whyZh": "位于牧羊人丛林市场铁路拱廊里的小型埃塞俄比亚与厄立特里亚餐厅，主打配英吉拉薄饼的炖菜和炒肉，还可体验传统咖啡仪式。",
+      "address": "Arch 176, Shepherd's Bush Market, London W12 8DF",
+      "cost": "£",
+      "price": "Mains £8.50–13.50; sharing platters £18–40; coffee ceremony with brunch £24",
+      "priceZh": "主菜 £8.50–13.50；拼盘 £18–40；咖啡仪式配早午餐 £24",
+      "note": "Opening days differ between sources, so check before you go.",
+      "noteZh": "各来源所列营业日不一致，出发前请先确认。",
+      "sourceUrl": "https://www.delinaonline.com/",
+      "links": [
+        "https://www.delinaonline.com/",
+        "https://maps.google.com/?cid=16822232692054153027"
+      ],
+      "coordinates": [
+        -0.2266715,
+        51.5037217
+      ]
+    },
+    {
+      "id": "B8",
+      "tier": "B",
+      "name": "Dishoom Shoreditch",
+      "subtitle": "Bombay café",
+      "subtitleZh": "孟买风味咖啡馆",
+      "zone": "east",
+      "themes": [
+        "south-asian"
+      ],
+      "why": "An all-day Indian café modelled on the old Irani cafés of Bombay, open from breakfast through to late evening. Mostly walk-in, so expect a queue at busy times.",
+      "whyZh": "仿照孟买老式伊朗咖啡馆的全天营业印度餐厅，从早餐一直营业到深夜。以直接到店为主，高峰时段需要排队。",
+      "address": "7 Boundary St, London E2 7JE",
+      "hours": "Mon–Wed 08:00–23:00; Thu–Fri 08:00–00:00; Sat 09:00–00:00; Sun 09:00–23:00",
+      "hoursZh": "周一至周三 08:00–23:00；周四至周五 08:00–00:00；周六 09:00–00:00；周日 09:00–23:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "note": "After 6pm, bookings are only taken for groups of six or more; queues build up in the evening and at weekends.",
+      "noteZh": "下午 6 点后只接受 6 人及以上的订位；晚上和周末通常要排队。",
+      "links": [
+        "https://www.dishoom.com/shoreditch",
+        "https://maps.google.com/?cid=16680674108387061240"
+      ],
+      "coordinates": [
+        -0.0765998,
+        51.5245002
+      ]
+    },
+    {
+      "id": "B9",
+      "tier": "B",
+      "name": "Ev Restaurant",
+      "subtitle": "Anatolian meze restaurant",
+      "subtitleZh": "安纳托利亚风味餐厅",
+      "zone": "southbank",
+      "themes": [
+        "middle-eastern-african"
+      ],
+      "why": "Anatolian and Mediterranean cooking in the railway arches beside Southwark station, with a bar and deli attached. Set meze menus make ordering easy, and it is close to the South Bank theatres.",
+      "whyZh": "位于索思沃克站旁的铁路拱廊下，供应安纳托利亚和地中海风味菜，另设酒吧和熟食店。有固定的冷热麦泽套餐，点菜省心，离南岸的剧院也近。",
+      "address": "The Arches, 97-99 Isabella St, London SE1 8DD",
+      "cost": "££",
+      "price": "Meze menus £22.50–38.50 per person",
+      "priceZh": "麦泽套餐每人 22.50–38.50 英镑",
+      "links": [
+        "https://www.tasrestaurants.co.uk/ev-restaurant",
+        "https://maps.google.com/?cid=11900629097814085638"
+      ],
+      "coordinates": [
+        -0.1062374,
+        51.5041547
+      ]
+    },
+    {
+      "id": "B10",
+      "tier": "B",
+      "name": "Fischer's",
+      "subtitle": "Viennese cafe-restaurant",
+      "subtitleZh": "维也纳风咖啡馆餐厅",
+      "by": "Corbin & King",
+      "zone": "west-end",
+      "themes": [
+        "british",
+        "coffee-tea"
+      ],
+      "why": "An all-day Viennese cafe-restaurant on Marylebone High Street, styled like an early 1900s coffeehouse. Come for schnitzel, sausages and strudel, or just a coffee and a slice of Sachertorte.",
+      "whyZh": "玛丽勒本高街上的全天营业维也纳咖啡馆餐厅，装潢仿二十世纪初的咖啡馆。可以来吃炸肉排、香肠和苹果卷，也可以只点咖啡配一块萨赫蛋糕。",
+      "address": "50 Marylebone High St, London W1U 5HN",
+      "hours": "Mon 07:30–21:30; Tue–Fri 07:30–22:00; Sat–Sun 09:00–22:00 (last orders)",
+      "hoursZh": "周一 07:30–21:30；周二至周五 07:30–22:00；周六至周日 09:00–22:00（最后点单时间）",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "note": "Online booking is for full meals only (parties up to 6); some tables are kept for walk-ins.",
+      "noteZh": "网上预订仅限正餐（最多 6 人）；部分桌位留给不预约的客人。",
+      "sourceUrl": "https://www.fischers.co.uk/",
+      "links": [
+        "https://www.fischers.co.uk/",
+        "https://maps.google.com/?cid=1585166096092845560"
+      ],
+      "coordinates": [
+        -0.15167,
+        51.5216231
+      ]
+    },
+    {
+      "id": "B11",
+      "tier": "B",
+      "name": "Gaucho Sloane Avenue",
+      "subtitle": "Argentine steakhouse",
+      "subtitleZh": "阿根廷牛排馆",
+      "zone": "west",
+      "themes": [
+        "latin-american",
+        "hotpot-grill"
+      ],
+      "why": "The Chelsea branch of the Gaucho group, an Argentine steakhouse cooking over open fire, with starters, small plates and a wine list to match. Steaks are the reason to come; expect Chelsea prices.",
+      "whyZh": "阿根廷牛排馆 Gaucho 在切尔西的分店，主打明火烧烤，另有前菜、小盘菜和配套酒单。点牛排是来这里的主要理由，价格属于切尔西水平。",
+      "address": "89 Sloane Ave, London SW3 3DX",
+      "hours": "Mon–Thu 12:00–22:00; Fri–Sat 12:00–23:00; Sun 12:00–21:00",
+      "hoursZh": "周一至周四 12:00–22:00；周五至周六 12:00–23:00；周日 12:00–21:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£££",
+      "price": "Starters and small plates from about £6–10",
+      "priceZh": "前菜和小食约 £6–10 起",
+      "note": "Book online.",
+      "noteZh": "请在线预订。",
+      "sourceUrl": "https://www.gauchorestaurants.com/restaurants/london-sloane-avenue",
+      "links": [
+        "https://www.gauchorestaurants.com/restaurants/london-sloane-avenue",
+        "https://maps.google.com/?cid=13441309989232349630"
+      ],
+      "coordinates": [
+        -0.1675885,
+        51.4928796
+      ]
+    },
+    {
+      "id": "B12",
+      "tier": "B",
+      "name": "Gloria",
+      "subtitle": "Italian trattoria",
+      "subtitleZh": "意大利小餐馆",
+      "zone": "east",
+      "themes": [
+        "mediterranean"
+      ],
+      "why": "A big, theatrical Italian trattoria on Great Eastern Street from the Big Mamma group, decorated in a retro Capri style. The menu runs from pizza and pasta to meatballs and cured meats.",
+      "whyZh": "大妈集团（Big Mamma）在 Great Eastern Street 开的意大利餐厅，空间宽敞，装饰带有复古卡普里风情。菜单从披萨、意面到肉丸和意式腌肉都有。",
+      "address": "54-56 Great Eastern St, London EC2A 3QR",
+      "cost": "££",
+      "links": [
+        "https://maps.google.com/?cid=6243780584135422006"
+      ],
+      "coordinates": [
+        -0.0813769,
+        51.5251207
+      ]
+    },
+    {
+      "id": "B13",
+      "tier": "B",
+      "name": "Grumbles",
+      "subtitle": "Traditional bistro",
+      "subtitleZh": "传统小酒馆式餐厅",
+      "zone": "west",
+      "themes": [
+        "british",
+        "french"
+      ],
+      "why": "An old-school Pimlico bistro that has been open since 1964, serving British and French classics with a long, fairly priced wine list. The set menus at lunch and early evening are the best value.",
+      "whyZh": "皮姆利科一家老派小酒馆式餐厅，1964年开业，供应英式和法式经典菜，酒单很长，价格合理。午市和傍晚早场的套餐最划算。",
+      "address": "35 Churton St, Pimlico, London SW1V 2LT",
+      "hours": "Mon–Sat 12:00–14:15, 18:00–22:15; Sun 12:00–15:15, 18:00–22:15 (last orders)",
+      "hoursZh": "周一至周六 12:00–14:15，18:00–22:15；周日 12:00–15:15，18:00–22:15（最后点单时间）",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "price": "Set menu Mon–Sat at lunch and 18:00–19:00: £18.95 for two courses, £22.50 for three; Sunday lunch £21.50 or £24.95",
+      "priceZh": "周一至周六午市及 18:00–19:00 套餐：两道菜 £18.95，三道菜 £22.50；周日午餐 £21.50 或 £24.95",
+      "note": "Mondays are BYO with no corkage (one bottle between two, tables of four or fewer; not in December).",
+      "noteZh": "周一可自带酒，不收开瓶费（每两人一瓶，限四人及以下的桌；十二月除外）。",
+      "sourceUrl": "https://www.grumblesrestaurant.co.uk",
+      "links": [
+        "https://www.grumblesrestaurant.co.uk",
+        "https://maps.google.com/?cid=11086589010019019661"
+      ],
+      "coordinates": [
+        -0.138975,
+        51.4911782
+      ]
+    },
+    {
+      "id": "B14",
+      "tier": "B",
+      "name": "Haidilao Hot Pot",
+      "subtitle": "Chinese hot pot chain",
+      "subtitleZh": "中式火锅连锁",
+      "zone": "west-end",
+      "themes": [
+        "hotpot-grill",
+        "chinese"
+      ],
+      "why": "A London branch of the Chinese hot pot chain, in the Trocadero near Piccadilly Circus. Pick a broth, then cook meat, seafood and vegetables at the table; it works well for groups.",
+      "whyZh": "中国火锅连锁品牌在伦敦的分店，位于皮卡迪利广场附近的 Trocadero。选好锅底，肉类、海鲜和蔬菜都在桌上自己涮煮，很适合多人聚餐。",
+      "address": "Unit 4/5, Trocadero Centre, 13 Coventry St, London W1D 7DH",
+      "cost": "££",
+      "sourceUrl": "https://leicestersquare.london/locations/haidilao-hot-pot",
+      "links": [
+        "https://maps.google.com/?cid=8107044033030746231"
+      ],
+      "coordinates": [
+        -0.1328395,
+        51.5103135
+      ]
+    },
+    {
+      "id": "B15",
+      "tier": "B",
+      "name": "Han Kang",
+      "subtitle": "Korean barbecue",
+      "subtitleZh": "韩式烧烤",
+      "zone": "west-end",
+      "themes": [
+        "korean",
+        "hotpot-grill"
+      ],
+      "why": "A Korean barbecue restaurant on a back street off Tottenham Court Road, with a Korean-style pub upstairs serving dishes such as bossam and jokbal. A good fit for a group.",
+      "whyZh": "托特纳姆法院路旁小街上的韩式烧烤店，楼上是韩式小酒馆，供应菜包肉（bossam）、酱猪蹄（jokbal）等。适合多人聚餐。",
+      "address": "16 Hanway St, London W1T 1UE",
+      "cost": "££",
+      "sourceUrl": "https://rollinjoint.com/han-kang-london",
+      "links": [
+        "https://maps.google.com/?cid=1709486934632841516"
+      ],
+      "coordinates": [
+        -0.1317865,
+        51.516907
+      ]
+    },
+    {
+      "id": "B16",
+      "tier": "B",
+      "name": "Hongdae Pocha",
+      "subtitle": "Korean pub",
+      "subtitleZh": "韩式酒馆",
+      "zone": "west-end",
+      "themes": [
+        "korean",
+        "drinks"
+      ],
+      "why": "A retro Korean pub styled on 1970s Seoul, with fried chicken, soup-based hotpots and grilled dishes alongside soju cocktails, rice wines and Korean beer. It is lively, with K-pop on the speakers.",
+      "whyZh": "仿 1970 年代首尔风格的复古韩式酒馆，有炸鸡、汤锅和烤物，搭配烧酒鸡尾酒、米酒和韩国啤酒。气氛热闹，店里放着韩流流行乐。",
+      "address": "26 Romilly St, London W1D 5AJ",
+      "hours": "Mon 17:00–00:30; Tue–Sat 12:00–15:00, 17:00–00:30; Sun 12:00–15:00, 17:00–00:00",
+      "hoursZh": "周一 17:00–00:30；周二至周六 12:00–15:00，17:00–00:30；周日 12:00–15:00，17:00–00:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "note": "Bookings are taken by Instagram message only.",
+      "noteZh": "只接受通过 Instagram 私信订位。",
+      "sourceUrl": "https://www.hongdaepocha.com",
+      "links": [
+        "https://www.hongdaepocha.com",
+        "https://maps.google.com/?cid=3776300782413415978"
+      ],
+      "coordinates": [
+        -0.1308605,
+        51.5130556
+      ]
+    },
+    {
+      "id": "B17",
+      "tier": "B",
+      "name": "Ippudo Central Saint Giles",
+      "subtitle": "Japanese ramen",
+      "subtitleZh": "日式拉面",
+      "zone": "west-end",
+      "themes": [
+        "japanese",
+        "noodles"
+      ],
+      "why": "The Fukuoka ramen chain's first European branch, on the Central Saint Giles piazza, known for rich tonkotsu pork broth. Gyoza, buns and a vegetarian bowl are on the menu too.",
+      "whyZh": "福冈拉面连锁品牌在欧洲的首家分店，位于 Central Saint Giles 广场，以浓郁的豚骨汤底闻名。菜单上还有煎饺、包子和素食拉面。",
+      "address": "3 Central Saint Giles Piazza, St Giles High St, London WC2H 8AG",
+      "cost": "££",
+      "sourceUrl": "https://www.centralsaintgiles.com/eat-drink/ippudo",
+      "links": [
+        "https://www.ippudo.co.uk",
+        "https://maps.google.com/?cid=18279982039177794830"
+      ],
+      "coordinates": [
+        -0.1274397,
+        51.5157444
+      ]
+    },
+    {
+      "id": "B18",
+      "tier": "B",
+      "name": "Kampai Kensington",
+      "subtitle": "Neighbourhood sushi bar",
+      "subtitleZh": "街坊寿司店",
+      "zone": "west",
+      "themes": [
+        "japanese"
+      ],
+      "why": "A low-key sushi restaurant on Hammersmith Road, a short walk from Olympia. The menu covers nigiri and rolls plus small plates, donburi and a chicken katsu curry, and you can sit at the counter to watch the chefs.",
+      "whyZh": "汉默史密斯路上低调的寿司店，离奥林匹亚展览馆不远。菜单有握寿司、卷物，也有小盘菜、盖饭和鸡排咖喱，可坐吧台看师傅现做。",
+      "address": "127A Hammersmith Rd, London W14 0QL",
+      "cost": "££",
+      "note": "Closed on Mondays; walk-ins are possible but booking is sensible at busy times.",
+      "noteZh": "周一休息；可以直接到店，繁忙时段建议预订。",
+      "sourceUrl": "https://theinfatuation.com/london/reviews/kampai-kensington",
+      "links": [
+        "https://maps.google.com/?cid=18215415007639813159"
+      ],
+      "coordinates": [
+        -0.2129595,
+        51.4943254
+      ]
+    },
+    {
+      "id": "B19",
+      "tier": "B",
+      "name": "Kiku",
+      "subtitle": "Japanese restaurant",
+      "subtitleZh": "日本餐厅",
+      "zone": "west-end",
+      "themes": [
+        "japanese"
+      ],
+      "why": "A family-run Japanese restaurant in Mayfair, open since 1978, serving sushi, sashimi and cooked dishes in a formal room. The set lunch is the cheaper way in.",
+      "whyZh": "梅菲尔一家家族经营的日本餐厅，1978年开业，在较为正式的环境里供应寿司、刺身和热菜。午市套餐是比较省钱的选择。",
+      "address": "17 Half Moon St, London W1J 7BE",
+      "hours": "Mon–Sat 12:00–14:30, 18:00–22:15; Sun closed",
+      "hoursZh": "周一至周六 12:00–14:30，18:00–22:15；周日休息",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "cost": "£££",
+      "price": "About £85 for a three-course dinner with half a bottle of wine (Harden's estimate)",
+      "priceZh": "三道菜晚餐配半瓶酒约 £85（Harden's 估算）",
+      "sourceUrl": "https://www.hardens.com/az/restaurants/london/w1/kiku.htm",
+      "links": [
+        "https://www.kikurestaurant.co.uk",
+        "https://maps.google.com/?cid=13181929209188573679"
+      ],
+      "coordinates": [
+        -0.1458138,
+        51.5068653
+      ]
+    },
+    {
+      "id": "B20",
+      "tier": "B",
+      "name": "Kuma Korean & Japanese",
+      "subtitle": "Korean and Japanese",
+      "subtitleZh": "韩日料理",
+      "zone": "south",
+      "themes": [
+        "korean",
+        "japanese"
+      ],
+      "why": "A small, relaxed Kennington restaurant doing katsu curry, bento boxes, bibimbap and Korean fried chicken. Good for an easy neighbourhood dinner, with lunch on Fridays and Saturdays.",
+      "whyZh": "位于肯宁顿的小店，氛围轻松，有炸猪排咖喱、便当、拌饭和韩式炸鸡。适合随意吃顿晚饭，周五和周六也供应午餐。",
+      "address": "305 Kennington Rd, London SE11 4QE",
+      "hours": "Tue–Thu 17:00–22:00; Fri–Sat 12:00–14:30, 17:00–22:00; closed Sun and Mon",
+      "hoursZh": "周二至周四 17:00–22:00；周五至周六 12:00–14:30，17:00–22:00；周日、周一休息",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "cost": "££",
+      "note": "Last evening orders are at 21:30.",
+      "noteZh": "晚市最后点单时间为 21:30。",
+      "links": [
+        "https://www.kumarestaurant.co.uk",
+        "https://maps.google.com/?cid=14173427984649925150"
+      ],
+      "coordinates": [
+        -0.1109607,
+        51.4882684
+      ]
+    },
+    {
+      "id": "B21",
+      "tier": "B",
+      "name": "Lao Dao",
+      "subtitle": "Xinjiang Chinese",
+      "subtitleZh": "新疆菜",
+      "zone": "south",
+      "themes": [
+        "chinese"
+      ],
+      "why": "A Xinjiang restaurant on Walworth Road from the team behind Silk Road in Camberwell. Expect spiced chicken, grilled lamb ribs, dumplings and hand-pulled noodles, with Chinese tea served in decorated pots.",
+      "whyZh": "沃尔沃斯路上的新疆餐厅，由坎伯韦尔 Silk Road 的原班人马开设。菜单上有香料鸡、烤羊排、饺子和手拉面，茶用彩绘茶壶盛放。",
+      "address": "305 Walworth Rd, London SE17 2TG",
+      "hours": "Daily 17:00–23:00",
+      "hoursZh": "每天 17:00–23:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "sourceUrl": "https://www.timeout.com/london/restaurants/lao-dao",
+      "links": [
+        "https://www.lao-dao.com",
+        "https://maps.google.com/?cid=6919278419646583034"
+      ],
+      "coordinates": [
+        -0.0949673,
+        51.4870683
+      ]
+    },
+    {
+      "id": "B22",
+      "tier": "B",
+      "name": "Lina Stores King's Cross",
+      "subtitle": "Italian restaurant and deli",
+      "subtitleZh": "意大利餐厅兼熟食店",
+      "zone": "north",
+      "themes": [
+        "mediterranean"
+      ],
+      "why": "The King's Cross branch of the Soho Italian deli, in a heritage building behind Granary Square. Pasta, antipasti and desserts at the tables and kitchen counter, with a deli for salumi, cheese and made-to-order panini.",
+      "whyZh": "苏豪意式熟食店的国王十字分店，位于粮仓广场后面的历史建筑里。餐桌和厨房吧台供应意面、开胃小菜和甜点，熟食区卖腌肉、奶酪和现做的帕尼尼。",
+      "address": "20 Stable St, London N1C 4DR",
+      "hours": "Restaurant daily 12:00–23:30 (last seating 22:00); deli Mon–Fri 08:00–17:00, Sat–Sun 09:00–17:00",
+      "hoursZh": "餐厅每天 12:00–23:30（最后入座 22:00）；熟食店周一至周五 08:00–17:00，周六至周日 09:00–17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "note": "Restaurant tables are booked online only; the kitchen counter is for same-day walk-ins.",
+      "noteZh": "餐厅座位只能在线订位；厨房吧台只接受当天直接入店的客人。",
+      "sourceUrl": "https://www.linastores.co.uk/locations/stable-street-restaurant-delicatessen",
+      "links": [
+        "https://www.linastores.co.uk/locations/stable-street-restaurant-delicatessen",
+        "https://maps.google.com/?cid=4821198689993646233"
+      ],
+      "coordinates": [
+        -0.125013,
+        51.5372423
+      ]
+    },
+    {
+      "id": "B23",
+      "tier": "B",
+      "name": "Maison François",
+      "subtitle": "French brasserie",
+      "subtitleZh": "法式啤酒馆餐厅",
+      "by": "François O'Neill",
+      "zone": "west-end",
+      "themes": [
+        "french"
+      ],
+      "why": "A large French brasserie in St James's, open from breakfast to late, serving brasserie classics and afternoon tea. Frank's, the wine bar and oyster counter below, takes walk-ins.",
+      "whyZh": "圣詹姆斯区一家规模很大的法式啤酒馆餐厅，从早餐一直营业到深夜，供应法式经典菜和下午茶。楼下的 Frank's 是葡萄酒吧兼生蚝吧，可以直接walk-in。",
+      "address": "34 Duke St, St James's, London SW1Y 6DF",
+      "hours": "Mon–Thu 07:00–23:00; Fri–Sat 09:00–23:30; Sun 12:00–23:00 (kitchen closes 21:30 Mon–Thu, 22:00 Fri–Sat, 21:00 Sun)",
+      "hoursZh": "周一至周四 07:00–23:00；周五至周六 09:00–23:30；周日 12:00–23:00（厨房关门时间：周一至周四 21:30，周五至周六 22:00，周日 21:00）",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£££",
+      "note": "Book online up to two months ahead; Frank's is walk-in only and closed on Sundays.",
+      "noteZh": "可提前两个月在线订位；Frank's 只接受walk-in，周日休息。",
+      "sourceUrl": "https://maisonfrancois.london",
+      "links": [
+        "https://maisonfrancois.london",
+        "https://maps.google.com/?cid=10835859856175701335"
+      ],
+      "coordinates": [
+        -0.1381801,
+        51.5076051
+      ]
+    },
+    {
+      "id": "B24",
+      "tier": "B",
+      "name": "Med Salleh Viet",
+      "subtitle": "Vietnamese pho and grills",
+      "subtitleZh": "越南河粉与烧烤",
+      "zone": "west",
+      "themes": [
+        "southeast-asian",
+        "noodles"
+      ],
+      "why": "A casual Vietnamese restaurant on Chepstow Road, run by the team behind the Malaysian Med Salleh Kopitiam. It does pho, grilled meats and noodle dishes in a plain, bright room.",
+      "whyZh": "切普斯托路上的休闲越南餐厅，经营团队同样开了马来西亚餐厅 Med Salleh Kopitiam。供应河粉、烧烤和各式米粉，环境简洁明亮。",
+      "address": "108 Chepstow Rd, London W2 5QS",
+      "cost": "££",
+      "note": "Reported as halal; check if it matters.",
+      "noteZh": "有资料称为清真餐厅，如有需要请先确认。",
+      "sourceUrl": "https://www.hardens.com/az/restaurants/london/w2/med-salleh-viet.htm",
+      "links": [
+        "https://maps.google.com/?cid=2105135159442593718"
+      ],
+      "coordinates": [
+        -0.1961274,
+        51.5189304
+      ]
+    },
+    {
+      "id": "B25",
+      "tier": "B",
+      "name": "Murger Han",
+      "subtitle": "Xi'an street food",
+      "subtitleZh": "西安风味小吃",
+      "zone": "west-end",
+      "themes": [
+        "chinese",
+        "noodles"
+      ],
+      "why": "A Xi'an-style Chinese restaurant just off Piccadilly, serving hand-pulled biang biang noodles, cold-skin noodles and roujiamo, a filled flatbread. The Sackville Street branch is the smarter sibling of the original near Euston.",
+      "whyZh": "皮卡迪利附近一家西安风味的中餐馆，主打手拉裤带面（biangbiang 面）、凉皮和肉夹馍。萨克维尔街这家分店比尤斯顿的老店更讲究一些。",
+      "address": "8A Sackville St, London W1S 3DF",
+      "cost": "££",
+      "price": "Time Out estimates about £65 for two with drinks and service",
+      "priceZh": "Time Out 估算两人含饮品和服务费约 £65",
+      "sourceUrl": "https://www.hardens.com/az/restaurants/london/w1s/murger-hanhan.htm",
+      "links": [
+        "https://www.murgerhan.com",
+        "https://maps.google.com/?cid=2646735087606211456"
+      ],
+      "coordinates": [
+        -0.1379717,
+        51.5093877
+      ]
+    },
+    {
+      "id": "B26",
+      "tier": "B",
+      "name": "My Old Place",
+      "subtitle": "Sichuan restaurant",
+      "subtitleZh": "川菜馆",
+      "zone": "east",
+      "themes": [
+        "chinese"
+      ],
+      "why": "A busy, no-frills Chinese restaurant near Liverpool Street with a very long, Sichuan-leaning menu and big portions. Reviewers single out the pork dumplings, cumin lamb skewers, gong bao chicken and cumin chilli chicken.",
+      "whyZh": "Liverpool Street 站附近热闹朴实的中餐馆，菜单很长、偏川味，分量很大。评论里常被点名的有猪肉饺子、孜然羊肉串、宫保鸡丁和孜然辣子鸡。",
+      "address": "88-90 Middlesex St, London E1 7EZ",
+      "cost": "££",
+      "links": [
+        "https://maps.google.com/?cid=4298405324317412353"
+      ],
+      "coordinates": [
+        -0.0768991,
+        51.516886
+      ]
+    },
+    {
+      "id": "B27",
+      "tier": "B",
+      "name": "PSV",
+      "subtitle": "Lao restaurant",
+      "subtitleZh": "老挝餐厅",
+      "zone": "southbank",
+      "themes": [
+        "southeast-asian"
+      ],
+      "why": "A Lao restaurant in the room upstairs at the Crown & Cushion pub, a short walk from Waterloo and Lambeth North. The menu has a Laos section with dishes such as duck laab.",
+      "whyZh": "老挝餐厅，开在 Crown & Cushion 酒吧楼上，离滑铁卢和兰贝斯北站都不远。菜单上有专门的老挝菜部分，例如鸭肉拉比沙拉。",
+      "address": "Upstairs, Crown & Cushion, 133-135 Westminster Bridge Rd, London SE1 7HR",
+      "cost": "££",
+      "links": [
+        "https://maps.google.com/?cid=3653539389504062205"
+      ],
+      "coordinates": [
+        -0.1140013,
+        51.4995003
+      ]
+    },
+    {
+      "id": "B28",
+      "tier": "B",
+      "name": "Rasa",
+      "subtitle": "Keralan vegetarian",
+      "subtitleZh": "喀拉拉素食餐厅",
+      "by": "Das Sreedharan",
+      "zone": "east",
+      "themes": [
+        "south-asian"
+      ],
+      "why": "A long-running vegetarian restaurant behind a bright pink front in Stoke Newington, cooking the food of Kerala. Dosas, dals and a set vegetarian feast are the way in.",
+      "whyZh": "Stoke Newington 一家开了很多年的素食餐厅，门面是醒目的粉红色，做的是喀拉拉菜。可以点多萨饼、扁豆汤，或素食套餐。",
+      "address": "55 Stoke Newington Church St, London N16 0AR",
+      "hours": "Mon–Fri 17:30–22:30; Sat–Sun 12:00–14:30, 17:30–22:30",
+      "hoursZh": "周一至周五 17:30–22:30；周六至周日 12:00–14:30，17:30–22:30",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "price": "Vegetarian feast about £25 a head",
+      "priceZh": "素食套餐约每人 £25",
+      "note": "Book for weekends; tables are held for 15 minutes at busy times.",
+      "noteZh": "周末建议订位；繁忙时段订位只保留 15 分钟。",
+      "links": [
+        "https://rasarestaurants.com",
+        "https://maps.google.com/?cid=11078458028391395122"
+      ],
+      "coordinates": [
+        -0.0763655,
+        51.5620894
+      ]
+    },
+    {
+      "id": "B29",
+      "tier": "B",
+      "name": "Renegade Urban Winery",
+      "subtitle": "Urban winery and bistro",
+      "subtitleZh": "城市酒庄与小酒馆",
+      "zone": "further",
+      "themes": [
+        "british",
+        "drinks"
+      ],
+      "why": "A working urban winery in a Walthamstow industrial unit, with a bistro called LEO serving seasonal British sharing plates. You can drink the wine made on site, and there is a garden.",
+      "whyZh": "位于 Walthamstow 工业区的城市酒庄，里面的 LEO 小酒馆供应应季英式分享菜。可以喝到现场酿的葡萄酒，还有花园。",
+      "address": "Unit 7, Lockwood Way, London E17 5RB",
+      "hours": "Thu 17:00–23:00; Fri–Sat 12:00–23:00; Sun 12:00–18:00",
+      "hoursZh": "周四 17:00–23:00；周五至周六 12:00–23:00；周日 12:00–18:00",
+      "open": [
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "price": "Thursday set menu with wine £29",
+      "priceZh": "周四套餐（含酒）£29",
+      "note": "Book online through the winery's Walthamstow page.",
+      "noteZh": "可通过酒庄网站的 Walthamstow 页面在线订位。",
+      "links": [
+        "https://www.renegadelondonwine.com/walthamstow",
+        "https://maps.google.com/?cid=13237074120801061574"
+      ],
+      "coordinates": [
+        -0.043168,
+        51.5954132
+      ]
+    },
+    {
+      "id": "B30",
+      "tier": "B",
+      "name": "Rice Coming Restaurant 米齊臨",
+      "subtitle": "Hunan rice noodles",
+      "subtitleZh": "湖南米粉",
+      "zone": "west-end",
+      "themes": [
+        "chinese",
+        "noodles"
+      ],
+      "why": "A Hunan-style rice noodle specialist near the British Museum, serving noodle soups with a choice of spice level and rice-based snacks on the side. An inexpensive, filling lunch in Holborn.",
+      "whyZh": "位于大英博物馆附近的湖南米粉专门店，汤粉可选辣度，另有米制小吃。是荷本区价格不高又吃得饱的午餐选择。",
+      "address": "10A Coptic St, London WC1A 1NH",
+      "cost": "£",
+      "links": [
+        "https://maps.google.com/?cid=7729872762202222334"
+      ],
+      "coordinates": [
+        -0.126111,
+        51.5172528
+      ]
+    },
+    {
+      "id": "B31",
+      "tier": "B",
+      "name": "Ristorante Olivelli",
+      "subtitle": "Sicilian trattoria",
+      "subtitleZh": "西西里小馆",
+      "zone": "southbank",
+      "themes": [
+        "mediterranean"
+      ],
+      "why": "A small, lively Sicilian trattoria on The Cut with pasta, pizza, meat and seafood. Tables are close together, and it suits a casual meal before or after a show on the South Bank.",
+      "whyZh": "The Cut 上的西西里小餐馆，气氛热闹，有意面、披萨、肉类和海鲜。桌子排得很紧凑，适合在南岸看演出前后随意吃一顿。",
+      "address": "61 The Cut, London SE1 8LL",
+      "hours": "Daily 12:00–22:00; closed 24 and 25 Dec",
+      "hoursZh": "每天 12:00–22:00；12月24日、25日休息",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "note": "Bookings need a deposit of £15 per person.",
+      "noteZh": "订位需每人预付 15 英镑订金。",
+      "links": [
+        "https://ristoranteolivelli.co.uk/",
+        "https://maps.google.com/?cid=5848279206069069659"
+      ],
+      "coordinates": [
+        -0.1076044,
+        51.5028563
+      ]
+    },
+    {
+      "id": "B32",
+      "tier": "B",
+      "name": "ROKA Aldwych",
+      "subtitle": "Japanese robatayaki",
+      "subtitleZh": "日式炉端烧",
+      "zone": "west-end",
+      "themes": [
+        "japanese",
+        "hotpot-grill"
+      ],
+      "why": "The theatreland branch of the ROKA group, built around a central charcoal grill, with black cod, tempura prawns and sushi on the menu. Set lunch and pre-theatre menus make it easier to try.",
+      "whyZh": "ROKA 集团位于剧院区的分店，店中央是一座炭火炉，菜单上有黑鳕鱼、天妇罗虾和寿司。午餐和剧前套餐让人更容易尝试。",
+      "address": "71 Aldwych, London WC2B 4HN",
+      "cost": "£££",
+      "note": "Booking ahead is recommended; the sharing style suits groups.",
+      "noteZh": "建议提前订位；菜式适合多人分享。",
+      "sourceUrl": "https://www.timeout.com/london/restaurants/roka-aldwych",
+      "links": [
+        "https://www.rokarestaurant.com",
+        "https://maps.google.com/?cid=11650638698227940654"
+      ],
+      "coordinates": [
+        -0.1162771,
+        51.5135419
+      ]
+    },
+    {
+      "id": "B33",
+      "tier": "B",
+      "name": "Roti King",
+      "subtitle": "Malaysian roti canai",
+      "subtitleZh": "马来西亚印度煎饼",
+      "zone": "north",
+      "themes": [
+        "southeast-asian"
+      ],
+      "why": "A basement Malaysian canteen next to Euston station, known for roti canai, a flaky flatbread served with curry, and for murtabak. Queues are common at peak times.",
+      "whyZh": "尤斯顿车站旁的地下室马来西亚小馆，以印度煎饼（roti canai，配咖喱蘸着吃）和马达巴（murtabak）闻名。高峰时段常要排队。",
+      "address": "40 Doric Way, London NW1 1LH",
+      "cost": "£",
+      "sourceUrl": "https://www.timeout.com/london/restaurants/roti-king",
+      "links": [
+        "https://maps.google.com/?cid=10137998710171492266"
+      ],
+      "coordinates": [
+        -0.1319957,
+        51.5290963
+      ]
+    },
+    {
+      "id": "B34",
+      "tier": "B",
+      "name": "Sagamiya",
+      "subtitle": "Japanese home cooking",
+      "subtitleZh": "日式家常菜",
+      "zone": "southbank",
+      "themes": [
+        "japanese"
+      ],
+      "why": "A small, quiet Japanese restaurant inside County Hall on the South Bank, serving home-style dishes alongside sushi and sashimi. Seats are limited, so ring ahead.",
+      "whyZh": "位于南岸县政厅大楼内的安静日料小店，供应日式家常菜，也有寿司和刺身。座位不多，建议提前电话订位。",
+      "address": "County Hall, Belvedere Rd, London SE1 7GP",
+      "cost": "££",
+      "links": [
+        "https://maps.google.com/?cid=217797747090428919"
+      ],
+      "coordinates": [
+        -0.1182506,
+        51.5020347
+      ]
+    },
+    {
+      "id": "B35",
+      "tier": "B",
+      "name": "Samad Al Iraqi Restaurant",
+      "subtitle": "Iraqi restaurant",
+      "subtitleZh": "伊拉克菜餐厅",
+      "zone": "west",
+      "themes": [
+        "middle-eastern-african"
+      ],
+      "why": "An Iraqi restaurant on Kensington High Street. Order kubbah dumplings, grilled masgouf fish or quzi, lamb on rice in a pastry shell; the window tables look onto the street.",
+      "whyZh": "肯辛顿高街上的伊拉克餐厅。可以点库巴（kubbah）肉馅饺、烤鱼 masgouf，或酥皮包裹的羊肉饭 quzi；靠窗位置可以看街景。",
+      "address": "284-286 Kensington High St, London W14 8NZ",
+      "cost": "££",
+      "note": "Walk-ins are fine; you can also reserve online.",
+      "noteZh": "可直接到店，也可在线预订。",
+      "sourceUrl": "https://theinfatuation.com/london/reviews/samad-al-iraqi",
+      "links": [
+        "https://maps.google.com/?cid=15439637233318272103"
+      ],
+      "coordinates": [
+        -0.2018533,
+        51.4983071
+      ]
+    },
+    {
+      "id": "B36",
+      "tier": "B",
+      "name": "Shujie Hotpot",
+      "subtitle": "Hotpot restaurant",
+      "subtitleZh": "火锅店",
+      "zone": "west-end",
+      "themes": [
+        "chinese",
+        "hotpot-grill"
+      ],
+      "why": "A hotpot restaurant on Red Lion Street in Holborn, a handy option for a group meal around the table. Little recent detail is available, so check the menu and hours before going.",
+      "whyZh": "位于荷本区红狮街的火锅店，适合几个人围桌聚餐。近期资料不多，出发前最好先确认菜单和营业时间。",
+      "address": "25-26 Red Lion St, London WC1R 4PS",
+      "cost": "££",
+      "links": [
+        "https://maps.google.com/?cid=15089473434391359710"
+      ],
+      "coordinates": [
+        -0.1170719,
+        51.5195297
+      ]
+    },
+    {
+      "id": "B37",
+      "tier": "B",
+      "name": "Smoking Goat",
+      "subtitle": "Thai bar and grill",
+      "subtitleZh": "泰式烧烤酒吧",
+      "by": "Ben Chapman",
+      "zone": "east",
+      "themes": [
+        "southeast-asian",
+        "hotpot-grill"
+      ],
+      "why": "A loud, lively Thai bar and grill where most dishes are cooked over charcoal, with shared tables and an open kitchen. The fish-sauce chicken wings are the dish people most often order.",
+      "whyZh": "热闹的泰式烧烤酒吧，大部分菜品用炭火烹制，有长桌共享座位和开放式厨房。最多人点的是鱼露鸡翅。",
+      "address": "64 Shoreditch High St, London E1 6JJ",
+      "hours": "Mon–Sat 12:00–23:00; Sun 12:00–22:00 (kitchen)",
+      "hoursZh": "周一至周六 12:00–23:00；周日 12:00–22:00（厨房）",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "note": "Mostly walk-in. Bookings are limited, and groups of eight or more must take the feasting menu.",
+      "noteZh": "以直接到店为主，可预订名额有限；8 人及以上须点套餐。",
+      "links": [
+        "https://smokinggoatbar.com",
+        "https://maps.google.com/?cid=1567628428332190086"
+      ],
+      "coordinates": [
+        -0.0769238,
+        51.524224
+      ]
+    },
+    {
+      "id": "B38",
+      "tier": "B",
+      "name": "Temaki",
+      "subtitle": "Japanese hand roll bar",
+      "subtitleZh": "日式手卷吧",
+      "zone": "west-end",
+      "themes": [
+        "japanese"
+      ],
+      "why": "A hand roll bar that moved from Brixton to Mayfair in June 2026. Sit at the 16-seat counter upstairs for hand rolls, or downstairs in a listening-bar style room for sharing plates and sake.",
+      "whyZh": "手卷寿司吧，2026年6月从布里克斯顿搬到梅菲尔。楼上有16个座位的吧台，主打手卷；楼下是仿日式听音酒吧的空间，适合分享小菜、喝清酒。",
+      "address": "11 Maddox St, London W1S 2QF",
+      "hours": "Daily 12:00–15:00, 17:00–23:00 (last seating 22:00)",
+      "hoursZh": "每天 12:00–15:00，17:00–23:00（最后入座 22:00）",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£££",
+      "note": "Book online through the venue's site.",
+      "noteZh": "请通过餐厅官网在线订位。",
+      "sourceUrl": "https://www.hot-dinners.com/2026011414769/Gastroblog/Latest-news/temaki-japanese-handroll-bar-mayfair-london-opening",
+      "links": [
+        "https://temaki.co.uk",
+        "https://maps.google.com/?cid=12887094853368419737"
+      ],
+      "coordinates": [
+        -0.1415572,
+        51.5132965
+      ]
+    },
+    {
+      "id": "B39",
+      "tier": "B",
+      "name": "The Clink Restaurant Brixton",
+      "subtitle": "Prison training restaurant",
+      "subtitleZh": "监狱内的培训餐厅",
+      "zone": "south",
+      "themes": [
+        "british"
+      ],
+      "why": "A restaurant inside HMP Brixton, run by The Clink Charity, where prisoners train for catering work. It serves seasonal a la carte lunches, a Thursday dinner and Sunday lunch, and has no alcohol.",
+      "whyZh": "位于布里克斯顿监狱内的餐厅，由 The Clink Charity 运营，服刑人员在此接受餐饮培训。供应时令单点午餐、周四晚餐和周日午餐，不供应酒精。",
+      "address": "HMP Brixton, Jebb Ave, Brixton Hill, London SW2 5XF",
+      "hours": "Tue–Thu lunch (sittings 12:00 and 12:30); Thu dinner (sittings 18:00 and 18:30); Sun lunch",
+      "hoursZh": "周二至周四午餐（12:00 和 12:30 入席）；周四晚餐（18:00 和 18:30 入席）；周日午餐",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "sun"
+      ],
+      "cost": "££",
+      "note": "Book at least seven working days ahead; every diner must be over 18, pass a security check and bring photo ID. Arrive 30 minutes before your sitting.",
+      "noteZh": "须至少提前七个工作日订位；所有食客须年满 18 岁、通过安检并携带带照片的证件。请在入席前 30 分钟到达。",
+      "sourceUrl": "https://theclinkcharity.org/restaurants/brixton",
+      "links": [
+        "https://theclinkcharity.org/restaurants/brixton",
+        "https://maps.google.com/?cid=5673410248995439596"
+      ],
+      "coordinates": [
+        -0.1256316,
+        51.4519672
+      ]
+    },
+    {
+      "id": "B40",
+      "tier": "B",
+      "name": "Tonkotsu Peckham",
+      "subtitle": "Ramen bar",
+      "subtitleZh": "拉面店",
+      "zone": "south",
+      "themes": [
+        "japanese",
+        "noodles"
+      ],
+      "why": "The Peckham branch of the Tonkotsu ramen group, upstairs in Market Place Peckham near the station. The group makes its own noodles and builds the menu around ramen.",
+      "whyZh": "Tonkotsu 拉面连锁的 Peckham 分店，位于车站附近 Market Place Peckham 的楼上。品牌自己制面，菜单以拉面为主。",
+      "address": "133 Rye Ln, London SE15 4ST",
+      "hours": "Daily 12:00–22:00 (kitchen closes 30 minutes earlier)",
+      "hoursZh": "每天 12:00–22:00（厨房提前 30 分钟结束点单）",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "note": "You can book online, and space is left for walk-ins.",
+      "noteZh": "可网上订位，也留有位置给直接到店的客人。",
+      "links": [
+        "https://www.tonkotsu.co.uk/locations/peckham",
+        "https://maps.google.com/?cid=6801012324797285963"
+      ],
+      "coordinates": [
+        -0.0681926,
+        51.4697958
+      ]
+    },
+    {
+      "id": "B41",
+      "tier": "B",
+      "name": "Yashin Sushi",
+      "subtitle": "Sushi counter and bar",
+      "subtitleZh": "寿司吧台餐厅",
+      "by": "Yasuhiro Mineno",
+      "zone": "west",
+      "themes": [
+        "japanese"
+      ],
+      "why": "A Kensington sushi restaurant from chefs Yasuhiro Mineno and Shinya Ikeda, with a sushi counter and a menu of nigiri and small plates. A good option for a sit-down sushi dinner near High Street Kensington.",
+      "whyZh": "肯辛顿的寿司餐厅，由主厨 Yasuhiro Mineno 与 Shinya Ikeda 创立，设有寿司吧台，供应握寿司和小盘菜。适合在高街肯辛顿附近坐下来吃一顿寿司晚餐。",
+      "address": "1A Argyll Rd, London W8 7DB",
+      "hours": "Daily 12:00–15:00 (last orders 14:30), 18:00–23:00 (last orders 22:30)",
+      "hoursZh": "每天 12:00–15:00（最后点单 14:30），18:00–23:00（最后点单 22:30）",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£££",
+      "note": "Counter seats can fill at peak times, so book ahead.",
+      "noteZh": "吧台座位在高峰时段可能订满，建议提前预订。",
+      "sourceUrl": "https://www.yashinsushi.com/",
+      "links": [
+        "https://www.yashinsushi.com/",
+        "https://maps.google.com/?cid=812607143442108275"
+      ],
+      "coordinates": [
+        -0.1954687,
+        51.5005449
+      ]
+    },
+    {
+      "id": "C1",
+      "tier": "C",
+      "name": "15grams",
+      "subtitle": "Coffee roaster and café",
+      "subtitleZh": "咖啡烘焙商与咖啡馆",
+      "zone": "south",
+      "themes": [
+        "coffee-tea",
+        "drinks"
+      ],
+      "why": "A specialty coffee roaster's café on Tranquil Vale in Blackheath village. On Friday and Saturday evenings it also serves wine, cocktails and late food.",
+      "whyZh": "位于 Blackheath 村 Tranquil Vale 的精品咖啡烘焙商咖啡馆。周五和周六晚上还供应葡萄酒、鸡尾酒和夜宵。",
+      "address": "30 Tranquil Vale, Blackheath, London SE3 0AX",
+      "hours": "Mon–Thu 08:00–16:00; Fri–Sat 08:00–23:00; Sun 09:00–17:00",
+      "hoursZh": "周一至周四 08:00–16:00；周五至周六 08:00–23:00；周日 09:00–17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "note": "Daytime is walk-in only; tables can be booked for Friday and Saturday evenings.",
+      "noteZh": "白天只接受直接到店；周五和周六晚上可订位。",
+      "links": [
+        "https://www.15grams.co.uk/visit-us",
+        "https://maps.google.com/?cid=546616006718099571"
+      ],
+      "coordinates": [
+        0.0088501,
+        51.4662644
+      ]
+    },
+    {
+      "id": "C2",
+      "tier": "C",
+      "name": "166 CafeBar",
+      "subtitle": "Neighbourhood cafe and bar",
+      "subtitleZh": "街坊咖啡馆兼酒吧",
+      "zone": "south",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A small independent cafe on Battersea Park Road, opposite Harris Academy. It serves coffee and baking from its own kitchen, with small plates and drinks later in the day according to directories.",
+      "whyZh": "巴特西公园路上的小型独立咖啡馆，位于哈里斯学院对面。供应咖啡和自家厨房烘焙的点心，据点评网站介绍晚间还有小盘菜和酒水。",
+      "address": "166 Battersea Park Rd, London SW11 4ND",
+      "cost": "£",
+      "links": [
+        "https://maps.google.com/?cid=1203363715781568041"
+      ],
+      "coordinates": [
+        -0.1600658,
+        51.4738306
+      ]
+    },
+    {
+      "id": "C3",
+      "tier": "C",
+      "name": "A Bar with Shapes for a Name",
+      "subtitle": "Late-night cocktail bar",
+      "subtitleZh": "深夜鸡尾酒吧",
+      "by": "Remy Savage and Paul Lougrat",
+      "zone": "east",
+      "themes": [
+        "drinks"
+      ],
+      "why": "A two-floor cocktail bar on Kingsland Road, styled on the Bauhaus and named only by a triangle, square and circle. It makes unusual drinks, stays open late, and was ranked 73rd in the World's 50 Best Bars in 2025.",
+      "whyZh": "Kingsland Road 上的两层鸡尾酒吧，设计取自包豪斯，店名只用三角形、方形和圆形表示。酒款独特，营业到很晚，2025 年位列全球 50 佳酒吧第 73 名。",
+      "address": "232 Kingsland Rd, Whitmore Estate, London E2 8AX",
+      "hours": "Daily from 17:00",
+      "hoursZh": "每天 17:00 起",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "note": "Tables can be booked online; it stays open into the early hours.",
+      "noteZh": "可网上订位，营业至凌晨。",
+      "links": [
+        "https://www.clubbauhaus.com/abarwithshapesforaname",
+        "https://maps.google.com/?cid=4614148170921664845"
+      ],
+      "coordinates": [
+        -0.0767291,
+        51.5356735
+      ]
+    },
+    {
+      "id": "C4",
+      "tier": "C",
+      "name": "Archetype Coffee",
+      "subtitle": "Specialty coffee shop",
+      "subtitleZh": "精品咖啡店",
+      "zone": "west-end",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A tiny Fitzrovia coffee shop with a few low tables and a bench, serving small-batch coffee and chai. A calm place for a quick flat white.",
+      "whyZh": "菲茨罗维亚一家很小的咖啡店，只有几张矮桌和一条长凳，供应小批量烘焙的咖啡和香料茶。适合安静地喝一杯馥芮白。",
+      "address": "31 Riding House St, London W1W 7DY",
+      "cost": "£",
+      "links": [
+        "https://maps.google.com/?cid=5706884281098590164"
+      ],
+      "coordinates": [
+        -0.1409418,
+        51.5185152
+      ]
+    },
+    {
+      "id": "C5",
+      "tier": "C",
+      "name": "Artisan Coffee",
+      "subtitle": "Neighbourhood coffee shop",
+      "subtitleZh": "街坊咖啡店",
+      "zone": "west",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A small coffee shop on Fulham Road with coffee, cakes and light bites. A simple stop if you are walking between Fulham Broadway and Parsons Green.",
+      "whyZh": "富勒姆路上的小咖啡店，供应咖啡、蛋糕和轻食。在富勒姆百老汇与帕森斯格林之间步行时可以顺路坐坐。",
+      "address": "623 Fulham Rd, London SW6 5UQ",
+      "cost": "£",
+      "links": [
+        "https://maps.google.com/?cid=11113537085249580822"
+      ],
+      "coordinates": [
+        -0.1985502,
+        51.4798701
+      ]
+    },
+    {
+      "id": "C6",
+      "tier": "C",
+      "name": "Aspen & Meursault",
+      "subtitle": "Natural wine bar and cafe",
+      "subtitleZh": "自然酒吧兼咖啡馆",
+      "by": "Sunny Hodge",
+      "zone": "south",
+      "themes": [
+        "drinks",
+        "coffee-tea"
+      ],
+      "why": "A natural wine bar in a former Battersea pub, working as a cafe by day and a wine bar with dips, boards and small plates in the evening. The list leans natural and low-intervention, and the staff will guide you through it.",
+      "whyZh": "巴特西一家由旧酒馆改造的自然酒吧，白天是咖啡馆，晚上变成供应蘸酱、拼盘和小盘菜的酒吧。酒单以自然酒和低干预酒为主，店员会帮你挑选。",
+      "address": "96 Westbridge Rd, London SW11 3PH",
+      "cost": "££",
+      "links": [
+        "https://maps.google.com/?cid=2332454608724724467"
+      ],
+      "coordinates": [
+        -0.1730227,
+        51.4758358
+      ]
+    },
+    {
+      "id": "C7",
+      "tier": "C",
+      "name": "Assembly Coffee",
+      "subtitle": "Roastery and coffee bar",
+      "subtitleZh": "烘焙坊兼咖啡吧",
+      "zone": "south",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A Brixton specialty coffee roaster based in a converted fire station. Its front-of-house coffee bar, Door, is a joint venture with Volcano Coffee Works, and you can buy beans to take home.",
+      "whyZh": "位于布里克斯顿的精品咖啡烘焙商，总部设在改建的旧消防站里。店面的咖啡吧 Door 与 Volcano Coffee Works 合作经营，也可以买咖啡豆带走。",
+      "address": "244 Ferndale Rd, London SW9 8FR",
+      "hours": "Door Coffee Bar: Mon–Fri 07:30–15:30; Sat 09:00–16:00",
+      "hoursZh": "Door 咖啡吧：周一至周五 07:30–15:30；周六 09:00–16:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "cost": "£",
+      "sourceUrl": "https://www.assemblycoffee.co.uk/pages/door-coffee-bar",
+      "links": [
+        "https://www.assemblycoffee.co.uk",
+        "https://maps.google.com/?cid=8701307664864374502"
+      ],
+      "coordinates": [
+        -0.1158868,
+        51.4641639
+      ]
+    },
+    {
+      "id": "C8",
+      "tier": "C",
+      "name": "Attendant",
+      "subtitle": "Coffee in a Victorian toilet",
+      "subtitleZh": "维多利亚公厕改建的咖啡馆",
+      "zone": "west-end",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A small coffee roaster's café in a converted Victorian underground public toilet, where the old urinals now serve as seating. Come for the setting as well as the coffee.",
+      "whyZh": "一家烘焙商开的小咖啡馆，开在改造过的维多利亚时代地下公厕里，旧的小便池如今当座位用。来这里既是为了咖啡，也是为了这个空间。",
+      "address": "27A Foley St, London W1W 6DY",
+      "cost": "£",
+      "note": "No reservations; service is first come, first served, and seating is very limited.",
+      "noteZh": "不接受预订，先到先得，座位很少。",
+      "sourceUrl": "https://www.attendantcoffee.com/pages/locations",
+      "links": [
+        "https://www.attendantcoffee.com",
+        "https://maps.google.com/?cid=11288187311504779954"
+      ],
+      "coordinates": [
+        -0.140675,
+        51.5192293
+      ]
+    },
+    {
+      "id": "C9",
+      "tier": "C",
+      "name": "Cafe de Nata",
+      "subtitle": "Portuguese custard tarts",
+      "subtitleZh": "葡式蛋挞店",
+      "zone": "west-end",
+      "themes": [
+        "sweets"
+      ],
+      "why": "A small Old Compton Street bakery-café built around pastéis de nata, in classic and flavoured versions, with a vegan one too. An easy sweet stop in the middle of Soho.",
+      "whyZh": "老康普顿街上的小型烘焙咖啡店，主打葡式蛋挞，有经典和不同口味，还有纯素版本。逛苏豪时顺路吃一块甜点正合适。",
+      "address": "25 Old Compton St, London W1D 5JN",
+      "hours": "Mon–Thu 09:00–23:00; Fri 09:00–00:00; Sat 10:00–00:00; Sun 10:00–23:00",
+      "hoursZh": "周一至周四 09:00–23:00；周五 09:00–00:00；周六 10:00–00:00；周日 10:00–23:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "sourceUrl": "https://cafedenata.com",
+      "links": [
+        "https://cafedenata.com",
+        "https://maps.google.com/?cid=17522518853269269283"
+      ],
+      "coordinates": [
+        -0.1312969,
+        51.5130967
+      ]
+    },
+    {
+      "id": "C10",
+      "tier": "C",
+      "name": "Café Kitsuné",
+      "subtitle": "Japanese-inspired cafe",
+      "subtitleZh": "日式风格咖啡馆",
+      "zone": "west",
+      "themes": [
+        "coffee-tea",
+        "sweets"
+      ],
+      "why": "The Belgravia branch of Café Kitsuné, on the ground floor of 19 Motcomb Street (the former Pantechnicon). It serves coffee, Japanese-inspired pastries, and breakfast and lunch dishes, with a terrace.",
+      "whyZh": "Café Kitsuné 在贝尔格拉维亚的分店，位于莫特科姆街 19 号（前 Pantechnicon 大楼）底层。供应咖啡、日式风味糕点以及早餐和午餐，另设露台。",
+      "address": "Ground Floor, 19 Motcomb St, London SW1X 8LB",
+      "cost": "££",
+      "sourceUrl": "https://hardens.com/az/restaurants/london/sw1x/cafe-kitsune.htm",
+      "links": [
+        "https://maps.google.com/?cid=3838175992310815014"
+      ],
+      "coordinates": [
+        -0.157074,
+        51.4992268
+      ]
+    },
+    {
+      "id": "C11",
+      "tier": "C",
+      "name": "Calico Coffee",
+      "subtitle": "Specialty coffee shop",
+      "subtitleZh": "精品咖啡店",
+      "zone": "southbank",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A calm, small specialty coffee shop on Lower Marsh, near Waterloo, with a pour-over menu, its own bags of beans and a few pastries and cakes. Opened in December 2024.",
+      "whyZh": "滑铁卢附近下马什街上安静的小型精品咖啡店，有手冲咖啡单、自家咖啡豆和几款糕点。2024 年 12 月开业。",
+      "address": "Unit C, 101 Lower Marsh, London SE1 7AB",
+      "cost": "£",
+      "sourceUrl": "https://www.doubleskinnymacchiato.com/2025/04/calico-coffee-london-waterloo.html",
+      "links": [
+        "https://maps.google.com/?cid=11315551054953088299"
+      ],
+      "coordinates": [
+        -0.1120729,
+        51.5012555
+      ]
+    },
+    {
+      "id": "C12",
+      "tier": "C",
+      "name": "Carbon Kopi",
+      "subtitle": "Specialty coffee shop",
+      "subtitleZh": "精品咖啡店",
+      "zone": "west",
+      "themes": [
+        "coffee-tea",
+        "sweets"
+      ],
+      "why": "A neighbourhood coffee shop near Parsons Green, on the corner of Hazlebury Road. It serves espresso drinks, single-origin filter coffee, cookies, pastries and toasties.",
+      "whyZh": "帕森斯格林附近、位于黑兹尔伯里路转角的街坊咖啡店。供应意式咖啡、单品手冲、曲奇、糕点和烤三明治。",
+      "address": "1 Hazlebury Rd, London SW6 2NA",
+      "hours": "Mon–Thu 07:00–16:30; Fri–Sun 07:30–17:00",
+      "hoursZh": "周一至周四 07:00–16:30；周五至周日 07:30–17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "sourceUrl": "https://www.carbonkopi.com/",
+      "links": [
+        "https://www.carbonkopi.com/",
+        "https://maps.google.com/?cid=3541075585418505636"
+      ],
+      "coordinates": [
+        -0.1914044,
+        51.4726282
+      ]
+    },
+    {
+      "id": "C13",
+      "tier": "C",
+      "name": "Flat White",
+      "subtitle": "Antipodean café",
+      "subtitleZh": "澳新风格咖啡馆",
+      "zone": "west-end",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A small Soho café on Berwick Street, open since 2005 and often cited as an early champion of Antipodean-style coffee in London. Good for a flat white and a bite to eat.",
+      "whyZh": "苏豪区贝里克街上的小咖啡馆，2005年开业，常被视为澳新风格咖啡在伦敦的先行者之一。适合喝杯馥芮白，再吃点东西。",
+      "address": "17 Berwick St, London W1F 0PT",
+      "cost": "£",
+      "sourceUrl": "https://www.timeout.com/london/restaurants/flat-white",
+      "links": [
+        "https://maps.google.com/?cid=328436187937423898"
+      ],
+      "coordinates": [
+        -0.1348554,
+        51.5136019
+      ]
+    },
+    {
+      "id": "C14",
+      "tier": "C",
+      "name": "H.R. Higgins",
+      "subtitle": "Coffee and tea merchant",
+      "subtitleZh": "咖啡与茶叶商",
+      "zone": "west-end",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A Mayfair coffee and tea merchant that has traded in the area since 1942, selling beans and loose-leaf tea over the counter. Downstairs is a small lounge for espresso, pour-over and cake.",
+      "whyZh": "梅菲尔的一家咖啡与茶叶商，自1942年起就在这一带经营，店里出售咖啡豆和散装茶叶。楼下有一间小休息室，可以喝意式咖啡、手冲咖啡，再配一块蛋糕。",
+      "address": "79 Duke St, London W1K 5AS",
+      "hours": "Shop Mon–Fri 08:00–17:30, Sat 10:00–18:00, Sun 11:00–16:00; coffee lounge opens 09:00 on weekdays; closed on bank holidays",
+      "hoursZh": "商店：周一至周五 08:00–17:30，周六 10:00–18:00，周日 11:00–16:00；楼下咖啡室工作日 09:00 开门；公共假日休息",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "sourceUrl": "https://www.hrhiggins.co.uk/the-shop/",
+      "links": [
+        "https://www.hrhiggins.co.uk",
+        "https://maps.google.com/?cid=13977336164133819314"
+      ],
+      "coordinates": [
+        -0.1506654,
+        51.5131067
+      ]
+    },
+    {
+      "id": "C15",
+      "tier": "C",
+      "name": "Hagen Espresso Bar",
+      "subtitle": "Espresso bar",
+      "subtitleZh": "意式咖啡吧",
+      "zone": "west",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "The South Kensington branch of a London specialty coffee chain, a short walk from the museums and the tube. It is set up as a quick standing and takeaway espresso bar.",
+      "whyZh": "伦敦精品咖啡连锁品牌在南肯辛顿的分店，离博物馆区和地铁站不远。以站着喝或外带的意式咖啡吧形式经营。",
+      "address": "9 Old Brompton Rd, London SW7 3HZ",
+      "cost": "£",
+      "links": [
+        "https://maps.google.com/?cid=15979691324697953818"
+      ],
+      "coordinates": [
+        -0.1738987,
+        51.4934878
+      ]
+    },
+    {
+      "id": "C16",
+      "tier": "C",
+      "name": "Host Café",
+      "subtitle": "Church café",
+      "subtitleZh": "教堂咖啡馆",
+      "zone": "city",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A non-profit café inside St Mary Aldermary, a Wren church in the City, with quiet seating and free Wi-Fi. A calm weekday coffee stop with entrances from Watling Street, Bow Lane and Queen Victoria Street.",
+      "whyZh": "位于伦敦金融城圣玛丽奥尔德玛丽教堂（雷恩设计）内的非营利咖啡馆，座位安静，有免费无线网络。工作日来喝杯咖啡很清静，可从 Watling Street、Bow Lane 和 Queen Victoria Street 三个入口进入。",
+      "address": "St Mary Aldermary Church, Watling St, London EC4M 9BW",
+      "hours": "Mon–Fri 07:30–16:00",
+      "hoursZh": "周一至周五 07:30–16:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri"
+      ],
+      "cost": "£",
+      "note": "Closed at weekends apart from two Saturdays a year (Lord Mayor's Show and London Open House, 09:30–15:00). Working there for more than 1.5 hours needs booking ahead.",
+      "noteZh": "周末不营业，每年只有两个周六例外（市长巡游日和伦敦开放日，09:30–15:00）。在这里工作超过 1.5 小时需提前预约。",
+      "links": [
+        "https://www.hostcafelondon.com/",
+        "https://maps.google.com/?cid=5419976441769141777"
+      ],
+      "coordinates": [
+        -0.0933652,
+        51.5128585
+      ]
+    },
+    {
+      "id": "C17",
+      "tier": "C",
+      "name": "Kaffeine",
+      "subtitle": "Espresso bar and café",
+      "subtitleZh": "意式咖啡吧与咖啡馆",
+      "zone": "west-end",
+      "themes": [
+        "coffee-tea",
+        "sweets"
+      ],
+      "why": "An independent espresso bar open since 2009, with a short breakfast and lunch menu that changes every week, plus cakes and baking. A solid stop for coffee and a sandwich in Fitzrovia.",
+      "whyZh": "2009年开业的独立意式咖啡吧，早餐和午餐菜单每周更换，另有蛋糕和烘焙点心。在菲茨罗维亚喝咖啡、吃个三明治的可靠选择。",
+      "address": "66 Great Titchfield St, London W1W 7QJ",
+      "hours": "Mon–Fri 07:30–17:00; Sat 08:30–17:00; Sun 09:00–17:00",
+      "hoursZh": "周一至周五 07:30–17:00；周六 08:30–17:00；周日 09:00–17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "sourceUrl": "https://kaffeine.co.uk/location/66-great-titchfield-street/",
+      "links": [
+        "https://kaffeine.co.uk",
+        "https://maps.google.com/?cid=242723320702919475"
+      ],
+      "coordinates": [
+        -0.1404166,
+        51.5184608
+      ]
+    },
+    {
+      "id": "C18",
+      "tier": "C",
+      "name": "Kanpai London Sake Brewery & Taproom",
+      "subtitle": "Sake brewery and taproom",
+      "subtitleZh": "清酒酿造厂与酒吧",
+      "zone": "southbank",
+      "themes": [
+        "drinks"
+      ],
+      "why": "A craft sake brewery on the Bermondsey Beer Mile with a taproom and small kitchen. You can taste sake made on site, some of it on tap.",
+      "whyZh": "位于 Bermondsey 啤酒一条街的精酿清酒厂，设有酒吧和小厨房。可以品尝本地酿造的清酒，其中部分是生啤式桶装。",
+      "address": "48 Druid St, London SE1 2EZ",
+      "hours": "Wed–Thu 17:00–22:00; Fri 17:00–22:30; Sat 12:00–22:30; Sun 12:00–19:00",
+      "hoursZh": "周三至周四 17:00–22:00；周五 17:00–22:30；周六 12:00–22:30；周日 12:00–19:00",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "note": "Walk-ins are welcome, and groups of up to nine can book online. Sake tastings run on Saturdays.",
+      "noteZh": "欢迎直接到店，9 人以内的团体可网上预订。周六有清酒品鉴。",
+      "links": [
+        "https://www.kanpai.london",
+        "https://maps.google.com/?cid=2239577985643604826"
+      ],
+      "coordinates": [
+        -0.077002,
+        51.5006082
+      ]
+    },
+    {
+      "id": "C19",
+      "tier": "C",
+      "name": "Le Chocolat Alain Ducasse",
+      "subtitle": "Chocolate shop",
+      "subtitleZh": "巧克力店",
+      "zone": "north",
+      "themes": [
+        "sweets"
+      ],
+      "why": "Alain Ducasse's chocolate shop in Coal Drops Yard, selling bars and bonbons, macarons, hot chocolate and ice cream. A sweet stop, or a gift box, while exploring King's Cross.",
+      "whyZh": "阿兰·杜卡斯的巧克力店，位于煤仓广场，出售巧克力板和夹心巧克力、马卡龙、热巧克力和冰淇淋。逛国王十字区时可以来买份甜点或礼盒。",
+      "address": "Unit 15, Bagley Walk Arches, Coal Drops Yard, London N1C 4DH",
+      "cost": "£",
+      "sourceUrl": "https://www.kingscross.co.uk/le-chocolat-alain-ducasse",
+      "links": [
+        "https://www.lechocolat-alainducasse.com/en",
+        "https://maps.google.com/?cid=9342736204911492203"
+      ],
+      "coordinates": [
+        -0.1269033,
+        51.5354244
+      ]
+    },
+    {
+      "id": "C20",
+      "tier": "C",
+      "name": "Le Choux",
+      "subtitle": "Choux pastry bakery",
+      "subtitleZh": "泡芙烘焙坊",
+      "zone": "west",
+      "themes": [
+        "sweets"
+      ],
+      "why": "A small pâtisserie on Ladbroke Grove built around choux pastry: filled buns, profiteroles, choux towers, plus cookies, tarts and cakes. A good stop for a box of pastries to take away.",
+      "whyZh": "诺丁山边上拉德布罗克格罗夫路上的小型法式甜品店，以泡芙为主：各种夹馅泡芙、小泡芙塔，另有曲奇、挞和蛋糕。适合买一盒带走。",
+      "address": "332 Ladbroke Grove, London W10 5AD",
+      "hours": "Tue–Fri 09:00–18:30; Sat 09:30–18:30; Sun 10:00–18:00; Mon closed",
+      "hoursZh": "周二至周五 09:00–18:30；周六 09:30–18:30；周日 10:00–18:00；周一休息",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "sourceUrl": "https://lechoux.com/",
+      "links": [
+        "https://lechoux.com/",
+        "https://maps.google.com/?cid=16338013576768616516"
+      ],
+      "coordinates": [
+        -0.2144265,
+        51.52539
+      ]
+    },
+    {
+      "id": "C21",
+      "tier": "C",
+      "name": "Lounge Bohemia",
+      "subtitle": "Hidden cocktail bar",
+      "subtitleZh": "隐秘鸡尾酒吧",
+      "by": "Paul Tvaroh",
+      "zone": "east",
+      "themes": [
+        "drinks"
+      ],
+      "why": "A small basement cocktail bar behind an unmarked door near Shoreditch High Street, decorated in a Czech style. The drinks are elaborate and theatrical, so it suits a special night out.",
+      "whyZh": "酒吧藏在 Shoreditch High Street 站附近一扇没有招牌的门后，地下空间装饰成捷克风格。调酒讲究、很有戏剧感，适合特别的夜晚。",
+      "address": "1e Great Eastern St, London EC2A 3EJ",
+      "cost": "££",
+      "note": "Regular service is paused until 23 December for a ticketed 20-course cocktail tasting (£175 a head); check before going.",
+      "noteZh": "常规营业已暂停至 12 月 23 日，期间只举办需购票的 20 道鸡尾酒品鉴（每人 £175）；出发前请先确认。",
+      "sourceUrl": "https://tvaroh.art/experience",
+      "links": [
+        "https://loungebohemia.com",
+        "https://maps.google.com/?cid=13790060879355730850"
+      ],
+      "coordinates": [
+        -0.0780972,
+        51.5228628
+      ]
+    },
+    {
+      "id": "C22",
+      "tier": "C",
+      "name": "Mehmet Efendi",
+      "subtitle": "Turkish dessert café",
+      "subtitleZh": "土耳其甜品店",
+      "zone": "east",
+      "themes": [
+        "sweets",
+        "coffee-tea"
+      ],
+      "why": "A Turkish sweet shop near Aldgate East that sells baklava, cakes and Turkish delight, along with Turkish tea and coffee.",
+      "whyZh": "Aldgate East 附近的土耳其甜品店，卖果仁蜜饼、蛋糕和土耳其软糖，也有土耳其茶和咖啡。",
+      "address": "71 Whitechapel High St, London E1 7PL",
+      "cost": "£",
+      "links": [
+        "https://www.mehmetefendi.co.uk",
+        "https://maps.google.com/?cid=12542452686253561357"
+      ],
+      "coordinates": [
+        -0.0695008,
+        51.5160292
+      ]
+    },
+    {
+      "id": "C23",
+      "tier": "C",
+      "name": "Moonstruck Cafe",
+      "subtitle": "Specialist coffee shop",
+      "subtitleZh": "精品咖啡店",
+      "by": "Liam Clifford",
+      "zone": "south",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A specialist coffee shop on South Lambeth Road, between Vauxhall and Stockwell, using beans from the Woolwich roaster Plot, with baked goods from Toklas Bakery. It also runs coffee classes.",
+      "whyZh": "位于南兰贝斯路的精品咖啡店，介于沃克斯豪尔和斯托克韦尔之间，咖啡豆来自伍尔维奇的烘焙商 Plot，糕点由 Toklas Bakery 供应。店里还开设咖啡课程。",
+      "address": "153 S Lambeth Rd, London SW8 1XN",
+      "hours": "Daily 08:00–16:00",
+      "hoursZh": "每天 08:00–16:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "sourceUrl": "https://hot-dinners.com/2024022313017/Gastroblog/Latest-news/moonstruck-coffee-shop-stockwell-london",
+      "links": [
+        "https://moonstruck.cafe",
+        "https://maps.google.com/?cid=6971067853939867251"
+      ],
+      "coordinates": [
+        -0.1232772,
+        51.4780654
+      ]
+    },
+    {
+      "id": "C24",
+      "tier": "C",
+      "name": "Nightjar",
+      "subtitle": "Jazz cocktail bar",
+      "subtitleZh": "爵士鸡尾酒吧",
+      "zone": "east",
+      "themes": [
+        "drinks"
+      ],
+      "why": "A basement cocktail bar by Old Street with live jazz, blues, swing and funk every night from 9pm. Walk-ins are taken, but booking is advised when there is music.",
+      "whyZh": "老街站附近的地下室鸡尾酒吧，每晚九点起有现场爵士、蓝调、摇摆和放克音乐。可直接进店，但有演出的晚上建议先订位。",
+      "address": "129 City Rd, London EC1V 1JB",
+      "note": "A cover charge applies on live-music nights; it goes to the musicians.",
+      "noteZh": "有现场演出的晚上要收入场费，费用归乐手所有。",
+      "links": [
+        "https://www.barnightjar.com",
+        "https://maps.google.com/?cid=18439350199878777593"
+      ],
+      "coordinates": [
+        -0.0877366,
+        51.5265246
+      ]
+    },
+    {
+      "id": "C25",
+      "tier": "C",
+      "name": "Nostos Coffee",
+      "subtitle": "Specialty coffee café",
+      "subtitleZh": "精品咖啡馆",
+      "zone": "west-end",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "The Westminster branch of a coffee brand that started in Battersea, in the Orchard Place development near St James's Park. It has an experience bar for tasting different brewing methods.",
+      "whyZh": "一个起家于巴特西的咖啡品牌的威斯敏斯特分店，位于圣詹姆斯公园附近的 Orchard Place 开发区。设有体验吧，可以品尝不同冲泡方式的咖啡。",
+      "address": "6 Orchard Pl, London SW1H 0BF",
+      "cost": "£",
+      "sourceUrl": "https://orchardplace.london/eat-article/nostos-coffee",
+      "links": [
+        "https://maps.google.com/?cid=5441862989564152208"
+      ],
+      "coordinates": [
+        -0.1333018,
+        51.4986733
+      ]
+    },
+    {
+      "id": "C26",
+      "tier": "C",
+      "name": "Omotesando Koffee",
+      "subtitle": "Japanese specialty coffee",
+      "subtitleZh": "日本精品咖啡",
+      "zone": "west-end",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "The London branch of a Tokyo coffee brand, in the Rathbone Square development, serving carefully made espresso and filter coffee from a minimalist counter.",
+      "whyZh": "东京咖啡品牌在伦敦的分店，位于 Rathbone Square 综合开发区内，在极简风格的吧台精心冲制意式浓缩和手冲咖啡。",
+      "address": "8 Newman St, London W1T 1PB",
+      "cost": "£",
+      "sourceUrl": "https://rathbonesquare.com/retail/omotesando-koffee",
+      "links": [
+        "https://ooo-koffee.com",
+        "https://maps.google.com/?cid=3837190546164018254"
+      ],
+      "coordinates": [
+        -0.1348038,
+        51.516584
+      ]
+    },
+    {
+      "id": "C27",
+      "tier": "C",
+      "name": "Origin Coffee (Scoresby Street)",
+      "subtitle": "Specialty coffee shop",
+      "subtitleZh": "精品咖啡馆",
+      "zone": "southbank",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A railway-arch coffee shop from the Cornish roaster Origin, a short walk from Tate Modern and Southwark station. It also runs regular coffee courses on site.",
+      "whyZh": "康沃尔烘焙商 Origin 在铁路拱廊下开的咖啡店，离泰特现代美术馆和索思沃克站都不远。店里还定期开设咖啡课程。",
+      "address": "84 Scoresby St, London SE1 0XN",
+      "cost": "£",
+      "sourceUrl": "https://origincoffee.co.uk/pages/origin-coffee-scoresby-street",
+      "links": [
+        "https://origincoffee.co.uk",
+        "https://maps.google.com/?cid=12236210215140255896"
+      ],
+      "coordinates": [
+        -0.1035745,
+        51.5042895
+      ]
+    },
+    {
+      "id": "C28",
+      "tier": "C",
+      "name": "Pierre Marcolini",
+      "subtitle": "Belgian chocolatier and patisserie",
+      "subtitleZh": "比利时巧克力与甜点店",
+      "by": "Pierre Marcolini",
+      "zone": "west-end",
+      "themes": [
+        "sweets"
+      ],
+      "why": "The Marylebone High Street shop of the Belgian chocolatier, selling chocolates and gift boxes along with pastries such as eclairs and macarons. A good place for a treat or a present.",
+      "whyZh": "比利时巧克力大师皮埃尔·马可里尼（Pierre Marcolini）在玛丽勒本高街的门店，出售巧克力、礼盒，也有泡芙条（éclair）和马卡龙等甜点。适合买点心犒劳自己或当作礼物。",
+      "address": "37 Marylebone High St, London W1U 4QE",
+      "cost": "£",
+      "sourceUrl": "https://www.timeout.com/london/restaurants/pierre-marcolini",
+      "links": [
+        "https://maps.google.com/?cid=12031816151076044333"
+      ],
+      "coordinates": [
+        -0.1515854,
+        51.520762
+      ]
+    },
+    {
+      "id": "C29",
+      "tier": "C",
+      "name": "Prufrock Coffee",
+      "subtitle": "Specialty coffee shop",
+      "subtitleZh": "精品咖啡馆",
+      "zone": "city",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A specialty coffee shop on Leather Lane that also serves food made from scratch, close to Hatton Garden and Farringdon. It also runs barista training and sells beans to take home.",
+      "whyZh": "皮革巷上的精品咖啡馆，也供应现做的餐食，离哈顿花园和法灵顿都很近。店里还开设咖啡师培训，并出售咖啡豆。",
+      "address": "23-25 Leather Ln, London EC1N 7TE",
+      "hours": "Mon–Fri 07:30–16:30; Sat 08:00–17:00; Sun 09:00–17:00",
+      "hoursZh": "周一至周五 07:30–16:30；周六 08:00–17:00；周日 09:00–17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "links": [
+        "https://www.prufrockcoffee.com",
+        "https://maps.google.com/?cid=8623503146008355857"
+      ],
+      "coordinates": [
+        -0.1094301,
+        51.5199349
+      ]
+    },
+    {
+      "id": "C30",
+      "tier": "C",
+      "name": "Qima Café",
+      "subtitle": "Yemeni coffee café",
+      "subtitleZh": "也门咖啡馆",
+      "by": "Faris Sheibani",
+      "zone": "west-end",
+      "themes": [
+        "coffee-tea",
+        "sweets"
+      ],
+      "why": "A café on Warren Street built around coffee from Yemen and other origins, with an in-house pastry range that uses flavours such as za'atar. A good place for something different from the usual flat white.",
+      "whyZh": "沃伦街上的一家咖啡馆，主打也门及其他产地的咖啡，自制的糕点用到百里香调料（za'atar）等风味。想喝点和平常馥芮白不一样的东西，可以来这里。",
+      "address": "21 Warren St, London W1T 5LT",
+      "cost": "£",
+      "sourceUrl": "https://www.qimacafe.com",
+      "links": [
+        "https://www.qimacafe.com",
+        "https://maps.google.com/?cid=2478854311363355793"
+      ],
+      "coordinates": [
+        -0.1399175,
+        51.523978
+      ]
+    },
+    {
+      "id": "C31",
+      "tier": "C",
+      "name": "Ronnie Scott's",
+      "subtitle": "Jazz club and bar",
+      "subtitleZh": "爵士俱乐部兼酒吧",
+      "zone": "west-end",
+      "themes": [
+        "drinks"
+      ],
+      "why": "Soho's long-running jazz club, founded in 1959, with live shows most nights and drinks and food served in the room. Go for the music, and book ahead for a table.",
+      "whyZh": "苏豪历史悠久的爵士俱乐部，1959 年创立，多数夜晚都有现场演出，场内供应酒水和餐食。为听音乐而来，最好提前订位。",
+      "address": "47 Frith St, London W1D 4HT",
+      "cost": "££",
+      "price": "Main shows from about £30; Late Late Shows £12; Jazz Jams £10",
+      "priceZh": "主场演出约 £30 起；Late Late Shows £12；Jazz Jam £10",
+      "note": "Ticketed shows; book ahead.",
+      "noteZh": "演出需购票，建议提前预订。",
+      "sourceUrl": "https://www.timeout.com/london/music/ronnie-scotts",
+      "links": [
+        "https://www.ronniescotts.co.uk",
+        "https://maps.google.com/?cid=5158198841314979984"
+      ],
+      "coordinates": [
+        -0.1315281,
+        51.513476
+      ]
+    },
+    {
+      "id": "C32",
+      "tier": "C",
+      "name": "Rosslyn Coffee London Wall",
+      "subtitle": "Specialty coffee shop",
+      "subtitleZh": "精品咖啡馆",
+      "zone": "city",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A branch of the City specialty coffee group, a short walk from Moorgate station. A quick place for espresso or filter coffee and a pastry on a weekday.",
+      "whyZh": "金融城精品咖啡连锁店的一家分店，离摩尔门站很近。工作日可以在这里快速喝杯意式浓缩或手冲咖啡，配一块糕点。",
+      "address": "118 London Wall, London EC2Y 5JA",
+      "hours": "Mon–Fri 06:30–17:00; closed Sat and Sun",
+      "hoursZh": "周一至周五 06:30–17:00；周六、周日休息",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri"
+      ],
+      "cost": "£",
+      "sourceUrl": "https://www.rosslyncoffee.com/pages/our-locations",
+      "links": [
+        "https://www.rosslyncoffee.com",
+        "https://maps.google.com/?cid=11643883769093134917"
+      ],
+      "coordinates": [
+        -0.0890369,
+        51.5176899
+      ]
+    },
+    {
+      "id": "C33",
+      "tier": "C",
+      "name": "Scenery",
+      "subtitle": "Café and coffee roastery",
+      "subtitleZh": "咖啡馆兼烘焙坊",
+      "zone": "southbank",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "The café of Scenery Coffee inside the Jerwood Space, a former Victorian school. It serves coffee roasted on site, with breakfast and small-plate lunches on weekdays and brunch on Saturdays.",
+      "whyZh": "Scenery Coffee 在 Jerwood Space（一所维多利亚时代旧校舍）里开的咖啡馆，供应自家烘焙的咖啡。工作日有早餐和小份午餐，周六有早午餐。",
+      "address": "Jerwood Space, 171 Union St, London SE1 0LN",
+      "hours": "Mon–Fri 07:30–16:00; Sat 09:00–15:00; closed Sun",
+      "hoursZh": "周一至周五 07:30–16:00；周六 09:00–15:00；周日休息",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "cost": "£",
+      "links": [
+        "https://scenery.coffee/pages/cafe",
+        "https://maps.google.com/?cid=7975589469022448614"
+      ],
+      "coordinates": [
+        -0.0992968,
+        51.5036648
+      ]
+    },
+    {
+      "id": "C34",
+      "tier": "C",
+      "name": "Special Guests Coffee",
+      "subtitle": "Specialty coffee shop",
+      "subtitleZh": "精品咖啡店",
+      "zone": "west-end",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A specialty coffee shop in Marylebone with an espresso menu, including a low-caffeine option, and a filter bar pouring about a dozen rotating single-origin coffees. A few baked goods are on sale, and bags of beans to take home.",
+      "whyZh": "玛丽勒本的精品咖啡店，意式咖啡款式多，还有低咖啡因选择，滤泡吧台供应十来款轮换的单品咖啡。另有少量烘焙点心，也可买咖啡豆带回家。",
+      "address": "8 Aybrook St, London W1U 4AW",
+      "hours": "Mon–Fri 07:30–17:00; Sat–Sun 08:00–16:00",
+      "hoursZh": "周一至周五 07:30–17:00；周六至周日 08:00–16:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "note": "Seats are limited; quieter times are easier for a table.",
+      "noteZh": "座位有限，避开高峰时段更容易找到位子。",
+      "sourceUrl": "https://www.specialguestscoffee.com/pages/location",
+      "links": [
+        "https://www.specialguestscoffee.com/",
+        "https://maps.google.com/?cid=12971725919474094831"
+      ],
+      "coordinates": [
+        -0.1528896,
+        51.5191276
+      ]
+    },
+    {
+      "id": "C35",
+      "tier": "C",
+      "name": "Swift Soho",
+      "subtitle": "Cocktail bar",
+      "subtitleZh": "鸡尾酒吧",
+      "by": "Bobby Hiddleston and Mia Johansson",
+      "zone": "west-end",
+      "themes": [
+        "drinks"
+      ],
+      "why": "A two-level Old Compton Street cocktail bar: a relaxed upstairs room for aperitivo and wine, and a darker whisky bar downstairs with regular live jazz sessions.",
+      "whyZh": "老康普顿街上的两层鸡尾酒吧：楼上轻松随意，适合喝开胃酒和葡萄酒；楼下更昏暗，是威士忌吧，定期有现场爵士演出。",
+      "address": "12 Old Compton St, London W1D 4TQ",
+      "hours": "Mon–Sat 15:00–00:00; Sun 15:00–23:00",
+      "hoursZh": "周一至周六 15:00–00:00；周日 15:00–23:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "note": "Walk-ins welcome, reservations recommended; over-21s only. Aperitivo Hour runs daily until 18:00 in the upstairs bar.",
+      "noteZh": "可直接入店，建议订位；仅限 21 岁以上。楼上酒吧每天营业开始至 18:00 为开胃酒时段。",
+      "sourceUrl": "https://www.timeout.com/london/bars-and-pubs/swift",
+      "links": [
+        "https://www.soho.barswift.com",
+        "https://maps.google.com/?cid=3906651176603898167"
+      ],
+      "coordinates": [
+        -0.1300036,
+        51.5137542
+      ]
+    },
+    {
+      "id": "C36",
+      "tier": "C",
+      "name": "T4 Waterloo",
+      "subtitle": "Taiwanese bubble tea",
+      "subtitleZh": "台式珍珠奶茶",
+      "zone": "southbank",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A branch of the Taiwanese bubble tea chain on Lower Marsh. A quick stop for a milk tea with pearls or a fruit tea while you wander around Waterloo.",
+      "whyZh": "台湾连锁珍珠奶茶店在滑铁卢 Lower Marsh 的分店。逛滑铁卢一带时，可以顺路买一杯珍珠奶茶或水果茶。",
+      "address": "100 Lower Marsh, London SE1 7AB",
+      "cost": "£",
+      "links": [
+        "https://www.t4.co.uk/",
+        "https://maps.google.com/?cid=5550246266094515432"
+      ],
+      "coordinates": [
+        -0.1119796,
+        51.5012879
+      ]
+    },
+    {
+      "id": "C37",
+      "tier": "C",
+      "name": "The Dusty Knuckle",
+      "subtitle": "Bakery and café",
+      "subtitleZh": "面包房与咖啡馆",
+      "zone": "east",
+      "themes": [
+        "sweets"
+      ],
+      "why": "A bakery-café in the Abbot Street car park in Dalston, serving bread, pastries and filled sandwiches. It also runs a training programme for young people.",
+      "whyZh": "位于 Dalston Abbot Street 停车场的面包房咖啡馆，供应面包、糕点和夹馅三明治。店里还开办面向年轻人的培训项目。",
+      "address": "Abbot St Car Park, London E8 3DP",
+      "hours": "Daily 08:00–15:30",
+      "hoursZh": "每天 08:00–15:30",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "price": "Breakfast from £3.60; lunch sandwiches about £11–12.50",
+      "priceZh": "早餐 £3.60 起；午餐三明治约 £11–12.50",
+      "note": "Weekend bread and pastries can be pre-ordered for collection until midnight on the Friday before.",
+      "noteZh": "周末的面包和糕点可提前预订自取，须在前一个周五午夜前下单。",
+      "links": [
+        "https://www.thedustyknuckle.com/dalston-cafe",
+        "https://maps.google.com/?cid=4645769034040419847"
+      ],
+      "coordinates": [
+        -0.074094,
+        51.5470859
+      ]
+    },
+    {
+      "id": "C38",
+      "tier": "C",
+      "name": "The Original Maids of Honour",
+      "subtitle": "Historic tearoom and bakery",
+      "subtitleZh": "老字号茶室与烘焙坊",
+      "zone": "further",
+      "themes": [
+        "sweets",
+        "coffee-tea"
+      ],
+      "why": "A long-running Kew Road tearoom and bakery, known for its small Maids of Honour tarts, made to a recipe the shop keeps secret. Come for the tarts with a pot of tea, or book one of the set afternoon teas.",
+      "whyZh": "邱园路上历史悠久的茶室兼烘焙坊，以小巧的“宫女挞”闻名，配方至今保密。可以来配一壶茶尝尝挞，也可以预订套餐下午茶。",
+      "address": "288 Kew Rd, Richmond TW9 3DU",
+      "hours": "Daily 09:00–18:00",
+      "hoursZh": "每天 09:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "price": "Tables 12:00–15:00 have a £20 per person minimum spend, plus 12.5% service",
+      "priceZh": "12:00–15:00 入座每人最低消费 £20，另加 12.5% 服务费",
+      "note": "Book set teas online; walk-ins are seated first come, first served.",
+      "noteZh": "套餐下午茶可网上预订；无预约的客人按先到先得入座。",
+      "sourceUrl": "https://theoriginalmaidsofhonour.co.uk/pages/contact-us",
+      "links": [
+        "https://theoriginalmaidsofhonour.co.uk/",
+        "https://maps.google.com/?cid=13375049249589932990"
+      ],
+      "coordinates": [
+        -0.2884071,
+        51.4808019
+      ]
+    },
+    {
+      "id": "C39",
+      "tier": "C",
+      "name": "WatchHouse Roastery",
+      "subtitle": "Coffee roastery and café",
+      "subtitleZh": "咖啡烘焙坊与咖啡馆",
+      "zone": "southbank",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "WatchHouse's own roastery, in a railway arch by Maltby Street Market. Coffee is roasted behind a glass wall, and the counter sells coffee, bakes and sandwiches.",
+      "whyZh": "WatchHouse 自己的烘焙坊，位于 Maltby Street 市集旁的铁路拱洞里。咖啡在玻璃墙后烘焙，柜台供应咖啡、烘焙点心和三明治。",
+      "address": "36 Maltby St, London SE1 3PA",
+      "hours": "Mon–Fri 07:30–16:30; Sat–Sun 08:00–18:00",
+      "hoursZh": "周一至周五 07:30–16:30；周六至周日 08:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "note": "Tables are first come, first served, and dogs are welcome.",
+      "noteZh": "座位先到先得，欢迎带狗。",
+      "links": [
+        "https://watchhouse.com/blogs/locations/roastery",
+        "https://maps.google.com/?cid=12317235424366833295"
+      ],
+      "coordinates": [
+        -0.0764027,
+        51.4997059
+      ]
+    }
+  ]
+}

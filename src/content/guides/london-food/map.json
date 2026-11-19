@@ -1,0 +1,28 @@
+{
+  "_comment": "Base maps: Web-Mercator crops rendered from OpenFreeMap's vector tiles of OpenStreetMap data. Do not edit: the numbers must match the images. 底图参数，请勿修改。",
+  "views": [
+    {
+      "id": "city",
+      "name": "Central London",
+      "nameZh": "伦敦市中心",
+      "file": "city.jpg",
+      "z": 14,
+      "originX": 2094647,
+      "originY": 1393952,
+      "width": 1981,
+      "height": 1555
+    },
+    {
+      "id": "region",
+      "name": "Greater London",
+      "nameZh": "大伦敦",
+      "file": "region.jpg",
+      "z": 11,
+      "originX": 261328,
+      "originY": 173840,
+      "width": 1195,
+      "height": 984
+    }
+  ],
+  "attribution": "© OpenStreetMap contributors · OpenFreeMap © OpenMapTiles Data from OpenStreetMap"
+}
