@@ -506,6 +506,7 @@ at the top of the repo (it's gitignored; never put real ones there):
 GUIDES_PASSWORD=made-up-visitor-pass
 GUIDES_PASSWORD_FOTOFILMIC=made-up-participant-pass
 GUIDES_PASSWORD_FOOD=made-up-guest-pass
+GUIDES_PASSWORD_LONDON=made-up-london-pass
 GUIDES_COOKIE_SECRET=made-up-key-of-32-or-more-characters
 ```
 

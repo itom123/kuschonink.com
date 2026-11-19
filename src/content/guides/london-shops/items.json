@@ -1,0 +1,602 @@
+{
+  "_comment": "The places, checked in November 2026 against their own pages and the press. 地点，2026年11月对照各家官网和媒体报道核实。",
+  "items": [
+    {
+      "id": "A1",
+      "tier": "A",
+      "name": "Columbia Road Flower Market",
+      "subtitle": "Sunday flower market",
+      "subtitleZh": "周日花卉市集",
+      "zone": "east",
+      "themes": [
+        "markets"
+      ],
+      "why": "Sunday street market in Bethnal Green with flower and plant stalls, set on a Victorian street that also has more than 60 independent shops, cafés and galleries. Good for browsing art, vintage and homeware as well as buying flowers.",
+      "whyZh": "贝思纳尔格林的周日街头市集，有花卉和植物摊位，所在的维多利亚式街道上还有 60 多家独立小店、咖啡馆和画廊。除了买花，也适合逛艺术、古着和家居小店。",
+      "address": "Columbia Rd, London E2 7RG",
+      "hours": "Sun 08:00–15:00 (closing time approximate)",
+      "hoursZh": "周日 08:00–15:00（结束时间为大约）",
+      "open": [
+        "sun"
+      ],
+      "note": "Some shops also open in the week. The shops stay open late, 17:00–21:00, on Wednesdays 25 Nov and 2, 9 and 16 Dec 2026, with the road closed to traffic.",
+      "noteZh": "部分小店平日也营业。2026 年 11 月 25 日及 12 月 2、9、16 日（周三）店铺延长营业至 17:00–21:00，街道禁止车辆通行。",
+      "links": [
+        "https://www.columbiaroad.info",
+        "https://maps.google.com/?cid=15833224257972022099"
+      ],
+      "coordinates": [
+        -0.0698257,
+        51.529134
+      ]
+    },
+    {
+      "id": "B1",
+      "tier": "B",
+      "name": "Aperture UK",
+      "subtitle": "Used camera shop and gallery",
+      "subtitleZh": "二手相机店与画廊",
+      "zone": "west-end",
+      "themes": [
+        "photo"
+      ],
+      "why": "Fitzrovia shop for pre-owned cameras and lenses, with a Leica section, plus camera repair, fine art printing and a small gallery for photo exhibitions and print sales.",
+      "whyZh": "位于菲茨罗维亚的二手相机店，主营二手相机和镜头，设有徕卡专区，同时提供相机维修、艺术微喷打印，店内的小画廊举办摄影展并出售照片。",
+      "address": "17a&b Riding House St, London W1W 7DT",
+      "hours": "Mon–Sat 12:00–18:30",
+      "hoursZh": "周一至周六 12:00–18:30",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "note": "Film processing is done at its other premises, 27 Rathbone Place.",
+      "noteZh": "胶卷冲洗在其另一处店面（27 Rathbone Place）进行。",
+      "links": [
+        "https://www.apertureuk.com",
+        "https://maps.google.com/?cid=3758288937423651839"
+      ],
+      "coordinates": [
+        -0.1414957,
+        51.5184082
+      ]
+    },
+    {
+      "id": "B2",
+      "tier": "B",
+      "name": "Cloth House",
+      "subtitle": "Fabric and vintage textiles studio",
+      "subtitleZh": "布料与古董织物工作室",
+      "zone": "north",
+      "themes": [
+        "fabrics"
+      ],
+      "why": "Family-run fabric specialist with a studio in Camden, selling cottons, linens, wools, vintage textiles and trims, plus haberdashery and homeware. You visit by appointment, apart from one open Saturday a month.",
+      "whyZh": "家族经营的布料专卖，工作室设在卡姆登，卖棉、麻、羊毛面料、古董织物和花边，另有缝纫配件和家居用品。需预约参观，每月有一个周六可免预约入内。",
+      "address": "130 Royal College St, London NW1 0TA",
+      "hours": "Mon–Thu 10:00–16:00, by appointment only; one Saturday a month, no appointment needed",
+      "hoursZh": "周一至周四 10:00–16:00，仅限预约；每月一个周六，无需预约",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu"
+      ],
+      "note": "Phone 020 7485 6247 to book. The studio is closed on bank holidays; its Visit Us page names Saturday 5 December as the next open Saturday.",
+      "noteZh": "请致电 020 7485 6247 预约。公共假日休息；官网参观页面注明下一个开放的周六为 12 月 5 日。",
+      "sourceUrl": "https://www.clothhouse.com/pages/visit-us",
+      "links": [
+        "https://www.clothhouse.com",
+        "https://maps.google.com/?cid=11308169162475498783"
+      ],
+      "coordinates": [
+        -0.1368906,
+        51.5402634
+      ]
+    },
+    {
+      "id": "B3",
+      "tier": "B",
+      "name": "Frock Me Vintage Fair",
+      "subtitle": "Vintage fashion fair",
+      "subtitleZh": "古着时装市集",
+      "by": "Matthew Adams",
+      "zone": "west",
+      "themes": [
+        "markets"
+      ],
+      "why": "A one-day fair of 60-plus dealers in vintage and antique clothes, jewellery and textiles, running since 1997. It's held on selected Sundays at a few West London halls.",
+      "whyZh": "为期一天的古着市集，有 60 多位商家出售复古和古董服饰、珠宝与织物，自 1997 年起举办。在西伦敦几处礼堂的部分周日举行。",
+      "address": "Chelsea Old Town Hall, King's Rd, London SW3 5EE",
+      "hours": "Sun 6 December 2026, 11:00–17:30",
+      "hoursZh": "2026 年 12 月 6 日（周日）11:00–17:30",
+      "price": "£8 adults; £5 students with ID from noon; under-16s free when accompanied",
+      "priceZh": "成人 £8；学生凭证件自中午起 £5；16 岁以下儿童在成人陪同下免费",
+      "note": "The venue changes between fairs (Chelsea Old Town Hall, Kensington Town Hall, Royal Horticultural Halls' Lindley Hall), so check the date and place before you go. Pre-booking is advised.",
+      "noteZh": "每场市集的举办地点不同（切尔西老市政厅、肯辛顿市政厅、皇家园艺学会 Lindley 展厅），出发前请先核对日期和地点。建议提前订票。",
+      "sourceUrl": "https://frockmevintagefashion.com/fair-dates",
+      "links": [
+        "https://frockmevintagefashion.com",
+        "https://maps.google.com/?cid=15686590946314361967"
+      ],
+      "coordinates": [
+        -0.1682689,
+        51.4874538
+      ]
+    },
+    {
+      "id": "B4",
+      "tier": "B",
+      "name": "Goodhood",
+      "subtitle": "Lifestyle concept store",
+      "subtitleZh": "生活方式买手店",
+      "zone": "east",
+      "themes": [
+        "fashion"
+      ],
+      "why": "Independent Shoreditch store mixing clothes, homeware, beauty, records and books, with Japanese labels and its own Lifestore range. It now has a larger shop just off Brick Lane.",
+      "whyZh": "肖迪奇的独立买手店，服饰、家居、美妆、唱片和书都有，也卖日本品牌和自家的 Lifestore 系列。现在搬进了砖巷旁一间更大的店。",
+      "address": "15 Hanbury St, London E1 6QR",
+      "hours": "Mon–Sat 11:00–19:00; Sun 11:00–18:00",
+      "hoursZh": "周一至周六 11:00–19:00；周日 11:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "sourceUrl": "https://www.timeout.com/london/shopping/the-goodhood-store",
+      "links": [
+        "https://www.goodhoodstore.com",
+        "https://maps.google.com/?cid=16853953334302041172"
+      ],
+      "coordinates": [
+        -0.0736023,
+        51.5204697
+      ]
+    },
+    {
+      "id": "B5",
+      "tier": "B",
+      "name": "Hedonism Wines",
+      "subtitle": "Fine wine and spirits shop",
+      "subtitleZh": "精品葡萄酒与烈酒店",
+      "zone": "west-end",
+      "themes": [
+        "food-drink"
+      ],
+      "why": "A large Mayfair wine and spirits merchant stocking fine and rare bottles, Champagne and whisky, with a few bottles under £30 among them. Worth a look even if you are only browsing.",
+      "whyZh": "梅菲尔一家规模很大的葡萄酒与烈酒专卖店，出售精品和稀有酒款、香槟和威士忌，也有少数三十英镑以下的酒。就算只是逛逛也值得进去看看。",
+      "address": "3-7 Davies St, London W1K 3LD",
+      "hours": "Mon–Sat 10:00–21:00; Sun 12:00–18:00",
+      "hoursZh": "周一至周六 10:00–21:00；周日 12:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "note": "Tastings are listed on the site but were not on sale when checked.",
+      "noteZh": "网站上列有品酒活动，但查看时暂无可订的票。",
+      "sourceUrl": "https://hedonism.co.uk",
+      "links": [
+        "https://hedonism.co.uk",
+        "https://maps.google.com/?cid=5626408847077113933"
+      ],
+      "coordinates": [
+        -0.1476107,
+        51.5107461
+      ]
+    },
+    {
+      "id": "B6",
+      "tier": "B",
+      "name": "MacCulloch & Wallis",
+      "subtitle": "Fabrics and haberdashery",
+      "subtitleZh": "布料与缝纫配件店",
+      "zone": "west-end",
+      "themes": [
+        "fabrics"
+      ],
+      "why": "Soho shop for fabrics, trimmings, threads and haberdashery, with millinery supplies and knitting and crochet materials too. It's a good stop for dressmaking, costume and craft supplies.",
+      "whyZh": "苏荷区的布料与缝纫配件店，除布料外还有花边饰带、线材、制帽材料以及编织和钩针用品，适合找裁缝、服装和手工所需的材料。",
+      "address": "25-26 Poland St, London W1F 8QN",
+      "hours": "Mon–Fri 10:00–18:00; Sat 10:30–17:00; Sun closed",
+      "hoursZh": "周一至周五 10:00–18:00；周六 10:30–17:00；周日休息",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "note": "Closed on bank holidays and Easter Saturday.",
+      "noteZh": "公共假日和复活节周六不营业。",
+      "links": [
+        "https://www.macculloch-wallis.co.uk",
+        "https://maps.google.com/?cid=13772330434191814386"
+      ],
+      "coordinates": [
+        -0.1374071,
+        51.5153089
+      ]
+    },
+    {
+      "id": "B7",
+      "tier": "B",
+      "name": "Mr CAD Photographic",
+      "subtitle": "Used film camera shop",
+      "subtitleZh": "二手胶片相机店",
+      "zone": "west",
+      "themes": [
+        "photo"
+      ],
+      "why": "Family-run Pimlico shop, going since 1962, for used film cameras, lenses and darkroom kit, plus fresh and out-of-date film in formats from 35mm to 10x8. It also does part exchange.",
+      "whyZh": "位于皮姆利科的家族经营店，1962 年开业，卖二手胶片相机、镜头和暗房设备，也有新鲜和过期胶卷，规格从 35mm 到 10x8 都有，还接受以旧换新。",
+      "address": "12 Upper Tachbrook St, Pimlico, London SW1V 1SH",
+      "hours": "Mon–Fri 10:00–17:30; closed Sat, Sun and bank holidays",
+      "hoursZh": "周一至周五 10:00–17:30；周六、周日及公共假日休息",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri"
+      ],
+      "note": "Closed at weekends, so go on a weekday. Stock is also listed on its online shop.",
+      "noteZh": "周末不营业，请工作日前往。店里的库存也在网店上架。",
+      "sourceUrl": "https://www.mrcad.co.uk/?page_id=15",
+      "links": [
+        "https://www.mrcad.co.uk",
+        "https://maps.google.com/?cid=13251390518481489581"
+      ],
+      "coordinates": [
+        -0.1397169,
+        51.4932581
+      ]
+    },
+    {
+      "id": "B8",
+      "tier": "B",
+      "name": "Orya Textiles",
+      "subtitle": "Fabric shop",
+      "subtitleZh": "布料店",
+      "zone": "west",
+      "themes": [
+        "fabrics"
+      ],
+      "why": "Family-run fabric shop on Goldhawk Road, the Shepherd's Bush street lined with cloth shops. It sources fabrics from Italy, Germany, Switzerland, India and the UK, and says it supplies film, TV and fashion customers as well as home sewers.",
+      "whyZh": "金鹰路（牧羊人丛林区一条布料店林立的街）上的家族经营布料店，面料来自意大利、德国、瑞士、印度和英国，店家称客户既有影视和时装行业，也有家庭缝纫爱好者。",
+      "address": "32 Goldhawk Rd, London W12 8DH",
+      "hours": "Mon–Sat 10:00–18:00; Sun closed",
+      "hoursZh": "周一至周六 10:00–18:00；周日休息",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "sourceUrl": "https://www.oryatextiles.com/customer-service",
+      "links": [
+        "https://www.oryatextiles.com",
+        "https://maps.google.com/?cid=12897857527125173485"
+      ],
+      "coordinates": [
+        -0.2257477,
+        51.5026907
+      ]
+    },
+    {
+      "id": "B9",
+      "tier": "B",
+      "name": "Park Cameras London",
+      "subtitle": "Camera shop",
+      "subtitleZh": "相机店",
+      "zone": "west-end",
+      "themes": [
+        "photo"
+      ],
+      "why": "Central London camera shop with new and second-hand bodies, lenses and kit to handle, plus trade-ins, repairs, sensor cleaning and passport photos. In 2025 it moved to a brighter one-floor shop a short walk from its old spot on the same street.",
+      "whyZh": "伦敦市中心的相机店，新旧机身、镜头和配件都可以上手试，还提供以旧换新、维修、传感器清洁和护照照片服务。2025 年搬到同一条街上一间更明亮的单层新店，离旧址不远。",
+      "address": "34 Rathbone Pl, London W1T 1JN",
+      "hours": "Mon–Wed 10:00–18:30; Thu 10:00–19:30; Fri–Sat 10:00–18:30; Sun 11:00–17:00",
+      "hoursZh": "周一至周三 10:00–18:30；周四 10:00–19:30；周五至周六 10:00–18:30；周日 11:00–17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "note": "Bank-holiday and Christmas hours differ, so check the shop's page before a festive visit.",
+      "noteZh": "公共假日和圣诞期间营业时间不同，节日前后出行请先查看店铺页面。",
+      "links": [
+        "https://www.parkcameras.com/park-cameras-london-store/",
+        "https://maps.google.com/?cid=3046848418671613720"
+      ],
+      "coordinates": [
+        -0.1343543,
+        51.5175368
+      ]
+    },
+    {
+      "id": "B10",
+      "tier": "B",
+      "name": "Regent Sounds",
+      "subtitle": "Guitar shop",
+      "subtitleZh": "吉他店",
+      "zone": "west-end",
+      "themes": [
+        "music"
+      ],
+      "why": "Guitar shop on Denmark Street, the old London music-shop row, selling new and second-hand electric, acoustic and bass guitars plus amps, pedals and strings. It also buys or takes in trade your old gear.",
+      "whyZh": "位于丹麦街（伦敦老牌乐器街）的吉他店，新旧电吉他、民谣吉他和贝斯都有，另有音箱、效果器和琴弦，也收购或置换旧乐器。",
+      "address": "4 Denmark St, London WC2H 8LP",
+      "hours": "Mon–Sat 10:00–19:00; Sun 11:00–17:00",
+      "hoursZh": "周一至周六 10:00–19:00；周日 11:00–17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "note": "Click and collect is offered, and you can email photos of gear you want to sell or trade in for a price.",
+      "noteZh": "支持线上下单到店自提；想出售或置换乐器，可以先发照片到店里报价。",
+      "links": [
+        "https://regentsounds.com",
+        "https://maps.google.com/?cid=764060356406621120"
+      ],
+      "coordinates": [
+        -0.1291873,
+        51.5153161
+      ]
+    },
+    {
+      "id": "B11",
+      "tier": "B",
+      "name": "Shepherds",
+      "subtitle": "Fine papers and bookbinding supplies",
+      "subtitleZh": "艺术纸与装帧材料店",
+      "zone": "west",
+      "themes": [
+        "art-supplies"
+      ],
+      "why": "Shop on Gillingham Street selling fine and decorative papers, from marbled sheets to Japanese washi, plus bookbinding materials, archival boxes, inks, pens and journals. The same firm runs a bookbinding workshop.",
+      "whyZh": "位于吉林厄姆街的店铺，卖大理石纹纸到日本和纸等各类艺术纸，还有装帧材料、档案盒、墨水、钢笔和笔记本。同一家公司也经营手工装帧工坊。",
+      "address": "30 Gillingham St, Pimlico, London SW1V 1HU",
+      "hours": "Mon–Fri 10:00–18:00; Sat 10:00–17:00; Sun and bank holidays closed",
+      "hoursZh": "周一至周五 10:00–18:00；周六 10:00–17:00；周日及公共假日休息",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "sourceUrl": "https://www.bookbinding.co.uk/",
+      "links": [
+        "https://www.shepherds-arts.co.uk",
+        "https://maps.google.com/?cid=3591363758370934991"
+      ],
+      "coordinates": [
+        -0.1423343,
+        51.4936967
+      ]
+    },
+    {
+      "id": "B12",
+      "tier": "B",
+      "name": "The Labelled Shop",
+      "subtitle": "Labelled cases and pouches",
+      "subtitleZh": "标签收纳包专门店",
+      "by": "Anya Hindmarch",
+      "zone": "west",
+      "themes": [
+        "fashion"
+      ],
+      "why": "A small Anya Hindmarch shop on Pont Street built around colourful pouches and cases with labelled compartments, for sorting anything from make-up to office kit. An in-house embosser can personalise pieces.",
+      "whyZh": "Anya Hindmarch 在 Pont Street 的小店，主打色彩鲜亮、带标签分格的收纳包，化妆品到办公用品都能分门别类。店内有压花服务，可以定制字母。",
+      "address": "14 Pont St, London SW1X 9EN",
+      "hours": "Mon–Sat 10:00–18:00; Sun 12:00–17:00",
+      "hoursZh": "周一至周六 10:00–18:00；周日 12:00–17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "note": "Part of Anya Hindmarch's cluster of small shops on Pont Street; the brand's page also gives Sunday and bank-holiday hours of 12:00–17:00.",
+      "noteZh": "它是 Anya Hindmarch 在 Pont Street 上几家小店中的一家；品牌页面注明周日及公共假日营业 12:00–17:00。",
+      "sourceUrl": "https://www.anyahindmarch.com/en-GB/stores",
+      "links": [
+        "https://www.anyahindmarch.com/pages/the-labelled-shop",
+        "https://maps.google.com/?cid=11644567686554439933"
+      ],
+      "coordinates": [
+        -0.1570987,
+        51.4974773
+      ]
+    },
+    {
+      "id": "C1",
+      "tier": "C",
+      "name": "Arc'teryx Piccadilly",
+      "subtitle": "Technical outdoor clothing",
+      "subtitleZh": "专业户外服饰",
+      "zone": "west-end",
+      "themes": [
+        "fashion"
+      ],
+      "why": "The outdoor label's Piccadilly store, selling its jackets, layers and packs. It also offers product support for gear care and warranty questions, and puts on clinics, talks and run clubs.",
+      "whyZh": "这家户外品牌在皮卡迪利大街的门店，卖冲锋衣、内外层服装和背包，还提供装备保养和保修咨询，并举办讲座、训练营和跑团活动。",
+      "address": "212 Piccadilly, St. James's, London W1J 9HL",
+      "hours": "Mon–Sat 10:00–19:00; Sun 11:30–17:30",
+      "hoursZh": "周一至周六 10:00–19:00；周日 11:30–17:30",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "links": [
+        "https://stores.arcteryx.com/piccadilly",
+        "https://maps.google.com/?cid=2025269397196562200"
+      ],
+      "coordinates": [
+        -0.135389,
+        51.5093525
+      ]
+    },
+    {
+      "id": "C2",
+      "tier": "C",
+      "name": "Carhartt WIP Store London Covent Garden",
+      "subtitle": "Workwear-inspired streetwear",
+      "subtitleZh": "工装风街头服饰",
+      "zone": "west-end",
+      "themes": [
+        "fashion"
+      ],
+      "why": "Carhartt's Work In Progress line in a shop on Earlham Street, with jackets, tees, caps and everyday basics. A quick stop if you're already around Seven Dials.",
+      "whyZh": "Carhartt 旗下 Work In Progress 系列的门店，位于 Earlham Street，卖夹克、T 恤、帽子和日常基本款。人在七晷区一带时顺路逛逛即可。",
+      "address": "15-17 Earlham St, London WC2H 9LL",
+      "hours": "Mon–Sat 11:00–19:00; Sun 11:00–17:00",
+      "hoursZh": "周一至周六 11:00–19:00；周日 11:00–17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "links": [
+        "https://www.carhartt-wip.com/en-gb/stores/london-covent-garden",
+        "https://maps.google.com/?cid=3306370372079675390"
+      ],
+      "coordinates": [
+        -0.1276406,
+        51.5137728
+      ]
+    },
+    {
+      "id": "C3",
+      "tier": "C",
+      "name": "North End Road Market",
+      "subtitle": "Fulham street market",
+      "subtitleZh": "富勒姆街头市集",
+      "zone": "west",
+      "themes": [
+        "markets",
+        "food-drink"
+      ],
+      "why": "A traditional street market in Fulham with fruit and veg, fishmongers, a butcher and cheese stalls, plus clothes and food stalls. A local, everyday market rather than a destination, handy if you are near Fulham Broadway.",
+      "whyZh": "富勒姆的传统街头市集，有蔬果摊、鱼贩、肉铺和奶酪摊，也有服装和小吃摊。属于本地日常市集，并非必去景点，在富勒姆百老汇附近可以顺路逛逛。",
+      "address": "North End Rd, London SW6 1NW",
+      "hours": "Mon–Sat 08:00–18:00",
+      "hoursZh": "周一至周六 08:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "price": "Free to walk through",
+      "priceZh": "免费逛",
+      "note": "Closed Sundays; individual stalls keep their own hours.",
+      "noteZh": "周日休市；各摊位营业时间不一。",
+      "sourceUrl": "https://thenudge.com/north-end-road-market/",
+      "links": [
+        "https://maps.google.com/?cid=15572424113082978943"
+      ],
+      "coordinates": [
+        -0.2013055,
+        51.4840128
+      ]
+    },
+    {
+      "id": "C4",
+      "tier": "C",
+      "name": "Red Wing Shoe Store London",
+      "subtitle": "Heritage boot shop",
+      "subtitleZh": "经典靴履专卖店",
+      "zone": "west-end",
+      "themes": [
+        "fashion"
+      ],
+      "why": "Soho store of the American bootmaker, selling its boots and care products, with a resoling and repair service and a small archive room of vintage boots and memorabilia.",
+      "whyZh": "这家美国靴履品牌在苏荷区的门店，卖靴子和护理用品，提供换底和修理服务，还有一间陈列古董靴和纪念物的小型档案室。",
+      "address": "17 Newburgh St, Carnaby, London W1F 7RZ",
+      "hours": "Mon–Sat 11:00–18:00; Sun 12:00–17:00",
+      "hoursZh": "周一至周六 11:00–18:00；周日 12:00–17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "sourceUrl": "https://www.redwinglondon.com/pages/visit-us",
+      "links": [
+        "https://www.redwinglondon.com",
+        "https://maps.google.com/?cid=17715839111192520544"
+      ],
+      "coordinates": [
+        -0.1385558,
+        51.5133105
+      ]
+    },
+    {
+      "id": "C5",
+      "tier": "C",
+      "name": "Tian Tian Market 天天超市 Aldgate",
+      "subtitle": "Asian supermarket",
+      "subtitleZh": "亚洲超市",
+      "zone": "east",
+      "themes": [
+        "food-drink"
+      ],
+      "why": "Aldgate branch of a London chain of Asian supermarkets, stocking groceries, snacks and drinks from more than 25 Asian countries. Handy for stocking up near Aldgate.",
+      "whyZh": "天天超市在伦敦的连锁分店之一，位于奥尔德盖特，货架上有来自 25 个以上亚洲国家的食品、零食和饮品。适合在附近顺路补货。",
+      "address": "18 Piazza Walk, London E1 8ZN",
+      "sourceUrl": "https://www.tiantian.london/find-us",
+      "links": [
+        "https://www.tiantian.london",
+        "https://maps.google.com/?cid=9921176436081912478"
+      ],
+      "coordinates": [
+        -0.0685372,
+        51.5136614
+      ]
+    }
+  ]
+}

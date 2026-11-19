@@ -1,0 +1,174 @@
+{
+  "_comment": "Places to eat in London: a long-term guide, no dates. Tiers are the categories (A worth planning for, B everyday tables, C coffee, bakeries and bars); costs are the price levels; awards are MICHELIN Guide distinctions. See docs/GUIDES.md. 伦敦餐厅长期导览：分级就是类别（A 值得专程前往，B 日常餐厅，C 咖啡、面包店与酒吧），costs 是价位，awards 是米其林评级。",
+  "title": "Eating in London, from a bowl of ramen to a tasting menu.",
+  "titleZh": "在伦敦吃饭：从一碗拉面到品鉴菜单。",
+  "subtitle": "{items} places to eat, sorted by category and price. Choose a cuisine or a price, and book the popular ones ahead.",
+  "subtitleZh": "{items} 个吃饭的地方，按类别和价位分好。可以选菜系或价位；热门的餐厅请提前预订。",
+  "public": {
+    "title": "Eating in London",
+    "titleZh": "伦敦美食",
+    "subtitle": "Restaurants, cafés and bars",
+    "subtitleZh": "餐厅、咖啡馆与酒吧"
+  },
+  "listed": true,
+  "kinds": ["food"],
+  "city": "London",
+  "cityZh": "伦敦",
+  "timezone": "Europe/London",
+  "timezoneLabel": "London time",
+  "timezoneLabelZh": "伦敦时间",
+  "checked": "2026-11-19",
+  "tiers": [
+    { "id": "A", "name": "Worth planning for", "nameZh": "值得专程前往", "text": "Places in the MICHELIN Guide (★, Bib Gourmand, Guide) and other restaurants worth booking ahead.", "textZh": "米其林指南的餐厅（★、必比登、指南），以及其他值得提前预订的餐厅。", "weight": 3 },
+    { "id": "B", "name": "Everyday tables", "nameZh": "日常餐厅", "text": "Good restaurants for any day: noodles, hotpot, curry, small plates and neighbourhood favourites.", "textZh": "哪天都可以去的好餐厅：面馆、火锅、咖喱、小盘菜和街坊常去的小店。", "weight": 2 },
+    { "id": "C", "name": "Coffee, bakeries and bars", "nameZh": "咖啡、面包店与酒吧", "text": "Coffee, tea, bakeries, pastry and chocolate, and a few bars.", "textZh": "咖啡、茶、面包店、甜点和巧克力，还有几家酒吧。", "weight": 1 }
+  ],
+  "costs": [
+    { "id": "£", "text": "under £20 a head", "textZh": "人均 £20 以下" },
+    { "id": "££", "text": "£20–40 a head", "textZh": "人均 £20–40" },
+    { "id": "£££", "text": "£40–80 a head", "textZh": "人均 £40–80" },
+    { "id": "££££", "text": "over £80 a head", "textZh": "人均 £80 以上" }
+  ],
+  "awards": [
+    { "id": "3-stars", "name": "Three Michelin stars", "nameZh": "米其林三星", "short": "★★★", "shortZh": "★★★" },
+    { "id": "2-stars", "name": "Two Michelin stars", "nameZh": "米其林二星", "short": "★★", "shortZh": "★★" },
+    { "id": "1-star", "name": "One Michelin star", "nameZh": "米其林一星", "short": "★", "shortZh": "★" },
+    { "id": "bib", "name": "Bib Gourmand", "nameZh": "必比登推介", "short": "Bib", "shortZh": "必比登" },
+    { "id": "selected", "name": "In the Michelin Guide, without a star", "nameZh": "入选米其林指南（无星）", "short": "Guide", "shortZh": "指南" }
+  ],
+  "themes": [
+    { "id": "tasting", "name": "Tasting menus", "nameZh": "品鉴菜单" },
+    { "id": "british", "name": "Modern British and European", "nameZh": "现代英式与欧陆菜" },
+    { "id": "french", "name": "French", "nameZh": "法餐" },
+    { "id": "mediterranean", "name": "Italian, Spanish and Mediterranean", "nameZh": "意大利、西班牙及地中海菜" },
+    { "id": "japanese", "name": "Japanese", "nameZh": "日料" },
+    { "id": "korean", "name": "Korean", "nameZh": "韩餐" },
+    { "id": "chinese", "name": "Chinese", "nameZh": "中餐" },
+    { "id": "southeast-asian", "name": "Thai, Malaysian, Vietnamese and more", "nameZh": "泰国、马来西亚、越南等东南亚菜" },
+    { "id": "south-asian", "name": "Indian and Sri Lankan", "nameZh": "印度及斯里兰卡菜" },
+    { "id": "middle-eastern-african", "name": "Middle Eastern, Turkish and African", "nameZh": "中东、土耳其及非洲菜" },
+    { "id": "latin-american", "name": "Latin American", "nameZh": "拉丁美洲菜" },
+    { "id": "noodles", "name": "Noodles and ramen", "nameZh": "面食与拉面" },
+    { "id": "hotpot-grill", "name": "Hotpot and grills", "nameZh": "火锅与烤肉" },
+    { "id": "coffee-tea", "name": "Coffee and tea", "nameZh": "咖啡与茶" },
+    { "id": "sweets", "name": "Bakery, pastry and chocolate", "nameZh": "面包、甜点与巧克力" },
+    { "id": "drinks", "name": "Bars, wine and sake", "nameZh": "酒吧、葡萄酒与清酒" }
+  ],
+  "zones": [
+    { "id": "west-end", "name": "West End", "nameZh": "西区" },
+    { "id": "city", "name": "City and Clerkenwell", "nameZh": "伦敦城与克勒肯维尔" },
+    { "id": "east", "name": "Shoreditch and Hackney", "nameZh": "肖迪奇与哈克尼" },
+    { "id": "north", "name": "King's Cross and North", "nameZh": "国王十字与北伦敦" },
+    { "id": "southbank", "name": "South Bank and Bermondsey", "nameZh": "南岸与伯蒙德赛" },
+    { "id": "west", "name": "Kensington, Chelsea and West", "nameZh": "肯辛顿、切尔西与西伦敦" },
+    { "id": "south", "name": "South London", "nameZh": "南伦敦" },
+    { "id": "further", "name": "Further out", "nameZh": "更远一些" }
+  ],
+  "labels": {
+    "item": "Place to eat",
+    "itemZh": "餐厅",
+    "items": "Places to eat",
+    "itemsZh": "餐厅",
+    "subtitle": "Cuisine",
+    "subtitleZh": "菜式",
+    "by": "Chef",
+    "byZh": "主厨",
+    "tier": "Category",
+    "tierZh": "类别",
+    "theme": "Cuisine",
+    "themeZh": "菜系",
+    "cost": "Price",
+    "costZh": "价位",
+    "award": "Michelin Guide",
+    "awardZh": "米其林指南"
+  },
+  "texts": {
+    "about": {
+      "heading": "About this guide",
+      "headingZh": "关于本导览",
+      "paras": [
+        {
+          "text": "Places to eat in London, from a bowl of ramen to a tasting menu. They come from shared Google Maps lists, and each was checked in November 2026 against the restaurant's own pages, the MICHELIN Guide and the press.",
+          "textZh": "从一碗拉面到品鉴菜单，这里是在伦敦吃饭的地方。名单来自几份共享的 Google 地图列表，2026年11月逐一对照了餐厅官网、米其林指南和媒体报道。"
+        },
+        {
+          "text": "This guide has no dates: it grows over time. Nothing has been booked for you.",
+          "textZh": "本导览没有固定日期，会不断更新。没有代为预订任何餐厅。"
+        }
+      ]
+    },
+    "how": {
+      "heading": "How to use it",
+      "headingZh": "使用方法",
+      "items": [
+        {
+          "lead": "Category.",
+          "leadZh": "类别。",
+          "text": "Worth planning for: stars (★), Bib Gourmand and the guide's other picks (Guide), and other places to book ahead. Everyday tables: restaurants for any day. Coffee, bakeries and bars: coffee, tea, pastry, chocolate and a few bars.",
+          "textZh": "值得专程前往：星级（★）、必比登推介和指南的其他入选餐厅（指南），以及其他值得提前预订的餐厅。日常餐厅：哪天都可以去的餐厅。咖啡、面包店与酒吧：咖啡、茶、甜点、巧克力，还有几家酒吧。"
+        },
+        {
+          "lead": "Price.",
+          "leadZh": "价位。",
+          "text": "£ under £20 a head, ££ £20–40, £££ £40–80, ££££ over £80: food for one person, without drinks. The Price box shows one level at a time; Sort by can put the cheapest first.",
+          "textZh": "£ 人均 £20 以下，££ £20–40，£££ £40–80，££££ £80 以上：一个人的餐费，不含酒水。“价位”框一次显示一个价位；“排序方式”可以把便宜的排在前面。"
+        },
+        {
+          "lead": "Cuisine.",
+          "leadZh": "菜系。",
+          "text": "Choose one in the Cuisine box, or type a dish, a name or a street in Find.",
+          "textZh": "在“菜系”框里选一种，或者在“查找”里输入菜名、店名或街道。"
+        },
+        {
+          "lead": "Booking.",
+          "leadZh": "预订。",
+          "text": "Popular places fill up weeks ahead, and some take walk-ins only. A service charge, usually 12.5%, is often added to the bill. Check the opening hours before you go.",
+          "textZh": "热门餐厅往往要提前几周预订，也有些只接待不预约的客人。账单里常常已经加了服务费，一般是 12.5%。出发前请先确认营业时间。"
+        }
+      ]
+    },
+    "prices": {
+      "heading": "Prices and distinctions",
+      "headingZh": "价格与评级",
+      "paras": [
+        {
+          "text": "Prices are those the restaurant or the MICHELIN Guide gave in November 2026. Menus change with the seasons, so take them as a guide. Stars, Bib Gourmand and Guide picks are as the MICHELIN Guide's website (Great Britain & Ireland) showed them in November 2026.",
+          "textZh": "价格以2026年11月餐厅或米其林指南公布的为准。菜单随季节变化，仅供参考。星级、必比登推介和指南入选，以2026年11月米其林指南网站（英国及爱尔兰）显示的为准。"
+        }
+      ]
+    }
+  },
+  "links": [
+    {
+      "label": "MICHELIN Guide: restaurants in London",
+      "labelZh": "米其林指南：伦敦餐厅",
+      "url": "https://guide.michelin.com/en/greater-london/london/restaurants"
+    },
+    {
+      "label": "OpenStreetMap: copyright and licence",
+      "labelZh": "OpenStreetMap：版权与许可",
+      "url": "https://www.openstreetmap.org/copyright"
+    },
+    {
+      "label": "OpenStreetMap: report a map issue",
+      "labelZh": "OpenStreetMap：报告地图问题",
+      "url": "https://www.openstreetmap.org/fixthemap"
+    }
+  ],
+  "credits": {
+    "points": "Points: shared Google Maps lists; addresses and details from each place's own pages, the MICHELIN Guide and the press",
+    "pointsZh": "点位：几份共享的 Google 地图列表；地址和信息来自各家官网、米其林指南和媒体报道"
+  },
+  "map": {
+    "centre": [-0.1300, 51.5065],
+    "heatRadius": 500
+  },
+  "sensitive": {
+    "public": []
+  },
+  "defaults": {
+    "price": "Prices change: check the restaurant's own page.",
+    "priceZh": "价格会变动，请以餐厅官网为准。"
+  },
+  "suggestions": false
+}

@@ -147,6 +147,8 @@ src/content/guides/
     map.json                     底图 base maps
     README.md                    速查表 a cheat-sheet
   paris-restaurants/             餐厅导览（长期，没有日期；第 13 节）the restaurant guide (long-term, no dates; section 13)
+  london-food/, london-art/,     伦敦的四份导览（长期，没有日期；街道级瓦片来自 OpenStreetMap）
+  london-books/, london-shops/   the four London guides (long-term, no dates; street tiles from OpenStreetMap)
 public/guides/paris-2026-11/
   img/                           图片 pictures
   map/                           底图图片 base-map images
@@ -473,6 +475,7 @@ both when the site is built.
 - `GUIDES_PASSWORD`：访客的密码；
 - `GUIDES_PASSWORD_FOTOFILMIC`：学员的密码；
 - `GUIDES_PASSWORD_FOOD`：餐厅导览（巴黎美食）的密码，读者显示为“来宾”（第 13 节）。没设之前，餐厅导览显示“尚未开放”；
+- `GUIDES_PASSWORD_LONDON`：四份伦敦导览（吃饭、艺术、书店、逛店）共用的密码，读者显示为“来宾”。没设之前，伦敦导览显示“尚未开放”；
 - `GUIDES_COOKIE_SECRET`（建议设置）：给登录 cookie 签名的密钥，这样别人伪造不了登录状态。
   用 32 个以上的随机字符，比如让密码管理器生成一个；不用记住它，也不要告诉别人。
   没设的话，Worker 用已有的 `TURNSTILE_SECRET` 签名；少于 24 个字符时，两个一起签名。
@@ -511,6 +514,9 @@ Passwords and keys **never** go in the repo. They are all Cloudflare secrets:
 - `GUIDES_PASSWORD_FOOD`: the restaurant guide's (Eating in Paris), whose
   readers show as Guest (section 13). Until it is set, that guide says it
   isn't open yet;
+- `GUIDES_PASSWORD_LONDON`: the one password of the four London guides (food,
+  art, bookshops, shops), whose readers show as Guest. Until it is set, they
+  say they aren't open yet;
 - `GUIDES_COOKIE_SECRET` (recommended): the key that signs the log-on
   cookies, so nobody can forge one. Use 32 or more random characters, for
   example from a password manager; you never need to remember it, and nobody

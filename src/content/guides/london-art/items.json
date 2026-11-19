@@ -1,0 +1,660 @@
+{
+  "_comment": "The places, checked in November 2026 against their own pages and the press. 地点，2026年11月对照各家官网和媒体报道核实。",
+  "items": [
+    {
+      "id": "A1",
+      "tier": "A",
+      "name": "Barbican Centre",
+      "subtitle": "Arts centre with gallery",
+      "subtitleZh": "综合艺术中心与美术馆",
+      "zone": "city",
+      "themes": [
+        "contemporary",
+        "modern",
+        "film"
+      ],
+      "why": "A Brutalist arts complex in the City with an art gallery, cinemas, a library and free-to-enter foyers. Go for the gallery's big exhibitions, then wander the terraces; the conservatory opens only on listed dates with free timed tickets.",
+      "whyZh": "位于伦敦金融城的粗野主义艺术综合体，设有美术馆、电影院、图书馆和可免费进入的大堂。可先看美术馆的大型展览，再去露台逛逛；温室只在指定日期开放，需预约免费限时票。",
+      "address": "Silk St, London EC2Y 8DS",
+      "hours": "Art Gallery: Tue–Wed 10:00–18:00, Thu–Fri 10:00–20:00, Sat–Sun 10:00–18:00; closed Mon and bank holidays. Building: Mon–Fri 08:00–23:00, Sat–Sun 09:00–23:00, bank holidays 11:00–23:00",
+      "hoursZh": "美术馆：周二至周三 10:00–18:00，周四至周五 10:00–20:00，周六至周日 10:00–18:00；周一及公共假日闭馆。大楼：周一至周五 08:00–23:00，周六至周日 09:00–23:00，公共假日 11:00–23:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "price": "Free to enter the building; Art Gallery exhibitions are ticketed",
+      "priceZh": "大楼可免费进入；美术馆展览需购票",
+      "note": "Last gallery entry is one hour before closing. Gallery shop opens an hour after the gallery.",
+      "noteZh": "美术馆最后入场为闭馆前一小时。商店比美术馆晚一小时开门。",
+      "sourceUrl": "https://www.barbican.org.uk/your-visit/general-info/opening-hours",
+      "links": [
+        "https://www.barbican.org.uk/",
+        "https://maps.google.com/?cid=14363916991236022080"
+      ],
+      "coordinates": [
+        -0.0937864,
+        51.5202077
+      ]
+    },
+    {
+      "id": "A2",
+      "tier": "A",
+      "name": "Cutty Sark",
+      "subtitle": "Historic clipper ship",
+      "subtitleZh": "历史帆船博物馆",
+      "zone": "south",
+      "themes": [
+        "historic"
+      ],
+      "why": "A restored nineteenth-century tea clipper in a dry dock at Greenwich that you can board and explore from deck to hold. It is a maritime heritage visit rather than an art one, but it sits beside the Greenwich museums and the river.",
+      "whyZh": "格林威治干船坞里的十九世纪茶叶快船，修复后可登船，从甲板一路参观到货舱。它属于航海遗产而非艺术，但紧邻格林威治的各家博物馆和泰晤士河。",
+      "address": "King William Walk, London SE10 9HT",
+      "hours": "Daily 10:00–17:00 (last entry 16:15); closed 24–26 Dec",
+      "hoursZh": "每天 10:00–17:00（最后入场 16:15）；12月24至26日闭馆",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "price": "Adult £22; child £11; members free",
+      "priceZh": "成人 £22；儿童 £11；会员免费",
+      "note": "Book online ahead to be sure of entry.",
+      "noteZh": "建议提前网上订票以确保入场。",
+      "sourceUrl": "https://www.rmg.co.uk/cutty-sark",
+      "links": [
+        "https://www.rmg.co.uk/cutty-sark",
+        "https://maps.google.com/?cid=12560196682964308232"
+      ],
+      "coordinates": [
+        -0.0095917,
+        51.4828646
+      ]
+    },
+    {
+      "id": "A3",
+      "tier": "A",
+      "name": "Museum of the Home",
+      "subtitle": "Museum of domestic life",
+      "subtitleZh": "家居生活博物馆",
+      "zone": "east",
+      "themes": [
+        "historic",
+        "design-craft",
+        "free"
+      ],
+      "why": "A free museum in restored almshouses on Kingsland Road, walking visitors through English living rooms from the 1600s to today. There is also a garden in the grounds.",
+      "whyZh": "位于金斯兰路修复后的济贫院建筑中的免费博物馆，带你走过从十七世纪至今的英国客厅。院内还有花园。",
+      "address": "136 Kingsland Rd, London E2 8EA",
+      "hours": "Tue–Sun 10:00–17:00; Mon closed except bank holidays (10:00–17:00)",
+      "hoursZh": "周二至周日 10:00–17:00；周一闭馆，公共假日周一 10:00–17:00 开放",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "price": "Free entry; no booking needed",
+      "priceZh": "免费入场；无需预约",
+      "note": "Closed on Mondays except bank holidays; check before a holiday visit.",
+      "noteZh": "周一闭馆（公共假日除外）；假期前往请先确认。",
+      "sourceUrl": "https://www.museumofthehome.org.uk/",
+      "links": [
+        "https://www.museumofthehome.org.uk/",
+        "https://maps.google.com/?cid=8239722753212478573"
+      ],
+      "coordinates": [
+        -0.07644,
+        51.5315265
+      ]
+    },
+    {
+      "id": "A4",
+      "tier": "A",
+      "name": "Orleans House Gallery",
+      "subtitle": "Free public gallery",
+      "subtitleZh": "免费公立美术馆",
+      "zone": "further",
+      "themes": [
+        "historic",
+        "contemporary",
+        "free"
+      ],
+      "why": "A free public gallery in a house in Twickenham, near the river, with changing exhibitions of art and sculpture. It suits a day out with a walk through the gardens.",
+      "whyZh": "特威克纳姆一栋宅邸里的免费公立美术馆，靠近泰晤士河，定期更换绘画与雕塑展览。适合配合花园散步安排一次出游。",
+      "address": "Orleans Rd, Twickenham TW1 3BL",
+      "hours": "Tue–Sun 10:00–17:00 (last entry 16:45); closed Mon except bank holiday Mondays",
+      "hoursZh": "周二至周日 10:00–17:00（最后入场 16:45）；周一闭馆，公共假日周一除外",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "price": "Free entry",
+      "priceZh": "免费入场",
+      "sourceUrl": "https://orleanshousegallery.org/",
+      "links": [
+        "https://orleanshousegallery.org/",
+        "https://maps.google.com/?cid=15330542248059834109"
+      ],
+      "coordinates": [
+        -0.3190546,
+        51.4473987
+      ]
+    },
+    {
+      "id": "A5",
+      "tier": "A",
+      "name": "South London Gallery",
+      "subtitle": "Free contemporary gallery",
+      "subtitleZh": "免费当代美术馆",
+      "zone": "south",
+      "themes": [
+        "contemporary",
+        "free"
+      ],
+      "why": "A free public gallery on Peckham Road with a steady programme of exhibitions by contemporary artists from Britain and abroad. Open late on Wednesdays.",
+      "whyZh": "位于佩卡姆路的免费公立美术馆，持续举办英国及国际当代艺术家的展览。周三开放至晚上9点。",
+      "address": "65–67 and 82 Peckham Rd, London SE5 8UH",
+      "hours": "Wed 12:00–21:00; Thu–Sun 12:00–18:00",
+      "hoursZh": "周三 12:00–21:00；周四至周日 12:00–18:00",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "price": "Free entry",
+      "priceZh": "免费入场",
+      "sourceUrl": "https://www.southlondongallery.org/",
+      "links": [
+        "https://www.southlondongallery.org/",
+        "https://maps.google.com/?cid=1004832988249252797"
+      ],
+      "coordinates": [
+        -0.079681,
+        51.474142
+      ]
+    },
+    {
+      "id": "A6",
+      "tier": "A",
+      "name": "Tate Britain",
+      "subtitle": "National gallery of British art",
+      "subtitleZh": "英国国家美术馆",
+      "zone": "west",
+      "themes": [
+        "historic",
+        "modern",
+        "free"
+      ],
+      "why": "Tate's riverside gallery for British art from the sixteenth century to today, with free entry to the collection displays. Special exhibitions are ticketed.",
+      "whyZh": "泰特旗下临河的英国艺术馆，收藏从十六世纪到当代的英国艺术，馆藏陈列免费参观。特别展览需购票。",
+      "address": "Millbank, London SW1P 4RG",
+      "hours": "Daily 10:00–18:00 (last entry 17:30)",
+      "hoursZh": "每天 10:00–18:00（最后入场 17:30）",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "price": "Free entry to the collection; exhibitions usually need a booked ticket",
+      "priceZh": "馆藏陈列免费；特别展览通常需预订门票",
+      "note": "The Millbank entrance is closed until 2027; use the Manton Entrance on Atterbury Street.",
+      "noteZh": "米尔班克入口关闭至2027年；请从阿特伯里街的曼顿入口进入。",
+      "sourceUrl": "https://www.tate.org.uk/visit/tate-britain",
+      "links": [
+        "https://www.tate.org.uk/visit/tate-britain",
+        "https://maps.google.com/?cid=17663075481774205088"
+      ],
+      "coordinates": [
+        -0.1277886,
+        51.4910621
+      ]
+    },
+    {
+      "id": "A7",
+      "tier": "A",
+      "name": "Tate Modern",
+      "subtitle": "Modern and contemporary art museum",
+      "subtitleZh": "现当代艺术博物馆",
+      "zone": "southbank",
+      "themes": [
+        "modern",
+        "contemporary",
+        "free"
+      ],
+      "why": "A free-to-enter museum of modern and contemporary art in a former power station on the South Bank, with the huge Turbine Hall and the underground Tanks. Open late on Fridays and Saturdays.",
+      "whyZh": "位于南岸前发电站内的现当代艺术博物馆，馆藏陈列免费，有宏大的涡轮大厅和地下的“油罐”空间。周五、周六开放至晚上9点。",
+      "address": "Bankside, London SE1 9TG",
+      "hours": "Sun–Thu 10:00–18:00; Fri–Sat 10:00–21:00 (last entry 30 minutes before closing)",
+      "hoursZh": "周日至周四 10:00–18:00；周五至周六 10:00–21:00（最后入场为闭馆前30分钟）",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "price": "Free entry to the collection; temporary exhibitions are ticketed",
+      "priceZh": "馆藏陈列免费；临时展览需购票",
+      "note": "Bags larger than cabin-bag size (55 x 40 x 20 cm) are not allowed; lockers are on Level 0 of the Blavatnik Building and do not take cash.",
+      "noteZh": "超过登机箱尺寸（55 x 40 x 20 厘米）的包不得带入；布拉瓦尼克大楼0层有储物柜，不收现金。",
+      "sourceUrl": "https://www.tate.org.uk/visit/tate-modern",
+      "links": [
+        "https://www.tate.org.uk/visit/tate-modern",
+        "https://maps.google.com/?cid=2304839309186538471"
+      ],
+      "coordinates": [
+        -0.0993564,
+        51.5075953
+      ]
+    },
+    {
+      "id": "B1",
+      "tier": "B",
+      "name": "Cooke Latham Gallery",
+      "subtitle": "Contemporary gallery",
+      "subtitleZh": "当代艺术画廊",
+      "by": "Clemency Cooke and Charlotte Latham",
+      "zone": "south",
+      "themes": [
+        "contemporary"
+      ],
+      "why": "A Battersea gallery in a nineteenth-century warehouse, opened in 2018, showing emerging and mid-career artists, often with large installations. Worth a visit if you are near Battersea Park.",
+      "whyZh": "位于巴特西、设在十九世纪仓库里的画廊，2018年开放，展出新晋和中生代艺术家，常有大型装置作品。若在巴特西公园附近，值得一访。",
+      "address": "41 Parkgate Rd, London SW11 4NP",
+      "hours": "Wed–Fri 11:00–17:00 during exhibitions",
+      "hoursZh": "展览期间 周三至周五 11:00–17:00",
+      "open": [
+        "wed",
+        "thu",
+        "fri"
+      ],
+      "note": "Other times by arrangement: email the gallery first.",
+      "noteZh": "其他时间需预约：请先发邮件联系画廊。",
+      "sourceUrl": "https://cookelathamgallery.com/contact",
+      "links": [
+        "https://cookelathamgallery.com/",
+        "https://maps.google.com/?cid=2610435958235836018"
+      ],
+      "coordinates": [
+        -0.1674101,
+        51.4791087
+      ]
+    },
+    {
+      "id": "B2",
+      "tier": "B",
+      "name": "David Zwirner",
+      "subtitle": "Contemporary gallery",
+      "subtitleZh": "当代艺术画廊",
+      "by": "David Zwirner",
+      "zone": "west-end",
+      "themes": [
+        "contemporary",
+        "modern"
+      ],
+      "why": "The only London space of a big international gallery, in Mayfair, with changing exhibitions of major living and twentieth-century artists. A short walk from the other Mayfair galleries.",
+      "whyZh": "一家大型国际画廊在伦敦唯一的展厅，位于梅菲尔，不定期举办在世及二十世纪重要艺术家的展览。离梅菲尔其他画廊都不远。",
+      "address": "24 Grafton St, London W1S 4EZ",
+      "hours": "Tue–Sat 10:00–18:00",
+      "hoursZh": "周二至周六 10:00–18:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "sourceUrl": "https://www.davidzwirner.com/galleries/london",
+      "links": [
+        "https://www.davidzwirner.com/",
+        "https://maps.google.com/?cid=12411474184384820441"
+      ],
+      "coordinates": [
+        -0.1430697,
+        51.509428
+      ]
+    },
+    {
+      "id": "B3",
+      "tier": "B",
+      "name": "DES BAINS",
+      "subtitle": "Contemporary gallery",
+      "subtitleZh": "当代艺术画廊",
+      "by": "Maria Valeria Biondo",
+      "zone": "west-end",
+      "themes": [
+        "contemporary"
+      ],
+      "why": "A small, minimal gallery near Oxford Circus for emerging artists and experimental work, with shows about borders, movement and belonging. Open Thursday to Saturday.",
+      "whyZh": "牛津圆环附近的极简风小画廊，面向新晋艺术家和实验性作品，展览常涉及边界、迁移与归属。周四至周六开放。",
+      "address": "20 Great Portland St, London W1W 8QR",
+      "hours": "Thu–Sat 11:00–18:00",
+      "hoursZh": "周四至周六 11:00–18:00",
+      "open": [
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "sourceUrl": "https://desbains.co.uk/",
+      "links": [
+        "https://desbains.co.uk/",
+        "https://maps.google.com/?cid=11421043852188221479"
+      ],
+      "coordinates": [
+        -0.1409473,
+        51.5164718
+      ]
+    },
+    {
+      "id": "B4",
+      "tier": "B",
+      "name": "LAMB",
+      "subtitle": "Contemporary gallery",
+      "subtitleZh": "当代艺术画廊",
+      "zone": "west-end",
+      "themes": [
+        "contemporary"
+      ],
+      "why": "A Mayfair gallery in an early eighteenth-century house, showing British and Latin American artists, with a video programme in the vaults. Its sister business sells furniture and objects by Latin American designers.",
+      "whyZh": "梅菲尔的画廊，设在一栋十八世纪初的老房子里，展出英国和拉美艺术家的作品，地下室有影像项目。姐妹品牌经营拉美设计师的家具与器物。",
+      "address": "32 St George St, London W1S 2FJ",
+      "links": [
+        "https://lambgallery.com/",
+        "https://maps.google.com/?cid=10729580717350919938"
+      ],
+      "coordinates": [
+        -0.1426928,
+        51.5122117
+      ]
+    },
+    {
+      "id": "B5",
+      "tier": "B",
+      "name": "Maureen Paley",
+      "subtitle": "Contemporary gallery",
+      "subtitleZh": "当代艺术画廊",
+      "by": "Maureen Paley",
+      "zone": "east",
+      "themes": [
+        "contemporary"
+      ],
+      "why": "The larger Bethnal Green space of a long-established contemporary gallery, with solo shows by British and international artists. Its first-floor room at 4 Herald Street is a few minutes' walk away.",
+      "whyZh": "这家老牌当代艺术画廊在贝思纳尔格林较大的一处展厅，展出英国及国际艺术家的个展。它在 Herald Street 4 号二楼的另一处展厅，步行几分钟即到。",
+      "address": "60 Three Colts Ln, London E2 6GQ",
+      "hours": "Wed–Sat 11:00–18:00",
+      "hoursZh": "周三至周六 11:00–18:00",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "note": "Wheelchair accessible.",
+      "noteZh": "无障碍通道。",
+      "links": [
+        "https://maureenpaley.com/",
+        "https://maps.google.com/?cid=695674717199382058"
+      ],
+      "coordinates": [
+        -0.0556656,
+        51.5245916
+      ]
+    },
+    {
+      "id": "B6",
+      "tier": "B",
+      "name": "MMX Gallery",
+      "subtitle": "Photography gallery",
+      "subtitleZh": "摄影画廊",
+      "zone": "south",
+      "themes": [
+        "photography",
+        "contemporary"
+      ],
+      "why": "A small photography gallery in a Victorian building on New Cross Road, showing established and emerging photographers. Viewing is currently by appointment only.",
+      "whyZh": "新十字路上维多利亚时期建筑里的小型摄影画廊，展出成名与新晋摄影师的作品。目前只接受预约参观。",
+      "address": "448 New Cross Rd, London SE14 6TY",
+      "note": "Open by appointment only; email or phone the gallery before you go.",
+      "noteZh": "目前仅限预约参观；出发前请先邮件或电话联系画廊。",
+      "sourceUrl": "https://www.mmxgallery.com/contact/",
+      "links": [
+        "https://www.mmxgallery.com/",
+        "https://maps.google.com/?cid=4046416227019843387"
+      ],
+      "coordinates": [
+        -0.029303,
+        51.4752964
+      ]
+    },
+    {
+      "id": "B7",
+      "tier": "B",
+      "name": "Pace Gallery",
+      "subtitle": "Contemporary gallery",
+      "subtitleZh": "当代艺术画廊",
+      "zone": "west-end",
+      "themes": [
+        "contemporary",
+        "modern"
+      ],
+      "why": "London home of an international gallery, on Hanover Square near Oxford Circus, with exhibitions of modern and contemporary artists.",
+      "whyZh": "一家国际画廊在伦敦的展厅，位于牛津圆环附近的汉诺威广场，展出现当代艺术家的作品。",
+      "address": "5 Hanover Square, London W1S 1HQ",
+      "hours": "Tue–Sat 10:00–18:00",
+      "hoursZh": "周二至周六 10:00–18:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "sourceUrl": "https://www.pacegallery.com/galleries/london/",
+      "links": [
+        "https://www.pacegallery.com/",
+        "https://maps.google.com/?cid=11249221488594903088"
+      ],
+      "coordinates": [
+        -0.1430346,
+        51.5138924
+      ]
+    },
+    {
+      "id": "B8",
+      "tier": "B",
+      "name": "Soft Opening",
+      "subtitle": "Emerging contemporary gallery",
+      "subtitleZh": "新锐当代艺术画廊",
+      "zone": "east",
+      "themes": [
+        "contemporary"
+      ],
+      "why": "A small Bethnal Green gallery, founded in 2018, that gives emerging artists their first solo shows in London, often with work that mixes materials and media. Step-free access.",
+      "whyZh": "贝思纳尔格林的小型画廊，2018年创办，常为新锐艺术家在伦敦举办首次个展，作品多混合材料与媒介。无障碍通道。",
+      "address": "6 Minerva St, London E2 9EH",
+      "links": [
+        "https://www.softopening.london/",
+        "https://maps.google.com/?cid=8788416227398186103"
+      ],
+      "coordinates": [
+        -0.0596681,
+        51.5316531
+      ]
+    },
+    {
+      "id": "B9",
+      "tier": "B",
+      "name": "Thaddaeus Ropac",
+      "subtitle": "Contemporary gallery",
+      "subtitleZh": "当代艺术画廊",
+      "by": "Thaddaeus Ropac",
+      "zone": "west-end",
+      "themes": [
+        "contemporary",
+        "modern"
+      ],
+      "why": "The London branch of an Austrian-founded international gallery, in Ely House on Dover Street, with changing shows of modern and contemporary artists. Close to the other Mayfair galleries.",
+      "whyZh": "奥地利人创办的国际画廊的伦敦分馆，设在多佛街的伊利府，不定期举办现当代艺术家的展览。离梅菲尔的其他画廊很近。",
+      "address": "Ely House, 37 Dover St, London W1S 4NJ",
+      "hours": "Tue–Sat 10:00–18:00",
+      "hoursZh": "周二至周六 10:00–18:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "sourceUrl": "https://ropac.net/",
+      "links": [
+        "https://ropac.net/",
+        "https://maps.google.com/?cid=9258131086848529285"
+      ],
+      "coordinates": [
+        -0.1424577,
+        51.5085622
+      ]
+    },
+    {
+      "id": "B10",
+      "tier": "B",
+      "name": "Victoria Miro",
+      "subtitle": "Contemporary gallery",
+      "subtitleZh": "当代艺术画廊",
+      "by": "Victoria Miro",
+      "zone": "east",
+      "themes": [
+        "contemporary",
+        "free"
+      ],
+      "why": "A large gallery beside the Regent's Canal in Hoxton, showing established and emerging artists across two exhibition spaces. Free to enter.",
+      "whyZh": "位于霍克斯顿摄政运河边的大型画廊，两个展厅同时展出知名与新晋艺术家的作品。免费入场。",
+      "address": "16 Wharf Rd, London N1 7RW",
+      "hours": "Tue–Sat 10:00–18:00; closed Sun, Mon and public holidays",
+      "hoursZh": "周二至周六 10:00–18:00；周日、周一及公共假日闭馆",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "price": "Free entry; no booking needed",
+      "priceZh": "免费入场；无需预约",
+      "sourceUrl": "https://www.victoria-miro.com/visit",
+      "links": [
+        "https://www.victoria-miro.com/",
+        "https://maps.google.com/?cid=4776024831680652759"
+      ],
+      "coordinates": [
+        -0.0950814,
+        51.5303141
+      ]
+    },
+    {
+      "id": "B11",
+      "tier": "B",
+      "name": "White Cube Mason's Yard",
+      "subtitle": "Contemporary gallery",
+      "subtitleZh": "当代艺术画廊",
+      "zone": "west-end",
+      "themes": [
+        "contemporary",
+        "free"
+      ],
+      "why": "A free, two-floor gallery in a courtyard in St James's, opened in 2006, showing contemporary artists. Both floors have lift access.",
+      "whyZh": "圣詹姆斯一处庭院里的免费两层画廊，2006年开放，展出当代艺术家的作品。两层均有电梯。",
+      "address": "25–26 Mason's Yard, London SW1Y 6BU",
+      "hours": "Tue, Wed, Fri, Sat 10:00–18:00; closed Mon, Thu, Sun",
+      "hoursZh": "周二、周三、周五、周六 10:00–18:00；周一、周四、周日闭馆",
+      "open": [
+        "tue",
+        "wed",
+        "fri",
+        "sat"
+      ],
+      "price": "Free entry",
+      "priceZh": "免费入场",
+      "sourceUrl": "https://www.whitecube.com/locations/white-cube-masons-yard",
+      "links": [
+        "https://www.whitecube.com/",
+        "https://maps.google.com/?cid=4823925557873575086"
+      ],
+      "coordinates": [
+        -0.1373327,
+        51.5075968
+      ]
+    },
+    {
+      "id": "C1",
+      "tier": "C",
+      "name": "Copeland Gallery",
+      "subtitle": "Project space and exhibition hall",
+      "subtitleZh": "项目空间与展览厅",
+      "zone": "south",
+      "themes": [
+        "contemporary",
+        "photography"
+      ],
+      "why": "A large gallery space inside Copeland Park in Peckham, used for exhibitions such as the annual Peckham 24 art and photography shows, as well as markets and events. Check what is on before you go, as it is event-led.",
+      "whyZh": "佩卡姆科普兰公园内的大型展览空间，用于举办每年的“Peckham 24”艺术与摄影展，也承办市集和活动。以活动为主，出发前请先查看当前展出。",
+      "address": "Unit 9I, Copeland Park, 133 Copeland Rd, London SE15 3SN",
+      "note": "No fixed opening hours; open for listed exhibitions and events only.",
+      "noteZh": "没有固定开放时间；仅在展览和活动期间开放。",
+      "sourceUrl": "https://www.copelandpark.com/copeland-gallery",
+      "links": [
+        "https://www.copelandpark.com/",
+        "https://maps.google.com/?cid=18322043003045625703"
+      ],
+      "coordinates": [
+        -0.0667263,
+        51.469788
+      ]
+    },
+    {
+      "id": "C2",
+      "tier": "C",
+      "name": "Curzon Bloomsbury",
+      "subtitle": "Independent cinema",
+      "subtitleZh": "独立电影院",
+      "zone": "west-end",
+      "themes": [
+        "film"
+      ],
+      "why": "A six-screen cinema in the Brunswick Centre showing new releases and arthouse films, near Russell Square. One screen, Bertha DocHouse, is dedicated to documentaries.",
+      "whyZh": "位于布伦瑞克中心的六厅影院，放映新片和艺术电影，靠近罗素广场。其中一厅“Bertha DocHouse”专映纪录片。",
+      "address": "The Brunswick Centre, London WC1N 1AW",
+      "sourceUrl": "https://www.timeout.com/london/cinemas/curzon-bloomsbury",
+      "links": [
+        "https://www.curzon.com/venues/bloomsbury/",
+        "https://maps.google.com/?cid=156673471063303817"
+      ],
+      "coordinates": [
+        -0.1231058,
+        51.5241103
+      ]
+    }
+  ]
+}

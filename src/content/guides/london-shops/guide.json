@@ -1,0 +1,124 @@
+{
+  "_comment": "Shops in London: a long-term guide, no dates. Tiers are the categories (A make the trip, B worth a detour, C if you're nearby). See docs/GUIDES.md. 伦敦逛店长期导览：分级就是类别（A 值得专程，B 值得绕道，C 顺路可去）。",
+  "title": "Shops in London: clothes, cameras, paper and cloth.",
+  "titleZh": "在伦敦逛店：衣服、相机、纸和布料。",
+  "subtitle": "{items} shops and markets, from fashion and vintage to camera, print and fabric suppliers.",
+  "subtitleZh": "{items} 家商店和市集，从服装、古着到相机、印刷和布料用品店。",
+  "public": {
+    "title": "Shops in London",
+    "titleZh": "伦敦逛店",
+    "subtitle": "Fashion, vintage and supplies",
+    "subtitleZh": "服装、古着与用品"
+  },
+  "listed": true,
+  "kinds": ["shops"],
+  "city": "London",
+  "cityZh": "伦敦",
+  "timezone": "Europe/London",
+  "timezoneLabel": "London time",
+  "timezoneLabelZh": "伦敦时间",
+  "checked": "2026-11-19",
+  "tiers": [
+    { "id": "A", "name": "Make the trip", "nameZh": "值得专程", "text": "Worth crossing town for.", "textZh": "值得专门跑一趟。", "weight": 3 },
+    { "id": "B", "name": "Worth a detour", "nameZh": "值得绕道", "text": "Worth a short detour when you are close.", "textZh": "在附近时值得绕过去看看。", "weight": 2 },
+    { "id": "C", "name": "If you're nearby", "nameZh": "顺路可去", "text": "Good to know when you are in the area.", "textZh": "在附近时，知道有这么一家就好。", "weight": 1 }
+  ],
+  "themes": [
+    { "id": "fashion", "name": "Fashion", "nameZh": "服装" },
+    { "id": "vintage", "name": "Vintage", "nameZh": "古着" },
+    { "id": "photo", "name": "Cameras, film and photo services", "nameZh": "相机、胶片与摄影服务" },
+    { "id": "art-supplies", "name": "Paper, print and art supplies", "nameZh": "纸、印刷与美术用品" },
+    { "id": "fabrics", "name": "Fabrics and haberdashery", "nameZh": "布料与缝纫用品" },
+    { "id": "music", "name": "Music", "nameZh": "音乐" },
+    { "id": "food-drink", "name": "Food and drink shops", "nameZh": "食品与酒水" },
+    { "id": "markets", "name": "Markets and fairs", "nameZh": "市集与展会" }
+  ],
+  "zones": [
+    { "id": "west-end", "name": "West End", "nameZh": "西区" },
+    { "id": "city", "name": "City and Clerkenwell", "nameZh": "伦敦城与克勒肯维尔" },
+    { "id": "east", "name": "Shoreditch and Hackney", "nameZh": "肖迪奇与哈克尼" },
+    { "id": "north", "name": "King's Cross and North", "nameZh": "国王十字与北伦敦" },
+    { "id": "southbank", "name": "South Bank and Bermondsey", "nameZh": "南岸与伯蒙德赛" },
+    { "id": "west", "name": "Kensington, Chelsea and West", "nameZh": "肯辛顿、切尔西与西伦敦" },
+    { "id": "south", "name": "South London", "nameZh": "南伦敦" },
+    { "id": "further", "name": "Further out", "nameZh": "更远一些" }
+  ],
+  "labels": {
+    "item": "Shop",
+    "itemZh": "商店",
+    "items": "Shops",
+    "itemsZh": "商店",
+    "subtitle": "What it sells",
+    "subtitleZh": "主营",
+    "by": "Run by",
+    "byZh": "店主",
+    "tier": "Category",
+    "tierZh": "类别",
+    "theme": "Kind",
+    "themeZh": "种类"
+  },
+  "texts": {
+    "about": {
+      "heading": "About this guide",
+      "headingZh": "关于本导览",
+      "paras": [
+        {
+          "text": "Shops and markets in London: clothes and vintage, cameras and film, paper, print and fabric. They come from shared Google Maps lists, and each was checked in November 2026 against the shop's own pages and the press.",
+          "textZh": "伦敦的商店和市集：服装和古着、相机和胶片、纸、印刷和布料。名单来自几份共享的 Google 地图列表，2026年11月逐一对照了商店官网和媒体报道。"
+        },
+        {
+          "text": "This guide has no dates: it grows over time.",
+          "textZh": "本导览没有固定日期，会不断更新。"
+        }
+      ]
+    },
+    "how": {
+      "heading": "How to use it",
+      "headingZh": "使用方法",
+      "items": [
+        {
+          "lead": "Category.",
+          "leadZh": "类别。",
+          "text": "Make the trip: worth crossing town for. Worth a detour: worth a short walk when you are close. If you're nearby: good to know in the area.",
+          "textZh": "值得专程：值得专门跑一趟。值得绕道：在附近时值得走过去看看。顺路可去：在附近时知道就好。"
+        },
+        {
+          "lead": "Kind.",
+          "leadZh": "种类。",
+          "text": "Choose one in the Kind box, or type a name or a street in Find.",
+          "textZh": "在“种类”框里选一种，或者在“查找”里输入店名或街道。"
+        },
+        {
+          "lead": "Markets and fairs.",
+          "leadZh": "市集与展会。",
+          "text": "Markets keep their own days, and a fair can move between halls. Check the date and place before you go.",
+          "textZh": "市集有各自的开放日，展会也可能换场地。出发前请先确认日期和地点。"
+        }
+      ]
+    }
+  },
+  "links": [
+    {
+      "label": "OpenStreetMap: copyright and licence",
+      "labelZh": "OpenStreetMap：版权与许可",
+      "url": "https://www.openstreetmap.org/copyright"
+    },
+    {
+      "label": "OpenStreetMap: report a map issue",
+      "labelZh": "OpenStreetMap：报告地图问题",
+      "url": "https://www.openstreetmap.org/fixthemap"
+    }
+  ],
+  "credits": {
+    "points": "Points: shared Google Maps lists; addresses and details from each shop's own pages and the press",
+    "pointsZh": "点位：几份共享的 Google 地图列表；地址和信息来自各商店官网和媒体报道"
+  },
+  "map": {
+    "centre": [-0.1300, 51.5065],
+    "heatRadius": 500
+  },
+  "sensitive": {
+    "public": []
+  },
+  "suggestions": false
+}

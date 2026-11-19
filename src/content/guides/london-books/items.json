@@ -1,0 +1,876 @@
+{
+  "_comment": "The places, checked in November 2026 against their own pages and the press. 地点，2026年11月对照各家官网和媒体报道核实。",
+  "items": [
+    {
+      "id": "A1",
+      "tier": "A",
+      "name": "Daunt Books Marylebone",
+      "subtitle": "Independent bookshop",
+      "subtitleZh": "独立书店",
+      "zone": "west-end",
+      "themes": [
+        "general",
+        "travel-maps"
+      ],
+      "why": "The original Daunt shop on Marylebone High Street, known for arranging its travel books by country alongside fiction and non-fiction for each place. It runs author talks and signings.",
+      "whyZh": "丹特书店在玛丽勒本大街的总店，旅行类书籍按国家分区，同一地区的小说和非虚构放在一起。书店还举办作家讲座和签售。",
+      "address": "83-84 Marylebone High St, London W1U 4QW",
+      "hours": "Mon–Sat 9:00–19:30; Sun 11:00–18:00",
+      "hoursZh": "周一至周六 9:00–19:30；周日 11:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "sourceUrl": "https://www.dauntbooks.co.uk/shops/marylebone",
+      "links": [
+        "https://www.dauntbooks.co.uk/",
+        "https://maps.google.com/?cid=16613852265345210498"
+      ],
+      "coordinates": [
+        -0.1519826,
+        51.5204034
+      ]
+    },
+    {
+      "id": "A2",
+      "tier": "A",
+      "name": "Foyles",
+      "subtitle": "Large general bookshop",
+      "subtitleZh": "大型综合书店",
+      "zone": "west-end",
+      "themes": [
+        "general",
+        "art-photography"
+      ],
+      "why": "A very large general bookshop on Charing Cross Road, laid out over several floors with strong art, music and cinema sections, a café and an events floor.",
+      "whyZh": "查令十字街上的大型综合书店，分多个楼层，艺术、音乐和电影类书籍很丰富，还设有咖啡馆和活动层。",
+      "address": "107 Charing Cross Rd, London WC2H 0DT",
+      "sourceUrl": "https://www.timeout.com/london/shopping/foyles",
+      "links": [
+        "https://www.foyles.co.uk/",
+        "https://maps.google.com/?cid=2021648986984537347"
+      ],
+      "coordinates": [
+        -0.1298993,
+        51.5143097
+      ]
+    },
+    {
+      "id": "A3",
+      "tier": "A",
+      "name": "Hatchards",
+      "subtitle": "Historic Piccadilly bookshop",
+      "subtitleZh": "皮卡迪利老牌书店",
+      "zone": "west-end",
+      "themes": [
+        "general"
+      ],
+      "why": "A bookshop on Piccadilly that has traded since 1797, billed as London's oldest surviving bookshop. Several floors of general stock, with a good reputation for signed editions and travel and biography titles.",
+      "whyZh": "皮卡迪利大街上的书店，1797年开业，被称为伦敦现存最古老的书店。楼层多、书目综合，签名版以及旅行和传记类书籍口碑不错。",
+      "address": "187 Piccadilly, London W1J 9LE",
+      "sourceUrl": "https://www.timeout.com/london/shopping/hatchards",
+      "links": [
+        "https://www.hatchards.co.uk/",
+        "https://maps.google.com/?cid=9353951582664048251"
+      ],
+      "coordinates": [
+        -0.1380739,
+        51.5085203
+      ]
+    },
+    {
+      "id": "A4",
+      "tier": "A",
+      "name": "John Sandoe (Books) Ltd",
+      "subtitle": "Independent bookshop",
+      "subtitleZh": "独立书店",
+      "zone": "west",
+      "themes": [
+        "general"
+      ],
+      "why": "An independent bookshop in a Georgian terrace off the King's Road, trading since 1957. Its tall shelves hold a general range, and the staff are known for recommending books.",
+      "whyZh": "国王路旁乔治亚式排屋里的独立书店，1957年开业。书架高耸，书目综合，店员以乐于推荐好书闻名。",
+      "address": "10 Blacklands Terrace, London SW3 2SR",
+      "sourceUrl": "https://www.timeout.com/london/shopping/john-sandoe",
+      "links": [
+        "https://johnsandoe.com/",
+        "https://maps.google.com/?cid=487510552012093867"
+      ],
+      "coordinates": [
+        -0.16103,
+        51.49139
+      ]
+    },
+    {
+      "id": "A5",
+      "tier": "A",
+      "name": "Libreria Bookshop",
+      "subtitle": "Independent bookshop",
+      "subtitleZh": "独立书店",
+      "zone": "east",
+      "themes": [
+        "general"
+      ],
+      "why": "A bookshop near Brick Lane whose shelves are grouped by theme and curiosity rather than the usual categories. Good for finding something you were not looking for.",
+      "whyZh": "位于砖巷附近的书店，书架按主题和兴趣而不是常规分类来排列，适合碰运气发现原本没打算找的书。",
+      "address": "65 Hanbury St, London E1 5JP",
+      "hours": "Tue–Sat 10:00–18:00; Sun 12:00–18:00; closed Mon",
+      "hoursZh": "周二至周六 10:00–18:00；周日 12:00–18:00；周一休息",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "links": [
+        "https://libreria.io/",
+        "https://maps.google.com/?cid=18006288795703757245"
+      ],
+      "coordinates": [
+        -0.0706278,
+        51.5203391
+      ]
+    },
+    {
+      "id": "A6",
+      "tier": "A",
+      "name": "London Review Bookshop",
+      "subtitle": "Independent bookshop",
+      "subtitleZh": "独立书店",
+      "zone": "west-end",
+      "themes": [
+        "general",
+        "poetry-politics"
+      ],
+      "why": "A bookshop beside the British Museum, run by the London Review of Books, with a thoughtful general range and regular events. A café next door is now an outpost of St. JOHN.",
+      "whyZh": "紧邻大英博物馆的书店，由《伦敦书评》经营，书目选得很用心，也常办活动。隔壁的咖啡馆现在是St. JOHN的分店。",
+      "address": "14 Bury Pl, London WC1A 2JL",
+      "hours": "Mon–Sat 10:00–18:30; Sun 12:00–18:00",
+      "hoursZh": "周一至周六 10:00–18:30；周日 12:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "links": [
+        "https://www.londonreviewbookshop.co.uk/",
+        "https://maps.google.com/?cid=14851578885188370687"
+      ],
+      "coordinates": [
+        -0.124256,
+        51.5185113
+      ]
+    },
+    {
+      "id": "A7",
+      "tier": "A",
+      "name": "The Notting Hill Bookshop",
+      "subtitle": "Independent bookshop",
+      "subtitleZh": "独立书店",
+      "zone": "west",
+      "themes": [
+        "general",
+        "travel-maps"
+      ],
+      "why": "A small independent shop on Blenheim Crescent that inspired the bookshop in the film Notting Hill. It stocks a broad general range with a good travel section, and sits a few steps from the Portobello Road crowds.",
+      "whyZh": "布伦海姆新月街上的小型独立书店，是电影《诺丁山》中书店的原型。书的种类广，旅行类尤其丰富，离波多贝罗路的人流只有几步之遥。",
+      "address": "13 Blenheim Cres, London W11 2EE",
+      "hours": "Mon–Sun 9:00–19:00 (bank holidays included)",
+      "hoursZh": "周一至周日 9:00–19:00（公共假日同样营业）",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "sourceUrl": "https://www.timeout.com/london/shopping/the-notting-hill-bookshop",
+      "links": [
+        "https://thenottinghillbookshop.co.uk/",
+        "https://maps.google.com/?cid=12350148047283049266"
+      ],
+      "coordinates": [
+        -0.2055461,
+        51.5157046
+      ]
+    },
+    {
+      "id": "B1",
+      "tier": "B",
+      "name": "Donlon Books",
+      "subtitle": "Art and photography books",
+      "subtitleZh": "艺术摄影书店",
+      "zone": "east",
+      "themes": [
+        "art-photography"
+      ],
+      "why": "A small Broadway Market shop for art, photography and cultural theory, with artist books, zines, rare titles and posters. A good place to find independent publications you won't see in big chains.",
+      "whyZh": "百老汇市集上的小书店，专营艺术、摄影和文化理论书籍，还有艺术家书、独立杂志、珍本和海报。适合来找大连锁书店里见不到的独立出版物。",
+      "address": "75 Broadway Market, London E8 4PH",
+      "links": [
+        "https://donlonbooks.com/",
+        "https://maps.google.com/?cid=10759583904130159598"
+      ],
+      "coordinates": [
+        -0.0611236,
+        51.5376594
+      ]
+    },
+    {
+      "id": "B2",
+      "tier": "B",
+      "name": "Gay's The Word",
+      "subtitle": "LGBTQ+ bookshop",
+      "subtitleZh": "LGBTQ+书店",
+      "zone": "west-end",
+      "themes": [
+        "lgbtq"
+      ],
+      "why": "The UK's oldest LGBTQ+ bookshop, on Marchmont Street in Bloomsbury since 1979. Fiction, non-fiction and community notices, and a good first stop for queer writing.",
+      "whyZh": "英国历史最悠久的LGBTQ+书店，1979年起在布鲁姆斯伯里的马奇蒙特街营业，有小说、非虚构类书籍，也有社区信息，想了解酷儿文学可以先来这里。",
+      "address": "66 Marchmont St, London WC1N 1AB",
+      "hours": "Tue–Sat 11:00–18:00; Sun 13:00–18:00; closed Mon",
+      "hoursZh": "周二至周六 11:00–18:00；周日 13:00–18:00；周一休息",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "links": [
+        "https://www.gaystheword.co.uk/",
+        "https://maps.google.com/?cid=8560008933908432240"
+      ],
+      "coordinates": [
+        -0.125237,
+        51.525429
+      ]
+    },
+    {
+      "id": "B3",
+      "tier": "B",
+      "name": "Kirkdale Bookshop",
+      "subtitle": "Independent bookshop",
+      "subtitleZh": "独立书店",
+      "zone": "south",
+      "themes": [
+        "general"
+      ],
+      "why": "A friendly Sydenham shop selling new and second-hand books, with a good children's and young adult section. A local favourite a short walk from Sydenham station.",
+      "whyZh": "锡德纳姆一家亲切的书店，新书和二手书都有，童书和青少年读物尤其丰富。离锡德纳姆车站不远，是当地人常去的地方。",
+      "address": "272 Kirkdale, London SE26 4RS",
+      "hours": "Mon–Sat 9:30–17:30; Sun 12:00–16:00",
+      "hoursZh": "周一至周六 9:30–17:30；周日 12:00–16:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "links": [
+        "https://www.kirkdalebookshop.com/",
+        "https://maps.google.com/?cid=10454665348446827780"
+      ],
+      "coordinates": [
+        -0.0554199,
+        51.4266232
+      ]
+    },
+    {
+      "id": "B4",
+      "tier": "B",
+      "name": "Lutyens & Rubinstein",
+      "subtitle": "Independent bookshop",
+      "subtitleZh": "独立书店",
+      "zone": "west",
+      "themes": [
+        "general"
+      ],
+      "why": "A two-floor Notting Hill bookshop opened by two literary agents, with a carefully chosen mix of fiction, non-fiction, children's books and gifts. A calm stop away from the Portobello crowds.",
+      "whyZh": "由两位文学经纪人在诺丁山开设的两层书店，精选小说、非虚构、童书和礼品。远离波多贝罗路的喧闹，适合安静地逛逛。",
+      "address": "21 Kensington Park Rd, London W11 2EU",
+      "sourceUrl": "https://www.timeout.com/london/shopping/lutyens-rubinstein",
+      "links": [
+        "https://www.lutyensrubinstein.co.uk/",
+        "https://maps.google.com/?cid=12422607007781119459"
+      ],
+      "coordinates": [
+        -0.2056572,
+        51.5151242
+      ]
+    },
+    {
+      "id": "B5",
+      "tier": "B",
+      "name": "Newham Bookshop",
+      "subtitle": "Community bookshop",
+      "subtitleZh": "社区书店",
+      "zone": "further",
+      "themes": [
+        "general"
+      ],
+      "why": "A not-for-profit independent shop on Barking Road in Plaistow, selling new books only, with events, a monthly book pick and a strong local following. A trip for people who like community bookshops.",
+      "whyZh": "位于普莱斯托巴金路上的非营利独立书店，只卖新书，常办活动，每月推荐一本书，在当地很受欢迎。喜欢社区书店的人值得专程前往。",
+      "address": "743-745 Barking Rd, London E13 9ER",
+      "hours": "Tue–Sat 10:00–17:00",
+      "hoursZh": "周二至周六 10:00–17:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "links": [
+        "https://www.newhambooks.co.uk/",
+        "https://maps.google.com/?cid=716192556388704625"
+      ],
+      "coordinates": [
+        0.0374631,
+        51.5303291
+      ]
+    },
+    {
+      "id": "B6",
+      "tier": "B",
+      "name": "Nomad Books",
+      "subtitle": "Independent bookshop",
+      "subtitleZh": "独立书店",
+      "zone": "west",
+      "themes": [
+        "general"
+      ],
+      "why": "A local independent bookshop on Fulham Road, open since 1990, with a general stock and a regular programme of author talks, signings and children's storytimes.",
+      "whyZh": "富勒姆路上的社区独立书店，1990年起营业，书目种类齐全，经常举办作家讲座、签售和儿童故事会。",
+      "address": "781 Fulham Rd, London SW6 5HA",
+      "hours": "Mon–Sat 10:00–18:00; Sun 11:00–17:00",
+      "hoursZh": "周一至周六 10:00–18:00；周日 11:00–17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "links": [
+        "https://www.nomadbooks.co.uk/",
+        "https://maps.google.com/?cid=14808353863170581410"
+      ],
+      "coordinates": [
+        -0.2042504,
+        51.4763747
+      ]
+    },
+    {
+      "id": "B7",
+      "tier": "B",
+      "name": "Owl Bookshop",
+      "subtitle": "Independent bookshop",
+      "subtitleZh": "独立书店",
+      "zone": "north",
+      "themes": [
+        "general"
+      ],
+      "why": "A long-standing Kentish Town Road bookshop with a general range, plus gifts, bags and a regular events programme.",
+      "whyZh": "肯蒂什镇路上开了多年的书店，书目综合，也卖礼品和布袋，还定期举办活动。",
+      "address": "207-209 Kentish Town Rd, London NW5 2JU",
+      "hours": "Mon–Sat 9:00–18:00; Sun 11:00–18:00",
+      "hoursZh": "周一至周六 9:00–18:00；周日 11:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "links": [
+        "https://www.owlbookshop.co.uk/",
+        "https://maps.google.com/?cid=18316488682257822724"
+      ],
+      "coordinates": [
+        -0.141703,
+        51.547204
+      ]
+    },
+    {
+      "id": "B8",
+      "tier": "B",
+      "name": "Persephone Books",
+      "subtitle": "Publisher and bookshop",
+      "subtitleZh": "出版社兼书店",
+      "zone": "west-end",
+      "themes": [
+        "general"
+      ],
+      "why": "A publisher that reprints neglected fiction and non-fiction, mostly by women and mostly from the mid-20th century, all in grey jackets with patterned endpapers. The London shop has reopened in Fitzrovia.",
+      "whyZh": "专门重印被遗忘的小说和非虚构作品的出版社，作者多为女性、年代多在20世纪中叶，所有书都是灰色封面配图案环衬。伦敦书店已在菲茨罗维亚重新开张。",
+      "address": "1 Scala Street, London W1T 2HL",
+      "hours": "Wed–Fri 10:00–18:00; Sat 11:00–17:00",
+      "hoursZh": "周三至周五 10:00–18:00；周六 11:00–17:00",
+      "open": [
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "sourceUrl": "https://www.timeout.com/london/news/much-loved-persephone-books-returns-november-2026-102826",
+      "links": [
+        "https://persephonebooks.co.uk/",
+        "https://maps.google.com/?cid=3592683765384666156"
+      ],
+      "coordinates": [
+        -0.135284,
+        51.520335
+      ]
+    },
+    {
+      "id": "B9",
+      "tier": "B",
+      "name": "Presse Books",
+      "subtitle": "Arts bookshop and café",
+      "subtitleZh": "艺术书店兼咖啡馆",
+      "zone": "southbank",
+      "themes": [
+        "art-photography"
+      ],
+      "why": "The arts bookshop and project space at Forma's Southwark base, stocking Forma's own publications, artist editions and books on art, architecture and poetry. It has a café, and hosts book launches and performances.",
+      "whyZh": "Forma 位于萨瑟克的艺术书店兼项目空间，售卖 Forma 自己的出版物、艺术家版本图书，以及艺术、建筑和诗歌类书籍。店里有咖啡馆，也常办新书发布和表演活动。",
+      "address": "FormaHQ, Peveril Garden Studios, 140 Great Dover St, London SE1 4GW",
+      "hours": "Tue–Fri 10:30–17:00",
+      "hoursZh": "周二至周五 10:30–17:00",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri"
+      ],
+      "note": "Open Tuesday to Friday only; see the news page for events.",
+      "noteZh": "仅周二至周五营业；活动安排见其新闻页面。",
+      "links": [
+        "https://www.forma.org.uk/projects/pressebooks",
+        "https://maps.google.com/?cid=12582395678462479443"
+      ],
+      "coordinates": [
+        -0.0862552,
+        51.4952587
+      ]
+    },
+    {
+      "id": "B10",
+      "tier": "B",
+      "name": "Primrose Hill Books",
+      "subtitle": "Independent bookshop",
+      "subtitleZh": "独立书店",
+      "zone": "north",
+      "themes": [
+        "general"
+      ],
+      "why": "A family-run bookshop in a Victorian terrace two minutes from Primrose Hill, selling new and second-hand books, signed copies and gifts.",
+      "whyZh": "樱草山旁维多利亚式排屋里的家族书店，离樱草山步行约两分钟，卖新书、二手书、签名本和礼品。",
+      "address": "134 Regent's Park Rd, London NW1 8XL",
+      "hours": "Mon–Sat 10:00–18:00; Sun 11:00–18:00",
+      "hoursZh": "周一至周六 10:00–18:00；周日 11:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "links": [
+        "https://www.primrosehillbooks.com/",
+        "https://maps.google.com/?cid=8890077918452949124"
+      ],
+      "coordinates": [
+        -0.157293,
+        51.5408072
+      ]
+    },
+    {
+      "id": "B11",
+      "tier": "B",
+      "name": "Review",
+      "subtitle": "Independent bookshop",
+      "subtitleZh": "独立书店",
+      "zone": "south",
+      "themes": [
+        "general"
+      ],
+      "why": "A small neighbourhood bookshop on Bellenden Road, Peckham, with literary fiction, magazines and zines, and a small garden. It also hosts book groups and the Peckham Literary Festival.",
+      "whyZh": "佩卡姆贝伦登路上的社区小书店，主打文学小说，也有杂志和独立刊物，还有一个小花园。书店办读书会，并参与佩卡姆文学节。",
+      "address": "131 Bellenden Rd, London SE15 4QY",
+      "sourceUrl": "https://www.timeout.com/london/shopping/review-bookshop",
+      "links": [
+        "https://www.reviewbookshop.co.uk/",
+        "https://maps.google.com/?cid=1084807221694173297"
+      ],
+      "coordinates": [
+        -0.0722912,
+        51.4676234
+      ]
+    },
+    {
+      "id": "B12",
+      "tier": "B",
+      "name": "Sotheran's Rare Books & Prints",
+      "subtitle": "Antiquarian bookshop",
+      "subtitleZh": "古籍善本书店",
+      "zone": "west-end",
+      "themes": [
+        "rare-secondhand"
+      ],
+      "why": "A long-established antiquarian dealer selling rare books, prints and manuscripts, on Charing Cross Road with a second shop in nearby Cecil Court. Worth a browse if you like old books and prints.",
+      "whyZh": "历史悠久的古籍书商，经营珍本书、版画和手稿，店面在查令十字街，附近的塞西尔庭院另有一家分店。喜欢旧书和版画的人值得进来逛逛。",
+      "address": "22 Charing Cross Rd, London WC2H 0HS",
+      "hours": "Mon–Fri 10:00–18:00 (Charing Cross Road shop)",
+      "hoursZh": "周一至周五 10:00–18:00（查令十字街店）",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri"
+      ],
+      "note": "The Cecil Court shop (8 Cecil Court) also opens on Saturdays, 11:00–17:00.",
+      "noteZh": "塞西尔庭院8号的分店周六也营业，11:00–17:00。",
+      "links": [
+        "https://www.sotherans.co.uk/",
+        "https://maps.google.com/?cid=14923920487193988827"
+      ],
+      "coordinates": [
+        -0.1281333,
+        51.5106149
+      ]
+    },
+    {
+      "id": "B13",
+      "tier": "B",
+      "name": "Stanfords",
+      "subtitle": "Travel books and maps",
+      "subtitleZh": "旅行书与地图专卖店",
+      "zone": "west-end",
+      "themes": [
+        "travel-maps"
+      ],
+      "why": "A specialist travel bookshop in Covent Garden for maps, globes and guidebooks, founded in 1853 and now at Mercer Walk. There is a café inside.",
+      "whyZh": "位于科文特花园的旅行专门书店，出售地图、地球仪和旅行指南，创办于1853年，现址在默瑟步道。店内设有咖啡馆。",
+      "address": "7 Mercer Walk, London WC2H 9FA",
+      "sourceUrl": "https://www.timeout.com/london/shopping/stanfords",
+      "links": [
+        "https://www.stanfords.co.uk/",
+        "https://maps.google.com/?cid=10948680385028733165"
+      ],
+      "coordinates": [
+        -0.1253621,
+        51.5130595
+      ]
+    },
+    {
+      "id": "B14",
+      "tier": "B",
+      "name": "Swedenborg House",
+      "subtitle": "Society bookshop and gallery",
+      "subtitleZh": "学会书店与展厅",
+      "zone": "west-end",
+      "themes": [
+        "general"
+      ],
+      "why": "The home of the Swedenborg Society in Bloomsbury, with a small bookshop and a gallery. A quiet stop for philosophy, spirituality and the society's own publications.",
+      "whyZh": "瑞典堡学会在布鲁姆斯伯里的总部，设有小书店和展厅。想找哲学、灵修类书籍和学会自己出版的书，可以来这里安静地逛一逛。",
+      "address": "20-21 Bloomsbury Way, London WC1A 2TH",
+      "hours": "Mon–Wed and Fri 9:30–17:00; Thu 9:30–21:00; Sat 12:00–17:00",
+      "hoursZh": "周一至周三及周五 9:30–17:00；周四 9:30–21:00；周六 12:00–17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "sourceUrl": "https://swedenborg.org.uk/visit",
+      "links": [
+        "https://swedenborg.org.uk/",
+        "https://maps.google.com/?cid=1361081757984951920"
+      ],
+      "coordinates": [
+        -0.1229658,
+        51.5180058
+      ]
+    },
+    {
+      "id": "B15",
+      "tier": "B",
+      "name": "Tenderbooks",
+      "subtitle": "Art and design bookshop",
+      "subtitleZh": "艺术设计书店",
+      "zone": "west-end",
+      "themes": [
+        "art-photography",
+        "design"
+      ],
+      "why": "A small bookshop on Cecil Court for art, design, architecture, photography and fashion, with rare and out-of-print titles, artist books, magazines and prints.",
+      "whyZh": "塞西尔庭院里的小书店，专营艺术、设计、建筑、摄影和时尚类书籍，也有珍本、绝版书、艺术家书、杂志和版画。",
+      "address": "6 Cecil Ct, London WC2N 4HE",
+      "hours": "Mon–Sat 12:00–18:00, and by appointment",
+      "hoursZh": "周一至周六 12:00–18:00，另可预约",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "links": [
+        "https://www.tenderbooks.co.uk/",
+        "https://maps.google.com/?cid=3747567668858815623"
+      ],
+      "coordinates": [
+        -0.1274618,
+        51.5107684
+      ]
+    },
+    {
+      "id": "B16",
+      "tier": "B",
+      "name": "The Broadway Bookshop",
+      "subtitle": "Independent bookshop",
+      "subtitleZh": "独立书店",
+      "zone": "east",
+      "themes": [
+        "general"
+      ],
+      "why": "A small independent bookshop at the canal end of Broadway Market, handy for a browse before or after the street's cafés and Saturday stalls.",
+      "whyZh": "位于百老汇市集运河一端的小型独立书店，在市集的咖啡馆和周六摊位之间逛书很顺路。",
+      "address": "6 Broadway Market, London E8 4QJ",
+      "hours": "Tue–Sat 10:00–18:00; Sun 11:00–18:00; closed Mon",
+      "hoursZh": "周二至周六 10:00–18:00；周日 11:00–18:00；周一休息",
+      "open": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "note": "No delivery; online orders are collected in the shop.",
+      "noteZh": "不提供送货，网上订的书需到店自取。",
+      "links": [
+        "https://broadwaybookshophackney.com/",
+        "https://maps.google.com/?cid=14415173974285233346"
+      ],
+      "coordinates": [
+        -0.06196,
+        51.5357942
+      ]
+    },
+    {
+      "id": "B17",
+      "tier": "B",
+      "name": "Word On The Water - The London Bookbarge",
+      "subtitle": "Floating bookshop",
+      "subtitleZh": "水上书店",
+      "zone": "north",
+      "themes": [
+        "general"
+      ],
+      "why": "A bookshop on a barge moored on the Regent's Canal near King's Cross, selling books to browse on board. Worth a visit for the setting as much as the stock.",
+      "whyZh": "停靠在国王十字附近摄政运河上的驳船书店，可以上船翻书。书固然有看头，船上的环境同样值得一来。",
+      "address": "Regent's Canal Towpath, London N1C 4LW",
+      "hours": "Daily 12:00–19:00",
+      "hoursZh": "每天 12:00–19:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "note": "On a boat, so hours and mooring can change with weather; check the shop's social pages before a special trip.",
+      "noteZh": "书店在船上，营业时间和停靠位置可能随天气变化，专程前往前请先看店家的社交媒体。",
+      "links": [
+        "https://www.wordonthewater.co.uk/",
+        "https://maps.google.com/?cid=18083416596117310531"
+      ],
+      "coordinates": [
+        -0.1234795,
+        51.535412
+      ]
+    },
+    {
+      "id": "C1",
+      "tier": "C",
+      "name": "BookMongers",
+      "subtitle": "Second-hand bookshop",
+      "subtitleZh": "二手书店",
+      "zone": "south",
+      "themes": [
+        "rare-secondhand"
+      ],
+      "why": "A well-organised second-hand bookshop a few minutes from Brixton station, open since 1992 and covering plays, poetry, travel, politics, cinema and more. Easy to lose an hour in.",
+      "whyZh": "距布里克斯顿车站几分钟的二手书店，1992年开业，涵盖戏剧、诗歌、旅行、政治和电影等类别，书架整理得井井有条，很容易一逛就是一小时。",
+      "address": "439 Coldharbour Ln, London SW9 8LN",
+      "hours": "Mon–Sat 10:30–18:30; Sun 11:00–17:00",
+      "hoursZh": "周一至周六 10:30–18:30；周日 11:00–17:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "sourceUrl": "https://www.timeout.com/london/shopping/bookmongers",
+      "links": [
+        "https://www.bookmongers.com/",
+        "https://maps.google.com/?cid=3739663887928232517"
+      ],
+      "coordinates": [
+        -0.1138818,
+        51.4614694
+      ]
+    },
+    {
+      "id": "C2",
+      "tier": "C",
+      "name": "Foster Books",
+      "subtitle": "Antiquarian and second-hand books",
+      "subtitleZh": "古籍与二手书店",
+      "zone": "west",
+      "themes": [
+        "rare-secondhand"
+      ],
+      "why": "A family-run Chiswick High Road shop for rare, out-of-print and second-hand books, including first editions, fine bindings and illustrated children's titles. One for patient browsers.",
+      "whyZh": "奇斯威克大街上的家族经营书店，出售珍本、绝版书和二手书，包括初版书、精装本和插画童书。适合有耐心慢慢翻找的人。",
+      "address": "183 Chiswick High Rd, London W4 2DR",
+      "sourceUrl": "https://www.pbfa.org/members/foster-books",
+      "links": [
+        "https://www.fosterbooks.co.uk/",
+        "https://maps.google.com/?cid=2802717653884825808"
+      ],
+      "coordinates": [
+        -0.2569207,
+        51.4923797
+      ]
+    },
+    {
+      "id": "C3",
+      "tier": "C",
+      "name": "Gosh! Comics",
+      "subtitle": "Comic and graphic novel shop",
+      "subtitleZh": "漫画与图像小说店",
+      "zone": "west-end",
+      "themes": [
+        "comics"
+      ],
+      "why": "A comics and graphic novel shop on Berwick Street in Soho, open every day. A handy stop if you are around the market or the record shops.",
+      "whyZh": "苏豪伯威克街上的漫画和图像小说店，每天营业。逛集市或唱片店时顺路进来很方便。",
+      "address": "1 Berwick St, London W1F 0DR",
+      "hours": "Daily 10:30–19:00",
+      "hoursZh": "每天 10:30–19:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "links": [
+        "https://www.goshlondon.com/",
+        "https://maps.google.com/?cid=13477519899988634218"
+      ],
+      "coordinates": [
+        -0.1341537,
+        51.5128992
+      ]
+    },
+    {
+      "id": "C4",
+      "tier": "C",
+      "name": "London Centre for Book Arts",
+      "subtitle": "Book arts studio",
+      "subtitleZh": "书籍艺术工作室",
+      "zone": "east",
+      "themes": [
+        "book-arts"
+      ],
+      "why": "An artist-run open-access studio near Hackney Wick for letterpress, printmaking, papermaking and bookbinding. Most visitors come for a course or a studio session rather than to browse.",
+      "whyZh": "位于哈克尼威克附近、由艺术家运营的开放式工作室，提供活版印刷、版画、造纸和装订等课程与场地。多数人是来上课或使用工作室，而不是随便逛逛。",
+      "address": "Unit 18, Britannia Works, 56 Dace Rd, London E3 2NQ",
+      "hours": "Mon–Sat 10:00–18:00",
+      "hoursZh": "周一至周六 10:00–18:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "note": "Mainly courses, studio access and occasional open days; check the website before turning up.",
+      "noteZh": "主要是课程、工作室使用和不定期的开放日，前往前请先查看官网。",
+      "sourceUrl": "https://londonbookarts.org/pages/about",
+      "links": [
+        "https://londonbookarts.org/",
+        "https://maps.google.com/?cid=14271902377568296681"
+      ],
+      "coordinates": [
+        -0.0224605,
+        51.5379335
+      ]
+    },
+    {
+      "id": "C5",
+      "tier": "C",
+      "name": "The Bookshop on the Heath",
+      "subtitle": "Second-hand and antiquarian books",
+      "subtitleZh": "二手与古籍书店",
+      "zone": "south",
+      "themes": [
+        "rare-secondhand"
+      ],
+      "why": "A second-hand bookshop in Blackheath village selling rare and older books, modern titles, maps, prints and posters. A pleasant browse after a walk on the heath.",
+      "whyZh": "布莱克希思村里的二手书店，出售珍本旧书、新近出版的书，还有地图、版画和海报。逛完荒野公园散步后，顺路进来翻翻很惬意。",
+      "address": "74 Tranquil Vale, London SE3 0BW",
+      "sourceUrl": "https://www.timeout.com/london/books-poetry/bookshop-on-the-heath",
+      "links": [
+        "https://www.bookshopontheheath.co.uk/",
+        "https://maps.google.com/?cid=17980223714913219296"
+      ],
+      "coordinates": [
+        0.0071421,
+        51.4670859
+      ]
+    }
+  ]
+}

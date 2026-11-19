@@ -406,7 +406,8 @@ to. Audiences, and which
 guides each may open, are in `src/content/guides/access.json`; each audience's
 password is a Cloudflare secret named there (`GUIDES_PASSWORD` for visitors,
 `GUIDES_PASSWORD_FOTOFILMIC` for participants, `GUIDES_PASSWORD_FOOD` for the
-restaurant guide's guests), never in the repo. Each needs
+restaurant guide's guests, `GUIDES_PASSWORD_LONDON` for the London guides'
+guests), never in the repo. Each needs
 6 or more characters and must differ from the other; case, extra spaces and
 full-width characters don't matter. Every
 guide is built once per audience, and the Worker serves the page for the
