@@ -1015,6 +1015,27 @@
     {
       "id": "B22",
       "tier": "B",
+      "name": "Laoma",
+      "subtitle": "Chinese restaurant",
+      "subtitleZh": "中餐馆",
+      "zone": "north",
+      "themes": [
+        "chinese"
+      ],
+      "why": "A Chinese restaurant on King's Cross Road, a short walk from King's Cross and St Pancras stations.",
+      "whyZh": "国王十字路上的中餐馆，从国王十字站和圣潘克拉斯站步行不远。",
+      "address": "135 King's Cross Rd, London WC1X 9BJ",
+      "links": [
+        "https://maps.google.com/?cid=3663964389537112980"
+      ],
+      "coordinates": [
+        -0.1159728,
+        51.5296594
+      ]
+    },
+    {
+      "id": "B23",
+      "tier": "B",
       "name": "Lina Stores King's Cross",
       "subtitle": "Italian restaurant and deli",
       "subtitleZh": "意大利餐厅兼熟食店",
@@ -1050,7 +1071,7 @@
       ]
     },
     {
-      "id": "B23",
+      "id": "B24",
       "tier": "B",
       "name": "Maison François",
       "subtitle": "French brasserie",
@@ -1088,7 +1109,7 @@
       ]
     },
     {
-      "id": "B24",
+      "id": "B25",
       "tier": "B",
       "name": "Med Salleh Viet",
       "subtitle": "Vietnamese pho and grills",
@@ -1114,7 +1135,7 @@
       ]
     },
     {
-      "id": "B25",
+      "id": "B26",
       "tier": "B",
       "name": "Murger Han",
       "subtitle": "Xi'an street food",
@@ -1141,7 +1162,7 @@
       ]
     },
     {
-      "id": "B26",
+      "id": "B27",
       "tier": "B",
       "name": "My Old Place",
       "subtitle": "Sichuan restaurant",
@@ -1163,7 +1184,28 @@
       ]
     },
     {
-      "id": "B27",
+      "id": "B28",
+      "tier": "B",
+      "name": "Naru",
+      "subtitle": "Korean restaurant",
+      "subtitleZh": "韩国餐厅",
+      "zone": "west-end",
+      "themes": [
+        "korean"
+      ],
+      "why": "A Korean restaurant on Shaftesbury Avenue, a short walk from Tottenham Court Road station.",
+      "whyZh": "沙夫茨伯里大道上的韩国餐厅，离托特纳姆法院路站步行不远。",
+      "address": "230 Shaftesbury Ave, London WC2H 8EG",
+      "links": [
+        "https://maps.google.com/?cid=14916936567434307204"
+      ],
+      "coordinates": [
+        -0.125892,
+        51.5167789
+      ]
+    },
+    {
+      "id": "B29",
       "tier": "B",
       "name": "PSV",
       "subtitle": "Lao restaurant",
@@ -1185,7 +1227,7 @@
       ]
     },
     {
-      "id": "B28",
+      "id": "B30",
       "tier": "B",
       "name": "Rasa",
       "subtitle": "Keralan vegetarian",
@@ -1224,7 +1266,7 @@
       ]
     },
     {
-      "id": "B29",
+      "id": "B31",
       "tier": "B",
       "name": "Renegade Urban Winery",
       "subtitle": "Urban winery and bistro",
@@ -1260,7 +1302,7 @@
       ]
     },
     {
-      "id": "B30",
+      "id": "B32",
       "tier": "B",
       "name": "Rice Coming Restaurant 米齊臨",
       "subtitle": "Hunan rice noodles",
@@ -1283,7 +1325,7 @@
       ]
     },
     {
-      "id": "B31",
+      "id": "B33",
       "tier": "B",
       "name": "Ristorante Olivelli",
       "subtitle": "Sicilian trattoria",
@@ -1319,7 +1361,7 @@
       ]
     },
     {
-      "id": "B32",
+      "id": "B34",
       "tier": "B",
       "name": "ROKA Aldwych",
       "subtitle": "Japanese robatayaki",
@@ -1346,7 +1388,7 @@
       ]
     },
     {
-      "id": "B33",
+      "id": "B35",
       "tier": "B",
       "name": "Roti King",
       "subtitle": "Malaysian roti canai",
@@ -1369,7 +1411,7 @@
       ]
     },
     {
-      "id": "B34",
+      "id": "B36",
       "tier": "B",
       "name": "Sagamiya",
       "subtitle": "Japanese home cooking",
@@ -1391,7 +1433,7 @@
       ]
     },
     {
-      "id": "B35",
+      "id": "B37",
       "tier": "B",
       "name": "Samad Al Iraqi Restaurant",
       "subtitle": "Iraqi restaurant",
@@ -1416,7 +1458,7 @@
       ]
     },
     {
-      "id": "B36",
+      "id": "B38",
       "tier": "B",
       "name": "Shujie Hotpot",
       "subtitle": "Hotpot restaurant",
@@ -1439,7 +1481,7 @@
       ]
     },
     {
-      "id": "B37",
+      "id": "B39",
       "tier": "B",
       "name": "Smoking Goat",
       "subtitle": "Thai bar and grill",
@@ -1477,7 +1519,65 @@
       ]
     },
     {
-      "id": "B38",
+      "id": "B40",
+      "tier": "B",
+      "name": "Sushinoen",
+      "subtitle": "Japanese restaurant",
+      "subtitleZh": "日本料理店",
+      "zone": "east",
+      "themes": [
+        "japanese"
+      ],
+      "why": "A Japanese restaurant a short walk from Aldgate East station, open since 2013, serving sushi and sashimi, hot rice and noodle dishes, and sukiyaki hot pot.",
+      "whyZh": "距奥德盖特东站步行不远的日本料理店，2013年开业，供应寿司和刺身、热腾腾的饭类和面类，以及寿喜烧火锅。",
+      "address": "2 White Church Ln, London E1 7QR",
+      "hours": "Mon–Sat 12:00–23:00; Sun 12:00–22:30; closed 15:00–17:00 Mon–Fri",
+      "hoursZh": "周一至周六 12:00–23:00；周日 12:00–22:30；周一至周五 15:00–17:00 休息",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "££",
+      "note": "Tables can be booked and takeaway ordered online through its website.",
+      "noteZh": "可通过官网在线订位和点外卖自取。",
+      "sourceUrl": "https://www.sushinoen.com/contact",
+      "links": [
+        "https://www.sushinoen.com",
+        "https://maps.google.com/?cid=1502181518303722544"
+      ],
+      "coordinates": [
+        -0.0691277,
+        51.5159921
+      ]
+    },
+    {
+      "id": "B41",
+      "tier": "B",
+      "name": "Taste of China",
+      "subtitle": "Chinese restaurant",
+      "subtitleZh": "中餐馆",
+      "zone": "west-end",
+      "themes": [
+        "chinese"
+      ],
+      "why": "A Chinese restaurant on Southampton Row, between Holborn and Russell Square.",
+      "whyZh": "南安普顿路上的中餐馆，位于霍尔本和罗素广场之间。",
+      "address": "84 Southampton Row, London WC1B 4BB",
+      "links": [
+        "https://maps.google.com/?cid=8274302550125119077"
+      ],
+      "coordinates": [
+        -0.1219071,
+        51.5198673
+      ]
+    },
+    {
+      "id": "B42",
       "tier": "B",
       "name": "Temaki",
       "subtitle": "Japanese hand roll bar",
@@ -1514,7 +1614,7 @@
       ]
     },
     {
-      "id": "B39",
+      "id": "B43",
       "tier": "B",
       "name": "The Clink Restaurant Brixton",
       "subtitle": "Prison training restaurant",
@@ -1548,7 +1648,7 @@
       ]
     },
     {
-      "id": "B40",
+      "id": "B44",
       "tier": "B",
       "name": "Tonkotsu Peckham",
       "subtitle": "Ramen bar",
@@ -1585,7 +1685,7 @@
       ]
     },
     {
-      "id": "B41",
+      "id": "B45",
       "tier": "B",
       "name": "Yashin Sushi",
       "subtitle": "Sushi counter and bar",
@@ -1884,6 +1984,29 @@
     {
       "id": "C10",
       "tier": "C",
+      "name": "Café East",
+      "subtitle": "Brunch café",
+      "subtitleZh": "早午餐咖啡馆",
+      "zone": "east",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A neighbourhood café on Roman Road in Bow, known for brunch and coffee.",
+      "whyZh": "鲍区罗曼路上的街坊咖啡馆，以早午餐和咖啡见长。",
+      "address": "426 Roman Rd, London E3 5LU",
+      "cost": "£",
+      "sourceUrl": "https://ratings.food.gov.uk/business/83818",
+      "links": [
+        "https://maps.google.com/?cid=13610886004880015846"
+      ],
+      "coordinates": [
+        -0.0347716,
+        51.5318788
+      ]
+    },
+    {
+      "id": "C11",
+      "tier": "C",
       "name": "Café Kitsuné",
       "subtitle": "Japanese-inspired cafe",
       "subtitleZh": "日式风格咖啡馆",
@@ -1906,7 +2029,7 @@
       ]
     },
     {
-      "id": "C11",
+      "id": "C12",
       "tier": "C",
       "name": "Calico Coffee",
       "subtitle": "Specialty coffee shop",
@@ -1929,7 +2052,7 @@
       ]
     },
     {
-      "id": "C12",
+      "id": "C13",
       "tier": "C",
       "name": "Carbon Kopi",
       "subtitle": "Specialty coffee shop",
@@ -1965,7 +2088,7 @@
       ]
     },
     {
-      "id": "C13",
+      "id": "C14",
       "tier": "C",
       "name": "Flat White",
       "subtitle": "Antipodean café",
@@ -1988,7 +2111,80 @@
       ]
     },
     {
-      "id": "C14",
+      "id": "C15",
+      "tier": "C",
+      "name": "Formative",
+      "subtitle": "Specialty coffee roaster",
+      "subtitleZh": "精品咖啡烘焙店",
+      "zone": "west-end",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A modern coffee shop tucked away between Westminster and Victoria, built around coffee it roasts itself.",
+      "whyZh": "藏在威斯敏斯特和维多利亚之间的现代咖啡店，一切围绕咖啡本身，咖啡豆由店家自己烘焙。",
+      "address": "4 Butler Pl, London SW1H 0RH",
+      "hours": "Mon–Fri 07:30–17:00; Sat–Sun 09:00–16:00",
+      "hoursZh": "周一至周五 07:30–17:00；周六至周日 09:00–16:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "sourceUrl": "https://formative.coffee/pages/coffeeshop",
+      "links": [
+        "https://formative.coffee",
+        "https://maps.google.com/?cid=10348831824875679263"
+      ],
+      "coordinates": [
+        -0.1354426,
+        51.4979102
+      ]
+    },
+    {
+      "id": "C16",
+      "tier": "C",
+      "name": "Good as Gold",
+      "subtitle": "Specialty coffee shop",
+      "subtitleZh": "精品咖啡馆",
+      "zone": "south",
+      "themes": [
+        "coffee-tea",
+        "british"
+      ],
+      "why": "An owner-run coffee shop a minute from Brockley station, with breakfast and seasonal lunch dishes by day. On Thursday and Friday evenings it serves a weekly-changing dinner menu with fresh pasta and cocktails.",
+      "whyZh": "离布洛克利站一分钟路程、由店主亲自经营的咖啡馆，白天供应早餐和应季午餐。周四、周五晚上提供每周更换的晚餐菜单，有手工新鲜意面和鸡尾酒。",
+      "address": "209 Mantle Road, London SE4 2EW",
+      "hours": "Mon–Fri 7:30–16:30; Thu and Fri dinner 18:00–22:30; Sat–Sun 8:00–15:00",
+      "hoursZh": "周一至周五 7:30–16:30；周四、周五晚餐 18:00–22:30；周六、周日 8:00–15:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "cost": "£",
+      "note": "Dinner is only on Thursday and Friday evenings; tables can be booked through its website.",
+      "noteZh": "晚餐仅限周四和周五晚上；可通过官网订位。",
+      "sourceUrl": "https://goodasgoldldn.com/pages/menu",
+      "links": [
+        "https://goodasgoldldn.com",
+        "https://maps.google.com/?cid=18075902351813006385"
+      ],
+      "coordinates": [
+        -0.0389627,
+        51.4636206
+      ]
+    },
+    {
+      "id": "C17",
       "tier": "C",
       "name": "H.R. Higgins",
       "subtitle": "Coffee and tea merchant",
@@ -2023,7 +2219,7 @@
       ]
     },
     {
-      "id": "C15",
+      "id": "C18",
       "tier": "C",
       "name": "Hagen Espresso Bar",
       "subtitle": "Espresso bar",
@@ -2045,7 +2241,40 @@
       ]
     },
     {
-      "id": "C16",
+      "id": "C19",
+      "tier": "C",
+      "name": "Hopper Coffee",
+      "subtitle": "Coffee shop",
+      "subtitleZh": "咖啡店",
+      "zone": "west-end",
+      "themes": [
+        "coffee-tea"
+      ],
+      "why": "A weekday coffee stop on Gray's Inn Road, one of a handful of London shops run by the Hopper group. Handy for a morning coffee between Holborn and King's Cross.",
+      "whyZh": "格雷律师学院路上的工作日咖啡店，是Hopper在伦敦的几家分店之一，适合在霍尔本和国王十字之间顺路喝杯早咖啡。",
+      "address": "81b Gray's Inn Rd, London WC1X 8TP",
+      "hours": "Mon–Fri 07:00–16:00",
+      "hoursZh": "周一至周五 07:00–16:00",
+      "open": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri"
+      ],
+      "cost": "£",
+      "sourceUrl": "https://www.hopper.coffee/visit-us",
+      "links": [
+        "https://www.hopper.coffee",
+        "https://maps.google.com/?cid=2336609626103905966"
+      ],
+      "coordinates": [
+        -0.1146956,
+        51.5228779
+      ]
+    },
+    {
+      "id": "C20",
       "tier": "C",
       "name": "Host Café",
       "subtitle": "Church café",
@@ -2079,7 +2308,7 @@
       ]
     },
     {
-      "id": "C17",
+      "id": "C21",
       "tier": "C",
       "name": "Kaffeine",
       "subtitle": "Espresso bar and café",
@@ -2115,7 +2344,7 @@
       ]
     },
     {
-      "id": "C18",
+      "id": "C22",
       "tier": "C",
       "name": "Kanpai London Sake Brewery & Taproom",
       "subtitle": "Sake brewery and taproom",
@@ -2149,7 +2378,7 @@
       ]
     },
     {
-      "id": "C19",
+      "id": "C23",
       "tier": "C",
       "name": "Le Chocolat Alain Ducasse",
       "subtitle": "Chocolate shop",
@@ -2173,7 +2402,7 @@
       ]
     },
     {
-      "id": "C20",
+      "id": "C24",
       "tier": "C",
       "name": "Le Choux",
       "subtitle": "Choux pastry bakery",
@@ -2207,7 +2436,7 @@
       ]
     },
     {
-      "id": "C21",
+      "id": "C25",
       "tier": "C",
       "name": "Lounge Bohemia",
       "subtitle": "Hidden cocktail bar",
@@ -2234,7 +2463,7 @@
       ]
     },
     {
-      "id": "C22",
+      "id": "C26",
       "tier": "C",
       "name": "Mehmet Efendi",
       "subtitle": "Turkish dessert café",
@@ -2258,7 +2487,7 @@
       ]
     },
     {
-      "id": "C23",
+      "id": "C27",
       "tier": "C",
       "name": "Moonstruck Cafe",
       "subtitle": "Specialist coffee shop",
@@ -2294,7 +2523,7 @@
       ]
     },
     {
-      "id": "C24",
+      "id": "C28",
       "tier": "C",
       "name": "Nightjar",
       "subtitle": "Jazz cocktail bar",
@@ -2318,7 +2547,32 @@
       ]
     },
     {
-      "id": "C25",
+      "id": "C29",
+      "tier": "C",
+      "name": "NOLA",
+      "subtitle": "Specialty coffee shop",
+      "subtitleZh": "精品咖啡馆",
+      "zone": "south",
+      "themes": [
+        "coffee-tea",
+        "sweets"
+      ],
+      "why": "A small independent coffee shop on Rye Lane serving single-origin coffee with homemade pastries, sandwiches and cookies. Handy for a slow morning near Peckham Rye station.",
+      "whyZh": "位于 Rye Lane 的独立小咖啡馆，供应单品咖啡，搭配自制的糕点、三明治和曲奇。适合在佩卡姆莱站附近悠闲地过个早晨。",
+      "address": "224 Rye Lane, London SE15 4NL",
+      "cost": "£",
+      "sourceUrl": "https://roadbook.com/london/city-guide/best-coffee-shops-london/",
+      "links": [
+        "https://www.nolacoffee.co.uk",
+        "https://maps.google.com/?cid=6512480619407901078"
+      ],
+      "coordinates": [
+        -0.066208,
+        51.466349
+      ]
+    },
+    {
+      "id": "C30",
       "tier": "C",
       "name": "Nostos Coffee",
       "subtitle": "Specialty coffee café",
@@ -2341,7 +2595,7 @@
       ]
     },
     {
-      "id": "C26",
+      "id": "C31",
       "tier": "C",
       "name": "Omotesando Koffee",
       "subtitle": "Japanese specialty coffee",
@@ -2365,7 +2619,7 @@
       ]
     },
     {
-      "id": "C27",
+      "id": "C32",
       "tier": "C",
       "name": "Origin Coffee (Scoresby Street)",
       "subtitle": "Specialty coffee shop",
@@ -2389,7 +2643,7 @@
       ]
     },
     {
-      "id": "C28",
+      "id": "C33",
       "tier": "C",
       "name": "Pierre Marcolini",
       "subtitle": "Belgian chocolatier and patisserie",
@@ -2413,7 +2667,7 @@
       ]
     },
     {
-      "id": "C29",
+      "id": "C34",
       "tier": "C",
       "name": "Prufrock Coffee",
       "subtitle": "Specialty coffee shop",
@@ -2447,7 +2701,7 @@
       ]
     },
     {
-      "id": "C30",
+      "id": "C35",
       "tier": "C",
       "name": "Qima Café",
       "subtitle": "Yemeni coffee café",
@@ -2473,7 +2727,7 @@
       ]
     },
     {
-      "id": "C31",
+      "id": "C36",
       "tier": "C",
       "name": "Ronnie Scott's",
       "subtitle": "Jazz club and bar",
@@ -2501,7 +2755,7 @@
       ]
     },
     {
-      "id": "C32",
+      "id": "C37",
       "tier": "C",
       "name": "Rosslyn Coffee London Wall",
       "subtitle": "Specialty coffee shop",
@@ -2534,7 +2788,7 @@
       ]
     },
     {
-      "id": "C33",
+      "id": "C38",
       "tier": "C",
       "name": "Scenery",
       "subtitle": "Café and coffee roastery",
@@ -2567,7 +2821,7 @@
       ]
     },
     {
-      "id": "C34",
+      "id": "C39",
       "tier": "C",
       "name": "Special Guests Coffee",
       "subtitle": "Specialty coffee shop",
@@ -2604,7 +2858,7 @@
       ]
     },
     {
-      "id": "C35",
+      "id": "C40",
       "tier": "C",
       "name": "Swift Soho",
       "subtitle": "Cocktail bar",
@@ -2642,7 +2896,7 @@
       ]
     },
     {
-      "id": "C36",
+      "id": "C41",
       "tier": "C",
       "name": "T4 Waterloo",
       "subtitle": "Taiwanese bubble tea",
@@ -2665,7 +2919,7 @@
       ]
     },
     {
-      "id": "C37",
+      "id": "C42",
       "tier": "C",
       "name": "The Dusty Knuckle",
       "subtitle": "Bakery and café",
@@ -2703,7 +2957,7 @@
       ]
     },
     {
-      "id": "C38",
+      "id": "C43",
       "tier": "C",
       "name": "The Original Maids of Honour",
       "subtitle": "Historic tearoom and bakery",
@@ -2743,7 +2997,33 @@
       ]
     },
     {
-      "id": "C39",
+      "id": "C44",
+      "tier": "C",
+      "name": "Troy Bar",
+      "subtitle": "Live-music bar, Caribbean food",
+      "subtitleZh": "现场音乐酒吧，加勒比美食",
+      "zone": "east",
+      "themes": [
+        "drinks"
+      ],
+      "why": "A long-running Hoxton bar just off Old Street with live music and open-mic nights through the week. By day it sells Caribbean food, mainly as takeaway.",
+      "whyZh": "位于老街附近霍克斯顿的老牌酒吧，每周多个晚上有现场音乐和开放麦。白天供应加勒比风味餐食，以外卖为主。",
+      "address": "10 Hoxton St, London N1 6NG",
+      "cost": "£",
+      "note": "Live music and open mics Tuesday to Saturday from 8pm; by day the food is mostly takeaway.",
+      "noteZh": "周二至周六晚上8点起有现场音乐和开放麦；白天的餐食以外卖为主。",
+      "sourceUrl": "https://www.threads.com/@troybarofficial",
+      "links": [
+        "https://troybar.co.uk",
+        "https://maps.google.com/?cid=11398910316781699420"
+      ],
+      "coordinates": [
+        -0.0800624,
+        51.5276203
+      ]
+    },
+    {
+      "id": "C45",
       "tier": "C",
       "name": "WatchHouse Roastery",
       "subtitle": "Coffee roastery and café",

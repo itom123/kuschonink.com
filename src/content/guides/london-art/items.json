@@ -610,6 +610,31 @@
     {
       "id": "C1",
       "tier": "C",
+      "name": "180 Studios",
+      "subtitle": "Creative and exhibition centre",
+      "subtitleZh": "创意与展览中心",
+      "zone": "west-end",
+      "themes": [
+        "contemporary"
+      ],
+      "why": "A Brutalist building on the Strand turned into a creative centre that opens to the public for large, ticketed installations and shows. It also has restaurants and cafés.",
+      "whyZh": "河岸街上的粗野主义建筑，如今改造成创意中心，向公众开放大型售票装置展和演出，楼内还有餐厅和咖啡馆。",
+      "address": "6 Surrey St, London WC2R 2ND",
+      "note": "Shows are ticketed with timed slots, so book online. Ryoji Ikeda's data-cosm [n°1] runs until 20 December 2026.",
+      "noteZh": "展览按时段售票，请在线预约。池田亮司的 data-cosm [n°1] 展至2026年12月20日。",
+      "sourceUrl": "https://www.180studios.com/data-cosm",
+      "links": [
+        "https://180studios.com",
+        "https://maps.google.com/?cid=3793786891128910803"
+      ],
+      "coordinates": [
+        -0.1150753,
+        51.5124516
+      ]
+    },
+    {
+      "id": "C2",
+      "tier": "C",
       "name": "Copeland Gallery",
       "subtitle": "Project space and exhibition hall",
       "subtitleZh": "项目空间与展览厅",
@@ -634,7 +659,7 @@
       ]
     },
     {
-      "id": "C2",
+      "id": "C3",
       "tier": "C",
       "name": "Curzon Bloomsbury",
       "subtitle": "Independent cinema",
