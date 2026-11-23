@@ -441,6 +441,32 @@
     {
       "id": "C1",
       "tier": "C",
+      "name": "AMI Paris",
+      "subtitle": "Paris fashion label",
+      "subtitleZh": "巴黎时装品牌",
+      "by": "Alexandre Mattiussi",
+      "zone": "west",
+      "themes": [
+        "fashion"
+      ],
+      "why": "A temporary Sloane Street shop for the Paris label, with its menswear, womenswear and accessories.",
+      "whyZh": "巴黎品牌 AMI 在斯隆街的临时门店，出售男装、女装和配饰。",
+      "address": "135 Sloane St, London SW1X 9AX",
+      "note": "Temporary: an 18-month pop-up that opened in May 2026.",
+      "noteZh": "临时门店：2026年5月开业的快闪店，为期18个月。",
+      "sourceUrl": "https://www.theindustry.fashion/ami-paris-to-open-long-term-pop-up-on-chelseas-sloane-street/",
+      "links": [
+        "https://www.amiparis.com",
+        "https://maps.google.com/?cid=14036935440682940643"
+      ],
+      "coordinates": [
+        -0.1582628,
+        51.4934119
+      ]
+    },
+    {
+      "id": "C2",
+      "tier": "C",
       "name": "Arc'teryx Piccadilly",
       "subtitle": "Technical outdoor clothing",
       "subtitleZh": "专业户外服饰",
@@ -472,7 +498,7 @@
       ]
     },
     {
-      "id": "C2",
+      "id": "C3",
       "tier": "C",
       "name": "Carhartt WIP Store London Covent Garden",
       "subtitle": "Workwear-inspired streetwear",
@@ -505,7 +531,7 @@
       ]
     },
     {
-      "id": "C3",
+      "id": "C4",
       "tier": "C",
       "name": "North End Road Market",
       "subtitle": "Fulham street market",
@@ -542,7 +568,7 @@
       ]
     },
     {
-      "id": "C4",
+      "id": "C5",
       "tier": "C",
       "name": "Red Wing Shoe Store London",
       "subtitle": "Heritage boot shop",
@@ -576,7 +602,7 @@
       ]
     },
     {
-      "id": "C5",
+      "id": "C6",
       "tier": "C",
       "name": "Tian Tian Market 天天超市 Aldgate",
       "subtitle": "Asian supermarket",

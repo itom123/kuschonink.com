@@ -210,6 +210,32 @@
     {
       "id": "B1",
       "tier": "B",
+      "name": "Artwords Bookshop",
+      "subtitle": "Art and design bookshop",
+      "subtitleZh": "艺术与设计书店",
+      "zone": "east",
+      "themes": [
+        "art-photography",
+        "design"
+      ],
+      "why": "An independent Broadway Market shop for books on contemporary visual culture, mostly fine art, with photography, graphic design, architecture, fashion and magazines too. Handy for browsing before or after the market.",
+      "whyZh": "百老汇市集上的独立书店，专营当代视觉文化图书，以当代美术为主，也有摄影、平面设计、建筑、时尚类图书和杂志。逛市集前后都适合顺道翻翻。",
+      "address": "20-22 Broadway Market, London E8 4QJ",
+      "note": "Its website was being rebuilt in November 2026, so check it is open before a special trip.",
+      "noteZh": "其官网在2026年11月正在改版，专程前往前请先确认是否营业。",
+      "sourceUrl": "https://www.timeout.com/london/books/londons-best-bookshops",
+      "links": [
+        "https://artwords.co.uk",
+        "https://maps.google.com/?cid=13931794544911031758"
+      ],
+      "coordinates": [
+        -0.0618164,
+        51.5361471
+      ]
+    },
+    {
+      "id": "B2",
+      "tier": "B",
       "name": "Donlon Books",
       "subtitle": "Art and photography books",
       "subtitleZh": "艺术摄影书店",
@@ -230,7 +256,7 @@
       ]
     },
     {
-      "id": "B2",
+      "id": "B3",
       "tier": "B",
       "name": "Gay's The Word",
       "subtitle": "LGBTQ+ bookshop",
@@ -262,7 +288,7 @@
       ]
     },
     {
-      "id": "B3",
+      "id": "B4",
       "tier": "B",
       "name": "Kirkdale Bookshop",
       "subtitle": "Independent bookshop",
@@ -295,7 +321,7 @@
       ]
     },
     {
-      "id": "B4",
+      "id": "B5",
       "tier": "B",
       "name": "Lutyens & Rubinstein",
       "subtitle": "Independent bookshop",
@@ -318,7 +344,7 @@
       ]
     },
     {
-      "id": "B5",
+      "id": "B6",
       "tier": "B",
       "name": "Newham Bookshop",
       "subtitle": "Community bookshop",
@@ -349,7 +375,7 @@
       ]
     },
     {
-      "id": "B6",
+      "id": "B7",
       "tier": "B",
       "name": "Nomad Books",
       "subtitle": "Independent bookshop",
@@ -382,7 +408,7 @@
       ]
     },
     {
-      "id": "B7",
+      "id": "B8",
       "tier": "B",
       "name": "Owl Bookshop",
       "subtitle": "Independent bookshop",
@@ -415,7 +441,7 @@
       ]
     },
     {
-      "id": "B8",
+      "id": "B9",
       "tier": "B",
       "name": "Persephone Books",
       "subtitle": "Publisher and bookshop",
@@ -446,7 +472,7 @@
       ]
     },
     {
-      "id": "B9",
+      "id": "B10",
       "tier": "B",
       "name": "Presse Books",
       "subtitle": "Arts bookshop and café",
@@ -478,7 +504,7 @@
       ]
     },
     {
-      "id": "B10",
+      "id": "B11",
       "tier": "B",
       "name": "Primrose Hill Books",
       "subtitle": "Independent bookshop",
@@ -511,7 +537,7 @@
       ]
     },
     {
-      "id": "B11",
+      "id": "B12",
       "tier": "B",
       "name": "Review",
       "subtitle": "Independent bookshop",
@@ -534,7 +560,7 @@
       ]
     },
     {
-      "id": "B12",
+      "id": "B13",
       "tier": "B",
       "name": "Sotheran's Rare Books & Prints",
       "subtitle": "Antiquarian bookshop",
@@ -567,7 +593,7 @@
       ]
     },
     {
-      "id": "B13",
+      "id": "B14",
       "tier": "B",
       "name": "Stanfords",
       "subtitle": "Travel books and maps",
@@ -590,7 +616,7 @@
       ]
     },
     {
-      "id": "B14",
+      "id": "B15",
       "tier": "B",
       "name": "Swedenborg House",
       "subtitle": "Society bookshop and gallery",
@@ -623,7 +649,7 @@
       ]
     },
     {
-      "id": "B15",
+      "id": "B16",
       "tier": "B",
       "name": "Tenderbooks",
       "subtitle": "Art and design bookshop",
@@ -656,7 +682,7 @@
       ]
     },
     {
-      "id": "B16",
+      "id": "B17",
       "tier": "B",
       "name": "The Broadway Bookshop",
       "subtitle": "Independent bookshop",
@@ -690,7 +716,7 @@
       ]
     },
     {
-      "id": "B17",
+      "id": "B18",
       "tier": "B",
       "name": "Word On The Water - The London Bookbarge",
       "subtitle": "Floating bookshop",
